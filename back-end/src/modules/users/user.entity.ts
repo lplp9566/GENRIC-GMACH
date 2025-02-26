@@ -1,6 +1,7 @@
 import { UserRole } from "src/types/userTypes";
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PaymentDetailsEntity } from "./payment-details/payment_details.entity";
+import { LoanEntity } from "../loans/loans.entity";
 
 @Entity('users')
 export class UserEntity {
@@ -13,8 +14,8 @@ export class UserEntity {
     @Column()
     last_name :string ;
 
-    @Column()
-    join_data :string ;
+    @Column({type:"date"})
+    join_data :Date ;
 
     @Column()
     password :string ;
@@ -30,4 +31,7 @@ export class UserEntity {
 
     @OneToOne(() => PaymentDetailsEntity, (paymentDetails) => paymentDetails.user, { cascade: true })
     payment_details: PaymentDetailsEntity;
+
+    @OneToMany(() => LoanEntity, (loan) => loan.user, { cascade: true })
+    loans: LoanEntity[];
 }
