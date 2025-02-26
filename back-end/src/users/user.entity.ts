@@ -1,5 +1,6 @@
 import { UserRole } from "src/types/userTypes";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { PaymentDetailsEntity } from "./payment-details/payment_details.entity";
 
 @Entity('users')
 export class UserEntity {
@@ -19,15 +20,6 @@ export class UserEntity {
     password :string ;
 
     @Column()
-    bank_number : number ;
-
-    @Column()
-    bank_branch :number;
-
-    @Column()
-    bank_account_number:number
-
-    @Column()
     phone_number:string
 
     @Column()
@@ -35,4 +27,7 @@ export class UserEntity {
 
     @Column()
     is_admin :boolean
+
+    @OneToOne(() => PaymentDetailsEntity, (paymentDetails) => paymentDetails.user, { cascade: true })
+    payment_details: PaymentDetailsEntity;
 }
