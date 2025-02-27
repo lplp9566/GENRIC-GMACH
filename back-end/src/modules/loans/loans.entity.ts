@@ -16,19 +16,19 @@ export class LoanEntity {
   @ManyToOne(() => UserEntity, (user) => user.loans, { onDelete: 'CASCADE' })
   user: UserEntity;
 
-  @Column({type:"date"})
+  @Column({ type: "float" })
   loan_amount: number;
 
-  @Column()
+  @Column({ type: "date" }) 
   loan_date: Date;
 
-  @Column()
+  @Column({ type: "float" })
   monthly_payment: number;
 
-  @Column()
-  payment_date:number;
+  @Column({ type: "int" }) 
+  payment_date: number;
 
-  @Column()
+  @Column({ type: "float", nullable: true }) 
   remaining_balance: number;
 
   @OneToMany(() => LoanPaymentEntity, (payment) => payment.loan, {

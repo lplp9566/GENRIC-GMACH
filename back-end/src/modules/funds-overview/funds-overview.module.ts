@@ -8,6 +8,6 @@ import { FundsOverviewEntity } from './funds-overview.entity';
   imports: [TypeOrmModule.forFeature([FundsOverviewEntity])],
   providers: [FundsOverviewService],
   controllers: [FundsOverviewController],
-  exports: [FundsOverviewService], // חשוב לייצא כדי שמודולים אחרים יוכלו להשתמש בזה
+  exports: [FundsOverviewService,TypeOrmModule], 
 })
 export class FundsOverviewModule {}
