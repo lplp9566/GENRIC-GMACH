@@ -11,7 +11,7 @@ export class FundsOverviewController {
   }
   @Get()
   async getFundsOverview() {
-    return await this.fundsOverviewService.getFundsOverview();
+    return await this.fundsOverviewService.getFundsOverviewRecord();
   }
   @Post('/monthly-deposit')
   async addMonthlyDeposit(@Body() body: { amount: number }) {
@@ -39,7 +39,7 @@ export class FundsOverviewController {
     }   
     @Patch('/update-fund-details')
     async updateFundDetails(@Body() body: { fundName: string, amount: number }) {
-        return await this.fundsOverviewService.updateFund(body.fundName, body.amount);
+        return await this.fundsOverviewService.updateFundDetails(body.fundName, body.amount);
     }
 
 }

@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { FundsOverviewService } from './funds-overview.service';
 import { FundsOverviewController } from './funds-overview.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { FundsOverviewEntity } from './funds-overview.entity';
 
 @Module({
-     providers: [FundsOverviewService],
-     controllers: [FundsOverviewController],
-     imports: [TypeOrmModule.forFeature([FundsOverviewEntity])],
-     exports: [FundsOverviewService]
+  imports: [TypeOrmModule.forFeature([FundsOverviewEntity])],
+  providers: [FundsOverviewService],
+  controllers: [FundsOverviewController],
+  exports: [FundsOverviewService], // חשוב לייצא כדי שמודולים אחרים יוכלו להשתמש בזה
 })
 export class FundsOverviewModule {}

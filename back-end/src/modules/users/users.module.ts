@@ -5,10 +5,11 @@ import { UsersService } from './users.service';
 import { UserEntity } from './user.entity';
 import { PaymentDetailsModule } from './payment-details/payment-details.module'; // ✅ נייבא את מודול התשלומים
 
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity]),
-    PaymentDetailsModule, 
+    PaymentDetailsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

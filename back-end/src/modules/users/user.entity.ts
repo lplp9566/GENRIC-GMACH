@@ -2,6 +2,7 @@ import { UserRole } from "src/types/userTypes";
 import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PaymentDetailsEntity } from "./payment-details/payment_details.entity";
 import { LoanEntity } from "../loans/loans.entity";
+import { UserFinancialsEntity } from "./user-financials/user-financials.entity";
 
 @Entity('users')
 export class UserEntity {
@@ -37,4 +38,7 @@ export class UserEntity {
 
     @OneToMany(() => LoanEntity, (loan) => loan.user, { cascade: true })
     loans: LoanEntity[];
+
+    @OneToMany(() => UserFinancialsEntity, (financials) => financials.user, { cascade: true })
+    financials: UserFinancialsEntity[];
 }

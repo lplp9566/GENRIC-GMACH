@@ -15,4 +15,10 @@ describe('FundsOverviewController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
+  it('should return an array of funds', async () => {
+    expect(await controller.getFundsOverview()).toBeInstanceOf(Array);
+  });
+  it('should return an array of funds', async () => {
+    expect(await controller.getFundsOverview()).toHaveLength(0);
+  });
 });

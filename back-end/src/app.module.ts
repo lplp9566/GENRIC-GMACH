@@ -10,6 +10,11 @@ import { LoanPaymentsModule } from './modules/loans/loan-payments/loan-payments.
 import { LoansController } from './modules/loans/loans.controller';
 import { LoansService } from './modules/loans/loans.service';
 import { LoansModule } from './modules/loans/loans.module';
+import { UserFinancialsModule } from './modules/users/user-financials/user-financials.module';
+import { ExpensesService } from './modules/expenses/expenses.service';
+import { ExpensesModule } from './modules/expenses/expenses.module';
+import { PaymentDetailsModule } from './modules/users/payment-details/payment-details.module';
+import { UserDepositsModule } from './modules/users/user_deposits/user_deposits.module';
 
 @Module({
   imports: [
@@ -28,9 +33,14 @@ import { LoansModule } from './modules/loans/loans.module';
     LoansModule,
     LoanPaymentsModule,
     FundsOverviewModule,
+    UserFinancialsModule,
+    ExpensesModule,
+    PaymentDetailsModule,
+    UserDepositsModule, 
     // AuthModule,
 
   ],
+  providers: [ExpensesService],
 
 
 })
