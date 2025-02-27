@@ -24,7 +24,6 @@ export class LoansService {
     if (!loan) {
       throw new Error('Loan not found');
     }
-    console.log(loan)
     const newPayment = this.paymentsRepository.create({
       loan: loan,
       payment_date: paymentData.payment_date,

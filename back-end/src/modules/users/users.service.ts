@@ -43,4 +43,9 @@ export class UsersService {
   async getUserByIdNumber(id_number: string): Promise<UserEntity | null> {
     return this.usersRepository.findOne({ where: { id: Number(id_number) } });
   }
+  async getAllUsers():Promise<UserEntity[]| null > {
+    return this.usersRepository.find()
+
+  } 
+
 }

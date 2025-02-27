@@ -21,6 +21,9 @@ export class UserEntity {
     password :string ;
 
     @Column()
+    email_address:string
+    
+    @Column()
     phone_number:string
 
     @Column()
