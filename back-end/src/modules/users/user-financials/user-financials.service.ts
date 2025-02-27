@@ -20,10 +20,12 @@ export class UserFinancialsService {
           record = this.userFinancialsRepository.create({
             user,
             year,
-            total_deposits: 0,
+            total_monthly_deposits: 0,
             total_donations: 0,
             total_loans_taken: 0,
             total_loans_repaid: 0,
+            total_fixed_deposits_added: 0,
+            total_fixed_deposits_withdrawn: 0,
           });
       
           await this.userFinancialsRepository.save(record);
@@ -33,7 +35,7 @@ export class UserFinancialsService {
       }
     async recordMonthlyDeposit(user: UserEntity, year: number, amount: number) {      
     const record = await this.getOrCreateFinancialRecord(user, year);
-    record.total_deposits += amount;
+    record.total_monthly_deposits += amount;
     return this.userFinancialsRepository.save(record);  
     }
     async recordDonation(user: UserEntity, year: number, amount: number) {
@@ -52,6 +54,16 @@ export class UserFinancialsService {
         return this.userFinancialsRepository.save(record);
       } 
       
+    async recordFixedDepositAdded(user: UserEntity, year: number, amount: number) {
+        const record = await this.getOrCreateFinancialRecord(user, year);
+        record.total_fixed_deposits_added += amount;
+        return this.userFinancialsRepository.save(record);
+      }
+    async recordFixedDepositWithdrawn(user: UserEntity, year: number, amount: number) {
+        const record = await this.getOrCreateFinancialRecord(user, year);
+        record.total_fixed_deposits_withdrawn += amount;
+        return this.userFinancialsRepository.save(record);
+      }
 
     
 }

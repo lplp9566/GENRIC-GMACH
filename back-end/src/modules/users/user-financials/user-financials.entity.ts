@@ -13,7 +13,7 @@ export class UserFinancialsEntity {
   year: number; // ✅ השנה של הנתונים
 
   @Column({type :"float" })
-  total_deposits: number; // ✅ סך ההפקדות החודשיות באותה שנה
+  total_monthly_deposits: number; // ✅ סך ההפקדות החודשיות באותה שנה
 
   @Column({ type: 'float' })
   total_donations: number; // ✅ סך התרומות באותה שנה
@@ -23,4 +23,10 @@ export class UserFinancialsEntity {
     
   @Column({type :"float" }) 
   total_loans_repaid: number; // ✅ סך ההחזרים של הלוואות באותה שנה
+
+  @Column({ type: 'float', default: 0 })
+  total_fixed_deposits_added: number; // ✅ כמה כסף הופקד לפקדונות השנה
+
+  @Column({ type: 'float', default: 0 })
+  total_fixed_deposits_withdrawn: number; // ✅ כמה כסף נמשך מהפקדונות השנה
 }
