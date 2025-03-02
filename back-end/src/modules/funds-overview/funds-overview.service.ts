@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FundsOverviewEntity } from './funds-overview.entity';
 import { Repository } from 'typeorm';
+import { log } from 'console';
+import { ApiResponse } from 'src/utils/response.utils';
 
 @Injectable()
 export class FundsOverviewService {
@@ -63,7 +65,7 @@ async initializeFundsOverview(initialAmount: number) {
       fund.available_funds += amount;
       fund.donations_received += amount;
       await this.fundsOverviewRepository.save(fund);
-      return fund;
+      return ApiResponse.success(fund);
     } catch (error) {
       return error.message;
     }
@@ -93,7 +95,6 @@ async initializeFundsOverview(initialAmount: number) {
   async addSpecialFund(fundName: string, amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
-
       if (!fund.fund_details) {
         fund.fund_details = {};
       }
@@ -169,7 +170,7 @@ async initializeFundsOverview(initialAmount: number) {
       await this.fundsOverviewRepository.save(fund);
       return fund;
     } catch (error) {
-      return error.message;
+      return ApiResponse.error(error.message)
     }
   }
 }

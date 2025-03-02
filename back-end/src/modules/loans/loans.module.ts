@@ -8,10 +8,12 @@ import { UserFinancialsService } from '../users/user-financials/user-financials.
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialsModule } from '../users/user-financials/user-financials.module';
 import { FundsOverviewModule } from '../funds-overview/funds-overview.module';
+import { UsersService } from '../users/users.service';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LoanEntity, LoanPaymentEntity,]),  UserFinancialsModule,FundsOverviewModule],
-  providers: [LoansService, UserFinancialsService, FundsOverviewService],
+  imports: [TypeOrmModule.forFeature([LoanEntity, LoanPaymentEntity,]),  UserFinancialsModule,FundsOverviewModule,UsersModule],
+  providers: [LoansService,],
   controllers: [LoansController],
   exports: [LoansService, TypeOrmModule],
 })

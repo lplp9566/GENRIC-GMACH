@@ -15,6 +15,8 @@ import { ExpensesService } from './modules/expenses/expenses.service';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { PaymentDetailsModule } from './modules/users/payment-details/payment-details.module';
 import { UserDepositsModule } from './modules/users/user_deposits/user_deposits.module';
+import { MonthlyDepositsModule } from './modules/monthly_deposits/monthly_deposits.module';
+import { DonationsModule } from './modules/donations/donations.module';
 
 @Module({
   imports: [
@@ -36,7 +38,9 @@ import { UserDepositsModule } from './modules/users/user_deposits/user_deposits.
     UserFinancialsModule,
     ExpensesModule,
     PaymentDetailsModule,
-    UserDepositsModule, 
+    UserDepositsModule,
+    MonthlyDepositsModule,
+    DonationsModule, 
     // AuthModule,
 
   ],

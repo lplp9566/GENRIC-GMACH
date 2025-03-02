@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { LoanEntity } from '../loans.entity';
+import { UserDebtsEntity } from 'src/modules/users/user_debts/user_debts.entity';
 
 @Entity('loan_payments')
 export class LoanPaymentEntity {
@@ -14,4 +15,7 @@ export class LoanPaymentEntity {
 
   @Column()
   amount_paid: number;
+  
+//   @OneToMany(() => UserDebtsEntity, (debt) => debt.loan_payment)
+//   debt: UserDebtsEntity;
 }

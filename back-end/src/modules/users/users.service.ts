@@ -37,7 +37,16 @@ export class UsersService {
   
   }
   async getUserById(id: number): Promise<UserEntity | null> {
-    return this.usersRepository.findOne({ where: { id } });
+    try {
+      const user =   this.usersRepository.findOne({ where: { id } });
+      if(!user){
+        throw new Error("user not fund")
+      }
+      return user
+    } catch (error) {
+      return error.message
+    }
+   
   }
 
   async getUserByIdNumber(id_number: string): Promise<UserEntity | null> {

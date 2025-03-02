@@ -7,7 +7,8 @@ import { AddPaymentDto } from 'src/types/loanTypes';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewEntity } from '../funds-overview/funds-overview.entity';
-
+import { UsersService } from '../users/users.service';
+import { getYearFromDate } from '../../services/services';
 @Injectable()
 export class LoansService {
   constructor(
@@ -17,21 +18,10 @@ export class LoansService {
     private paymentsRepository: Repository<LoanPaymentEntity>,
     private readonly user_financialsService: UserFinancialsService,
     private readonly fundsOverviewService: FundsOverviewService,
+    private readonly usersService:UsersService,
   ) {}
   
-  async getYearRromDate(date: Date): Promise<number> {
-    try {
-      const newDate = new Date(date);
-      if (isNaN(newDate.getTime())) {
-       throw new Error(`Invalid loan_date: ${newDate}`);
-     }
-      return newDate.getFullYear();
-   } 
-     catch (error) {
-      return error.message;
-    }
-  }
-  
+
 
   async createLoan(loanData: Partial<LoanEntity>): Promise<LoanEntity> {
     try {
@@ -42,11 +32,13 @@ export class LoansService {
       }
       const newLoan = this.loansRepository.create(loanData);
       newLoan.remaining_balance = newLoan.loan_amount;
-     const year = await this.getYearRromDate(newLoan.loan_date);
-
-
+     const year =  getYearFromDate(newLoan.loan_date);
+      const user = await this.usersService.getUserById(Number(newLoan.user));
+      if (!user) {
+        throw new Error('User not found');
+      }
       await this.user_financialsService.recordLoanTaken(
-        newLoan.user,
+        user,
         year,
         newLoan.loan_amount,
       );
@@ -59,28 +51,35 @@ export class LoansService {
   }
 
   async addPayment(paymentData: AddPaymentDto): Promise<LoanPaymentEntity> {
-    const loan = await this.loansRepository.findOne({
-      where: { id: paymentData.loanId },
-    });
-    if (!loan) {
-      throw new Error('Loan not found');
+    try {
+      const loan = await this.loansRepository.findOne({
+        where: { id: paymentData.loanId },
+        relations: ['user'],
+      });
+      if (!loan) {
+        throw new Error('Loan not found');
+      }
+      const newPayment = this.paymentsRepository.create({
+        loan: loan,
+        payment_date: paymentData.payment_date,
+        amount_paid: paymentData.amount_paid,
+      });
+      await this.paymentsRepository.save(newPayment);
+      loan.remaining_balance -= paymentData.amount_paid;
+  
+      await this.loansRepository.save(loan);
+      const year = getYearFromDate(newPayment.payment_date);
+      await this.user_financialsService.recordLoanRepaid(
+        loan.user,
+        year,
+        paymentData.amount_paid,
+      );
+      await this.fundsOverviewService.repayLoan(paymentData.amount_paid);
+      return newPayment;
+      
+    } catch (error) {
+      return error.message;
     }
-    const newPayment = this.paymentsRepository.create({
-      loan: loan,
-      payment_date: paymentData.payment_date,
-      amount_paid: paymentData.amount_paid,
-    });
-    await this.paymentsRepository.save(newPayment);
-    loan.remaining_balance -= paymentData.amount_paid;
-
-    await this.loansRepository.save(loan);
-    const year = await this.getYearRromDate(newPayment.payment_date);
-    await this.user_financialsService.recordLoanRepaid(
-      loan.user,
-      year,
-      paymentData.amount_paid,
-    );
-    await this.fundsOverviewService.repayLoan(paymentData.amount_paid);
-    return newPayment;
+ 
   }
 }

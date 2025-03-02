@@ -3,6 +3,10 @@ import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typ
 import { PaymentDetailsEntity } from "./payment-details/payment_details.entity";
 import { LoanEntity } from "../loans/loans.entity";
 import { UserFinancialsEntity } from "./user-financials/user-financials.entity";
+import { MonthlyDepositsEntity } from "../monthly_deposits/monthle_deposits.entity";
+import { UserDebtsEntity } from "./user_debts/user_debts.entity";
+import { on } from "events";
+import { DonationsEntity } from "../donations/donations.entity";
 
 @Entity('users')
 export class UserEntity {
@@ -41,4 +45,11 @@ export class UserEntity {
 
     @OneToMany(() => UserFinancialsEntity, (financials) => financials.user, { cascade: true })
     financials: UserFinancialsEntity[];
+
+    @OneToMany(()=>MonthlyDepositsEntity, (monthlyDeposits) => monthlyDeposits.user, { cascade: true })
+    monthly_deposits: MonthlyDepositsEntity[];
+    @OneToMany(()=>UserDebtsEntity, (debts) => debts.user, { cascade: true })
+    debts: UserDebtsEntity[];
+    @OneToMany(()=>DonationsEntity, (donations) => donations.user, { cascade: true })
+    donations: DonationsEntity[];
 }
