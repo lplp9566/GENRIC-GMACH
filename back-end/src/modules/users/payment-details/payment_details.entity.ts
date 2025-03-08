@@ -1,5 +1,4 @@
-import { on } from 'events';
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
 import { UserEntity } from '../user.entity';
 import { payment_method } from 'src/types/userTypes';
 
@@ -11,6 +10,7 @@ export class PaymentDetailsEntity {
   @OneToOne(() => UserEntity, (user) => user.payment_details, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: "user_id" }) 
   user: UserEntity;
 
   @Column()
@@ -22,15 +22,15 @@ export class PaymentDetailsEntity {
   @Column()
   bank_account_number: number;
 
-  // @Column()
-  // credit_card_number:number'
-
   @Column()
   charge_date: string;
 
   @Column()
-  amount: number;
-
-  @Column()
   payment_method: payment_method;
+
+  @Column({ type: 'float', default: 0 })
+  monthly_balance: number; // ✅ יתרת המשתמש בתשלומים החודשיים
+
+  @Column({ type: 'float', default: 0 })
+  loan_balance: number; // ✅ יתרת המשתמש בהחזרי ההלוואות
 }

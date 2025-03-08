@@ -3,8 +3,7 @@ import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typ
 import { PaymentDetailsEntity } from "./payment-details/payment_details.entity";
 import { LoanEntity } from "../loans/loans.entity";
 import { UserFinancialsEntity } from "./user-financials/user-financials.entity";
-import { MonthlyDepositsEntity } from "../monthly_deposits/monthle_deposits.entity";
-import { UserDebtsEntity } from "./user_debts/user_debts.entity";
+import { MonthlyDepositsEntity } from "../monthly_deposits/monthly_deposits.entity";
 import { on } from "events";
 import { DonationsEntity } from "../donations/donations.entity";
 
@@ -19,8 +18,14 @@ export class UserEntity {
     @Column()
     last_name :string ;
 
-    @Column({type:"date"})
-    join_data :Date ;
+    @Column({
+        type: 'date',
+        transformer: {
+          from: (value: string) => new Date(value), // 🔄 המרה אוטומטית ל-`Date`
+          to: (value: Date) => value, // שומר את ה-`Date` כמות שהוא
+        },
+      })
+      join_date: Date;
 
     @Column()
     password :string ;
@@ -36,7 +41,6 @@ export class UserEntity {
 
     @Column()
     is_admin :boolean
-
     @OneToOne(() => PaymentDetailsEntity, (paymentDetails) => paymentDetails.user, { cascade: true })
     payment_details: PaymentDetailsEntity;
 
@@ -48,8 +52,6 @@ export class UserEntity {
 
     @OneToMany(()=>MonthlyDepositsEntity, (monthlyDeposits) => monthlyDeposits.user, { cascade: true })
     monthly_deposits: MonthlyDepositsEntity[];
-    @OneToMany(()=>UserDebtsEntity, (debts) => debts.user, { cascade: true })
-    debts: UserDebtsEntity[];
     @OneToMany(()=>DonationsEntity, (donations) => donations.user, { cascade: true })
     donations: DonationsEntity[];
 }

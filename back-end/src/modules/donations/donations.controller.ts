@@ -9,6 +9,7 @@ export class DonationsController {
     ) {}
     @Post()
     async createDonation(@Body() donation: DonationsEntity) {
+        process.stdout.write("createDonation function called!\n");
         return this.donationsService.createDonation(donation);
     }
     

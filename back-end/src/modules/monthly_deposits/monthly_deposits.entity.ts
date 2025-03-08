@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "../users/user.entity";
-import { UserDebtsEntity } from "../users/user_debts/user_debts.entity";
+
 
 @Entity('monthly_deposits')
 export class MonthlyDepositsEntity {
@@ -16,10 +16,4 @@ export class MonthlyDepositsEntity {
 
     @Column({ type: 'float' })
     amount: number;
-
-    @Column({type:"boolean"})
-    isDepositCharged:boolean;
-
-     @OneToMany(() => UserDebtsEntity, (debt) => debt.deposit_payment , { cascade: true })
-     debt: UserDebtsEntity;
    }

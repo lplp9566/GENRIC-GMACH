@@ -14,12 +14,14 @@ import { UserFinancialsModule } from './modules/users/user-financials/user-finan
 import { ExpensesService } from './modules/expenses/expenses.service';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { PaymentDetailsModule } from './modules/users/payment-details/payment-details.module';
-import { UserDepositsModule } from './modules/users/user_deposits/user_deposits.module';
 import { MonthlyDepositsModule } from './modules/monthly_deposits/monthly_deposits.module';
 import { DonationsModule } from './modules/donations/donations.module';
+import { MonthlyRatesModule } from './modules/monthly_rates/monthly_rates.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    // ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -38,9 +40,9 @@ import { DonationsModule } from './modules/donations/donations.module';
     UserFinancialsModule,
     ExpensesModule,
     PaymentDetailsModule,
-    UserDepositsModule,
     MonthlyDepositsModule,
-    DonationsModule, 
+    DonationsModule,
+    MonthlyRatesModule, 
     // AuthModule,
 
   ],

@@ -22,42 +22,24 @@ export class DonationsService {
     async getDonations() {
         return this.donationsRepository.find();
     }
-    async createDonation(donation: DonationsEntity) {
-        try {           
-            if(!donation.donation_reason){
-                throw new Error("ertyuio")
-            }
-            this.donationsRepository.save(donation);
-                if(donation.donation_reason =="Equity"){
-                 const equity = this.createEquityDonation(donation);
-                 return equity
-                }
-                else{
-                    const special_funds = this.createFundDonation(donation)
-                    return special_funds
-                }
-                
-        } catch (error) {
-            return error.message
-        }
-       
-    }
+ 
     async createEquityDonation(donation: DonationsEntity) {
-        try {
-            const year  = getYearFromDate(donation.donation_date);
+        try {    
+            const year  = await getYearFromDate(donation.donation_date);
             const user =  await this.usersService.getUserById(Number(donation.user));
-            if(!user){
-                throw new Error("NO USER ")
+            if (!user) {
+                throw new Error("NO USER");
             }
-            this.userFinancialsService.recordEquityDonation(user,year,donation.amount);
-            this.fundsOverviewService.addDonation(donation.amount)
-            return ApiResponse.success(donation)
-         
+            const equity = await this.userFinancialsService.recordEquityDonation(user, year, donation.amount);
+         const fundOve=  await this.fundsOverviewService.addDonation(donation.amount); 
+            return donation;
+    
         } catch (error) {
-            ApiResponse.error(error.message)
+            console.error("Error in createEquityDonation:", error.message);
+            return ApiResponse.error(error.message);
         }
-       
     }
+    
     async createFundDonation(donation: DonationsEntity) {
         try {
             const year  = getYearFromDate(donation.donation_date);
@@ -70,6 +52,24 @@ export class DonationsService {
             return ApiResponse.success(donation)
         } catch (error) {
             ApiResponse.error(error.message)
+        }
+    }
+    async createDonation(donation: DonationsEntity) {
+        try {           
+            if (!donation.donation_reason) {
+                throw new Error("Donation reason is required");
+            }
+           this.donationsRepository.save(donation);
+            if (donation.donation_reason == "Equity") {
+                const equity = await this.createEquityDonation(donation);
+                return equity       
+            } else {
+                const special_funds = await this.createFundDonation(donation);
+                return special_funds;
+            }
+        } catch (error) {
+            console.error("Error in createDonation:", error.message);
+            return error.message;
         }
     }
 }

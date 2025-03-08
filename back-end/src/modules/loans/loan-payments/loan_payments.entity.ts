@@ -1,7 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { LoanEntity } from '../loans.entity';
-import { UserDebtsEntity } from 'src/modules/users/user_debts/user_debts.entity';
-
 @Entity('loan_payments')
 export class LoanPaymentEntity {
   @PrimaryGeneratedColumn()

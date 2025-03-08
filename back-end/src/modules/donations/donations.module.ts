@@ -10,11 +10,30 @@ import { UserFinancialsService } from '../users/user-financials/user-financials.
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialsEntity } from '../users/user-financials/user-financials.entity';
 import { FundsOverviewEntity } from '../funds-overview/funds-overview.entity';
+import { MonthlyDepositsModule } from '../monthly_deposits/monthly_deposits.module';
+import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
+import { FundsOverviewModule } from '../funds-overview/funds-overview.module';
+import { UserFinancialsModule } from '../users/user-financials/user-financials.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([DonationsEntity,UserEntity,PaymentDetailsEntity,UserFinancialsEntity,FundsOverviewEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      DonationsEntity,
+      UserEntity,
+      PaymentDetailsEntity,
+    ]),
+    MonthlyDepositsModule,
+    UserFinancialsModule,
+    FundsOverviewModule, 
+    MonthlyRatesModule
+  ],
   controllers: [DonationsController],
-  providers: [DonationsService,UsersService,UserFinancialsService,FundsOverviewService],
-  exports:[DonationsService,TypeOrmModule]
+  providers: [
+    DonationsService,
+    UsersService,
+    UserFinancialsService,
+    FundsOverviewService,
+  ],
+  exports: [DonationsService],
 })
 export class DonationsModule {}

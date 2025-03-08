@@ -5,7 +5,7 @@ import { PaymentDetailsService } from './payment-details.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PaymentDetailsEntity])],
-  exports: [PaymentDetailsService,TypeOrmModule],
+  exports: [PaymentDetailsService],
   providers: [PaymentDetailsService]
 })
 export class PaymentDetailsModule {}

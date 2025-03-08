@@ -16,21 +16,22 @@ export class LoanEntity {
   @ManyToOne(() => UserEntity, (user) => user.loans, { onDelete: 'CASCADE' })
   user: UserEntity;
 
-  @Column({ type: "float" })
+  @Column({ type: 'float' })
   loan_amount: number;
 
-  @Column({ type: "date" }) 
+  @Column({ type: 'date' })
   loan_date: Date;
 
-  @Column({ type: "float" })
+  @Column({ type: 'float' })
   monthly_payment: number;
 
-  @Column({ type: "int" }) 
+  @Column({ type: 'int' })
   payment_date: number;
 
-  @Column({ type: "float", nullable: true }) 
+  @Column({ type: 'float', nullable: true })
   remaining_balance: number;
-
+  @Column()
+  total_installments: number;
   @OneToMany(() => LoanPaymentEntity, (payment) => payment.loan, {
     cascade: true,
   })
