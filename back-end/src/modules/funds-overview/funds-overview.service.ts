@@ -65,7 +65,7 @@ export class FundsOverviewService {
       fund.available_funds += amount;
       fund.donations_received += amount;
       await this.fundsOverviewRepository.save(fund);
-      return ApiResponse.success(fund);
+      return fund;
     } catch (error) {
       return error.message;
     }
@@ -87,7 +87,7 @@ export class FundsOverviewService {
       fund.available_funds -= amount;
       fund.loaned_amount += amount;
       await this.fundsOverviewRepository.save(fund);
-      ApiResponse.success(fund);
+return fund
     } catch (error) {
       return error.message;
     }

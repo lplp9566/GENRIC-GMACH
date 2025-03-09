@@ -18,6 +18,7 @@ import { MonthlyDepositsModule } from './modules/monthly_deposits/monthly_deposi
 import { DonationsModule } from './modules/donations/donations.module';
 import { MonthlyRatesModule } from './modules/monthly_rates/monthly_rates.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     PaymentDetailsModule,
     MonthlyDepositsModule,
     DonationsModule,
-    MonthlyRatesModule, 
+    MonthlyRatesModule,
+    MailModule, 
     // AuthModule,
 
   ],

@@ -107,14 +107,12 @@ export class UsersService {
         totalDue += lastRate.amount;
       }
     }
-console.log(totalDue,"סך הכל צריך לשלם עד כה")
     return totalDue;
   }
 
   // ✅ שליפת כל התשלומים של המשתמש עד כה
   async getUserTotalDeposits(userId: number): Promise<number> {
     const UserTotalDeposits = await this.monthlyDepositsService.getUserTotalDeposits(userId);
-    console.log("כמה שילם עד כה ",UserTotalDeposits)
     return UserTotalDeposits;
   }
 
@@ -125,7 +123,6 @@ console.log(totalDue,"סך הכל צריך לשלם עד כה")
     const totalDue = await this.calculateTotalDue(user);
     const totalPaid = await this.getUserTotalDeposits(user.id);
     const balance = totalPaid - totalDue;
-    console.log(balance)
 
     return { total_due: totalDue, total_paid: totalPaid, balance };
   }
@@ -136,13 +133,11 @@ console.log(totalDue,"סך הכל צריך לשלם עד כה")
       where: { user: { id: user.id } },
       relations: ["user"],
     });
-    console.log(paymentDetails)
     if (!paymentDetails) {
       throw new Error("Payment details not found for user");
     }
 
     const balanceData = await this.calculateUserMonthlyBalance(user)
-    console.log(balanceData.balance,"balanceData.balance")
     paymentDetails.monthly_balance = balanceData.balance;
     await this.paymentDetailsRepository.save(paymentDetails);
   }

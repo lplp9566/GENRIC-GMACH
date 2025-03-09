@@ -18,33 +18,32 @@ export class LoansService {
     private paymentsRepository: Repository<LoanPaymentEntity>,
     private readonly user_financialsService: UserFinancialsService,
     private readonly fundsOverviewService: FundsOverviewService,
-    private readonly usersService:UsersService,
+    private readonly usersService: UsersService,
   ) {}
-  
-
 
   async createLoan(loanData: Partial<LoanEntity>): Promise<LoanEntity> {
     try {
-      const avnbalance =
+      const fundsOverview =
         await this.fundsOverviewService.getFundsOverviewRecord();
-      if (loanData.loan_amount! > avnbalance.available_funds) {
+      if (loanData.loan_amount! > fundsOverview.available_funds) {
         throw new Error('Not enough funds');
       }
-      const newLoan = this.loansRepository.create(loanData);
-      newLoan.remaining_balance = newLoan.loan_amount;
-     const year =  getYearFromDate(newLoan.loan_date);
-      const user = await this.usersService.getUserById(Number(newLoan.user));
+      const loanRecord = this.loansRepository.create(loanData);
+      loanRecord.remaining_balance = loanRecord.loan_amount;
+      loanRecord.total_installments = loanRecord.loan_amount / loanRecord.monthly_payment;
+      const year = getYearFromDate(loanRecord.loan_date);
+      const user = await this.usersService.getUserById(Number(loanRecord.user));
       if (!user) {
         throw new Error('User not found');
       }
-      await this.user_financialsService.recordLoanTaken(
+      const addToFinancials = await this.user_financialsService.recordLoanTaken(
         user,
         year,
-        newLoan.loan_amount,
+        loanRecord.loan_amount,
       );
 
-      await this.fundsOverviewService.addLoan(newLoan.loan_amount);
-      return this.loansRepository.save(newLoan);
+      await this.fundsOverviewService.addLoan(loanRecord.loan_amount);
+      return this.loansRepository.save(loanRecord);
     } catch (error) {
       return error.message;
     }
@@ -66,7 +65,7 @@ export class LoansService {
       });
       await this.paymentsRepository.save(newPayment);
       loan.remaining_balance -= paymentData.amount_paid;
-  
+
       await this.loansRepository.save(loan);
       const year = getYearFromDate(newPayment.payment_date);
       await this.user_financialsService.recordLoanRepaid(
@@ -76,10 +75,8 @@ export class LoansService {
       );
       await this.fundsOverviewService.repayLoan(paymentData.amount_paid);
       return newPayment;
-      
     } catch (error) {
       return error.message;
     }
- 
   }
 }
