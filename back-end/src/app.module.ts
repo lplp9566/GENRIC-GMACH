@@ -20,10 +20,12 @@ import { MonthlyRatesModule } from './modules/monthly_rates/monthly_rates.module
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailModule } from './modules/mail/mail.module';
 import { UserFinancialsModule } from './modules/users/user-financials/user-financials.module';
+import { InvestmentsModule } from './modules/investments/investments.module';
+import { InvestmentTransactionsModule } from './modules/investments/investment-transactions/investment-transactions.module';
 
 @Module({
   imports: [
-    // ScheduleModule.forRoot(),
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -46,7 +48,9 @@ import { UserFinancialsModule } from './modules/users/user-financials/user-finan
     DonationsModule,
     MonthlyRatesModule,
     MailModule,
-    UserFinancialsModule, 
+    UserFinancialsModule,
+    InvestmentsModule, 
+    InvestmentTransactionsModule
     // AuthModule,
 
   ],

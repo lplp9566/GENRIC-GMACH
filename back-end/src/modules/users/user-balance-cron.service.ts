@@ -6,7 +6,9 @@ import { UsersService } from './users.service';
 export class UserBalanceCronService {
   constructor(private readonly usersService: UsersService) {}
 
-  @Cron('0 0 * * *') // ✅ ירוץ כל יום בחצות
+  @Cron('55 21 * * *',{
+   timeZone: 'Asia/Jerusalem'
+  }) 
   async updateAllUsersBalances() {
     console.log('🔄 Updating all users balances...');
 

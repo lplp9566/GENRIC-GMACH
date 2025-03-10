@@ -14,6 +14,5 @@ export class LoanPaymentEntity {
   @Column()
   amount_paid: number;
   
-//   @OneToMany(() => UserDebtsEntity, (debt) => debt.loan_payment)
-//   debt: UserDebtsEntity;
+
 }
