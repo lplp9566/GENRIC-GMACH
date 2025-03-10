@@ -8,6 +8,7 @@ import { UserBalanceCronService } from './user-balance-cron.service';
 import { MonthlyDepositsModule } from '../monthly_deposits/monthly_deposits.module';
 import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
 import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
+import { UserFinancialsModule } from './user-financials/user-financials.module';
 
 
 
@@ -17,6 +18,7 @@ import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
     forwardRef(() => MonthlyDepositsModule),
     forwardRef(()=> MonthlyRatesModule),
     PaymentDetailsModule,
+    UserFinancialsModule,
    
   ],
   controllers: [UsersController],

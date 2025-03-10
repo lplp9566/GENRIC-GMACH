@@ -4,9 +4,10 @@ import { Repository } from 'typeorm';
 import { MonthlyDepositsEntity } from "./monthly_deposits.entity";
 import { UserEntity } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
-import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { getYearFromDate } from 'src/services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
+import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 
 @Injectable()
 export class MonthlyDepositsService {
@@ -15,8 +16,9 @@ export class MonthlyDepositsService {
     private readonly monthlyDepositsRepository: Repository<MonthlyDepositsEntity>,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
-    private readonly userFinashialService: UserFinancialsService,
-    private readonly fundsOverviewService: FundsOverviewService
+    private readonly userFinashialByYearService: UserFinancialByYearService,
+    private readonly fundsOverviewService: FundsOverviewService,
+    private readonly userFinancialsService: UserFinancialsService
   ) {}
 
   async getAllDeposits(): Promise<MonthlyDepositsEntity[]> {
@@ -63,11 +65,12 @@ export class MonthlyDepositsService {
       });
 
       await this.monthlyDepositsRepository.save(newDeposit);
-      await this.userFinashialService.recordMonthlyDeposit(
+      await this.userFinashialByYearService.recordMonthlyDeposit(
         user,
         year,
         payment_details.amount,
       );
+      await this.userFinancialsService.recordMonthlyDeposit(user, payment_details.amount);
       await this.fundsOverviewService.addMonthlyDeposit(payment_details.amount);
       // ✅ עדכון `balance` אחרי כל תשלום חודשי
       await this.usersService.updateUserMonthlyBalance(user);

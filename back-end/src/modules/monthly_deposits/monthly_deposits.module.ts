@@ -5,15 +5,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MonthlyDepositsEntity } from './monthly_deposits.entity';
 import { use } from 'passport';
 import { UsersModule } from '../users/users.module';
-import { UserFinancialsModule } from '../users/user-financials/user-financials.module';
+import { UserFinancialByYearModule } from '../users/user-financials-by-year/user-financial-by-year.module';
 import { FundsOverviewModule } from '../funds-overview/funds-overview.module';
 import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
+import { UserFinancialsModule } from '../users/user-financials/user-financials.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([MonthlyDepositsEntity]),
     forwardRef(() => UsersModule),
     forwardRef(() => MonthlyRatesModule),
+    UserFinancialByYearModule,
     UserFinancialsModule,
     FundsOverviewModule
   ],

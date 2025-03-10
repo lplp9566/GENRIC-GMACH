@@ -2,10 +2,11 @@ import { UserRole } from "src/types/userTypes";
 import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PaymentDetailsEntity } from "./payment-details/payment_details.entity";
 import { LoanEntity } from "../loans/loans.entity";
-import { UserFinancialsEntity } from "./user-financials/user-financials.entity";
+import { UserFinancialByYearEntity } from "./user-financials-by-year/user-financial-by-year.entity";
 import { MonthlyDepositsEntity } from "../monthly_deposits/monthly_deposits.entity";
 import { on } from "events";
 import { DonationsEntity } from "../donations/donations.entity";
+import { UserFinancialsEntity } from "./user-financials/user-financials.entity";
 
 @Entity('users')
 export class UserEntity {
@@ -47,8 +48,12 @@ export class UserEntity {
     @OneToMany(() => LoanEntity, (loan) => loan.user, { cascade: true })
     loans: LoanEntity[];
 
-    @OneToMany(() => UserFinancialsEntity, (financials) => financials.user, { cascade: true })
-    financials: UserFinancialsEntity[];
+    @OneToMany(() => UserFinancialByYearEntity, (financials) => financials.user, { cascade: true })
+    financialHistoryByYear: UserFinancialByYearEntity[];
+
+    @OneToOne(() => UserFinancialsEntity,(financials) => financials.user, { cascade: true })
+    userFinancials: UserFinancialsEntity
+
 
     @OneToMany(()=>MonthlyDepositsEntity, (monthlyDeposits) => monthlyDeposits.user, { cascade: true })
     monthly_deposits: MonthlyDepositsEntity[];

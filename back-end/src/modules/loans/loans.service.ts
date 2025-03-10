@@ -4,11 +4,12 @@ import { Repository } from 'typeorm';
 import { LoanEntity } from './loans.entity';
 import { LoanPaymentEntity } from './loan-payments/loan_payments.entity';
 import { AddPaymentDto } from 'src/types/loanTypes';
-import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewEntity } from '../funds-overview/funds-overview.entity';
 import { UsersService } from '../users/users.service';
 import { getYearFromDate } from '../../services/services';
+import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 @Injectable()
 export class LoansService {
   constructor(
@@ -16,7 +17,8 @@ export class LoansService {
     private loansRepository: Repository<LoanEntity>,
     @InjectRepository(LoanPaymentEntity)
     private paymentsRepository: Repository<LoanPaymentEntity>,
-    private readonly user_financialsService: UserFinancialsService,
+    private readonly userFinacialsService: UserFinancialsService,
+    private readonly userFinancialsByYearService: UserFinancialByYearService,
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly usersService: UsersService,
   ) {}
@@ -36,12 +38,15 @@ export class LoansService {
       if (!user) {
         throw new Error('User not found');
       }
-      const addToFinancials = await this.user_financialsService.recordLoanTaken(
+        await this.userFinancialsByYearService.recordLoanTaken(
         user,
         year,
         loanRecord.loan_amount,
       );
-
+      await this.userFinacialsService.recordLoanTaken(
+        user,
+        loanRecord.loan_amount,
+      );
       await this.fundsOverviewService.addLoan(loanRecord.loan_amount);
       return this.loansRepository.save(loanRecord);
     } catch (error) {
@@ -68,11 +73,12 @@ export class LoansService {
 
       await this.loansRepository.save(loan);
       const year = getYearFromDate(newPayment.payment_date);
-      await this.user_financialsService.recordLoanRepaid(
+      await this.userFinancialsByYearService.recordLoanRepaid(
         loan.user,
         year,
         paymentData.amount_paid,
       );
+      await this.userFinacialsService.recordLoanRepaid(loan.user, paymentData.amount_paid);
       await this.fundsOverviewService.repayLoan(paymentData.amount_paid);
       return newPayment;
     } catch (error) {

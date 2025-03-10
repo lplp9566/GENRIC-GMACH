@@ -10,7 +10,7 @@ import { LoanPaymentsModule } from './modules/loans/loan-payments/loan-payments.
 import { LoansController } from './modules/loans/loans.controller';
 import { LoansService } from './modules/loans/loans.service';
 import { LoansModule } from './modules/loans/loans.module';
-import { UserFinancialsModule } from './modules/users/user-financials/user-financials.module';
+import { UserFinancialByYearModule } from './modules/users/user-financials-by-year/user-financial-by-year.module';
 import { ExpensesService } from './modules/expenses/expenses.service';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { PaymentDetailsModule } from './modules/users/payment-details/payment-details.module';
@@ -19,6 +19,7 @@ import { DonationsModule } from './modules/donations/donations.module';
 import { MonthlyRatesModule } from './modules/monthly_rates/monthly_rates.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailModule } from './modules/mail/mail.module';
+import { UserFinancialsModule } from './modules/users/user-financials/user-financials.module';
 
 @Module({
   imports: [
@@ -38,13 +39,14 @@ import { MailModule } from './modules/mail/mail.module';
     LoansModule,
     LoanPaymentsModule,
     FundsOverviewModule,
-    UserFinancialsModule,
+    UserFinancialByYearModule,
     ExpensesModule,
     PaymentDetailsModule,
     MonthlyDepositsModule,
     DonationsModule,
     MonthlyRatesModule,
-    MailModule, 
+    MailModule,
+    UserFinancialsModule, 
     // AuthModule,
 
   ],

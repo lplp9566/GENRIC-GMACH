@@ -1,26 +1,22 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  AfterLoad,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from '../user.entity';
 
-@Entity('user_financials')
+@Entity('user-financials')
 export class UserFinancialsEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.financials, {
-    eager: true,
-    onDelete: 'CASCADE',
-  })
-  user: UserEntity;
+   @OneToOne(() => UserEntity, (user) => user, {
+     onDelete: 'CASCADE',
+   })
+   @JoinColumn({ name: "user_id" }) 
+   user: UserEntity;
+ 
+  // Total contributed to charity, including both donations and membership fees
+  @Column({ type: 'float' })
+  total_donations: number;
 
-  @Column({ type: 'int' })
-  year: number;
-
+  // סך ההפקדות החודשיות
   @Column({ type: 'float' })
   total_monthly_deposits: number;
 
@@ -28,25 +24,20 @@ export class UserFinancialsEntity {
   total_equity_donations: number;
 
   @Column({ type: 'float' })
-  special_fund_donations: number;
+  total_special_fund_donations: number;
 
-  @Column({ type: 'float' })
+
+  @Column({ type: 'int' })
   total_loans_taken: number;
 
   @Column({ type: 'float' })
   total_loans_repaid: number;
 
-  @Column({ type: 'float', default: 0 })
-  total_fixed_deposits_added: number;
+  @Column({ type: 'float' })
+  total_fixed_deposits_deposited: number;
 
-  @Column({ type: 'float', default: 0 })
+  @Column({ type: 'float' })
   total_fixed_deposits_withdrawn: number;
 
-  total_donations: number;
 
-  @AfterLoad()
-  calculateTotalDonations() {
-    this.total_donations =
-      (this.total_equity_donations || 0) + (this.special_fund_donations || 0);
-  }
 }

@@ -13,6 +13,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
+
     <Container sx={{ mt: 4 }}>
       <Typography variant="h4" sx={{ mb: 3, textAlign: 'center', fontWeight: 'bold' }}>
         מצב קרנות הגמ"ח
