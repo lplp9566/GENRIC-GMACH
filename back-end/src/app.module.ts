@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './modules/users/users.module';
 // import { AuthModule } from './auth/auth.module';
 import { FundsOverviewModule } from './modules/funds-overview/funds-overview.module';
@@ -22,21 +22,27 @@ import { MailModule } from './modules/mail/mail.module';
 import { UserFinancialsModule } from './modules/users/user-financials/user-financials.module';
 import { InvestmentsModule } from './modules/investments/investments.module';
 import { InvestmentTransactionsModule } from './modules/investments/investment-transactions/investment-transactions.module';
+import { config } from 'dotenv';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      autoLoadEntities: true,
-      synchronize: true, // לשימוש בפיתוח בלבד!
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'postgres',
+        url: configService.get<string>('DATABASE_URL'),
+        autoLoadEntities: true,
+        synchronize: true,
+        ssl: process.env.NODE_ENV === 'production'
+          ? { rejectUnauthorized: false } 
+          : false, // ללא SSL בלוקאלי
+      }),
     }),
+    
+    
     UsersModule,
     LoansModule,
     LoanPaymentsModule,
@@ -55,6 +61,7 @@ import { InvestmentTransactionsModule } from './modules/investments/investment-t
 
   ],
   providers: [ExpensesService],
+
 
 
 })
