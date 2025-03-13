@@ -9,7 +9,7 @@ import { PaymentDetailsEntity } from '../users/payment-details/payment_details.e
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialByYearEntity } from '../users/user-financials-by-year/user-financial-by-year.entity';
-import { FundsOverviewEntity } from '../funds-overview/funds-overview.entity';
+import { FundsOverviewEntity } from '../funds-overview/entity/funds-overview.entity';
 import { MonthlyDepositsModule } from '../monthly_deposits/monthly_deposits.module';
 import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
 import { FundsOverviewModule } from '../funds-overview/funds-overview.module';

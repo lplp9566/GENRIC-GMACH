@@ -15,6 +15,9 @@ export class FundsOverviewEntity {
   investments: number; // ✅ סכום הכסף שנמצא בהשקעות
 
   @Column({ type: 'float' })
+  Investment_profits : number;
+
+  @Column({ type: 'float' })
   special_funds: number; // ✅ סכום שמוקצה לקרנות מיוחדות (קרן עונג שבת וכו')
 
   @Column({ type: 'float' })

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FundsOverviewService } from './funds-overview.service';
 import { FundsOverviewController } from './funds-overview.controller';
-import { FundsOverviewEntity } from './funds-overview.entity';
+import { FundsOverviewEntity } from './entity/funds-overview.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([FundsOverviewEntity])],

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { InvestmentEntity } from './entity/investments.entity';
 import { InvestmentTransactionService } from './investment-transactions/investment-transactions.service';
 import { TransactionType } from 'src/types/investementsTypes';
+import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 
 @Injectable()
 export class InvestmentsService {
@@ -11,6 +12,7 @@ export class InvestmentsService {
     @InjectRepository(InvestmentEntity)
     private readonly investmentRepo: Repository<InvestmentEntity>,
     private readonly transactionService: InvestmentTransactionService,
+    private readonly fundsOverviewService: FundsOverviewService
   ) {}
 
   async createInitialInvestment(dto: { investment_name: string, amount: number, start_date: Date }) {
@@ -27,7 +29,7 @@ export class InvestmentsService {
     });
 
     await this.investmentRepo.save(investment);
-
+    await this.fundsOverviewService.addInvestment(amount);
     await this.transactionService.createTransaction({
       investmentId: investment.id,
       transaction_type: TransactionType.INITIAL_INVESTMENT,

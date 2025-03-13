@@ -7,7 +7,7 @@ const App: React.FC = () => {
   const [fundsData, setFundsData] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:3000/funds-overview')
+    axios.get('https://ahavat-chesed-2.onrender.com/funds-overview')
       .then((response) => setFundsData(response.data))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);

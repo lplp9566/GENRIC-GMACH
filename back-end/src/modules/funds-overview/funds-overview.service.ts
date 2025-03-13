@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FundsOverviewEntity } from './funds-overview.entity';
+import { FundsOverviewEntity } from './entity/funds-overview.entity';
 import { Repository } from 'typeorm';
 import { log } from 'console';
 import { ApiResponse } from 'src/utils/response.utils';
@@ -35,6 +35,7 @@ export class FundsOverviewService {
         donations_received: 0,
         loaned_amount: 0,
         investments: 0,
+        Investment_profits: 0,
         special_funds: 0,
         fund_details: {},
       });
