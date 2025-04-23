@@ -9,8 +9,8 @@ import { MonthlyDepositsModule } from '../monthly_deposits/monthly_deposits.modu
 import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
 import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
 import { UserFinancialsModule } from './user-financials/user-financials.module';
-import { RequestsModule } from 'src/requests/requests.module';
 import { LoanPaymentsModule } from '../loans/loan-payments/loan-payments.module';
+import { RequestsModule } from '../requests/requests.module';
 
 
 

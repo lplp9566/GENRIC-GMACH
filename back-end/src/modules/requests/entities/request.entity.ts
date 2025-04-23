@@ -1,5 +1,4 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { c } from "vite/dist/node/moduleRunnerTransport.d-CXw_Ws6P";
 import { RequestStatus } from "../dto/request.dto";
 import { UserEntity } from "src/modules/users/user.entity";
 

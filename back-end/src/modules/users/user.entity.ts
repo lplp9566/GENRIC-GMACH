@@ -7,7 +7,7 @@ import { MonthlyDepositsEntity } from "../monthly_deposits/monthly_deposits.enti
 import { on } from "events";
 import { DonationsEntity } from "../donations/donations.entity";
 import { UserFinancialsEntity } from "./user-financials/user-financials.entity";
-import { RequestEntity } from "src/requests/entities/request.entity";
+import { RequestEntity } from "../requests/entities/request.entity";
 
 @Entity('users')
 export class UserEntity {
