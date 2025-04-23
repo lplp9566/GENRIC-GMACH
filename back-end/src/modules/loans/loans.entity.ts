@@ -30,6 +30,8 @@ export class LoanEntity {
 
   @Column({ type: 'float', nullable: true })
   remaining_balance: number;
+  @Column({type:"int"})
+  initialMonthlyPayment  : number;
   @Column({ type: 'float' , nullable: true })
   total_installments: number;
   @OneToMany(() => LoanPaymentEntity, (payment) => payment.loan, {

@@ -47,37 +47,40 @@ export class MonthlyDepositsService {
   }
   async recordMonthlyDeposit(payment_details: Partial<MonthlyDepositsEntity>) {
     try {
-        if(!payment_details.amount || !payment_details.deposit_date || !payment_details.user){
-                throw new Error('Missing required fields');
-        }
+      // ✅ בדיקת תקינות
+      if (!payment_details.amount || !payment_details.deposit_date || !payment_details.user) {
+        throw new Error('Missing required fields');
+      }
+  
       const year = await getYearFromDate(payment_details.deposit_date);
-      const user = await this.usersService.getUserById(
-        Number(payment_details.user),
-      );
-
+  
+      // ✅ שליפת משתמש
+      const user = await this.usersService.getUserById(Number(payment_details.user));
       if (!user) {
         throw new Error('User not found');
       }
+  
+      // ✅ יצירת ההפקדה ושמירה
       const newDeposit = this.monthlyDepositsRepository.create({
         user: user,
         amount: payment_details.amount,
         deposit_date: payment_details.deposit_date,
       });
-
       await this.monthlyDepositsRepository.save(newDeposit);
-      await this.userFinashialByYearService.recordMonthlyDeposit(
-        user,
-        year,
-        payment_details.amount,
-      );
-      await this.userFinancialsService.recordMonthlyDeposit(user, payment_details.amount);
-      await this.fundsOverviewService.addMonthlyDeposit(payment_details.amount);
-      // ✅ עדכון `balance` אחרי כל תשלום חודשי
-      await this.usersService.updateUserMonthlyBalance(user);
-
+  
+      // ✅ פעולות נוספות במקביל
+      await Promise.all([
+        this.userFinashialByYearService.recordMonthlyDeposit(user, year, payment_details.amount),
+        this.userFinancialsService.recordMonthlyDeposit(user, payment_details.amount),
+        this.fundsOverviewService.addMonthlyDeposit(payment_details.amount),
+        this.usersService.updateUserMonthlyBalance(user),
+      ]);
+  
       return { message: `Deposit recorded successfully.` };
+  
     } catch (error) {
-      return error.message;
+      console.error('❌ Error recording deposit:', error.message);
+      throw new Error(error.message);
     }
   }
-}
+}  

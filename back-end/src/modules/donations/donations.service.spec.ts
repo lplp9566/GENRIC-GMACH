@@ -15,4 +15,7 @@ describe('DonationsService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+  it('should return an array of donations', async () => {
+    expect(await service.getDonations()).toBeInstanceOf(Array);
+  })
 });

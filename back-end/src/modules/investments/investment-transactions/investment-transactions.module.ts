@@ -9,7 +9,7 @@ import { InvestmentTransactionEntity } from './entity/investment-transaction.ent
 @Module({
   imports: [TypeOrmModule.forFeature([InvestmentTransactionEntity]),forwardRef(() => InvestmentsModule)],
   controllers: [InvestmentTransactionController],
-  providers: [InvestmentTransactionService],
+  providers: [InvestmentTransactionService,InvestmentTransactionEntity],
   exports : [InvestmentTransactionService,TypeOrmModule]
 })
 export class InvestmentTransactionsModule {}

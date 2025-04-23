@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FundsOverviewEntity } from './entity/funds-overview.entity';
 import { Repository } from 'typeorm';
 import { log } from 'console';
 import { ApiResponse } from 'src/utils/response.utils';
+import { first } from 'rxjs';
 
 @Injectable()
 export class FundsOverviewService {
@@ -14,16 +15,15 @@ export class FundsOverviewService {
   async getFundsOverviewRecord() {
     try {
       const fund = await this.fundsOverviewRepository.findOne({ where: {} });
-      return fund
+      return fund;
     } catch (error) {
-      return error.message
+      return error.message;
     }
-   
   }
 
   async initializeFundsOverview(initialAmount: number) {
     try {
-      const existingRecord = await this.getFundsOverviewRecord()
+      const existingRecord = await this.getFundsOverviewRecord();
       if (existingRecord) {
         throw new Error('Funds overview already initialized');
       }
@@ -41,7 +41,7 @@ export class FundsOverviewService {
       });
 
       await this.fundsOverviewRepository.save(newRecord);
-     return ApiResponse.success(newRecord);
+      return ApiResponse.success(newRecord);
     } catch (error) {
       return error.message;
     }
@@ -54,7 +54,7 @@ export class FundsOverviewService {
       fund.available_funds += amount;
       fund.monthly_deposits += amount;
       await this.fundsOverviewRepository.save(fund);
-      return ApiResponse.success(fund);;
+      return ApiResponse.success(fund);
     } catch (error) {
       return error.message;
     }
@@ -72,26 +72,41 @@ export class FundsOverviewService {
     }
   }
   async addInvestment(amount: number) {
-    try {
-      const fund = await this.getFundsOverviewRecord();
-      fund.available_funds -= amount;
-      fund.investments += amount;
-      await this.fundsOverviewRepository.save(fund);
-      return fund;
-    } catch (error) {
-      return error.message;
+    const fund = await this.getFundsOverviewRecord();
+    if (amount > fund.available_funds) {
+      throw new NotFoundException('not enough funds');
     }
+
+    fund.available_funds -= amount;
+    fund.investments += amount;
+    await this.fundsOverviewRepository.save(fund);
+    return fund;
+  }
+
+  async addInvestmentProfits(principal: number, profit: number) {
+    
+      console.log(principal, profit)
+      const fund = await this.getFundsOverviewRecord();
+
+      fund.available_funds += principal;
+      fund.available_funds += profit
+      fund.Investment_profits += profit;
+      fund.investments -= principal;
+      fund.total_funds += profit;
+      await this.fundsOverviewRepository.save(fund);
+      console.log(fund)
+      return fund;
+
   }
   async addLoan(amount: number) {
-    try {
-      const fund = await this.getFundsOverviewRecord();
-      fund.available_funds -= amount;
-      fund.loaned_amount += amount;
-      await this.fundsOverviewRepository.save(fund);
-return fund
-    } catch (error) {
-      return error.message;
+    const fund = await this.getFundsOverviewRecord();
+    if (amount > fund.available_funds) {
+      throw new NotFoundException('not enough funds');
     }
+    fund.available_funds -= amount;
+    fund.loaned_amount += amount;
+    await this.fundsOverviewRepository.save(fund);
+    return fund;
   }
   async addSpecialFund(fundName: string, amount: number) {
     try {
@@ -102,7 +117,7 @@ return fund
       fund.fund_details[fundName] = (fund.fund_details[fundName] || 0) + amount;
       fund.special_funds += amount;
       await this.fundsOverviewRepository.save(fund);
-      ApiResponse.success(fund);;
+      return fund
     } catch (error) {
       return error.message;
     }
@@ -133,7 +148,7 @@ return fund
       fund.fund_details[fundName] -= amount;
       fund.special_funds -= amount;
       await this.fundsOverviewRepository.save(fund);
-      ApiResponse.success(fund);;
+      ApiResponse.success(fund);
     } catch (error) {
       return error.message;
     }
@@ -145,7 +160,7 @@ return fund
       fund.available_funds -= amount;
       fund.total_funds -= amount;
       await this.fundsOverviewRepository.save(fund);
-      ApiResponse.success(fund);;
+      ApiResponse.success(fund);
     } catch (error) {
       return error.message;
     }

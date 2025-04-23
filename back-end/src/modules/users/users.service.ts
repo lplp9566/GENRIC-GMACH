@@ -33,30 +33,38 @@ export class UsersService {
     userData: Partial<UserEntity>,
     paymentData: Partial<PaymentDetailsEntity>,
   ): Promise<UserEntity> {
-    if (
-      paymentData.payment_method === undefined ||
-      !Object.values(paymentData).includes(paymentData.payment_method)
-    ) {
-      throw new Error('Invalid payment method');
+    try {
+      if (
+        paymentData.payment_method === undefined ||
+        !Object.values(paymentData).includes(paymentData.payment_method)
+      ) {
+        throw new Error('Invalid payment method');
+      }
+  
+      const salt = await bcrypt.genSalt(10);
+      if (userData.password) {
+        userData.password = await bcrypt.hash(userData.password, salt);
+      } else {
+        throw new Error('Password is required');
+      }
+  
+      const newUser = this.usersRepository.create(userData);
+      const paymentDetails = this.paymentDetailsRepository.create(paymentData);
+      newUser.payment_details = paymentDetails;
+  
+      return this.usersRepository.save(newUser);
+    } catch (error) {
+      return error.message;
     }
-
-    const salt = await bcrypt.genSalt(10);
-    if (userData.password) {
-      userData.password = await bcrypt.hash(userData.password, salt);
-    } else {
-      throw new Error('Password is required');
-    }
-
-    const newUser = this.usersRepository.create(userData);
-    const paymentDetails = this.paymentDetailsRepository.create(paymentData);
-    newUser.payment_details = paymentDetails;
-
-    return this.usersRepository.save(newUser);
+    
   }
 
   // ✅ שליפת משתמש לפי ID
   async getUserById(id: number): Promise<UserEntity | null> {
-    return this.usersRepository.findOne({ where: { id } });
+    return this.usersRepository.findOne({
+      where: { id },
+      relations: ['payment_details'], // 🎯 תיקון עיקרי! מביא גם את פרטי התשלום
+    });
   }
 
   // ✅ שליפת משתמש לפי מספר זהות
@@ -64,15 +72,21 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { id: Number(id_number) } });
   }
 
-  // ✅ שליפת כל המשתמשים
-  async getAllUsers(): Promise<UserEntity[] | null> {
-    return this.usersRepository.find();
+  async getAllUsers(): Promise<UserEntity[]> {
+    return this.usersRepository.find({
+      relations: ['payment_details'], // 🎯 תיקון עיקרי
+    });
   }
+
 
   // ✅ חישוב כמה המשתמש היה אמור לשלם עד כה
   async calculateTotalDue(user: UserEntity): Promise<number> {
     const currentDate = new Date();
     let totalDue = 0;
+
+    if (!user.payment_details || !user.payment_details.charge_date) {
+      throw new Error(`Missing payment details for user ${user.id}`);
+    }
 
     const rates = await this.monthlyRatesService.getRatesForRole(user.role);
 
@@ -81,22 +95,21 @@ export class UsersService {
     }
 
     let lastRate = rates[0];
+    const userJoinYear = user.join_date.getFullYear();
+    const userJoinMonth = user.join_date.getMonth() + 1;
 
-
-    let userJoinYear = user.join_date.getFullYear();
-    let userJoinMonth = user.join_date.getMonth() + 1;
+    const chargeDay = Number(user.payment_details.charge_date);
 
     for (let year = userJoinYear; year <= currentDate.getFullYear(); year++) {
-      for (
-        let month = year === userJoinYear ? userJoinMonth : 1;
-        month <= 12;
-        month++
-      ) {
-        if (
-          year === currentDate.getFullYear() &&
-          month > currentDate.getMonth() + 1
-        ) {
+      for (let month = year === userJoinYear ? userJoinMonth : 1; month <= 12; month++) {
+        if (year === currentDate.getFullYear() && month > currentDate.getMonth() + 1) {
           break;
+        }
+
+        if (year === currentDate.getFullYear() && month === currentDate.getMonth() + 1) {
+          if (currentDate.getDate() < chargeDay) {
+            break;
+          }
         }
 
         const newRate = rates.find((r) => r.year === year && r.month === month);
@@ -107,8 +120,10 @@ export class UsersService {
         totalDue += lastRate.amount;
       }
     }
+
     return totalDue;
   }
+  
 
   // ✅ שליפת כל התשלומים של המשתמש עד כה
   async getUserTotalDeposits(userId: number): Promise<number> {

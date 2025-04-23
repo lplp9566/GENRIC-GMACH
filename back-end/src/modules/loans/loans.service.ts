@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoanEntity } from './loans.entity';
 import { LoanPaymentEntity } from './loan-payments/loan_payments.entity';
-import { AddPaymentDto } from 'src/types/loanTypes';
+import { LoanActionDto, LoanPaymentActionType } from 'src/types/loanTypes';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewEntity } from '../funds-overview/entity/funds-overview.entity';
@@ -25,11 +25,7 @@ export class LoansService {
 
   async createLoan(loanData: Partial<LoanEntity>): Promise<LoanEntity> {
     try {
-      const fundsOverview =
-        await this.fundsOverviewService.getFundsOverviewRecord();
-      if (loanData.loan_amount! > fundsOverview.available_funds) {
-        throw new Error('Not enough funds');
-      }
+      await this.fundsOverviewService.addLoan(loanData.loan_amount!);
       const loanRecord = this.loansRepository.create(loanData);
       loanRecord.remaining_balance = loanRecord.loan_amount;
       loanRecord.total_installments = loanRecord.loan_amount / loanRecord.monthly_payment;
@@ -43,46 +39,107 @@ export class LoansService {
         year,
         loanRecord.loan_amount,
       );
+      loanRecord.initialMonthlyPayment= loanData.monthly_payment!;
       await this.userFinacialsService.recordLoanTaken(
         user,
         loanRecord.loan_amount,
       );
-      await this.fundsOverviewService.addLoan(loanRecord.loan_amount);
+      
       return this.loansRepository.save(loanRecord);
     } catch (error) {
       return error.message;
     }
   }
 
-  async addPayment(paymentData: AddPaymentDto): Promise<LoanPaymentEntity> {
-    try {
-      const loan = await this.loansRepository.findOne({
-        where: { id: paymentData.loanId },
-        relations: ['user'],
-      });
-      if (!loan) {
-        throw new Error('Loan not found');
-      }
-      const newPayment = this.paymentsRepository.create({
-        loan: loan,
-        payment_date: paymentData.payment_date,
-        amount_paid: paymentData.amount_paid,
-      });
-      await this.paymentsRepository.save(newPayment);
-      loan.remaining_balance -= paymentData.amount_paid;
 
-      await this.loansRepository.save(loan);
-      const year = getYearFromDate(newPayment.payment_date);
-      await this.userFinancialsByYearService.recordLoanRepaid(
-        loan.user,
-        year,
-        paymentData.amount_paid,
-      );
-      await this.userFinacialsService.recordLoanRepaid(loan.user, paymentData.amount_paid);
-      await this.fundsOverviewService.repayLoan(paymentData.amount_paid);
-      return newPayment;
+ 
+  async getLoanById(id: number): Promise<LoanEntity | null> {
+    try {
+      return this.loansRepository.findOne({
+        where: { id },
+        relations: ['payments'],
+      });
     } catch (error) {
       return error.message;
     }
   }
+
+  async getAllPements(): Promise<LoanPaymentEntity[]> {
+    try {
+      return this.paymentsRepository.find({ relations: ['loan'] });
+    } catch (error) {
+      return error.message;
+    }
+  }
+  async changeLoanAmount(dto: LoanActionDto): Promise<LoanPaymentEntity> {
+    const loan = await this.loansRepository.findOne({ where: { id: dto.loanId } });
+    if (!loan) throw new Error('Loan not found');
+  try {
+    const diff = dto.amount - loan.loan_amount;
+    loan.loan_amount = dto.amount;
+    loan.remaining_balance += diff;
+    loan.total_installments= loan.remaining_balance / loan.monthly_payment;
+    await this.loansRepository.save(loan);
+  
+
+    const year = getYearFromDate(dto.date);
+    await Promise.all([
+      this.userFinancialsByYearService.recordLoanTaken(loan.user,year, diff),
+      this.userFinacialsService.recordLoanTaken(loan.user, diff),
+      this.fundsOverviewService.addLoan(diff),
+    ]);
+  return  await this.paymentsRepository.save({
+      loan,
+      date: dto.date,
+      amount: diff,
+      action_type: LoanPaymentActionType.AMOUNT_CHANGE,
+      note: dto.note || `שינוי סכום הלוואה ל-${dto.amount}`
+    });
+  } catch (error) {
+    console.error('❌ Error in editLoin:', error.message);
+    throw new Error(error.message);
+  }
+   
+  }
+  async changeMonthlyPayment(dto:LoanActionDto) {
+    try {
+      const loan = await this.loansRepository.findOne({ where: { id: dto.loanId } });
+      if (!loan) throw new Error('Loan not found');
+      loan.monthly_payment = dto.amount;
+      loan.total_installments = loan.remaining_balance / loan.monthly_payment;
+      await this.loansRepository.save(loan);
+      return await this.paymentsRepository.save({
+        loan,
+        date: dto.date,
+        amount: dto.amount,
+        action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
+        note: dto.note || `שינוי תשלום חודשי ל-${dto.amount}`,
+      });
+    } catch (error) {
+      console.error('❌ Error in editmontlyPayment:', error.message);
+    throw new Error(error.message);
+    }
+ }
+ async changeDateOfPayment(dto:LoanActionDto) {
+  try {
+    const loan = await this.loansRepository.findOne({ where: { id: dto.loanId } });
+    if (!loan) throw new Error('Loan not found');
+    if(dto.amount > 31 || dto.amount < 0) {
+      throw new Error('Invalid payment date');
+    }
+    loan.payment_date = dto.amount;
+    await this.loansRepository.save(loan);
+    return await this.paymentsRepository.save({
+      loan,
+      date: dto.date,
+      amount: dto.amount,
+      action_type: LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
+      note: dto.note || `שינוי תאריך תשלום ל-${dto.date}`,
+    });
+  } catch (error) {
+    console.error('❌ Error in editDateOfPyment:', error.message);
+    throw new Error(error.message);
+  }
 }
+
+ }

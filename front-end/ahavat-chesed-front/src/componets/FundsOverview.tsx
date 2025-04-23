@@ -20,6 +20,7 @@ interface FundsOverviewProps {
 // הגדרת מבנה הריבועים
 const fundsItems = [
   { key: 'total_funds', label: 'הון עצמי', icon: <AccountBalance />, color: '#1976D2' },
+  { key: 'Investment_profits', label: "רווח מהשקעות", icon:  <TrendingUp />, color: '#1976D2' },
   { key: 'loaned_amount', label: 'כסף בהלוואות', icon: <MonetizationOn />, color: '#E53935' },
   { key: 'investments', label: 'השקעות', icon: <Savings />, color: '#8E24AA' },
   { key: 'special_funds', label: 'קרנות מיוחדות', icon: <VolunteerActivism />, color: '#43A047' },

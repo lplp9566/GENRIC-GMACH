@@ -75,6 +75,5 @@ export class UserFinancialByYearService {
         record.total_fixed_deposits_withdrawn += amount;
         return this.userFinancialsByYearRepository.save(record);
       }
-      
-    
+       
 }
