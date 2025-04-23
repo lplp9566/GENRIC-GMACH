@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoanPaymentEntity } from './loan_payments.entity';
 import { UserFinancialByYearModule } from 'src/modules/users/user-financials-by-year/user-financial-by-year.module';
@@ -12,11 +12,19 @@ import { LoansModule } from '../loans.module';
 import { PaymentDetailsModule } from 'src/modules/users/payment-details/payment-details.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([LoanPaymentEntity,LoanEntity,]),LoansModule,  UserFinancialByYearModule,UserFinancialsModule, FundsOverviewModule,UsersModule,PaymentDetailsModule],
-    providers:[LoanPaymentsService],
-    controllers:[LoanPaymentsController],
-    exports: [LoanPaymentsService,TypeOrmModule]
+  imports: [
+    TypeOrmModule.forFeature([LoanPaymentEntity, LoanEntity]),
+    forwardRef(() => UsersModule),
+    forwardRef(() =>  PaymentDetailsModule,),
+    forwardRef(() => UsersModule),
+    LoansModule,
+    UserFinancialByYearModule,
+    UserFinancialsModule,
+    FundsOverviewModule,
+   
+  ],
+  providers: [LoanPaymentsService],
+  controllers: [LoanPaymentsController],
+  exports: [LoanPaymentsService, TypeOrmModule],
 })
-export class LoanPaymentsModule {
-    ;
-}
+export class LoanPaymentsModule {}

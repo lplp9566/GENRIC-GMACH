@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { LoanPaymentsService } from "./loan_payments.service";
-import { LoanActionDto } from "src/types/loanTypes";
+import { LoanActionDto } from "src/modules/loans/loan-dto/loanTypes";
 
 @Controller("loan-payments")
 export class LoanPaymentsController {

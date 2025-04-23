@@ -27,6 +27,8 @@ export class LoanEntity {
 
   @Column({ type: 'int' })
   payment_date: number;
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
 
   @Column({ type: 'float', nullable: true })
   remaining_balance: number;

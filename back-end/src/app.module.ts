@@ -23,6 +23,7 @@ import { UserFinancialsModule } from './modules/users/user-financials/user-finan
 import { InvestmentsModule } from './modules/investments/investments.module';
 import { InvestmentTransactionsModule } from './modules/investments/investment-transactions/investment-transactions.module';
 import { config } from 'dotenv';
+import { RequestsModule } from './requests/requests.module';
 
 @Module({
   imports: [
@@ -56,7 +57,7 @@ import { config } from 'dotenv';
     MailModule,
     UserFinancialsModule,
     InvestmentsModule, 
-    InvestmentTransactionsModule
+    InvestmentTransactionsModule, RequestsModule
     // AuthModule,
 
   ],

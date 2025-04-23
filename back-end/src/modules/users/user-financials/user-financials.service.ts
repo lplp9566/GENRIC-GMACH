@@ -16,24 +16,28 @@ constructor(
 ) {}
 
 async getOrCreateUserFinancials(user: UserEntity) {
-  let record = await this.userFinancialsRepository.findOne({ where:{user},  } );
-  if(!record){
-    record = this.userFinancialsRepository.create({user,
-        total_special_fund_donations:0,
-        total_donations:0,
-        total_monthly_deposits:0,
-        total_equity_donations:0,
-        total_loans_taken:0,
-        total_loans_repaid:0,
-        total_fixed_deposits_deposited:0,
-        total_fixed_deposits_withdrawn:0,
-        
-     }); 
-}
-await this.userFinancialsRepository.save(record);
-return record
+  let record = await this.userFinancialsRepository.findOne({
+    where: { user: { id: user.id } },   // ← חיפוש רק לפי id
+  });
 
-}async recordMonthlyDeposit(user: UserEntity, amount: number) {      
+  if (!record) {
+    record = this.userFinancialsRepository.create({
+      user,
+      total_special_fund_donations: 0,
+      total_donations: 0,
+      total_monthly_deposits: 0,
+      total_equity_donations: 0,
+      total_loans_taken: 0,
+      total_loans_repaid: 0,
+      total_fixed_deposits_deposited: 0,
+      total_fixed_deposits_withdrawn: 0,
+    });
+    await this.userFinancialsRepository.save(record);
+  }
+  return record;
+}
+
+async recordMonthlyDeposit(user: UserEntity, amount: number) {      
     const record = await this.getOrCreateUserFinancials(user);
     record.total_monthly_deposits += amount;
     record.total_donations += amount;

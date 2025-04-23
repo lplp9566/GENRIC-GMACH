@@ -155,6 +155,7 @@ export class UsersService {
     const balanceData = await this.calculateUserMonthlyBalance(user)
     paymentDetails.monthly_balance = balanceData.balance;
     await this.paymentDetailsRepository.save(paymentDetails);
+    return paymentDetails.monthly_balance;
   }
 
   // ✅ שליפת כל המשתמשים עם `balance` מעודכן

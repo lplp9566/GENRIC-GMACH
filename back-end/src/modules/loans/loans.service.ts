@@ -1,15 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoanEntity } from './loans.entity';
 import { LoanPaymentEntity } from './loan-payments/loan_payments.entity';
-import { LoanActionDto, LoanPaymentActionType } from 'src/types/loanTypes';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewEntity } from '../funds-overview/entity/funds-overview.entity';
 import { UsersService } from '../users/users.service';
 import { getYearFromDate } from '../../services/services';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { LoanActionDto, LoanPaymentActionType } from './loan-dto/loanTypes';
 @Injectable()
 export class LoansService {
   constructor(
@@ -23,7 +23,7 @@ export class LoansService {
     private readonly usersService: UsersService,
   ) {}
 
-  async createLoan(loanData: Partial<LoanEntity>): Promise<LoanEntity> {
+  async createLoan(loanData: Partial<LoanEntity>) {
     try {
       await this.fundsOverviewService.addLoan(loanData.loan_amount!);
       const loanRecord = this.loansRepository.create(loanData);
@@ -34,18 +34,19 @@ export class LoansService {
       if (!user) {
         throw new Error('User not found');
       }
+      loanRecord.initialMonthlyPayment= loanData.monthly_payment!;
+      this.loansRepository.save(loanRecord);
+      const tt =    await this.userFinacialsService.recordLoanTaken(
+        user,
+        loanRecord.loan_amount,
+      );
         await this.userFinancialsByYearService.recordLoanTaken(
         user,
         year,
         loanRecord.loan_amount,
       );
-      loanRecord.initialMonthlyPayment= loanData.monthly_payment!;
-      await this.userFinacialsService.recordLoanTaken(
-        user,
-        loanRecord.loan_amount,
-      );
       
-      return this.loansRepository.save(loanRecord);
+       return loanRecord;
     } catch (error) {
       return error.message;
     }
@@ -74,14 +75,17 @@ export class LoansService {
   async changeLoanAmount(dto: LoanActionDto): Promise<LoanPaymentEntity> {
     const loan = await this.loansRepository.findOne({ where: { id: dto.loanId } });
     if (!loan) throw new Error('Loan not found');
+    if (!loan.isActive) {
+      throw new BadRequestException('Cannot operate on a closed loan');
+    }
   try {
     const diff = dto.amount - loan.loan_amount;
     loan.loan_amount = dto.amount;
     loan.remaining_balance += diff;
-    loan.total_installments= loan.remaining_balance / loan.monthly_payment;
+    loan.total_installments = Math.ceil(
+      loan.remaining_balance / loan.monthly_payment
+    );
     await this.loansRepository.save(loan);
-  
-
     const year = getYearFromDate(dto.date);
     await Promise.all([
       this.userFinancialsByYearService.recordLoanTaken(loan.user,year, diff),
@@ -105,8 +109,13 @@ export class LoansService {
     try {
       const loan = await this.loansRepository.findOne({ where: { id: dto.loanId } });
       if (!loan) throw new Error('Loan not found');
+      if (!loan.isActive) {
+        throw new BadRequestException('Cannot operate on a closed loan');
+      }
       loan.monthly_payment = dto.amount;
-      loan.total_installments = loan.remaining_balance / loan.monthly_payment;
+      loan.total_installments = Math.ceil(
+        loan.remaining_balance / loan.monthly_payment
+      );
       await this.loansRepository.save(loan);
       return await this.paymentsRepository.save({
         loan,
@@ -124,6 +133,9 @@ export class LoansService {
   try {
     const loan = await this.loansRepository.findOne({ where: { id: dto.loanId } });
     if (!loan) throw new Error('Loan not found');
+    if (!loan.isActive) {
+      throw new BadRequestException('Cannot operate on a closed loan');
+    }
     if(dto.amount > 31 || dto.amount < 0) {
       throw new Error('Invalid payment date');
     }

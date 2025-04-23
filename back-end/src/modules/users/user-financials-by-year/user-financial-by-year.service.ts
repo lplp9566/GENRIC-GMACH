@@ -14,29 +14,30 @@ export class UserFinancialByYearService {
         return this.userFinancialsByYearRepository.find();
     }
     
-    async getOrCreateFinancialRecord(user: UserEntity, year: number): Promise<UserFinancialByYearEntity> {
+    async getOrCreateFinancialRecord(
+      user: UserEntity,
+      year: number,
+    ): Promise<UserFinancialByYearEntity> {
       let record = await this.userFinancialsByYearRepository.findOne({
-          where: { user,year }, 
+        where: { user: { id: user.id }, year },     // ← id בלבד
       });
+    
       if (!record) {
-
-          record = this.userFinancialsByYearRepository.create({
-              user,
-              year,
-              total_monthly_deposits: 0,
-              total_equity_donations: 0,
-              total_loans_taken: 0,
-              total_loans_repaid: 0,
-              special_fund_donations: 0,
-              total_fixed_deposits_added: 0,
-              total_fixed_deposits_withdrawn: 0,
-          });
-  
-          await this.userFinancialsByYearRepository.save(record);
+        record = this.userFinancialsByYearRepository.create({
+          user,
+          year,
+          total_monthly_deposits: 0,
+          total_equity_donations: 0,
+          special_fund_donations: 0,
+          total_loans_taken: 0,
+          total_loans_repaid: 0,
+          total_fixed_deposits_added: 0,
+          total_fixed_deposits_withdrawn: 0,
+        });
+        await this.userFinancialsByYearRepository.save(record);
       }
-      
       return record;
-  }
+    }
  
     
     async recordMonthlyDeposit(user: UserEntity, year: number, amount: number) {      

@@ -31,6 +31,6 @@ export class PaymentDetailsEntity {
   @Column({ type: 'float', default: 0 })
   monthly_balance: number; // ✅ יתרת המשתמש בתשלומים החודשיים
 
-  @Column({ type: 'float', default: 0 })
-  loan_balance: number; // ✅ יתרת המשתמש בהחזרי ההלוואות
+  @Column({ type: 'json', default: [] })
+  loan_balances: { loanId: number; balance: number }[];
 }

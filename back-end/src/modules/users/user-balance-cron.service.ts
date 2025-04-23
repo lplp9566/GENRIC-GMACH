@@ -1,22 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { UsersService } from './users.service';
+import { LoanPaymentsService } from 'src/modules/loans/loan-payments/loan_payments.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { LoanEntity } from 'src/modules/loans/loans.entity';
+import { PaymentDetailsEntity } from 'src/modules/users/payment-details/payment_details.entity';
 
 @Injectable()
 export class UserBalanceCronService {
-  constructor(private readonly usersService: UsersService) {}
+  private readonly logger = new Logger(UserBalanceCronService.name);
 
-  @Cron('55 21 * * *',{
-   timeZone: 'Asia/Jerusalem'
-  }) 
+  constructor(
+    private readonly usersService: UsersService,
+
+    private readonly loanPaymentsService: LoanPaymentsService,
+
+    @InjectRepository(LoanEntity)
+    private readonly loansRepo: Repository<LoanEntity>,
+
+    @InjectRepository(PaymentDetailsEntity)
+    private readonly paymentDetailsRepo: Repository<PaymentDetailsEntity>,
+  ) {}
+
+  @Cron('00 00 * * *', { timeZone: 'Asia/Jerusalem' })
   async updateAllUsersBalances() {
-    console.log('🔄 Updating all users balances...');
-
+    this.logger.log('🔄 Updating all users balances...');
     const users = await this.usersService.getAllUsers();
     for (const user of users!) {
-      await this.usersService.updateUserMonthlyBalance(user);
+
+   const net =   await this.usersService.updateUserMonthlyBalance(user);
+      this.logger.debug(`Loan ${user.id}: payment  balance updated to ${net}`);
+    }
+    this.logger.log('✅ All user balances updated successfully.');
+  }
+  @Cron('00 00 * * *', { timeZone: 'Asia/Jerusalem' })
+  async updateDailyLoanBalances() {
+    const today = new Date().getDate(); // 1–31
+    this.logger.log(`🔄 Checking loans with payment_date = ${today}`);
+
+    const loans = await this.loansRepo.find({
+      where: { payment_date: today, isActive: true },
+    });
+
+    this.logger.log(`Found ${loans.length} active loans to update`);
+
+    for (const loan of loans) {
+      try {
+        const net = await this.loanPaymentsService.computeLoanNetBalance(loan.id);
+        this.logger.debug(`Loan ${loan.id}: net balance updated to ${net}`);
+      } catch (err) {
+        this.logger.error(`Error updating loan ${loan.id}: ${err.message}`);
+      }
     }
 
-    console.log('✅ All user balances updated successfully.');
+    this.logger.log('✅ Daily loan balances update complete.');
   }
 }

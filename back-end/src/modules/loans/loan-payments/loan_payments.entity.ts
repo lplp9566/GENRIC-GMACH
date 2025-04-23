@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { LoanEntity } from '../loans.entity';
-import { LoanPaymentActionType } from 'src/types/loanTypes';
+import { LoanPaymentActionType } from '../loan-dto/loanTypes';
 @Entity('loan_payments')
 export class LoanPaymentEntity {
   @PrimaryGeneratedColumn()

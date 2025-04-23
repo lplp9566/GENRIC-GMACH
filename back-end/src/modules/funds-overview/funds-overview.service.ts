@@ -14,7 +14,7 @@ export class FundsOverviewService {
   ) {}
   async getFundsOverviewRecord() {
     try {
-      const fund = await this.fundsOverviewRepository.findOne({ where: {} });
+      const fund = await this.fundsOverviewRepository.find({ take: 1 }).then(r => r[0] ?? null);
       return fund;
     } catch (error) {
       return error.message;

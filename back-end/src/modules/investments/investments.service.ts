@@ -223,10 +223,15 @@ async applyManagementFee(dto: { id: number, feeAmount: number, date: Date }) {
   }
 
   private async findActiveInvestment(id: number): Promise<InvestmentEntity> {
-    const investment = await this.investmentRepo.findOne({ where: { id, is_active: true } });
-    if (!investment) {
-      throw new NotFoundException('השקעה פעילה לא נמצאה');
+    try {
+      
+      const investment = await this.investmentRepo.findOne({ where: { id, is_active: true } });
+      if (!investment) {
+        throw new Error('investment not fond');
+      }
+      return investment;
+    } catch (error) {
+      return error.message
     }
-    return investment;
   }
 }
