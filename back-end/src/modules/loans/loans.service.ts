@@ -22,7 +22,13 @@ export class LoansService {
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly usersService: UsersService,
   ) {}
-
+  async getLoans(): Promise<LoanEntity[]> {
+    try {
+      return this.loansRepository.find({ relations: ['user'] });
+    } catch (error) {
+      return error.message;
+    }
+  }
   async createLoan(loanData: Partial<LoanEntity>) {
     try {
       await this.fundsOverviewService.addLoan(loanData.loan_amount!);
