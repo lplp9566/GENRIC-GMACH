@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Typography } from '@mui/material';
-import FundsOverview from "./componets/FundsOverview";
+import FundsOverview, { FundsOverviewProps } from "./componets/FundsOverview";
 
 const App: React.FC = () => {
-  const [fundsData, setFundsData] = useState<Array<any>>([]);
+  const [fundsData, setFundsData] = useState<FundsOverviewProps[]>([]);
   const [users, setusers] = useState<Array<any>>([])
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const App: React.FC = () => {
   )}
       {/* <FundsOverview data={fundsData} /> */}
 
-      {/* {fundsData ? <FundsOverview data={fundsData} /> : <Typography>טוען נתונים...</Typography>} */}
+      {/* {fundsData.length > 0 ? <FundsOverview data={fundsData[0]} /> : <Typography>טוען נתונים...</Typography>} */}
     </Container>
   );
 };
