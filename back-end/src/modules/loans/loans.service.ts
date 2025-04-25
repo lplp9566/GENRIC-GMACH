@@ -24,7 +24,7 @@ export class LoansService {
   ) {}
   async getLoans(): Promise<LoanEntity[]> {
     try {
-      return this.loansRepository.find({ relations: ['user'] });
+      return this.loansRepository.find({ relations: ['user', 'paymentsDetails'] });
     } catch (error) {
       return error.message;
     }
