@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
@@ -28,7 +28,7 @@ export class UsersService {
     return this.paymentDetailsRepository.findOne({ where: { user: { id: userId } } });
 }
 
-  // ✅ הוספת משתמש עם פרטי תשלום
+
   async createUserWithPayment(
     userData: Partial<UserEntity>,
     paymentData: Partial<PaymentDetailsEntity>,
@@ -54,32 +54,29 @@ export class UsersService {
   
       return this.usersRepository.save(newUser);
     } catch (error) {
-      return error.message;
+  throw new BadRequestException(error.message);
     }
     
   }
-
-  // ✅ שליפת משתמש לפי ID
   async getUserById(id: number): Promise<UserEntity | null> {
     return this.usersRepository.findOne({
       where: { id },
-      relations: ['payment_details'], // 🎯 תיקון עיקרי! מביא גם את פרטי התשלום
+      relations: ['payment_details'],
     });
   }
 
-  // ✅ שליפת משתמש לפי מספר זהות
   async getUserByIdNumber(id_number: string): Promise<UserEntity | null> {
     return this.usersRepository.findOne({ where: { id: Number(id_number) } });
   }
 
   async getAllUsers(): Promise<UserEntity[]> {
     return this.usersRepository.find({
-      relations: ['payment_details'], // 🎯 תיקון עיקרי
+      relations: ['payment_details'], 
     });
   }
 
 
-  // ✅ חישוב כמה המשתמש היה אמור לשלם עד כה
+ 
   async calculateTotalDue(user: UserEntity): Promise<number> {
     const currentDate = new Date();
     let totalDue = 0;
@@ -123,15 +120,12 @@ export class UsersService {
 
     return totalDue;
   }
-  
-
-  // ✅ שליפת כל התשלומים של המשתמש עד כה
   async getUserTotalDeposits(userId: number): Promise<number> {
     const UserTotalDeposits = await this.monthlyDepositsService.getUserTotalDeposits(userId);
     return UserTotalDeposits;
   }
 
-  // ✅ חישוב הבאלנס החודשי
+
   async calculateUserMonthlyBalance(
     user: UserEntity,
   ): Promise<{ total_due: number; total_paid: number; balance: number }> {
@@ -142,7 +136,6 @@ export class UsersService {
     return { total_due: totalDue, total_paid: totalPaid, balance };
   }
 
-  // ✅ עדכון `balance` של המשתמש
   async updateUserMonthlyBalance(user: UserEntity) {
     const paymentDetails = await this.paymentDetailsRepository.findOne({
       where: { user: { id: user.id } },
@@ -157,8 +150,6 @@ export class UsersService {
     await this.paymentDetailsRepository.save(paymentDetails);
     return paymentDetails.monthly_balance;
   }
-
-  // ✅ שליפת כל המשתמשים עם `balance` מעודכן
   async getAllUsersBalances(): Promise<
     { user: string; total_due: number; total_paid: number; balance: number }[]
   > {

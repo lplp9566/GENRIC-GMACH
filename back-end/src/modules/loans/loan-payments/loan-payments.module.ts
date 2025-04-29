@@ -10,6 +10,7 @@ import { LoanPaymentsController } from './loan_payments.controller';
 import { LoanEntity } from '../loans.entity';
 import { LoansModule } from '../loans.module';
 import { PaymentDetailsModule } from 'src/modules/users/payment-details/payment-details.module';
+// cSpell:ignore Financials
 
 @Module({
   imports: [

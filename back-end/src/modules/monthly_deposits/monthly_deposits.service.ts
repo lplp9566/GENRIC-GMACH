@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MonthlyDepositsEntity } from "./monthly_deposits.entity";
@@ -8,6 +8,7 @@ import { UserFinancialByYearService } from '../users/user-financials-by-year/use
 import { getYearFromDate } from 'src/services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+// cSpell:ignore Financials
 
 @Injectable()
 export class MonthlyDepositsService {
@@ -16,7 +17,7 @@ export class MonthlyDepositsService {
     private readonly monthlyDepositsRepository: Repository<MonthlyDepositsEntity>,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
-    private readonly userFinashialByYearService: UserFinancialByYearService,
+    private readonly userFinancialByYearService: UserFinancialByYearService,
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly userFinancialsService: UserFinancialsService
   ) {}
@@ -29,7 +30,7 @@ export class MonthlyDepositsService {
       }
       return allDeposits;
     } catch (error) {
-      return error.message;
+    throw new BadRequestException(error.message);
     }
   }
   async getUserTotalDeposits(userId: number): Promise<number> {
@@ -42,7 +43,7 @@ export class MonthlyDepositsService {
 
       return result?.totalPaid || 0;
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
   async recordMonthlyDeposit(payment_details: Partial<MonthlyDepositsEntity>) {
@@ -60,17 +61,14 @@ export class MonthlyDepositsService {
         throw new Error('User not found');
       }
   
-      // ✅ יצירת ההפקדה ושמירה
       const newDeposit = this.monthlyDepositsRepository.create({
         user: user,
         amount: payment_details.amount,
         deposit_date: payment_details.deposit_date,
       });
       await this.monthlyDepositsRepository.save(newDeposit);
-  
-      // ✅ פעולות נוספות במקביל
       await Promise.all([
-        this.userFinashialByYearService.recordMonthlyDeposit(user, year, payment_details.amount),
+        this.userFinancialByYearService.recordMonthlyDeposit(user, year, payment_details.amount),
         this.userFinancialsService.recordMonthlyDeposit(user, payment_details.amount),
         this.fundsOverviewService.addMonthlyDeposit(payment_details.amount),
         this.usersService.updateUserMonthlyBalance(user),

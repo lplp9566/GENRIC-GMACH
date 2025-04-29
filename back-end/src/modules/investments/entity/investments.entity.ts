@@ -1,6 +1,9 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { InvestmentTransactionEntity } from "../investment-transactions/entity/investment-transaction.entity";
-
+const decimalTransformer = {
+  to:    (value: number)   => value,              // לפני שמירה – מספר
+  from:  (value: string)   => parseFloat(value),  // אחרי קריאה – ממיר למספר
+};
 @Entity('investments')
 export class InvestmentEntity {
   @PrimaryGeneratedColumn()
@@ -9,7 +12,7 @@ export class InvestmentEntity {
   @Column()
   investment_name: string;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0})
   total_principal_invested: number; // סה"כ קרן שהושקעה
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
@@ -18,7 +21,8 @@ export class InvestmentEntity {
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
   principal_remaining: number; // כמה מהקרן עוד קיים בתוך ההשקעה
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0,    transformer: decimalTransformer
+  })
   profit_realized: number; // סה"כ רווח שצברנו (יכול להיות גם שלילי)
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })

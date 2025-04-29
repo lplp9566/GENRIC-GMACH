@@ -4,6 +4,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  RelationId,
 } from 'typeorm';
 import { UserEntity } from '../users/user.entity';
 import { LoanPaymentEntity } from './loan-payments/loan_payments.entity';
@@ -18,6 +19,8 @@ export class LoanEntity {
 
   @Column({ type: 'float' })
   loan_amount: number;
+
+
 
   @Column({ type: 'date' })
   loan_date: Date;
