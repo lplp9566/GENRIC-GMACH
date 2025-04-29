@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { UsersService } from './users.service';
-import { LoanPaymentsService } from 'src/modules/loans/loan-payments/loan_payments.service';
+import { LoanActionsService } from 'src/modules/loans/loan-actions/loan_actions.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoanEntity } from 'src/modules/loans/loans.entity';
@@ -14,7 +14,7 @@ export class UserBalanceCronService {
   constructor(
     private readonly usersService: UsersService,
 
-    private readonly loanPaymentsService: LoanPaymentsService,
+    private readonly loanPaymentsService: LoanActionsService,
 
     @InjectRepository(LoanEntity)
     private readonly loansRepo: Repository<LoanEntity>,

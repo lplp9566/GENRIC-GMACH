@@ -7,7 +7,7 @@ import {
   RelationId,
 } from 'typeorm';
 import { UserEntity } from '../users/user.entity';
-import { LoanPaymentEntity } from './loan-payments/loan_payments.entity';
+import { LoanPaymentEntity } from './loan-actions/loan_actions.entity';
 
 @Entity('loans')
 export class LoanEntity {

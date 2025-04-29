@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoanEntity } from './loans.entity';
-import { LoanPaymentEntity } from './loan-payments/loan_payments.entity';
+import { LoanPaymentEntity } from './loan-actions/loan_actions.entity';
 import { LoansService } from './loans.service';
 import { LoansController } from './loans.controller';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';

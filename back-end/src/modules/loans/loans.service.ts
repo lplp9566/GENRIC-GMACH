@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoanEntity } from './loans.entity';
-import { LoanPaymentEntity } from './loan-payments/loan_payments.entity';
+import { LoanPaymentEntity } from './loan-actions/loan_actions.entity';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewEntity } from '../funds-overview/entity/funds-overview.entity';
@@ -80,8 +80,10 @@ export class LoansService {
     }
   }
   async changeLoanAmount(dto: LoanActionDto): Promise<LoanPaymentEntity> {
-    const loan = await this.loansRepository.findOne({ where: { id: dto.loanId } });
-    if (!loan) throw new Error('Loan not found');
+    const loan = await this.loansRepository.findOne({
+      where: { id: dto.loanId },
+      relations: ['user'],      
+    });    if (!loan) throw new Error('Loan not found');
     if (!loan.isActive) {
       throw new BadRequestException('Cannot operate on a closed loan');
     }
@@ -114,6 +116,7 @@ export class LoansService {
   }
   async changeMonthlyPayment(dto:LoanActionDto) {
     try {
+      
       const loan = await this.loansRepository.findOne({ where: { id: dto.loanId } });
       if (!loan) throw new Error('Loan not found');
       if (!loan.isActive) {
@@ -153,7 +156,7 @@ export class LoansService {
       date: dto.date,
       amount: dto.amount,
       action_type: LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
-      note: dto.note || `שינוי תאריך תשלום ל-${dto.date}`,
+      note: dto.note || `שינוי תאריך תשלום ל-${dto.amount}`,
     });
   } catch (error) {
     console.error('❌ Error in editDateOfPyment:', error.message);

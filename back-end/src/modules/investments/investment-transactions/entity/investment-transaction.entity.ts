@@ -5,7 +5,7 @@ import { InvestmentEntity } from "../../entity/investments.entity";
 export class InvestmentTransactionEntity {
   @PrimaryGeneratedColumn()
   id: number;
-
+  
   @ManyToOne(() => InvestmentEntity, investment => investment.id, { onDelete: 'CASCADE' })
   investment: InvestmentEntity;
 

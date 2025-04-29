@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { LoanEntity } from "../loans.entity";
 import { Repository } from "typeorm";
-import { LoanPaymentEntity } from "./loan_payments.entity";
+import { LoanPaymentEntity } from "./loan_actions.entity";
 import { UserFinancialsService } from "src/modules/users/user-financials/user-financials.service";
 import { UserFinancialByYearService } from "src/modules/users/user-financials-by-year/user-financial-by-year.service";
 import { FundsOverviewService } from "src/modules/funds-overview/funds-overview.service";
@@ -17,7 +17,7 @@ import { LoanActionDto, LoanPaymentActionType, PaymentEvent } from "../loan-dto/
 
  
 @Injectable()
-export class LoanPaymentsService {
+export class LoanActionsService {
   constructor(
     @InjectRepository(LoanEntity)
     private readonly loansRepo: Repository<LoanEntity>,
@@ -25,7 +25,7 @@ export class LoanPaymentsService {
     private readonly paymentsRepo: Repository<LoanPaymentEntity>,
     @InjectRepository(PaymentDetailsEntity)
     private readonly paymentDetailsRepo: Repository<PaymentDetailsEntity>,
-    private readonly loansService: LoansService,                  // צריך להיות LoansService
+    private readonly loansService: LoansService,              
     private readonly userFinByYear: UserFinancialByYearService,
     private readonly userFin: UserFinancialsService,
     private readonly fundsOverview: FundsOverviewService,
@@ -181,9 +181,7 @@ export class LoanPaymentsService {
       totalExpected = Math.min(totalExpected, principal);
     }
   
-    // 8. החזר net balance
-    //   חיובי => שילם יותר מהמצופה (בפלוס)
-    //   שלילי => שילם פחות מהמצופה (בחוב)
+ 
 
     const netBalance  = totalActualPaid - totalExpected
     const pd = await this.paymentDetailsRepo.findOne({

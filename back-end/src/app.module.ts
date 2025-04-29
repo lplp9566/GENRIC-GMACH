@@ -8,7 +8,7 @@ import { UsersModule } from './modules/users/users.module';
 import { FundsOverviewModule } from './modules/funds-overview/funds-overview.module';
 import { FundsOverviewService } from './modules/funds-overview/funds-overview.service';
 import { FundsOverviewController } from './modules/funds-overview/funds-overview.controller';
-import { LoanPaymentsModule } from './modules/loans/loan-payments/loan-payments.module';
+import { LoanPaymentsModule } from './modules/loans/loan-actions/loan-actions.module';
 import { LoansController } from './modules/loans/loans.controller';
 import { LoansService } from './modules/loans/loans.service';
 import { LoansModule } from './modules/loans/loans.module';
