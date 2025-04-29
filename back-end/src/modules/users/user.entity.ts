@@ -6,6 +6,8 @@ import { UserFinancialByYearEntity } from "./user-financials-by-year/user-financ
 import { MonthlyDepositsEntity } from "../monthly_deposits/monthly_deposits.entity";
 import { on } from "events";
 import { DonationsEntity } from "../donations/donations.entity";
+// cSpell:ignore Financials
+
 import { UserFinancialsEntity } from "./user-financials/user-financials.entity";
 import { RequestEntity } from "../requests/entities/request.entity";
 
@@ -23,8 +25,8 @@ export class UserEntity {
     @Column({
         type: 'date',
         transformer: {
-          from: (value: string) => new Date(value), // 🔄 המרה אוטומטית ל-`Date`
-          to: (value: Date) => value, // שומר את ה-`Date` כמות שהוא
+          from: (value: string) => new Date(value), 
+          to: (value: Date) => value, 
         },
       })
       join_date: Date;

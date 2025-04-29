@@ -3,7 +3,7 @@ import { Card, CardContent, Typography, Grid } from '@mui/material';
 import { MonetizationOn, AccountBalance, Savings, VolunteerActivism, AccountBalanceWallet, Favorite, Payments, TrendingUp, MoneyOff } from '@mui/icons-material';
 
 // הגדרת סוג הנתונים
-interface FundsOverviewProps {
+ export interface FundsOverviewProps {
   data: {
     total_funds: number ;
     loaned_amount: number;

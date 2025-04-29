@@ -15,7 +15,6 @@ export class LoanPaymentEntity {
       enum:LoanPaymentActionType,
       default: LoanPaymentActionType.PAYMENT,
     }
-    
   )
   action_type: LoanPaymentActionType;
   @Column({ type: 'date', nullable: false })

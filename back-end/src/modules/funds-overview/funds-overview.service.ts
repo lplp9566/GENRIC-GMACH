@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FundsOverviewEntity } from './entity/funds-overview.entity';
 import { Repository } from 'typeorm';
@@ -17,7 +17,8 @@ export class FundsOverviewService {
       const fund = await this.fundsOverviewRepository.find({ take: 1 }).then(r => r[0] ?? null);
       return fund;
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
+
     }
   }
 
@@ -43,7 +44,7 @@ export class FundsOverviewService {
       await this.fundsOverviewRepository.save(newRecord);
       return ApiResponse.success(newRecord);
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -56,7 +57,7 @@ export class FundsOverviewService {
       await this.fundsOverviewRepository.save(fund);
       return ApiResponse.success(fund);
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
   async addDonation(amount: number) {
@@ -68,7 +69,7 @@ export class FundsOverviewService {
       await this.fundsOverviewRepository.save(fund);
       return fund;
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
   async addInvestment(amount: number) {
@@ -84,17 +85,13 @@ export class FundsOverviewService {
   }
 
   async addInvestmentProfits(principal: number, profit: number) {
-    
-      console.log(principal, profit)
-      const fund = await this.getFundsOverviewRecord();
-
+          const fund = await this.getFundsOverviewRecord();
       fund.available_funds += principal;
       fund.available_funds += profit
       fund.Investment_profits += profit;
       fund.investments -= principal;
       fund.total_funds += profit;
       await this.fundsOverviewRepository.save(fund);
-      console.log(fund)
       return fund;
 
   }
@@ -119,7 +116,7 @@ export class FundsOverviewService {
       await this.fundsOverviewRepository.save(fund);
       return fund
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
   async repayLoan(amount: number) {
@@ -132,7 +129,7 @@ export class FundsOverviewService {
       await this.fundsOverviewRepository.save(fund);
       return fund;
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -150,7 +147,7 @@ export class FundsOverviewService {
       await this.fundsOverviewRepository.save(fund);
       ApiResponse.success(fund);
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
   async addExpense(amount: number) {
@@ -162,7 +159,7 @@ export class FundsOverviewService {
       await this.fundsOverviewRepository.save(fund);
       ApiResponse.success(fund);
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
   async addToDepositsTotal(amount: number) {
@@ -174,7 +171,7 @@ export class FundsOverviewService {
       await this.fundsOverviewRepository.save(fund);
       ApiResponse.success(fund);
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
   async editUserDepositsTotal(amount: number) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MonthlyRatesEntity } from './monthly_rates.entity';
@@ -11,7 +11,7 @@ export class MonthlyRatesService {
   ) {}
 
 
-  //קבלת כל הנתוים  לפי דרגה 
+
   async getRatesForRole(role: string): Promise<MonthlyRatesEntity[]> {
     return this.monthlyRatesRepository
       .createQueryBuilder("rate")
@@ -20,7 +20,7 @@ export class MonthlyRatesService {
       .addOrderBy("rate.month", "ASC")
       .getMany();
   }
-//הוספת שורה בטבלה 
+
   async addRate(rate: MonthlyRatesEntity): Promise<MonthlyRatesEntity> {
     try {
       const OldRate = await this.monthlyRatesRepository.findOne({
@@ -36,10 +36,10 @@ export class MonthlyRatesService {
       return this.monthlyRatesRepository.save(newRate);
     }
      catch (error) {
-      return error.message;
+  throw new BadRequestException(error.message);
     }
   }
-  //קבלת כל השורות 
+
   async getAllRates(): Promise<MonthlyRatesEntity[]> {
     try {
       const allRates = this.monthlyRatesRepository.find() 
@@ -48,7 +48,7 @@ export class MonthlyRatesService {
       }
       return allRates
     } catch (error) {
-      return error.message
+      throw new BadRequestException(error.message);
     }
   } 
   }

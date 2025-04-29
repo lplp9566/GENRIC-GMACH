@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/modules/users/users.service';
 import { RequestEntity } from './entities/request.entity';
@@ -26,7 +26,7 @@ export class RequestsService {
       return this.requestsRepo.save(request);
     } catch (error) {
       console.error('Error creating request:', error);
-      return error.message;
+  throw new BadRequestException(error.message);
     }
   }
   async editStatus(id: number, status: RequestStatus) { 
@@ -39,7 +39,7 @@ export class RequestsService {
       return this.requestsRepo.save(request);
     } catch (error) {
       console.error('Error updating request status:', error);
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   
   }

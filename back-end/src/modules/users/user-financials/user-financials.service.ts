@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserFinancialsEntity } from './user-financials.entity';
 import { use } from 'passport';
 import { UserEntity } from '../user.entity';
+// cSpell:ignore Financials
 
 @Injectable()
 export class UserFinancialsService {

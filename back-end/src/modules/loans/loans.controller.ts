@@ -12,10 +12,10 @@ export class LoansController {
   async createLoan(@Body() loanData: Partial<LoanEntity>) {
     return this.loansService.createLoan(loanData);
   }
-// @Get()
-//   async getLoans() {
-//     return this.loansService.getLoans();
-//   }
+@Get()
+  async getLoans() {
+    return this.loansService.getLoans();
+  }
   @Get('loan/:id')
   async getLoan(@Body('id') id: number) {
     return this.loansService.getLoanById(id);
