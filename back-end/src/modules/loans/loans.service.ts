@@ -55,7 +55,7 @@ export class LoansService {
         loanRecord.loan_amount,
       );
       
-       return loanData;
+       return loanRecord;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
