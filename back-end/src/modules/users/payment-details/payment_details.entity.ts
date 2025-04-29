@@ -29,7 +29,7 @@ export class PaymentDetailsEntity {
   payment_method: payment_method;
 
   @Column({ type: 'float', default: 0 })
-  monthly_balance: number; // ✅ יתרת המשתמש בתשלומים החודשיים
+  monthly_balance: number; 
 
   @Column({ type: 'json', default: [] })
   loan_balances: { loanId: number; balance: number }[];

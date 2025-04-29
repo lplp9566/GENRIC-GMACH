@@ -10,6 +10,9 @@ import { UsersService } from '../users/users.service';
 import { getYearFromDate } from '../../services/services';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { LoanActionDto, LoanPaymentActionType } from './loan-dto/loanTypes';
+// cSpell:ignore Financials
+
+
 @Injectable()
 export class LoansService {
   constructor(
@@ -17,16 +20,16 @@ export class LoansService {
     private loansRepository: Repository<LoanEntity>,
     @InjectRepository(LoanPaymentEntity)
     private paymentsRepository: Repository<LoanPaymentEntity>,
-    private readonly userFinacialsService: UserFinancialsService,
+    private readonly userFinancialsService: UserFinancialsService,
     private readonly userFinancialsByYearService: UserFinancialByYearService,
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly usersService: UsersService,
   ) {}
   async getLoans(): Promise<LoanEntity[]> {
     try {
-      return this.loansRepository.find({ relations: ['user', 'paymentsDetails'] });
+      return this.loansRepository.find({ relations: ['user', ] });
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
   async createLoan(loanData: Partial<LoanEntity>) {
@@ -42,7 +45,7 @@ export class LoansService {
       }
       loanRecord.initialMonthlyPayment= loanData.monthly_payment!;
       this.loansRepository.save(loanRecord);
-      const tt =    await this.userFinacialsService.recordLoanTaken(
+      const tt =    await this.userFinancialsService.recordLoanTaken(
         user,
         loanRecord.loan_amount,
       );
@@ -51,15 +54,12 @@ export class LoansService {
         year,
         loanRecord.loan_amount,
       );
-      
        return loanRecord;
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
 
-
- 
   async getLoanById(id: number): Promise<LoanEntity | null> {
     try {
       return this.loansRepository.findOne({
@@ -67,7 +67,7 @@ export class LoansService {
         relations: ['payments'],
       });
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -75,7 +75,7 @@ export class LoansService {
     try {
       return this.paymentsRepository.find({ relations: ['loan'] });
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   }
   async changeLoanAmount(dto: LoanActionDto): Promise<LoanPaymentEntity> {
@@ -95,7 +95,7 @@ export class LoansService {
     const year = getYearFromDate(dto.date);
     await Promise.all([
       this.userFinancialsByYearService.recordLoanTaken(loan.user,year, diff),
-      this.userFinacialsService.recordLoanTaken(loan.user, diff),
+      this.userFinancialsService.recordLoanTaken(loan.user, diff),
       this.fundsOverviewService.addLoan(diff),
     ]);
   return  await this.paymentsRepository.save({

@@ -13,6 +13,7 @@ import { differenceInCalendarMonths, differenceInMonths } from 'date-fns';
 import { PaymentDetailsEntity } from "src/modules/users/payment-details/payment_details.entity";
 import { LoanActionDto, LoanPaymentActionType, PaymentEvent } from "../loan-dto/loanTypes";
 
+// cSpell:ignore Financials
 
  
 @Injectable()
@@ -53,7 +54,7 @@ export class LoanPaymentsService {
     try {
       const loan = await this.loansRepo.findOne({
         where: { id:dto.loanId  },
-        // relations: ['user'],
+        relations: ['user'],
       });
   
       if (!loan) {
@@ -94,7 +95,7 @@ export class LoanPaymentsService {
   
     } catch (error) {
       console.error('❌ Error in addPayment:', error.message);
-      throw new Error(error.message);
+      throw new BadRequestException(error.message);
     }
   }
   async getLoanPayments(loanId: number){

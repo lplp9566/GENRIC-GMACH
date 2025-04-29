@@ -1,25 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Typography } from '@mui/material';
-import FundsOverview from "./componets/FundsOverview";
+import FundsOverview, { FundsOverviewProps } from "./componets/FundsOverview";
 
 const App: React.FC = () => {
-  const [fundsData, setFundsData] = useState<Array<any>>([]);
-  const [users, setusers] = useState<Array<any>>([])
+  const [fundsData, setFundsData] = useState<FundsOverviewProps[]>([]);
+  const [users, setUsers] = useState<Array<any>>([])
+  const [loans, setLoans] = useState<Array<any>>([])
 
   useEffect(() => {
+    axios.get('https://ahavat-chesed-2.onrender.com/loans')
+    .then((response) => setLoans(response.data))
+    .catch((error) => console.error("Error fetching data:", error));
     axios.get('https://ahavat-chesed-2.onrender.com/funds-overview')
 
       .then((response) => setFundsData(response.data))
       .catch((error) => console.error("Error fetching data:", error));
       axios.get('https://ahavat-chesed-2.onrender.com/users')
-      .then((response)=> setusers(response.data))
-      axios.get('https://ahavat-chesed-2.onrender.com/loans')
-      .then((response) => console.log(response.data))
-      .catch((error) => console.error("Error fetching data:", error));
+      .then((response)=> setUsers(response.data))
 
   }, []);
   console.log(users)
+  console.log(loans)
   return (
 
     <Container sx={{ mt: 4 }}>
@@ -33,7 +35,7 @@ const App: React.FC = () => {
   )}
       {/* <FundsOverview data={fundsData} /> */}
 
-      {/* {fundsData ? <FundsOverview data={fundsData} /> : <Typography>טוען נתונים...</Typography>} */}
+      {/* {fundsData.length > 0 ? <FundsOverview data={fundsData[0]} /> : <Typography>טוען נתונים...</Typography>} */}
     </Container>
   );
 };

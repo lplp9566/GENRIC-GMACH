@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserFinancialByYearEntity } from './user-financial-by-year.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../user.entity';
+// cSpell:ignore Financials
 
 @Injectable()
 export class UserFinancialByYearService {

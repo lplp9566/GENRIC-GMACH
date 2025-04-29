@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InvestmentEntity } from './entity/investments.entity';
 import { InvestmentTransactionService } from './investment-transactions/investment-transactions.service';
-import { TransactionType } from 'src/types/investementsTypes';
+import { TransactionType } from 'src/modules/investments/investmentsTypes';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 
 @Injectable()
@@ -41,7 +41,7 @@ export class InvestmentsService {
   
       return investment;
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
   
   }
@@ -68,7 +68,7 @@ export class InvestmentsService {
 
     return investment;
     } catch (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
     
   }
@@ -82,8 +82,9 @@ export class InvestmentsService {
       }
       const previousValue = investment.current_value;
       const profitOrLoss = new_value - previousValue;
+      const profit_realized = new_value - investment.principal_remaining;
       investment.current_value = new_value;
-      investment.profit_realized = new_value - investment.principal_remaining;
+      investment.profit_realized =  profit_realized ;
       investment.last_update = date;
   
       await this.investmentRepo.save(investment);
@@ -111,21 +112,17 @@ export class InvestmentsService {
         let withdrawnTotal = Number(investment.withdrawn_total);
 
         if (amount > currentValue) {
-            throw new Error('אין מספיק כסף למשיכה');
+            throw new Error('not enough funds');
         }
-
-        // חישוב כמה נלקח מהרווח וכמה מהקרן
-        let profitWithdrawal = Math.max(0, currentValue - principalRemaining); // כמה רווח זמין למשיכה
-        let principalWithdrawal = 0; // כמה נמשך מהקרן בפועל
-        let profitWithdrawn = Math.min(amount, profitWithdrawal); // כמה כסף נמשך מהרווח
-
+        let profitWithdrawal = Math.max(0, currentValue - principalRemaining); 
+        let principalWithdrawal = 0; 
+        let profitWithdrawn = Math.min(amount, profitWithdrawal); 
         if (amount > profitWithdrawal) {
-            // אם המשיכה חורגת מהרווח, לוקחים גם מהקרן
             principalWithdrawal = amount - profitWithdrawn;
             principalRemaining -= principalWithdrawal;
         }
 
-        // עדכון הנתונים של ההשקעה
+
         investment.current_value = currentValue - amount;
         investment.withdrawn_total = withdrawnTotal + amount;
         investment.principal_remaining = principalRemaining;
@@ -144,18 +141,19 @@ export class InvestmentsService {
             transaction_type: TransactionType.WITHDRAWAL,
             amount,
             transaction_date: date,
-            note: investment.is_active ? 'משיכה חלקית' : 'משיכה וסגירה',
+            note: investment.is_active ? ' part of withdrawal' : 'full withdrawal',
         });
         await this.fundsOverviewService.addInvestmentProfits(principalWithdrawal,profitWithdrawn);
-        // ✅ מחזירים גם פירוט על מקור הכסף שנמשך
+
         return {
             investment,
-            profitWithdrawn,      // כמה כסף יצא מהרווח
-            principalWithdrawal    // כמה כסף יצא מהקרן
+            profitWithdrawn,      
+            principalWithdrawal    
         };
 
     } catch (error) {
-        return error.message;
+      throw new BadRequestException(error.message);
+
     }
 }
 
@@ -231,7 +229,7 @@ async applyManagementFee(dto: { id: number, feeAmount: number, date: Date }) {
       }
       return investment;
     } catch (error) {
-      return error.message
+      throw new BadRequestException(error.message);
     }
   }
 }
