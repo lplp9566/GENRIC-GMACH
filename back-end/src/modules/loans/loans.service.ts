@@ -46,7 +46,7 @@ export class LoansService {
         loanRecord.loan_amount,
       );
       
-       return loanRecord;
+       return loanData;
     } catch (error) {
       return error.message;
     }
