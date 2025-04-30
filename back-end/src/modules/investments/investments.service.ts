@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InvestmentEntity } from './entity/investments.entity';
@@ -12,10 +16,14 @@ export class InvestmentsService {
     @InjectRepository(InvestmentEntity)
     private readonly investmentRepo: Repository<InvestmentEntity>,
     private readonly transactionService: InvestmentTransactionService,
-    private readonly fundsOverviewService: FundsOverviewService
+    private readonly fundsOverviewService: FundsOverviewService,
   ) {}
 
-  async createInitialInvestment(dto: { investment_name: string, amount: number, start_date: Date }) {
+  async createInitialInvestment(dto: {
+    investment_name: string;
+    amount: number;
+    start_date: Date;
+  }) {
     try {
       const { investment_name, amount, start_date } = dto;
       await this.fundsOverviewService.addInvestment(amount);
@@ -28,9 +36,7 @@ export class InvestmentsService {
         last_update: start_date,
         is_active: true,
       });
-  
       await this.investmentRepo.save(investment);
-  
       await this.transactionService.createTransaction({
         investmentId: investment.id,
         transaction_type: TransactionType.INITIAL_INVESTMENT,
@@ -38,176 +44,162 @@ export class InvestmentsService {
         transaction_date: start_date,
         note: 'השקעה ראשונית',
       });
-  
       return investment;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
-  
   }
 
-  async addInvestment(dto: { id: number, amount: number, date: Date }) {
+  async addInvestment(dto: { id: number; amount: number; date: Date }) {
     try {
       const { id, amount, date } = dto;
-    const investment = await this.findActiveInvestment(id);
-    await this.fundsOverviewService.addInvestment(amount);
-    investment.total_principal_invested = +investment.total_principal_invested + amount;
-    investment.principal_remaining = +investment.principal_remaining + amount;
-    investment.current_value = +investment.current_value + amount;
-    investment.last_update = date;
+      const investment = await this.findActiveInvestment(id);
+      await this.fundsOverviewService.addInvestment(amount);
+      investment.total_principal_invested =
+        +investment.total_principal_invested + amount;
+      investment.principal_remaining = +investment.principal_remaining + amount;
+      investment.current_value = +investment.current_value + amount;
+      investment.last_update = date;
+      await this.investmentRepo.save(investment);
+      await this.transactionService.createTransaction({
+        investmentId: investment.id,
+        transaction_type: TransactionType.ADDITIONAL_INVESTMENT,
+        amount,
+        transaction_date: date,
+        note: 'הוספת קרן',
+      });
 
-    await this.investmentRepo.save(investment);
-
-    await this.transactionService.createTransaction({
-      investmentId: investment.id,
-      transaction_type: TransactionType.ADDITIONAL_INVESTMENT,
-      amount,
-      transaction_date: date,
-      note: 'הוספת קרן',
-    });
-
-    return investment;
+      return investment;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
-    
   }
 
-  async updateCurrentValue(dto: { id: number, new_value: number, date: Date }) {
+  async updateCurrentValue(dto: { id: number; new_value: number; date: Date }) {
     try {
       const { id, new_value, date } = dto;
       const investment = await this.findActiveInvestment(id);
-      if(!investment){
+      if (!investment) {
         throw new Error('investment not found');
       }
       const previousValue = investment.current_value;
       const profitOrLoss = new_value - previousValue;
       const profit_realized = new_value - investment.principal_remaining;
       investment.current_value = new_value;
-      investment.profit_realized =  profit_realized ;
+      investment.profit_realized = profit_realized;
       investment.last_update = date;
-  
+
       await this.investmentRepo.save(investment);
       await this.transactionService.createTransaction({
         investmentId: investment.id,
-        transaction_type:TransactionType.VALUE_UPDATE,
+        transaction_type: TransactionType.VALUE_UPDATE,
         amount: profitOrLoss,
         transaction_date: date,
         note: 'עדכון ערך',
       });
-  
+
       return investment;
     } catch (error) {
-      return  error.message
+      return error.message;
     }
   }
 
-  async withdraw(dto: { id: number, amount: number, date: Date }) {
+  async withdraw(dto: { id: number; amount: number; date: Date }) {
     try {
-        const { id, amount, date } = dto;
-        const investment = await this.findActiveInvestment(id);
+      const { id, amount, date } = dto;
+      const investment = await this.findActiveInvestment(id);
 
-        let currentValue = Number(investment.current_value);
-        let principalRemaining = Number(investment.principal_remaining);
-        let withdrawnTotal = Number(investment.withdrawn_total);
+      let currentValue = Number(investment.current_value);
+      let principalRemaining = Number(investment.principal_remaining);
+      let withdrawnTotal = Number(investment.withdrawn_total);
 
-        if (amount > currentValue) {
-            throw new Error('not enough funds');
-        }
-        let profitWithdrawal = Math.max(0, currentValue - principalRemaining); 
-        let principalWithdrawal = 0; 
-        let profitWithdrawn = Math.min(amount, profitWithdrawal); 
-        if (amount > profitWithdrawal) {
-            principalWithdrawal = amount - profitWithdrawn;
-            principalRemaining -= principalWithdrawal;
-        }
+      if (amount > currentValue) {
+        throw new Error('not enough funds');
+      }
+      let profitWithdrawal = Math.max(0, currentValue - principalRemaining);
+      let principalWithdrawal = 0;
+      let profitWithdrawn = Math.min(amount, profitWithdrawal);
+      if (amount > profitWithdrawal) {
+        principalWithdrawal = amount - profitWithdrawn;
+        principalRemaining -= principalWithdrawal;
+      }
 
+      investment.current_value = currentValue - amount;
+      investment.withdrawn_total = withdrawnTotal + amount;
+      investment.principal_remaining = principalRemaining;
 
-        investment.current_value = currentValue - amount;
-        investment.withdrawn_total = withdrawnTotal + amount;
-        investment.principal_remaining = principalRemaining;
+      if (investment.current_value === 0) {
+        investment.is_active = false;
+      }
 
-        if (investment.current_value === 0) {
-            investment.is_active = false;
-        }
+      investment.profit_realized =
+        investment.current_value - principalRemaining;
+      investment.last_update = date;
 
-        investment.profit_realized = investment.current_value - principalRemaining;
-        investment.last_update = date;
+      await this.investmentRepo.save(investment);
 
-        await this.investmentRepo.save(investment);
+      await this.transactionService.createTransaction({
+        investmentId: investment.id,
+        transaction_type: TransactionType.WITHDRAWAL,
+        amount,
+        transaction_date: date,
+        note: investment.is_active ? ' part of withdrawal' : 'full withdrawal',
+      });
+      await this.fundsOverviewService.addInvestmentProfits(
+        principalWithdrawal,
+        profitWithdrawn,
+      );
 
-        await this.transactionService.createTransaction({
-            investmentId: investment.id,
-            transaction_type: TransactionType.WITHDRAWAL,
-            amount,
-            transaction_date: date,
-            note: investment.is_active ? ' part of withdrawal' : 'full withdrawal',
-        });
-        await this.fundsOverviewService.addInvestmentProfits(principalWithdrawal,profitWithdrawn);
-
-        return {
-            investment,
-            profitWithdrawn,      
-            principalWithdrawal    
-        };
-
+      return {
+        investment,
+        profitWithdrawn,
+        principalWithdrawal,
+      };
     } catch (error) {
       throw new BadRequestException(error.message);
-
     }
-}
-
-
-  
-async applyManagementFee(dto: { id: number, feeAmount: number, date: Date }) {
-  const { id, feeAmount, date } = dto;
-  const investment = await this.findActiveInvestment(id);
-
-  const currentValue = Number(investment.current_value);
-  let profitRealized = Number(investment.current_value) - Number(investment.principal_remaining);
-  let principalRemaining = Number(investment.principal_remaining);
-  const managementFeesTotal = Number(investment.management_fees_total);
-
-  // if (feeAmount > currentValue) {
-  //     throw new BadRequestException('אין מספיק יתרה לדמי ניהול');
-  // }
-
-  if (feeAmount <= profitRealized) {
-      // מספיק רווח לכיסוי דמי ניהול
-      profitRealized -= feeAmount;
-  } else {
-      // לא מספיק רווח, נוריד קודם מהרווחים ואז מהקרן
-      const remainingFee = feeAmount - profitRealized;
-      profitRealized = 0;
-
-      // if (remainingFee > principalRemaining) {
-      //     throw new BadRequestException('אין מספיק קרן לכיסוי דמי ניהול');
-      // }
-
-      principalRemaining -= remainingFee;
   }
 
-  investment.current_value -= feeAmount;
-  investment.management_fees_total = managementFeesTotal + feeAmount;
-  investment.profit_realized = profitRealized;
-  investment.principal_remaining = principalRemaining;
-  investment.last_update = date;
+  async applyManagementFee(dto: { id: number; feeAmount: number; date: Date }) {
+    const { id, feeAmount, date } = dto;
+    const investment = await this.findActiveInvestment(id);
 
-  await this.investmentRepo.save(investment);
+    const currentValue = Number(investment.current_value);
+    let profitRealized =
+      Number(investment.current_value) - Number(investment.principal_remaining);
+    let principalRemaining = Number(investment.principal_remaining);
+    const managementFeesTotal = Number(investment.management_fees_total);
 
-  await this.transactionService.createTransaction({
+    // if (feeAmount > currentValue) {
+    //     throw new BadRequestException('אין מספיק יתרה לדמי ניהול');
+    // }
+
+    if (feeAmount <= profitRealized) {
+      profitRealized -= feeAmount;
+    } else {
+      const remainingFee = feeAmount - profitRealized;
+      profitRealized = 0;
+      principalRemaining -= remainingFee;
+    }
+
+    investment.current_value -= feeAmount;
+    investment.management_fees_total = managementFeesTotal + feeAmount;
+    investment.profit_realized = profitRealized;
+    investment.principal_remaining = principalRemaining;
+    investment.last_update = date;
+
+    await this.investmentRepo.save(investment);
+
+    await this.transactionService.createTransaction({
       investmentId: investment.id,
       transaction_type: TransactionType.MANAGEMENT_FEE,
       amount: feeAmount,
       transaction_date: date,
       note: 'דמי ניהול',
-  });
+    });
 
-  return investment;
-}
-
-  
-
+    return investment;
+  }
   async getInvestmentById(id: number) {
     const investment = await this.investmentRepo.findOne({ where: { id } });
     if (!investment) {
@@ -222,8 +214,9 @@ async applyManagementFee(dto: { id: number, feeAmount: number, date: Date }) {
 
   private async findActiveInvestment(id: number): Promise<InvestmentEntity> {
     try {
-      
-      const investment = await this.investmentRepo.findOne({ where: { id, is_active: true } });
+      const investment = await this.investmentRepo.findOne({
+        where: { id, is_active: true },
+      });
       if (!investment) {
         throw new Error('investment not fond');
       }

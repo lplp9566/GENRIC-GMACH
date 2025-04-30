@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Typography, Grid } from '@mui/material';
 import { MonetizationOn, AccountBalance, Savings, VolunteerActivism, AccountBalanceWallet, Favorite, Payments, TrendingUp, MoneyOff } from '@mui/icons-material';
+import LoanDeshbord from './LoanDeshbord/LoanDeshbord';
 
 // הגדרת סוג הנתונים
  export interface FundsOverviewProps {
@@ -45,6 +46,7 @@ const FundsOverview: React.FC<FundsOverviewProps> = ({ data }) => {
               </Typography>
             </CardContent>
           </Card>
+          <button onClick={()=><LoanDeshbord/>}>lo</button>
         </Grid>
       ))}
     </Grid>
