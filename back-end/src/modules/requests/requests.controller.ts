@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { RequestsService } from './requests.service';
 import { IRequest } from './dto/request.dto';
 
@@ -6,7 +14,7 @@ import { IRequest } from './dto/request.dto';
 export class RequestsController {
   constructor(private readonly requestsService: RequestsService) {}
 
-  @Post()  
+  @Post()
   create(@Body() createRequestDto: IRequest) {
     return this.requestsService.createRequest(createRequestDto);
   }

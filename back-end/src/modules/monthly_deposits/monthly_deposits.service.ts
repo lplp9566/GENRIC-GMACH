@@ -5,7 +5,7 @@ import { MonthlyDepositsEntity } from "./monthly_deposits.entity";
 import { UserEntity } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
-import { getYearFromDate } from 'src/services/services';
+import { getYearFromDate } from '../../services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 // cSpell:ignore Financials

@@ -6,6 +6,6 @@ import { PaymentDetailsService } from './payment-details.service';
 @Module({
   imports: [TypeOrmModule.forFeature([PaymentDetailsEntity])],
   exports: [PaymentDetailsService],
-  providers: [PaymentDetailsService]
+  providers: [PaymentDetailsService],
 })
 export class PaymentDetailsModule {}

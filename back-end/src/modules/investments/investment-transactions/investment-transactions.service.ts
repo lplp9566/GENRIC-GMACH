@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InvestmentTransactionEntity } from '../investment-transactions/entity/investment-transaction.entity';
 import { InvestmentEntity } from '../entity/investments.entity';
-import { TransactionType } from 'src/modules/investments/investmentsTypes';
+import { TransactionType } from '../investmentsTypes';
 
 @Injectable()
 export class InvestmentTransactionService {

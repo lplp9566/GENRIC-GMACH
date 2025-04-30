@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InvestmentEntity } from './entity/investments.entity';
 import { InvestmentTransactionService } from './investment-transactions/investment-transactions.service';
-import { TransactionType } from 'src/modules/investments/investmentsTypes';
+import { TransactionType } from '../investments/investmentsTypes';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 
 @Injectable()

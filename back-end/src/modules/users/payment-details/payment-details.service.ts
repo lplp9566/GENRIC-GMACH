@@ -5,8 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class PaymentDetailsService {
-    constructor(
-        @InjectRepository(PaymentDetailsEntity) 
-        private readonly paymentDetailsRepository: Repository<PaymentDetailsEntity>,
-    ) {}
+  constructor(
+    @InjectRepository(PaymentDetailsEntity)
+    private readonly paymentDetailsRepository: Repository<PaymentDetailsEntity>,
+  ) {}
 }

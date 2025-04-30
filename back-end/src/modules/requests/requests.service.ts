@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsersService } from 'src/modules/users/users.service';
+import { UsersService } from '../users/users.service';
 import { RequestEntity } from './entities/request.entity';
 import { Repository } from 'typeorm';
 import { IRequest, RequestStatus } from './dto/request.dto';

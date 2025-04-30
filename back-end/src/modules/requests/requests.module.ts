@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RequestEntity } from './entities/request.entity';
 import { RequestsController } from './requests.controller';
 import { RequestsService } from './requests.service';
-import { UsersModule } from 'src/modules/users/users.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [

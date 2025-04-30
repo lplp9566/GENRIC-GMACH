@@ -1,14 +1,13 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoanPaymentEntity } from './loan_actions.entity';
-import { UserFinancialByYearModule } from 'src/modules/users/user-financials-by-year/user-financial-by-year.module';
-import { UserFinancialsModule } from 'src/modules/users/user-financials/user-financials.module';
-import { FundsOverviewModule } from 'src/modules/funds-overview/funds-overview.module';
-import { UsersModule } from 'src/modules/users/users.module';
+import { UserFinancialsModule } from '../../users/user-financials/user-financials.module';
+import { FundsOverviewModule } from '../../funds-overview/funds-overview.module';
+import { UsersModule } from '../../users/users.module';
 import { LoanActionsService } from './loan_actions.service';
 import { LoanEntity } from '../loans.entity';
 import { LoansModule } from '../loans.module';
-import { PaymentDetailsModule } from 'src/modules/users/payment-details/payment-details.module';
+import { PaymentDetailsModule } from '../../users/payment-details/payment-details.module';
 import { LoanActionsController } from './loan_actions.controller';
 // cSpell:ignore Financials
 
@@ -19,7 +18,7 @@ import { LoanActionsController } from './loan_actions.controller';
     forwardRef(() =>  PaymentDetailsModule,),
     forwardRef(() => UsersModule),
     LoansModule,
-    UserFinancialByYearModule,
+    UserFinancialsModule,
     UserFinancialsModule,
     FundsOverviewModule,
    

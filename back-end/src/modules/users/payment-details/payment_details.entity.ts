@@ -1,4 +1,10 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  JoinColumn,
+} from 'typeorm';
 import { UserEntity } from '../user.entity';
 import { payment_method } from '../userTypes';
 
@@ -10,7 +16,7 @@ export class PaymentDetailsEntity {
   @OneToOne(() => UserEntity, (user) => user.payment_details, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: "user_id" }) 
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   @Column()
@@ -29,7 +35,7 @@ export class PaymentDetailsEntity {
   payment_method: payment_method;
 
   @Column({ type: 'float', default: 0 })
-  monthly_balance: number; 
+  monthly_balance: number;
 
   @Column({ type: 'json', default: [] })
   loan_balances: { loanId: number; balance: number }[];

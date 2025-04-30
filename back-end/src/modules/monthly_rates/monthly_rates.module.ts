@@ -6,10 +6,13 @@ import { MonthlyDepositsModule } from '../monthly_deposits/monthly_deposits.modu
 import { MonthlyRatesController } from './monthly_rates.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MonthlyRatesEntity]), forwardRef(() => MonthlyRatesModule)],
-   
+  imports: [
+    TypeOrmModule.forFeature([MonthlyRatesEntity]),
+    forwardRef(() => MonthlyRatesModule),
+  ],
+
   controllers: [MonthlyRatesController],
   providers: [MonthlyRatesService],
-  exports: [MonthlyRatesService,TypeOrmModule],
+  exports: [MonthlyRatesService, TypeOrmModule],
 })
 export class MonthlyRatesModule {}

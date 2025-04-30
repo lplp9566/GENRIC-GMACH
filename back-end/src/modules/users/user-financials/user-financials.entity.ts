@@ -1,17 +1,23 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { UserEntity } from '../user.entity';
 
 @Entity('user-financials')
-export class UserFinancialsEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+export class UserFinancialEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-   @OneToOne(() => UserEntity, (user) => user, {
-     onDelete: 'CASCADE',
-   })
-   @JoinColumn({ name: "user_id" }) 
-   user: UserEntity;
- 
+  @OneToOne(() => UserEntity, (user) => user, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
+  user: UserEntity;
+
   // Total contributed to charity, including both donations and membership fees
   @Column({ type: 'float' })
   total_donations: number;
@@ -26,7 +32,6 @@ export class UserFinancialsEntity {
   @Column({ type: 'float' })
   total_special_fund_donations: number;
 
-
   @Column({ type: 'int' })
   total_loans_taken: number;
 
@@ -38,6 +43,4 @@ export class UserFinancialsEntity {
 
   @Column({ type: 'float' })
   total_fixed_deposits_withdrawn: number;
-
-
 }

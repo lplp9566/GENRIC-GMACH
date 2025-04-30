@@ -4,7 +4,7 @@ import { LoanEntity } from "../loans/loans.entity";
 import { UserFinancialByYearEntity } from "./user-financials-by-year/user-financial-by-year.entity";
 import { MonthlyDepositsEntity } from "../monthly_deposits/monthly_deposits.entity";
 import { DonationsEntity } from "../donations/donations.entity";
-import { UserFinancialsEntity } from "./user-financials/user-financials.entity";
+import { UserFinancialEntity } from "./user-financials/user-financials.entity";
 import { RequestEntity } from "../requests/entities/request.entity";
 import {UserRole} from "./userTypes"
 // cSpell:ignore Financials
@@ -51,8 +51,8 @@ export class UserEntity {
     @OneToMany(() => UserFinancialByYearEntity, (financials) => financials.user, { cascade: true })
     financialHistoryByYear: UserFinancialByYearEntity[];
 
-    @OneToOne(() => UserFinancialsEntity,(financials) => financials.user, { cascade: true })
-    userFinancials: UserFinancialsEntity
+    @OneToOne(() => UserFinancialEntity,(financials) => financials.user, { cascade: true })
+    userFinancials: UserFinancialEntity
 
 
     @OneToMany(()=>MonthlyDepositsEntity, (monthlyDeposits) => monthlyDeposits.user, { cascade: true })

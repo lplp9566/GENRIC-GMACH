@@ -10,14 +10,12 @@ export class MonthlyRatesService {
     private monthlyRatesRepository: Repository<MonthlyRatesEntity>,
   ) {}
 
-
-
   async getRatesForRole(role: string): Promise<MonthlyRatesEntity[]> {
     return this.monthlyRatesRepository
-      .createQueryBuilder("rate")
-      .where("rate.role = :role", { role })
-      .orderBy("rate.year", "ASC")
-      .addOrderBy("rate.month", "ASC")
+      .createQueryBuilder('rate')
+      .where('rate.role = :role', { role })
+      .orderBy('rate.year', 'ASC')
+      .addOrderBy('rate.month', 'ASC')
       .getMany();
   }
 
@@ -27,29 +25,27 @@ export class MonthlyRatesService {
         where: {
           year: rate.year,
           month: rate.month,
-          role: rate.role
+          role: rate.role,
         },
       });
-      if(OldRate) throw new Error('Rate already exist') 
-      
+      if (OldRate) throw new Error('Rate already exist');
+
       const newRate = this.monthlyRatesRepository.create(rate);
       return this.monthlyRatesRepository.save(newRate);
-    }
-     catch (error) {
-  throw new BadRequestException(error.message);
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
   }
 
   async getAllRates(): Promise<MonthlyRatesEntity[]> {
     try {
-      const allRates = this.monthlyRatesRepository.find() 
-      if(!allRates){
-        throw new Error('no rates fund')
+      const allRates = this.monthlyRatesRepository.find();
+      if (!allRates) {
+        throw new Error('no rates fund');
       }
-      return allRates
+      return allRates;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
-  } 
   }
-
+}

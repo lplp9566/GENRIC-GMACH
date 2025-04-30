@@ -1,4 +1,10 @@
-import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
@@ -22,11 +28,14 @@ export class UsersService {
     @Inject(forwardRef(() => MonthlyRatesService))
     private readonly monthlyRatesService: MonthlyRatesService,
   ) {}
-  
-  async getUserPaymentDetails(userId: number): Promise<PaymentDetailsEntity | null> {
-    return this.paymentDetailsRepository.findOne({ where: { user: { id: userId } } });
-}
 
+  async getUserPaymentDetails(
+    userId: number,
+  ): Promise<PaymentDetailsEntity | null> {
+    return this.paymentDetailsRepository.findOne({
+      where: { user: { id: userId } },
+    });
+  }
 
   async createUserWithPayment(
     userData: Partial<UserEntity>,
@@ -39,32 +48,34 @@ export class UsersService {
       ) {
         throw new Error('Invalid payment method');
       }
-  
+
       const salt = await bcrypt.genSalt(10);
       if (userData.password) {
         userData.password = await bcrypt.hash(userData.password, salt);
       } else {
         throw new Error('Password is required');
       }
-  
+
       const newUser = this.usersRepository.create(userData);
       const paymentDetails = this.paymentDetailsRepository.create(paymentData);
       newUser.payment_details = paymentDetails;
-  
+
       return this.usersRepository.save(newUser);
     } catch (error) {
-  throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message);
     }
-    
   }
   async findByEmail(email: string): Promise<UserEntity> {
-    const user = await this.usersRepository.findOne({ where: { email_address: email }, relations: ['payment_details'], });
+    const user = await this.usersRepository.findOne({
+      where: { email_address: email },
+      relations: ['payment_details'],
+    });
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
   async getUserById(id: number): Promise<UserEntity | null> {
-    console.log('getUserById id=', id, 'result=', "user");
-    const user = await  this.usersRepository.findOne({
+    console.log('getUserById id=', id, 'result=', 'user');
+    const user = await this.usersRepository.findOne({
       where: { id },
       relations: ['payment_details'],
     });
@@ -79,12 +90,10 @@ export class UsersService {
 
   async getAllUsers(): Promise<UserEntity[]> {
     return this.usersRepository.find({
-      relations: ['payment_details'], 
+      relations: ['payment_details'],
     });
   }
 
-
- 
   async calculateTotalDue(user: UserEntity): Promise<number> {
     const currentDate = new Date();
     let totalDue = 0;
@@ -106,12 +115,22 @@ export class UsersService {
     const chargeDay = Number(user.payment_details.charge_date);
 
     for (let year = userJoinYear; year <= currentDate.getFullYear(); year++) {
-      for (let month = year === userJoinYear ? userJoinMonth : 1; month <= 12; month++) {
-        if (year === currentDate.getFullYear() && month > currentDate.getMonth() + 1) {
+      for (
+        let month = year === userJoinYear ? userJoinMonth : 1;
+        month <= 12;
+        month++
+      ) {
+        if (
+          year === currentDate.getFullYear() &&
+          month > currentDate.getMonth() + 1
+        ) {
           break;
         }
 
-        if (year === currentDate.getFullYear() && month === currentDate.getMonth() + 1) {
+        if (
+          year === currentDate.getFullYear() &&
+          month === currentDate.getMonth() + 1
+        ) {
           if (currentDate.getDate() < chargeDay) {
             break;
           }
@@ -129,10 +148,10 @@ export class UsersService {
     return totalDue;
   }
   async getUserTotalDeposits(userId: number): Promise<number> {
-    const UserTotalDeposits = await this.monthlyDepositsService.getUserTotalDeposits(userId);
+    const UserTotalDeposits =
+      await this.monthlyDepositsService.getUserTotalDeposits(userId);
     return UserTotalDeposits;
   }
-
 
   async calculateUserMonthlyBalance(
     user: UserEntity,
@@ -147,13 +166,13 @@ export class UsersService {
   async updateUserMonthlyBalance(user: UserEntity) {
     const paymentDetails = await this.paymentDetailsRepository.findOne({
       where: { user: { id: user.id } },
-      relations: ["user"],
+      relations: ['user'],
     });
     if (!paymentDetails) {
-      throw new Error("Payment details not found for user");
+      throw new Error('Payment details not found for user');
     }
 
-    const balanceData = await this.calculateUserMonthlyBalance(user)
+    const balanceData = await this.calculateUserMonthlyBalance(user);
     paymentDetails.monthly_balance = balanceData.balance;
     await this.paymentDetailsRepository.save(paymentDetails);
     return paymentDetails.monthly_balance;
