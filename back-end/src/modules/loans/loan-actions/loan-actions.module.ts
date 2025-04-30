@@ -9,7 +9,7 @@ import { LoanEntity } from '../loans.entity';
 import { LoansModule } from '../loans.module';
 import { PaymentDetailsModule } from '../../users/payment-details/payment-details.module';
 import { LoanActionsController } from './loan_actions.controller';
-import { UserFinancialByYearModule } from 'src/modules/users/user-financials-by-year/user-financial-by-year.module';
+import { UserFinancialByYearModule } from '../../users/user-financials-by-year/user-financial-by-year.module';
 // cSpell:ignore Financials
 
 @Module({
