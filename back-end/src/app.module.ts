@@ -31,7 +31,8 @@ import { AuthModule } from './modules/auth/auth.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,}),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -61,7 +62,7 @@ import { AuthModule } from './modules/auth/auth.module';
     UserFinancialsModule,
     InvestmentsModule, 
     InvestmentTransactionsModule, RequestsModule,
-    // AuthModule,
+    AuthModule,
 
   ],
   providers: [ExpensesService],

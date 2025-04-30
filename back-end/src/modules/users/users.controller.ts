@@ -3,6 +3,7 @@ import { UsersService } from './users.service';
 import { UserEntity } from './user.entity';
 import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
 import { AdminGuard } from '../auth/admin.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -13,13 +14,15 @@ export class UsersController {
        const { userData, paymentData } = body;
        return this.usersService.createUserWithPayment(userData, paymentData); 
     }
+    @UseGuards(JwtAuthGuard, AdminGuard)
     @Get()
     async getAllUsers(){
         return this.usersService.getAllUsers()
     }
+    @UseGuards(JwtAuthGuard)
     @Get("UsersData")
     async getUsersData(@Body()body:{userId:number}){
-        
+        return this.usersService.getUserById(body.userId)
     }
     @Get('balance')
     async getUserBalance(@Body() body: { userId: number }) {
