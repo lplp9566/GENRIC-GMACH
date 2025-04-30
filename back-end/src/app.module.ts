@@ -4,7 +4,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './modules/users/users.module';
-// import { AuthModule } from './auth/auth.module';
 import { FundsOverviewModule } from './modules/funds-overview/funds-overview.module';
 import { FundsOverviewService } from './modules/funds-overview/funds-overview.service';
 import { FundsOverviewController } from './modules/funds-overview/funds-overview.controller';
@@ -26,6 +25,7 @@ import { InvestmentsModule } from './modules/investments/investments.module';
 import { InvestmentTransactionsModule } from './modules/investments/investment-transactions/investment-transactions.module';
 import { config } from 'dotenv';
 import { RequestsModule } from './modules/requests/requests.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 
 @Module({
@@ -60,7 +60,7 @@ import { RequestsModule } from './modules/requests/requests.module';
     MailModule,
     UserFinancialsModule,
     InvestmentsModule, 
-    InvestmentTransactionsModule, RequestsModule
+    InvestmentTransactionsModule, RequestsModule,
     // AuthModule,
 
   ],
