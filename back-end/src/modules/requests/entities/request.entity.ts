@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { RequestStatus } from "../dto/request.dto";
-import { UserEntity } from "src/modules/users/user.entity";
+import { UserEntity } from "../../users/user.entity"
 
 @Entity('requests')
 export class RequestEntity {

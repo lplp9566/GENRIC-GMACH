@@ -5,9 +5,9 @@ import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { get } from 'http';
-import { getYearFromDate } from 'src/services/services';
+import { getYearFromDate } from '../../services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
-import { ApiResponse } from 'src/utils/response.utils';
+import { ApiResponse } from '../../utils/response.utils';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 
 @Injectable()

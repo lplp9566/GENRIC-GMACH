@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { InvestmentTransactionService } from './investment-transactions.service';
-import { TransactionType } from 'src/modules/investments/investmentsTypes';
+import { TransactionType } from '../investmentsTypes';
 
 @Controller('investment-transactions')
 export class InvestmentTransactionController {

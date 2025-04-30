@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FundsOverviewEntity } from './entity/funds-overview.entity';
 import { Repository } from 'typeorm';
 import { log } from 'console';
-import { ApiResponse } from 'src/utils/response.utils';
+import { ApiResponse } from '../../utils/response.utils';
 import { first } from 'rxjs';
 
 @Injectable()

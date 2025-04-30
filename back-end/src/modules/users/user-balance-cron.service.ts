@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { UsersService } from './users.service';
-import { LoanActionsService } from 'src/modules/loans/loan-actions/loan_actions.service';
+import { LoanActionsService } from '../loans/loan-actions/loan_actions.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { LoanEntity } from 'src/modules/loans/loans.entity';
-import { PaymentDetailsEntity } from 'src/modules/users/payment-details/payment_details.entity';
+import { LoanEntity } from '../loans/loans.entity';
+import { PaymentDetailsEntity } from "../users/payment-details/payment_details.entity";
 
 @Injectable()
 export class UserBalanceCronService {
