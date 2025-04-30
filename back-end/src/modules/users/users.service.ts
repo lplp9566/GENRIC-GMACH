@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
 import * as bcrypt from 'bcrypt';
-import { payment_method } from '../../types/userTypes';
+import { payment_method } from './userTypes';
 import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
 import { MonthlyDepositsService } from '../monthly_deposits/monthly_deposits.service';
 import { MonthlyRatesService } from '../monthly_rates/monthly_rates.service';

@@ -1,4 +1,3 @@
-import { UserRole } from "src/types/userTypes";
 import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PaymentDetailsEntity } from "./payment-details/payment_details.entity";
 import { LoanEntity } from "../loans/loans.entity";
@@ -10,6 +9,7 @@ import { DonationsEntity } from "../donations/donations.entity";
 
 import { UserFinancialsEntity } from "./user-financials/user-financials.entity";
 import { RequestEntity } from "../requests/entities/request.entity";
+import { UserRole } from "./userTypes";
 
 @Entity('users')
 export class UserEntity {

@@ -1,6 +1,6 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
 import { UserEntity } from '../user.entity';
-import { payment_method } from 'src/types/userTypes';
+import { payment_method } from 'src/modules/users/userTypes';
 
 @Entity('payment_details')
 export class PaymentDetailsEntity {
