@@ -1,26 +1,21 @@
-// src/auth/jwt.strategy.ts
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, ExtractJwt } from 'passport-jwt';
-import { UsersService } from '../users/users.service';
-import { Request } from 'express';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private usersService: UsersService) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+  constructor(private configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (req: Request) => req?.cookies?.jwt,
+        (req) => req?.cookies?.Authentication,
       ]),
+      secretOrKey: configService.get<string>('JWT_SECRET') ||"secret",
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || 'secretKey',
     });
   }
 
   async validate(payload: any) {
-    const user = await this.usersService.getUserById(payload.sub);
-    if (!user) throw new UnauthorizedException();
-    // מוסיף ל-req.user את המשתמש + ה־isAdmin מה-payload
-    return { ...user, isAdmin: payload.isAdmin };
+    return payload;
   }
 }

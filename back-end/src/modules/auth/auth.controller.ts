@@ -1,27 +1,46 @@
-// src/auth/auth.controller.ts
-import { Controller, Post, Body, Res, UseGuards, Req } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import {
+  Controller,
+  Post,
+  Body,
+  Res,
+  Get,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { Response, Request } from 'express';
+import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { AdminGuard } from './admin.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  // 1. Login – מקבל email+password, שומר JWT ב-cookie
   @Post('login')
   async login(
-    @Body() body: { email: string; password: string },
+    @Body('email') email: string,
+    @Body('password') password: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = await this.authService.validateUser(body.email, body.password);
-    return this.authService.login(user, res);
+    const token = await this.authService.login(email, password);
+    res.cookie('Authentication', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: false, // true בפרודקשן
+      maxAge: 1000 * 60 * 60 * 24,
+    });
+    return { message: 'Token issued successfully' };
   }
 
-  // 2. Validate – רק מי שמחובר יכול לקרוא, מחזיר req.user
   @UseGuards(JwtAuthGuard)
-  @Post('validate')
+  @Get('validate')
   validate(@Req() req: Request) {
-    return req.user;
+    return { message: 'Token is valid', user: req.user };
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('admin-only')
+  adminRoute(@Req() req: Request) {
+    return { message: 'You are admin', user: req.user };
   }
 }

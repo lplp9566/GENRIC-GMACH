@@ -64,10 +64,12 @@ export class UsersService {
     return user;
   }
   async getUserById(id: number): Promise<UserEntity | null> {
+    console.log('getUserById id=', id, 'result=', "user");
     const user = await  this.usersRepository.findOne({
       where: { id },
       relations: ['payment_details'],
     });
+    console.log('getUserById id=', id, 'result=', user);
     if (!user) throw new NotFoundException('User not found');
     return user;
   }

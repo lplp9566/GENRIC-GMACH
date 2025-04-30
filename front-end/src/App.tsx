@@ -15,7 +15,6 @@ const App: React.FC = () => {
       .then((response)=> setusers(response.data))
 
   }, []);
-  console.log(users)
   return (
 
     <Container sx={{ mt: 4 }}>
