@@ -3,14 +3,11 @@ import { PaymentDetailsEntity } from "./payment-details/payment_details.entity";
 import { LoanEntity } from "../loans/loans.entity";
 import { UserFinancialByYearEntity } from "./user-financials-by-year/user-financial-by-year.entity";
 import { MonthlyDepositsEntity } from "../monthly_deposits/monthly_deposits.entity";
-import { on } from "events";
 import { DonationsEntity } from "../donations/donations.entity";
-// cSpell:ignore Financials
-
 import { UserFinancialsEntity } from "./user-financials/user-financials.entity";
 import { RequestEntity } from "../requests/entities/request.entity";
-import { UserRole } from "./userTypes";
-
+import {UserRole} from "./userTypes"
+// cSpell:ignore Financials
 @Entity('users')
 export class UserEntity {
     @PrimaryGeneratedColumn()

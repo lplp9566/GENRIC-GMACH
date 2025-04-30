@@ -3,15 +3,15 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { LoanEntity } from "../loans.entity";
 import { Repository } from "typeorm";
 import { LoanPaymentEntity } from "./loan_actions.entity";
-import { UserFinancialsService } from "src/modules/users/user-financials/user-financials.service";
-import { UserFinancialByYearService } from "src/modules/users/user-financials-by-year/user-financial-by-year.service";
 import { FundsOverviewService } from "src/modules/funds-overview/funds-overview.service";
-import { UsersService } from "src/modules/users/users.service";
 import { getYearFromDate } from "src/services/services";
 import { LoansService } from "../loans.service";
 import { differenceInCalendarMonths, differenceInMonths } from 'date-fns';
-import { PaymentDetailsEntity } from "src/modules/users/payment-details/payment_details.entity";
 import { LoanActionDto, LoanPaymentActionType, PaymentEvent } from "../loan-dto/loanTypes";
+import { PaymentDetailsEntity } from "src/modules/users/payment-details/payment_details.entity";
+import { UserFinancialByYearService } from "src/modules/users/user-financials-by-year/user-financial-by-year.service";
+import { UserFinancialsService } from "src/modules/users/user-financials/user-financials.service";
+import { UsersService } from "src/modules/users/users.service";
 
 // cSpell:ignore Financials
 
