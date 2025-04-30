@@ -1,12 +1,13 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserEntity } from './user.entity';
 import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
+import { AdminGuard } from '../auth/admin.guard';
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
-
+    // @UseGuards(AdminGuard)
     @Post()
     async createUserWithPayment(@Body() body: { userData: Partial<UserEntity>, paymentData: Partial<PaymentDetailsEntity> }) {
        const { userData, paymentData } = body;
