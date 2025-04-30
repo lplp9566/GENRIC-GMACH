@@ -25,12 +25,13 @@ export class AuthController {
     const token = await this.authService.login(email, password);
     res.cookie('Authentication', token, {
       httpOnly: true,
-      sameSite: 'lax',
-      secure: false, // true בפרודקשן
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === 'production', // true רק בפרודקשן
       maxAge: 1000 * 60 * 60 * 24,
     });
     return { message: 'Token issued successfully' };
   }
+  
 
   @UseGuards(JwtAuthGuard)
   @Get('validate')
