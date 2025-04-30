@@ -25,19 +25,19 @@ export class AuthController {
     const token = await this.authService.login(email, password);
     res.cookie('Authentication', token, {
       httpOnly: true,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      secure: process.env.NODE_ENV === 'production', // true רק בפרודקשן
+      sameSite: 'lax',
+      secure: false, // true בפרודקשן
       maxAge: 1000 * 60 * 60 * 24,
     });
     return { message: 'Token issued successfully' };
   }
-  
 
   @UseGuards(JwtAuthGuard)
   @Get('validate')
-  validate(@Req() req: Request) {
-    return { message: 'Token is valid', user: req.user };
+  async validate(@Req() req: Request) {
+    return req.user;
   }
+  
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('admin-only')
