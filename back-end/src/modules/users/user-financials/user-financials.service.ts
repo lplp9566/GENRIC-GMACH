@@ -2,16 +2,16 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { UsersService } from '../users.service';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserFinancialEntity } from './user-financials.entity';
 import { use } from 'passport';
 import { UserEntity } from '../user.entity';
+import { UserFinancialEntity } from './user-financials.entity';
 // cSpell:ignore Financials
 
 @Injectable()
 export class UserFinancialsService {
 constructor(
-    @InjectRepository(UserFinancialEntity)
-    private readonly userFinancialsRepository: Repository<UserFinancialEntity>,
+    @InjectRepository(UserFinancialEntity )
+    private readonly userFinancialsRepository: Repository<UserFinancialEntity >,
         @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService
 ) {}

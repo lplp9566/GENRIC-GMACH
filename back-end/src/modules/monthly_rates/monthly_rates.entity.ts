@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { UserRole } from '../users/userTypes';
 
 @Entity('monthly_rates')
 export class MonthlyRatesEntity {
@@ -12,7 +13,7 @@ export class MonthlyRatesEntity {
   month: number;
 
   @Column({ type: 'text' })
-  role: string;
+  role: UserRole;
 
   @Column({ type: 'float' })
   amount: number;

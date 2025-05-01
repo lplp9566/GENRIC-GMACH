@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { DonationsService } from './donations.service';
 import { DonationsEntity } from './donations.entity';
 
@@ -12,5 +12,8 @@ export class DonationsController {
         process.stdout.write("createDonation function called!\n");
         return this.donationsService.createDonation(donation);
     }
-    
+    @Get()
+    async getDonations() {
+        return this.donationsService.getDonations();
+    }
 }

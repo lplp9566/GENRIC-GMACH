@@ -20,8 +20,6 @@ export class LoanEntity {
   @Column({ type: 'float' })
   loan_amount: number;
 
-
-
   @Column({ type: 'date' })
   loan_date: Date;
 
@@ -35,9 +33,9 @@ export class LoanEntity {
 
   @Column({ type: 'float', nullable: true })
   remaining_balance: number;
-  @Column({type:"int"})
-  initialMonthlyPayment  : number;
-  @Column({ type: 'float' , nullable: true })
+  @Column({ type: 'int' })
+  initialMonthlyPayment: number;
+  @Column({ type: 'float', nullable: true })
   total_installments: number;
   @OneToMany(() => LoanPaymentEntity, (payment) => payment.loan, {
     cascade: true,
