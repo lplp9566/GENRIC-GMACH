@@ -26,6 +26,7 @@ import { InvestmentTransactionsModule } from './modules/investments/investment-t
 import { config } from 'dotenv';
 import { RequestsModule } from './modules/requests/requests.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { DepositsModule } from './modules/deposits/deposits.module';
 
 
 @Module({
@@ -63,6 +64,7 @@ import { AuthModule } from './modules/auth/auth.module';
     InvestmentsModule, 
     InvestmentTransactionsModule, RequestsModule,
     AuthModule,
+    DepositsModule,
 
   ],
   providers: [ExpensesService],

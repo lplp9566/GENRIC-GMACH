@@ -26,7 +26,7 @@ export class AuthController {
     res.cookie('Authentication', token, {
       httpOnly: true,
       sameSite: 'lax',
-      secure: false, // true בפרודקשן
+      secure: process.env.NODE_ENV === 'production'? true : false,
       maxAge: 1000 * 60 * 60 * 24,
     });
     return { message: 'Token issued successfully' };
@@ -37,7 +37,6 @@ export class AuthController {
   async validate(@Req() req: Request) {
     return req.user;
   }
-  
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('admin-only')
