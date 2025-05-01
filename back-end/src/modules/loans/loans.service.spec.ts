@@ -42,6 +42,7 @@ describe('LoansService', () => {
     join_date: new Date(),
     password: 'pass',
     email_address: 'test@example.com',
+    id_number: '123456789',
     phone_number: '0501234567',
     role: UserRole.committeeMember,
     is_admin: false,

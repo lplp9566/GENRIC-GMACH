@@ -27,6 +27,7 @@ describe('DonationsService', () => {
     last_name: 'User',
     join_date: new Date(),
     password: 'pass',
+    id_number: '123456789',
     email_address: 'test@example.com',
     phone_number: '0501234567',
     role: UserRole.committeeMember,

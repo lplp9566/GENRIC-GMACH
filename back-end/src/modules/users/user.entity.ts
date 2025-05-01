@@ -18,7 +18,8 @@ export class UserEntity {
 
     @Column()
     last_name :string ;
-
+@Column()
+id_number :string ;
     @Column({
         type: 'date',
         transformer: {

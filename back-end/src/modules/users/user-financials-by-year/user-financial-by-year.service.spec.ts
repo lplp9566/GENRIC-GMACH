@@ -21,6 +21,7 @@ describe('UserFinancialByYearService', () => {
     id: 1,
     first_name: 'Test',
     last_name: 'User',
+    id_number: '123456789',
     join_date: new Date(),
     password: 'pass',
     email_address: 'test@example.com',
