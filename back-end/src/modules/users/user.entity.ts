@@ -29,7 +29,6 @@ id_number :string ;
         },
       })
       join_date: Date;
-
     @Column()
     password :string ;
 
