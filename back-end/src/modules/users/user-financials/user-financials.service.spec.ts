@@ -32,6 +32,7 @@ describe('UserFinancialsService', () => {
     id: 1,
     user: {} as any, // או את אותו mockUser
     total_donations: 0,
+    total_cash_holdings: 0,
     total_monthly_deposits: 0,
     total_equity_donations: 0,
     total_special_fund_donations: 0,
@@ -58,6 +59,7 @@ describe('UserFinancialsService', () => {
     monthly_deposits: [],
     donations: [],
     requests: [],
+    cashHoldings: [],
   };
 
   beforeEach(async () => {

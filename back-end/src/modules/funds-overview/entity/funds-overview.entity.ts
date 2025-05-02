@@ -28,7 +28,10 @@ export class FundsOverviewEntity {
 
   @Column({ type: 'float' })
   available_funds: number; // ✅ כסף נזיל (סך ההון העצמי פחות ההשקעות והלוואות
-
+ 
+  @Column({ type: 'float' })
+  cash_holdings : number; 
+  
   @Column({ type: 'float', default: 0 })
   user_deposits_total: number; // ✅ סכום הפיקדונות הכללי בגמ"ח
 

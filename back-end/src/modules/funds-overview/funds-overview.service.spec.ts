@@ -19,6 +19,7 @@ const mockFund: FundsOverviewEntity = {
   investments: 0,
   Investment_profits: 0,
   special_funds: 0,
+  cash_holdings: 0,
   monthly_deposits: 0,
   donations_received: 0,
   user_deposits_total: 0,

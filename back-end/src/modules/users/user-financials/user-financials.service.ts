@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { use } from 'passport';
 import { UserEntity } from '../user.entity';
 import { UserFinancialEntity } from './user-financials.entity';
+import { CashHoldingsTypesRecordType } from '../../cash-holdings/cash-holdingsTypes';
 // cSpell:ignore Financials
 
 @Injectable()
@@ -32,6 +33,7 @@ async getOrCreateUserFinancials(user: UserEntity) {
       total_loans_repaid: 0,
       total_fixed_deposits_deposited: 0,
       total_fixed_deposits_withdrawn: 0,
+      total_cash_holdings: 0,
     });
     await this.userFinancialsRepository.save(record);
   }
@@ -75,6 +77,18 @@ async recordMonthlyDeposit(user: UserEntity, amount: number) {
     async recordFixedDepositWithdrawn(user: UserEntity, amount: number) {
         const record = await this.getOrCreateUserFinancials(user);
         record.total_fixed_deposits_withdrawn += amount;
+        return this.userFinancialsRepository.save(record);
+      }
+      async recordCashHoldings(user: UserEntity, amount: number,type:CashHoldingsTypesRecordType) {
+        const record = await this.getOrCreateUserFinancials(user);
+        if (type === CashHoldingsTypesRecordType.add) {
+          record.total_cash_holdings += amount;
+        } else if (type === CashHoldingsTypesRecordType.subtract) {
+          record.total_cash_holdings -= amount;
+        }
+        else {
+          throw new Error('Invalid type for cash holdings record');
+        }
         return this.userFinancialsRepository.save(record);
       }
 }

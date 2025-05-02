@@ -51,9 +51,6 @@ export class DonationsService {
     if (!donation.donation_reason) {
       throw new BadRequestException('Donation reason is required');
     }
-
-    await this.donationsRepository.save(donation);
-
     if (donation.donation_reason === 'Equity') {
       return await this.createEquityDonation(donation);
     } else {

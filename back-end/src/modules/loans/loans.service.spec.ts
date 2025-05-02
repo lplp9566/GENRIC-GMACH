@@ -74,6 +74,7 @@ describe('LoansService', () => {
     monthly_deposits: [],
     donations: [],
     requests: [],
+    cashHoldings: [],
   };
 
   beforeEach(async () => {

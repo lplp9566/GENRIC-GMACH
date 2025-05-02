@@ -14,7 +14,7 @@ export class AuthService {
   ) {}
 
   async login(email: string, password: string): Promise<string> {
-    const user = await this.userRepo.findOne({ where: { email_address: email } });
+    const user = await this.userRepo.findOne({ where: { email_address: email } , relations: ['payment_details'] });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }

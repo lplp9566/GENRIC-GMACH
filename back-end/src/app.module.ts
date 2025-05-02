@@ -27,6 +27,7 @@ import { config } from 'dotenv';
 import { RequestsModule } from './modules/requests/requests.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { DepositsModule } from './modules/deposits/deposits.module';
+import { CashHoldingsModule } from './modules/cash-holdings/cash-holdings.module';
 
 
 @Module({
@@ -65,6 +66,7 @@ import { DepositsModule } from './modules/deposits/deposits.module';
     InvestmentTransactionsModule, RequestsModule,
     AuthModule,
     DepositsModule,
+    CashHoldingsModule,
 
   ],
   providers: [ExpensesService],

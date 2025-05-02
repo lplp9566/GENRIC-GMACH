@@ -101,6 +101,7 @@ describe('LoanActionsService', () => {
         monthly_deposits: [],
         donations: [],
         requests: [],
+        cashHoldings: [],
       };
   
       const mockLoan: LoanEntity = {

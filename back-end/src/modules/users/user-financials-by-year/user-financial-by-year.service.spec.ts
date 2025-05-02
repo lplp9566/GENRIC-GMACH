@@ -35,6 +35,7 @@ describe('UserFinancialByYearService', () => {
     monthly_deposits: [],
     donations: [],
     requests: [],
+    cashHoldings: [],
   };
 
   beforeEach(async () => {

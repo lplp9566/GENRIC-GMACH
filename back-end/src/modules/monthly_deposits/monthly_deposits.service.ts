@@ -78,7 +78,7 @@ export class MonthlyDepositsService {
   
     } catch (error) {
       console.error('❌ Error recording deposit:', error.message);
-      throw new Error(error.message);
+      throw new BadRequestException(error.message);
     }
   }
 }  

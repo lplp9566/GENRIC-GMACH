@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { log } from 'console';
 import { ApiResponse } from '../../utils/response.utils';
 import { first } from 'rxjs';
+import { CashHoldingsTypesRecordType } from '../cash-holdings/cash-holdingsTypes';
 
 @Injectable()
 export class FundsOverviewService {
@@ -55,7 +56,7 @@ export class FundsOverviewService {
       fund.available_funds += amount;
       fund.monthly_deposits += amount;
       await this.fundsOverviewRepository.save(fund);
-      return ApiResponse.success(fund);
+      return fund;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -77,7 +78,6 @@ export class FundsOverviewService {
     if (amount > fund.available_funds) {
       throw new NotFoundException('not enough funds');
     }
-
     fund.available_funds -= amount;
     fund.investments += amount;
     await this.fundsOverviewRepository.save(fund);
@@ -145,7 +145,7 @@ export class FundsOverviewService {
       fund.fund_details[fundName] -= amount;
       fund.special_funds -= amount;
       await this.fundsOverviewRepository.save(fund);
-      ApiResponse.success(fund);
+      return fund
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -157,7 +157,7 @@ export class FundsOverviewService {
       fund.available_funds -= amount;
       fund.total_funds -= amount;
       await this.fundsOverviewRepository.save(fund);
-      ApiResponse.success(fund);
+      return fund
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -169,7 +169,7 @@ export class FundsOverviewService {
       fund.available_funds += amount;
       fund.user_deposits_total += amount;
       await this.fundsOverviewRepository.save(fund);
-      ApiResponse.success(fund);
+     return fund;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -181,9 +181,36 @@ export class FundsOverviewService {
       fund.available_funds -= amount;
       fund.user_deposits_total -= amount;
       await this.fundsOverviewRepository.save(fund);
-      ApiResponse.success(fund);
+      return fund;
     } catch (error) {
       return ApiResponse.error(error.message);
+    }
+  }
+  async recordCashHoldings(amount: number, type: CashHoldingsTypesRecordType) {
+    try {
+      const fund = await this.getFundsOverviewRecord();
+      if (type === CashHoldingsTypesRecordType.add) {
+        fund.cash_holdings += amount;
+      } else if (type === CashHoldingsTypesRecordType.subtract) {
+        fund.cash_holdings -= amount;
+      } else {
+        throw new Error('Invalid type for cash holdings record');
+      }
+      await this.fundsOverviewRepository.save(fund);
+      return fund;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+  async getFundDetails() {  
+    try {
+      const fund = await this.getFundsOverviewRecord();
+      if (!fund) {
+        throw new NotFoundException('Fund details not found');
+      }
+      return fund.fund_details;
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
   }
 }

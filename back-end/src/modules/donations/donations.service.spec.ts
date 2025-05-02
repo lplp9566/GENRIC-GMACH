@@ -20,7 +20,6 @@ const mockDonationRepo = () => ({
 describe('DonationsService', () => {
   let service: DonationsService;
   let donationRepo: jest.Mocked<Repository<DonationsEntity>>;
-
   const mockUser: UserEntity = {
     id: 1,
     first_name: 'Test',
@@ -39,6 +38,7 @@ describe('DonationsService', () => {
     monthly_deposits: [],
     donations: [],
     requests: [],
+    cashHoldings: [],
   };
 
   beforeEach(async () => {
