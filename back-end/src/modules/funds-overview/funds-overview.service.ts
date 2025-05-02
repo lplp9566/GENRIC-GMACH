@@ -40,6 +40,7 @@ export class FundsOverviewService {
         Investment_profits: 0,
         special_funds: 0,
         fund_details: {},
+        cash_holdings: 0,
       });
 
       await this.fundsOverviewRepository.save(newRecord);
