@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CashHoldingsEntity } from './Entity/cash-holdings.entity';
-import { c } from 'vite/dist/node/moduleRunnerTransport.d-CXw_Ws6P';
 import { UsersService } from '../users/users.service';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';

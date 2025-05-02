@@ -11,6 +11,7 @@ import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
 import { UserFinancialsModule } from './user-financials/user-financials.module';
 import { LoanPaymentsModule } from '../loans/loan-actions/loan-actions.module';
 import { RequestsModule } from '../requests/requests.module';
+import { CashHoldingsModule } from '../cash-holdings/cash-holdings.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { RequestsModule } from '../requests/requests.module';
     // cSpell:ignore Financials
 
     UserFinancialsModule,
+    CashHoldingsModule
   ],
   controllers: [UsersController],
   providers: [UsersService, UserBalanceCronService],
