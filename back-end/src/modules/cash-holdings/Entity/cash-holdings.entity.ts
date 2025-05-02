@@ -10,5 +10,7 @@ export class CashHoldingsEntity {
   @Column({ type: 'float' })
   amount: number;
     @Column({ type: 'text' })
-    note ?: string;
+    note : string;
+    @Column({type:'boolean'})
+    is_active : boolean
 }

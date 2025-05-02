@@ -4,3 +4,10 @@ export enum CashHoldingsTypesRecordType {
     subtract = 'subtract',
 
 }
+export interface CashHoldingRequest {
+    id?: number;
+    amount : number ;
+    user :number ;
+    note ? :string ;
+    type: CashHoldingsTypesRecordType;
+}

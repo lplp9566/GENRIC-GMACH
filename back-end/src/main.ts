@@ -13,7 +13,6 @@ async function bootstrap() {
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
   console.log(`🚀  Server ready at http://localhost:${port}`);
-  console.log('JWT_SECRET =', process.env.JWT_SECRET);
 
 }
 

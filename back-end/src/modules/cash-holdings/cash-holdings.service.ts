@@ -5,62 +5,158 @@ import { CashHoldingsEntity } from './Entity/cash-holdings.entity';
 import { UsersService } from '../users/users.service';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
-import { CashHoldingsTypesRecordType } from './cash-holdingsTypes';
+import {
+  CashHoldingRequest,
+  CashHoldingsTypesRecordType,
+} from './cash-holdingsTypes';
 
 @Injectable()
 export class CashHoldingsService {
-    constructor(
-        @InjectRepository(CashHoldingsEntity)
-        private  cashHoldingsRepository: Repository<CashHoldingsEntity>,
-        private readonly UserService: UsersService,
-        private readonly userFinancialsService: UserFinancialsService,
-        private readonly fundsOverviewService: FundsOverviewService,
-    ) {}
+  constructor(
+    @InjectRepository(CashHoldingsEntity)
+    private cashHoldingsRepository: Repository<CashHoldingsEntity>,
+    private readonly UserService: UsersService,
+    private readonly userFinancialsService: UserFinancialsService,
+    private readonly fundsOverviewService: FundsOverviewService,
+  ) {}
 
-    async getCashHoldings() {
-        return this.cashHoldingsRepository.find();
-    }
-    async createCashHolding(cashHolding: CashHoldingsEntity) {
-        try {
-        if (!cashHolding.amount  || !cashHolding.user) {
-            throw new Error('Missing required fields');
-        }
-        const user = await this.UserService.getUserById(Number(cashHolding.user));
-        if (!user) throw new Error('User not found');
-        const userFinancials = await this.userFinancialsService.recordCashHoldings(user, cashHolding.amount,CashHoldingsTypesRecordType.add);
-        await this.fundsOverviewService.recordCashHoldings(cashHolding.amount, CashHoldingsTypesRecordType.add);
-        return this.cashHoldingsRepository.save(cashHolding);
+  async getCashHoldings() {
+    return this.cashHoldingsRepository.find();
+  }
+
+  async getCashHoldingById(id: number) {
+    return this.cashHoldingsRepository.findOne({ where: { id } });
+  }
+
+  async cashHolding(cashHolding: CashHoldingRequest) {
+    try {
+      if (!cashHolding.amount || !cashHolding.user) {
+        throw new Error('Missing required fields');
+      }
+
+      const user = await this.UserService.getUserById(Number(cashHolding.user));
+      console.log("useraf",user)
+      if (!user) throw new Error('User not found');
+      switch (cashHolding.type) {
+        case CashHoldingsTypesRecordType.initialize:
+          return this.createCashHolding(cashHolding, user);
+
+        case CashHoldingsTypesRecordType.add:
+          return this.updateCashHolding(cashHolding.id!, cashHolding, user);
+
+        case CashHoldingsTypesRecordType.subtract:
+          return this.subtractCashHolding(cashHolding.id!, cashHolding, user);
+
+        default:
+          throw new Error('Invalid cash holding type');
+      }
     } catch (error) {
-        throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message);
     }
-    }
-    async updateCashHolding(id: number, cashHolding: CashHoldingsEntity) {
-        try {
-        const existingCashHolding = await this.cashHoldingsRepository.findOne({ where: { id } });
-        if (!existingCashHolding) throw new Error('Cash holding not found');
-        const user = await this.UserService.getUserById(Number(cashHolding.user));
-        if (!user) throw new Error('User not found');
-        existingCashHolding.amount += cashHolding.amount;
-        await this.fundsOverviewService.recordCashHoldings(cashHolding.amount, CashHoldingsTypesRecordType.add);
-        await this.userFinancialsService.recordCashHoldings(user, cashHolding.amount,CashHoldingsTypesRecordType.add);
-          return this.cashHoldingsRepository.save(existingCashHolding);
-        } catch (error) {
-            throw new BadRequestException(error.message);
-        }
-    }
-    async subtractCashHolding(id: number, cashHolding: CashHoldingsEntity) {
-        try {
-        const existingCashHolding = await this.cashHoldingsRepository.findOne({ where: { id } });
-        if (!existingCashHolding) throw new Error('Cash holding not found');
-        existingCashHolding.amount -= cashHolding.amount;
-        const user = await this.UserService.getUserById(Number(cashHolding.user));
-        if (!user) throw new Error('User not found');
-        await this.fundsOverviewService.recordCashHoldings(cashHolding.amount, CashHoldingsTypesRecordType.subtract);
-        await this.userFinancialsService.recordCashHoldings(user, cashHolding.amount,CashHoldingsTypesRecordType.subtract);
-          return this.cashHoldingsRepository.save(existingCashHolding);         
-        } catch (error) {
-            throw new BadRequestException(error.message);
-        }
-    }
+  }
 
+  async createCashHolding(cashHolding: CashHoldingRequest, user: any) {
+    try {
+        console.log(user ,"create")
+      await this.userFinancialsService.recordCashHoldings(
+        user,
+        cashHolding.amount,
+        CashHoldingsTypesRecordType.add,
+      );
+      await this.fundsOverviewService.recordCashHoldings(
+        cashHolding.amount,
+        CashHoldingsTypesRecordType.add,
+      );
+      const newCashHolding = this.cashHoldingsRepository.create({
+        amount: cashHolding.amount,
+        user,
+        note: cashHolding.note,
+        is_active: true,
+      });
+      const saved = await this.cashHoldingsRepository.save(newCashHolding);
+      return {
+        id: saved.id,
+        amount: saved.amount,
+        note: saved.note,
+        is_active: saved.is_active,
+      };
+      
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async updateCashHolding(
+    id: number,
+    cashHolding: CashHoldingRequest,
+    user: any,
+  ) {
+    try {
+      const existingCashHolding = await this.cashHoldingsRepository.findOne({
+        where: { id },
+      });
+      if (!existingCashHolding || existingCashHolding.is_active == false)
+        throw new Error('Cash holding not found');
+
+      existingCashHolding.amount += cashHolding.amount;
+      await this.userFinancialsService.recordCashHoldings(
+        user,
+        cashHolding.amount,
+        CashHoldingsTypesRecordType.add,
+      );
+      await this.fundsOverviewService.recordCashHoldings(
+        cashHolding.amount,
+        CashHoldingsTypesRecordType.add,
+      );
+
+     this.cashHoldingsRepository.save(existingCashHolding);
+     return existingCashHolding;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async subtractCashHolding(
+    id: number,
+    cashHolding: CashHoldingRequest,
+    user: any,
+  ) {
+    try {
+      const existingCashHolding = await this.cashHoldingsRepository.findOne({
+        where: { id },
+      });
+
+      if (!existingCashHolding || existingCashHolding.is_active === false) {
+        throw new Error('Cash holding not found or already inactive');
+      }
+
+      if (existingCashHolding.amount < cashHolding.amount) {
+        throw new Error(
+          `Insufficient cash: available ${existingCashHolding.amount}, requested ${cashHolding.amount}`,
+        );
+      }
+
+      existingCashHolding.amount -= cashHolding.amount;
+
+      if (existingCashHolding.amount === 0) {
+        existingCashHolding.is_active = false;
+      }
+
+      await this.userFinancialsService.recordCashHoldings(
+        user,
+        cashHolding.amount,
+        CashHoldingsTypesRecordType.subtract,
+      );
+
+      await this.fundsOverviewService.recordCashHoldings(
+        cashHolding.amount,
+        CashHoldingsTypesRecordType.subtract,
+      );
+
+      this.cashHoldingsRepository.save(existingCashHolding);
+      return existingCashHolding;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
 }
