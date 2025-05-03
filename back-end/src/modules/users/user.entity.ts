@@ -8,6 +8,7 @@ import { UserFinancialEntity } from "./user-financials/user-financials.entity";
 import { RequestEntity } from "../requests/entities/request.entity";
 import {UserRole} from "./userTypes"
 import { CashHoldingsEntity } from "../cash-holdings/Entity/cash-holdings.entity";
+import { OrderReturnEntity } from "../order-return/Entity/order-return.entity";
 // cSpell:ignore Financials
 @Entity('users')
 export class UserEntity {
@@ -64,4 +65,6 @@ id_number :string ;
     requests: RequestEntity[];
     @OneToMany(() => CashHoldingsEntity, (holding) => holding.user, { cascade: true })  
     cashHoldings: CashHoldingsEntity[];
+    @OneToMany(()=> OrderReturnEntity ,(order)=> order.user,{cascade:true})
+    orderReturns:OrderReturnEntity[]
 }

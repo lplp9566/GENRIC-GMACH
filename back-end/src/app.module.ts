@@ -28,6 +28,7 @@ import { RequestsModule } from './modules/requests/requests.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { DepositsModule } from './modules/deposits/deposits.module';
 import { CashHoldingsModule } from './modules/cash-holdings/cash-holdings.module';
+import { OrderReturnModule } from './modules/order-return/order-return.module';
 
 
 @Module({
@@ -67,6 +68,7 @@ import { CashHoldingsModule } from './modules/cash-holdings/cash-holdings.module
     AuthModule,
     DepositsModule,
     CashHoldingsModule,
+    OrderReturnModule,
 
   ],
   providers: [ExpensesService],

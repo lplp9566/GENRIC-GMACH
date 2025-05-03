@@ -34,6 +34,7 @@ async getOrCreateUserFinancials(user: UserEntity) {
       total_fixed_deposits_deposited: 0,
       total_fixed_deposits_withdrawn: 0,
       total_cash_holdings: 0,
+      total_standing_order_return: 0
     });
     await this.userFinancialsRepository.save(record);
   }

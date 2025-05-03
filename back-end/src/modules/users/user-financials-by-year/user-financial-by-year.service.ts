@@ -34,6 +34,8 @@ export class UserFinancialByYearService {
         total_loans_repaid: 0,
         total_fixed_deposits_added: 0,
         total_fixed_deposits_withdrawn: 0,
+        total_standing_order_return: 0,
+        total_donations: 0,
       });
       await this.userFinancialsByYearRepository.save(record);
     }

@@ -61,6 +61,7 @@ describe('UserFinancialsService', () => {
     donations: [],
     requests: [],
     cashHoldings: [],
+    orderReturns:[]
   };
 
   beforeEach(async () => {
@@ -124,5 +125,5 @@ describe('UserFinancialsService', () => {
     const result = await service.recordLoanRepaid(mockUser, 200);
     expect(result.total_loans_repaid).toBe(200);
   });
-  
+
 });
