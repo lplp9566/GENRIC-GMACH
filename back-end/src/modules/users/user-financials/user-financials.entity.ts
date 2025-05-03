@@ -28,8 +28,10 @@ export class UserFinancialEntity {
 
   @Column({ type: 'float' })
   total_equity_donations: number;
+
   @Column({ type: 'float' })
   total_cash_holdings: number;
+
   @Column({ type: 'float' })
   total_special_fund_donations: number;
 
@@ -44,4 +46,7 @@ export class UserFinancialEntity {
 
   @Column({ type: 'float' })
   total_fixed_deposits_withdrawn: number;
+
+  @Column({ type: 'float' })
+  total_standing_order_return: number;
 }

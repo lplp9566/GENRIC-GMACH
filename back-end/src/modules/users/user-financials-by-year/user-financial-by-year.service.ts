@@ -88,4 +88,14 @@ export class UserFinancialByYearService {
     record.total_fixed_deposits_withdrawn += amount;
     return this.userFinancialsByYearRepository.save(record);
   }
+
+  async recordStandingOrderReturn(
+    user: UserEntity,
+    year: number,
+    amount: number,
+  ) {
+    const record = await this.getOrCreateFinancialRecord(user, year);
+    record.total_standing_order_return += amount;
+    return this.userFinancialsByYearRepository.save(record);
+  }
 }

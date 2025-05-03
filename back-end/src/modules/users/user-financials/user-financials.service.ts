@@ -91,5 +91,11 @@ async recordMonthlyDeposit(user: UserEntity, amount: number) {
         }
         return this.userFinancialsRepository.save(record);
       }
+
+      async recordStandingOrderReturn(user: UserEntity, amount: number) {
+        const record = await this.getOrCreateUserFinancials(user);
+        record.total_standing_order_return += amount;
+        return this.userFinancialsRepository.save(record);
+      } 
 }
 

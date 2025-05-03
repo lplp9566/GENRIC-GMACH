@@ -13,17 +13,19 @@ const mockRepo = () => ({
 
 const mockFund: FundsOverviewEntity = {
   id: 1,
-  total_funds: 1000,
+  own_equity: 1000,
   available_funds: 1000,
-  loaned_amount: 0,
-  investments: 0,
+  total_loaned_out: 0,
+  total_invested: 0,
   Investment_profits: 0,
   special_funds: 0,
   cash_holdings: 0,
   monthly_deposits: 0,
-  donations_received: 0,
-  user_deposits_total: 0,
-  expenses_total: 0,
+  total_donations: 0,
+  total_user_deposits: 0,
+  total_expenses: 0,
+  fund_principal : 1000,
+  standing_order_return: 0,
   fund_details: {},
 };
 
@@ -74,7 +76,7 @@ describe('FundsOverviewService', () => {
       repo.save.mockResolvedValue(updatedFund);
 
       const result = await service.addDonation(100);
-      expect(result.donations_received).toBe(100);
+      expect(result.total_donations).toBe(100);
     });
   });
 

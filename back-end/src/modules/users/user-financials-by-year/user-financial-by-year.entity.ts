@@ -41,6 +41,8 @@ export class UserFinancialByYearEntity {
 
   @Column({ type: 'float', default: 0 })
   total_fixed_deposits_withdrawn: number;
+  @Column({ type: 'float', default: 0 })
+  total_standing_order_return: number;
 
   total_donations: number;
 
