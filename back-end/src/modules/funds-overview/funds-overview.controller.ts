@@ -44,7 +44,7 @@ export class FundsOverviewController {
   }
   @Patch('/update-fund-details')
   async updateFundDetails(@Body() body: { fundName: string; amount: number }) {
-    return await this.fundsOverviewService.updateFundDetails(
+    return await this.fundsOverviewService.reduceFundAmount(
       body.fundName,
       body.amount,
     );

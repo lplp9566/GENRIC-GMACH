@@ -6,13 +6,16 @@ export class FundsOverviewEntity {
   id: number;
 
   @Column({ type: 'float' })
-  total_funds: number; // ✅ ההון העצמי של הגמ"ח
+  own_equity: number; // ✅ ההון העצמי של הגמ"ח
 
   @Column({ type: 'float' })
-  loaned_amount: number; // ✅ סכום הכסף שנמצא כרגע בהלוואות
+  fund_principal : number; 
 
   @Column({ type: 'float' })
-  investments: number; // ✅ סכום הכסף שנמצא בהשקעות
+  total_loaned_out: number; // ✅ סכום הכסף שנמצא כרגע בהלוואות
+
+  @Column({ type: 'float' })
+  total_invested: number; // ✅ סכום הכסף שנמצא בהשקעות
 
   @Column({ type: 'float' })
   Investment_profits : number;
@@ -24,7 +27,7 @@ export class FundsOverviewEntity {
   monthly_deposits: number; // ✅ כסף שנכנס מהפקדות חודשיות
 
   @Column({ type: 'float' })
-  donations_received: number; // ✅ כסף שנכנס מתרומות
+  total_donations: number; // ✅ כסף שנכנס מתרומות
 
   @Column({ type: 'float' })
   available_funds: number; // ✅ כסף נזיל (סך ההון העצמי פחות ההשקעות והלוואות
@@ -33,11 +36,15 @@ export class FundsOverviewEntity {
   cash_holdings : number; 
   
   @Column({ type: 'float', default: 0 })
-  user_deposits_total: number; // ✅ סכום הפיקדונות הכללי בגמ"ח
+  total_user_deposits: number; // ✅ סכום הפיקדונות הכללי בגמ"ח
 
   @Column({ type: 'float', default: 0 })
-  expenses_total: number; // ✅ סכום ההוצאות הכללי בגמ"ח
+  total_expenses: number; // ✅ סכום ההוצאות הכללי בגמ"ח
 
+  @Column({ type: 'float', default: 0 })
+  standing_order_return : number; // ✅ סכום החזרים על הוראות קבע
   @Column({ type: 'json', nullable: true })
   fund_details: Record<string, number>; // ✅ פירוט הקרנות לפי שם וסכום
+
+
 }

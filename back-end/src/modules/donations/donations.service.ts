@@ -31,7 +31,7 @@ export class DonationsService {
     await this.userFinancialsyYearService.recordEquityDonation(user, year, donation.amount);
     await this.userFinancialsService.recordEquityDonation(user, donation.amount);
     await this.fundsOverviewService.addDonation(donation.amount);
-
+    this.donationsRepository.save(donation);
     return donation;
   }
 
@@ -39,11 +39,10 @@ export class DonationsService {
     const year = getYearFromDate(donation.donation_date);
     const user = await this.usersService.getUserById(Number(donation.user));
     if (!user) throw new BadRequestException('User not found');
-
     await this.userFinancialsyYearService.recordSpecialFundDonation(user, year, donation.amount);
     await this.userFinancialsService.recordSpecialFundDonation(user, donation.amount);
     await this.fundsOverviewService.addSpecialFund(donation.donation_reason, donation.amount);
-
+    this.donationsRepository.save(donation);
     return donation;
   }
 

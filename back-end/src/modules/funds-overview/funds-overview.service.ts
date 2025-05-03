@@ -31,12 +31,16 @@ export class FundsOverviewService {
       }
 
       const newRecord = this.fundsOverviewRepository.create({
-        total_funds: initialAmount,
+        own_equity: initialAmount,
+        fund_principal:initialAmount,
         available_funds: initialAmount,
         monthly_deposits: 0,
-        donations_received: 0,
-        loaned_amount: 0,
-        investments: 0,
+        total_loaned_out: 0,
+        total_invested:0,
+        total_user_deposits: 0,
+        standing_order_return: 0,
+        total_expenses: 0,
+        total_donations:0,
         Investment_profits: 0,
         special_funds: 0,
         fund_details: {},
@@ -53,7 +57,8 @@ export class FundsOverviewService {
   async addMonthlyDeposit(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
-      fund.total_funds += amount;
+      fund.own_equity += amount;
+      fund.fund_principal += amount;
       fund.available_funds += amount;
       fund.monthly_deposits += amount;
       await this.fundsOverviewRepository.save(fund);
@@ -65,9 +70,10 @@ export class FundsOverviewService {
   async addDonation(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
-      fund.total_funds += amount;
+      fund.own_equity += amount;
+      fund.fund_principal += amount;
       fund.available_funds += amount;
-      fund.donations_received += amount;
+      fund.total_donations += amount;
       await this.fundsOverviewRepository.save(fund);
       return fund;
     } catch (error) {
@@ -80,18 +86,18 @@ export class FundsOverviewService {
       throw new NotFoundException('not enough funds');
     }
     fund.available_funds -= amount;
-    fund.investments += amount;
+    fund.total_invested += amount;
     await this.fundsOverviewRepository.save(fund);
     return fund;
   }
 
-  async addInvestmentProfits(principal: number, profit: number) {
+  async recordInvestmentEarnings(principal: number, profit: number) {
           const fund = await this.getFundsOverviewRecord();
       fund.available_funds += principal;
       fund.available_funds += profit
       fund.Investment_profits += profit;
-      fund.investments -= principal;
-      fund.total_funds += profit;
+      fund.total_invested -= principal;
+      fund.own_equity += profit;
       await this.fundsOverviewRepository.save(fund);
       return fund;
 
@@ -102,7 +108,7 @@ export class FundsOverviewService {
       throw new NotFoundException('not enough funds');
     }
     fund.available_funds -= amount;
-    fund.loaned_amount += amount;
+    fund.total_loaned_out += amount;
     await this.fundsOverviewRepository.save(fund);
     return fund;
   }
@@ -114,6 +120,8 @@ export class FundsOverviewService {
       }
       fund.fund_details[fundName] = (fund.fund_details[fundName] || 0) + amount;
       fund.special_funds += amount;
+      fund.own_equity += amount;
+      fund.available_funds += amount;
       await this.fundsOverviewRepository.save(fund);
       return fund
     } catch (error) {
@@ -124,8 +132,7 @@ export class FundsOverviewService {
     try {
       const fund = await this.fundsOverviewRepository.findOne({ where: {} });
       if (!fund) throw new Error('General Fund not found');
-
-      fund.loaned_amount -= amount;
+      fund.total_loaned_out -= amount;
       fund.available_funds += amount;
       await this.fundsOverviewRepository.save(fund);
       return fund;
@@ -134,7 +141,7 @@ export class FundsOverviewService {
     }
   }
 
-  async updateFundDetails(fundName: string, amount: number) {
+  async reduceFundAmount(fundName: string, amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
       if (!fund.fund_details) {
@@ -145,6 +152,8 @@ export class FundsOverviewService {
       }
       fund.fund_details[fundName] -= amount;
       fund.special_funds -= amount;
+      fund.own_equity -= amount;
+      fund.available_funds -= amount;
       await this.fundsOverviewRepository.save(fund);
       return fund
     } catch (error) {
@@ -154,9 +163,10 @@ export class FundsOverviewService {
   async addExpense(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
-      fund.expenses_total += amount;
+      fund.total_expenses += amount;
       fund.available_funds -= amount;
-      fund.total_funds -= amount;
+      fund.own_equity -= amount;
+      fund.fund_principal -= amount;
       await this.fundsOverviewRepository.save(fund);
       return fund
     } catch (error) {
@@ -166,25 +176,25 @@ export class FundsOverviewService {
   async addToDepositsTotal(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
-      fund.total_funds += amount;
+      fund.own_equity += amount;
       fund.available_funds += amount;
-      fund.user_deposits_total += amount;
+      fund.total_user_deposits += amount;
       await this.fundsOverviewRepository.save(fund);
      return fund;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
-  async editUserDepositsTotal(amount: number) {
+  async decreaseUserDepositsTotal(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
-      fund.total_funds -= amount;
+      fund.own_equity -= amount;
       fund.available_funds -= amount;
-      fund.user_deposits_total -= amount;
+      fund.total_user_deposits -= amount;
       await this.fundsOverviewRepository.save(fund);
       return fund;
     } catch (error) {
-      return ApiResponse.error(error.message);
+      throw new BadRequestException(error.message);
     }
   }
   async recordCashHoldings(amount: number, type: CashHoldingsTypesRecordType) {
@@ -213,5 +223,21 @@ export class FundsOverviewService {
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+  async addToStandingOrderReturn(amount: number) {
+try {
+  const fund = await this.getFundsOverviewRecord();
+  if(!fund) {
+    throw new NotFoundException('Fund details not found');
+  }
+  fund.standing_order_return += amount;
+  fund.available_funds += amount;
+  fund.own_equity += amount;
+  fund.fund_principal += amount;
+  return this.fundsOverviewRepository.save(fund);
+
+} catch (error) {
+  throw new BadRequestException(error.message);
+}
   }
 }

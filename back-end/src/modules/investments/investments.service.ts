@@ -145,7 +145,7 @@ export class InvestmentsService {
         transaction_date: date,
         note: investment.is_active ? ' part of withdrawal' : 'full withdrawal',
       });
-      await this.fundsOverviewService.addInvestmentProfits(
+      await this.fundsOverviewService.recordInvestmentEarnings(
         principalWithdrawal,
         profitWithdrawn,
       );

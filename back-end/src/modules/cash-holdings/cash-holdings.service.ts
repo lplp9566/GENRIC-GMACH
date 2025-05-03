@@ -35,7 +35,6 @@ export class CashHoldingsService {
       }
 
       const user = await this.UserService.getUserById(Number(cashHolding.user));
-      console.log("useraf",user)
       if (!user) throw new Error('User not found');
       switch (cashHolding.type) {
         case CashHoldingsTypesRecordType.initialize:
@@ -57,7 +56,6 @@ export class CashHoldingsService {
 
   async createCashHolding(cashHolding: CashHoldingRequest, user: any) {
     try {
-        console.log(user ,"create")
       await this.userFinancialsService.recordCashHoldings(
         user,
         cashHolding.amount,
