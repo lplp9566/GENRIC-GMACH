@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from '../users/user.entity';
+import { DonationActionType } from './donationsTypes';
 
 @Entity('donations')
 export class DonationsEntity {
@@ -10,12 +11,12 @@ export class DonationsEntity {
   user: UserEntity;
 
   @Column({ type: 'date' })
-  donation_date: Date;
-
+  date: Date;
+  @Column({ type: 'enum', enum:DonationActionType })
+  action: DonationActionType;
   @Column({ type: 'float' })
   amount: number;
-  
+
   @Column({ type: 'text' })
   donation_reason: string;
-  
 }

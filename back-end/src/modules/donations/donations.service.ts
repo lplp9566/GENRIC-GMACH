@@ -8,7 +8,7 @@ import { getYearFromDate } from '../../services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
-import { IWindowDonations } from './donationsTypes';
+import { DonationActionType, IWindowDonations } from './donationsTypes';
 
 @Injectable()
 export class DonationsService {
@@ -27,7 +27,7 @@ export class DonationsService {
   }
 
   async createEquityDonation(donation: DonationsEntity) {
-    const year = getYearFromDate(donation.donation_date);
+    const year = getYearFromDate(donation.date);
     const user = await this.usersService.getUserById(Number(donation.user));
     if (!user) throw new BadRequestException('User not found');
     
@@ -40,7 +40,7 @@ export class DonationsService {
   }
 
   async createFundDonation(donation: DonationsEntity) {
-    const year = getYearFromDate(donation.donation_date);
+    const year = getYearFromDate(donation.date);
     const user = await this.usersService.getUserById(Number(donation.user));
     if (!user) throw new BadRequestException('User not found');
     await this.userFinancialsyYearService.recordSpecialFundDonation(user, year, donation.amount);
@@ -52,20 +52,30 @@ export class DonationsService {
   }
 
   async createDonation(donation: DonationsEntity) {
-    if (!donation.donation_reason) {
-      throw new BadRequestException('Donation reason is required');
+    if(!donation){
+      throw new BadRequestException('Donation is required');
     }
-    if (donation.donation_reason === 'Equity') {
-      return await this.createEquityDonation(donation);
-    } else {
-      return await this.createFundDonation(donation);
+    if(donation.action == DonationActionType.donation){
+      if (donation.donation_reason === 'Equity') {
+        return await this.createEquityDonation(donation);
+      } else {
+        return await this.createFundDonation(donation);
+      }
     }
+    else if (donation.action == DonationActionType.withdraw){
+      return await this.withdrawSpecialFund(donation);
+    }
+  
   }
-//   async withdrawSpecialFund(donation:IWindowDonations ) {
-//     const year = getYearFromDate(donation.date);
-//     const user = await this.usersService.getUserById(Number(donation.userId));
-//     if (!user) throw new BadRequestException('User not found');
+  async withdrawSpecialFund(donation: DonationsEntity) {
+    const year = getYearFromDate(donation.date);
+    const user = await this.usersService.getUserById(Number(donation.user));
+    if (!user) throw new BadRequestException('User not found');
+    await this.fundsOverviewService.reduceFundAmount(donation.donation_reason, donation.amount);
+    await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(year, donation.donation_reason, donation.amount);
+return donation;
 
-//     // await this.userFinancialsyYearService.r(user, year, donation.amount);
+}
+
 
  }

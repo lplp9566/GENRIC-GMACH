@@ -7,10 +7,11 @@ import { UserFinancialByYearModule } from '../users/user-financials-by-year/user
 import { FundsOverviewModule } from '../funds-overview/funds-overview.module';
 import { UserFinancialsModule } from '../users/user-financials/user-financials.module';
 import { UsersModule } from '../users/users.module';
+import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overview-by-year.module';
 
 @Module({
   imports:[TypeOrmModule.forFeature([OrderReturnEntity]),
-  UserFinancialByYearModule,FundsOverviewModule,UserFinancialsModule,UsersModule
+  UserFinancialByYearModule,FundsOverviewModule,UserFinancialsModule,UsersModule,FundsOverviewByYearModule
 ],
   controllers: [OrderReturnController],
   providers: [OrderReturnService],

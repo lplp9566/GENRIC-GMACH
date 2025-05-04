@@ -8,6 +8,7 @@ import { UserFinancialByYearService } from '../users/user-financials-by-year/use
 import { getYearFromDate } from '../../services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 // cSpell:ignore Financials
 
 @Injectable()
@@ -19,7 +20,8 @@ export class MonthlyDepositsService {
     private readonly usersService: UsersService,
     private readonly userFinancialByYearService: UserFinancialByYearService,
     private readonly fundsOverviewService: FundsOverviewService,
-    private readonly userFinancialsService: UserFinancialsService
+    private readonly userFinancialsService: UserFinancialsService,
+    private readonly fundsOverviewByYearService: FundsOverviewByYearService,
   ) {}
 
   async getAllDeposits(): Promise<MonthlyDepositsEntity[]> {
@@ -72,6 +74,7 @@ export class MonthlyDepositsService {
         this.userFinancialsService.recordMonthlyDeposit(user, payment_details.amount),
         this.fundsOverviewService.addMonthlyDeposit(payment_details.amount),
         this.usersService.updateUserMonthlyBalance(user),
+        this.fundsOverviewByYearService.recordMonthlyDeposit(year, payment_details.amount),
       ]);
   
       return { message: `Deposit recorded successfully.` };

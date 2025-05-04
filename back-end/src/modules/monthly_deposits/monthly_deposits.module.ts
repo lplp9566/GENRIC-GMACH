@@ -9,6 +9,7 @@ import { UserFinancialByYearModule } from '../users/user-financials-by-year/user
 import { FundsOverviewModule } from '../funds-overview/funds-overview.module';
 import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
 import { UserFinancialsModule } from '../users/user-financials/user-financials.module';
+import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overview-by-year.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { UserFinancialsModule } from '../users/user-financials/user-financials.m
     forwardRef(() => MonthlyRatesModule),
     UserFinancialByYearModule,
     UserFinancialsModule,
-    FundsOverviewModule
+    FundsOverviewModule,
+    FundsOverviewByYearModule
   ],
   controllers: [MonthlyDepositsController],
   providers: [MonthlyDepositsService],

@@ -7,6 +7,7 @@ import { UserFinancialByYearService } from '../users/user-financials-by-year/use
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { getYearFromDate } from '../../services/services';
+import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 
 @Injectable()
 export class OrderReturnService {
@@ -17,6 +18,7 @@ export class OrderReturnService {
         private readonly userFinancialsyYearService: UserFinancialByYearService,
         private readonly userFinancialsService: UserFinancialsService,
         private readonly fundsOverviewService: FundsOverviewService,
+        private readonly fundsOverviewByYearService: FundsOverviewByYearService,
   ) {}
   async getOrderReturns() {
     return await this.orderReturnRepository.find();
@@ -28,6 +30,7 @@ export class OrderReturnService {
     await this.userFinancialsyYearService.recordStandingOrderReturn(user, year, orderReturn.amount);
     await this.userFinancialsService.recordStandingOrderReturn(user, orderReturn.amount);
     await this.fundsOverviewService.addToStandingOrderReturn(orderReturn.amount);
+    await this.fundsOverviewByYearService.recordStandingOrderReturn(year, orderReturn.amount);
     return await this.orderReturnRepository.save(orderReturn);
   }
   

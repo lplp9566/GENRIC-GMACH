@@ -16,7 +16,7 @@ import { PaymentDetailsEntity } from '../../users/payment-details/payment_detail
 import { UserFinancialByYearService } from '../../users/user-financials-by-year/user-financial-by-year.service';
 import { UserFinancialsService } from '../../users/user-financials/user-financials.service';
 import { UsersService } from '../../users/users.service';
-import { FundsOverviewByYearService } from 'src/modules/funds-overview-by-year/funds-overview-by-year.service';
+import { FundsOverviewByYearService } from '../../funds-overview-by-year/funds-overview-by-year.service';
 
 // cSpell:ignore Financials
 

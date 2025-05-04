@@ -11,6 +11,7 @@ import { UserEntity } from '../users/user.entity';
 import { PaymentDetailsEntity } from '../users/payment-details/payment_details.entity';
 import { UserFinancialEntity } from '../users/user-financials/user-financials.entity';
 import { UserRole } from '../users/userTypes';
+import { DonationActionType } from './donationsTypes';
 
 const mockDonationRepo = () => ({
   find: jest.fn(),
@@ -82,9 +83,10 @@ describe('DonationsService', () => {
     const donation: DonationsEntity = {
       id: 1,
       user: mockUser,
-      donation_date: new Date(),
+      date: new Date(),
       amount: 100,
       donation_reason: 'Equity',
+      action:DonationActionType.donation,
     };
     donationRepo.save = jest.fn().mockResolvedValue(donation);
     const result = await service.createDonation(donation);
@@ -95,9 +97,10 @@ describe('DonationsService', () => {
     const donation: DonationsEntity = {
       id: 1,
       user: mockUser,
-      donation_date: new Date(),
+      date: new Date(),
       amount: 150,
       donation_reason: 'SpecialFund',
+      action: DonationActionType.donation,
     };
     donationRepo.save = jest.fn().mockResolvedValue(donation);
     const result = await service.createDonation(donation);

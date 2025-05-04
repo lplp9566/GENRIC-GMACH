@@ -5,7 +5,6 @@ import { LoanEntity } from './loans.entity';
 import { LoanPaymentEntity } from './loan-actions/loan_actions.entity';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
-import { FundsOverviewEntity } from '../funds-overview/entity/funds-overview.entity';
 import { UsersService } from '../users/users.service';
 import { getYearFromDate } from '../../services/services';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
