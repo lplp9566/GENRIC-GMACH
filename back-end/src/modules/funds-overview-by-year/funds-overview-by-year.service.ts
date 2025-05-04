@@ -24,6 +24,7 @@ export class FundsOverviewByYearService {
         total_fixed_deposits_added: 0,
         total_fixed_deposits_withdrawn: 0,
         total_standing_order_return: 0,
+        total_special_funds_withdrawn: 0,
       });
       await this.fundsOverviewByYearRepo.save(record);
     }
