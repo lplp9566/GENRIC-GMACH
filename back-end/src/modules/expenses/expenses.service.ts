@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Expense } from './expenses.entity';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
+import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
+import { getYearFromDate } from 'src/services/services';
 
 @Injectable()
 export class ExpensesService {
@@ -10,11 +12,14 @@ export class ExpensesService {
     @InjectRepository(Expense)
     private readonly expensesRepository: Repository<Expense>,
     private readonly fundsOverviewService: FundsOverviewService,
+    private readonly fundsOverviewByYearService: FundsOverviewByYearService, // Assuming this is the correct import
   ) {}
 
   async create(expenseData: Partial<Expense>): Promise<Expense> {
     const expense = this.expensesRepository.create(expenseData);
     await this.fundsOverviewService.addExpense(expense.amount);
+    const year = getYearFromDate(expense.expenseDate) 
+    await this.fundsOverviewByYearService.recordExpense(year, expense.amount);
     return this.expensesRepository.save(expense);
   }
 

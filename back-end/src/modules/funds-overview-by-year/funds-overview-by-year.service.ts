@@ -26,6 +26,7 @@ export class FundsOverviewByYearService {
         total_standing_order_return: 0,
         total_special_funds_withdrawn: 0,
         total_expenses: 0,
+        fund_details: {},
       });
       await this.fundsOverviewByYearRepo.save(record);
     }
