@@ -10,6 +10,7 @@ import { InvestmentTransactionService } from './investment-transactions/investme
 import { TransactionType } from '../investments/investmentsTypes';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
+import { getYearFromDate } from "../../services/services";
 
 @Injectable()
 export class InvestmentsService {
@@ -29,7 +30,7 @@ export class InvestmentsService {
     try {
       const { investment_name, amount, start_date } = dto;
       await this.fundsOverviewService.addInvestment(amount);
-      const year = start_date.getFullYear();
+      const year = getYearFromDate(start_date);
       await this.fundsOverviewByYearService.recordInvestmentOut(year, amount);
       const investment = this.investmentRepo.create({
         investment_name,
@@ -59,7 +60,7 @@ export class InvestmentsService {
       const { id, amount, date } = dto;
       const investment = await this.findActiveInvestment(id);
       await this.fundsOverviewService.addInvestment(amount);
-      const year = date.getFullYear();
+      const year = getYearFromDate(date);
       await this.fundsOverviewByYearService.recordInvestmentOut(year, amount);
       investment.total_principal_invested =
         +investment.total_principal_invested + amount;
@@ -155,7 +156,7 @@ export class InvestmentsService {
         principalWithdrawal,
         profitWithdrawn,
       );
-      const year = date.getFullYear();
+      const year = getYearFromDate(date);
       await this.fundsOverviewByYearService.recordInvestmentIn(
         year,
         principalWithdrawal+profitWithdrawn,

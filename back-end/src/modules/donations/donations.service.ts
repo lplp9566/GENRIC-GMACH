@@ -68,12 +68,16 @@ export class DonationsService {
   
   }
   async withdrawSpecialFund(donation: DonationsEntity) {
+    try {
     const year = getYearFromDate(donation.date);
     const user = await this.usersService.getUserById(Number(donation.user));
     if (!user) throw new BadRequestException('User not found');
     await this.fundsOverviewService.reduceFundAmount(donation.donation_reason, donation.amount);
     await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(year, donation.donation_reason, donation.amount);
 return donation;
+} catch (error) {
+      throw new BadRequestException(error.message);
+}
 
 }
 

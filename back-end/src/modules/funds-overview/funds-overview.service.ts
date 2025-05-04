@@ -152,6 +152,9 @@ export class FundsOverviewService {
       if (!fund.fund_details[fundName]) {
         throw new Error('no mony in this fund');
       }
+      if(fund.fund_details[fundName] < amount) {
+        throw new Error('not enough funds in this fund');
+      }
       fund.fund_details[fundName] -= amount;
       fund.special_funds -= amount;
       fund.own_equity -= amount;
