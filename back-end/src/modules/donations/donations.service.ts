@@ -8,6 +8,7 @@ import { getYearFromDate } from '../../services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
+import { IWindowDonations } from './donationsTypes';
 
 @Injectable()
 export class DonationsService {
@@ -60,4 +61,11 @@ export class DonationsService {
       return await this.createFundDonation(donation);
     }
   }
-}
+//   async withdrawSpecialFund(donation:IWindowDonations ) {
+//     const year = getYearFromDate(donation.date);
+//     const user = await this.usersService.getUserById(Number(donation.userId));
+//     if (!user) throw new BadRequestException('User not found');
+
+//     // await this.userFinancialsyYearService.r(user, year, donation.amount);
+
+ }

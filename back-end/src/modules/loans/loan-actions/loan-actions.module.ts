@@ -10,6 +10,7 @@ import { LoansModule } from '../loans.module';
 import { PaymentDetailsModule } from '../../users/payment-details/payment-details.module';
 import { LoanActionsController } from './loan_actions.controller';
 import { UserFinancialByYearModule } from '../../users/user-financials-by-year/user-financial-by-year.module';
+import { FundsOverviewByYearModule } from 'src/modules/funds-overview-by-year/funds-overview-by-year.module';
 // cSpell:ignore Financials
 
 @Module({
@@ -22,6 +23,7 @@ import { UserFinancialByYearModule } from '../../users/user-financials-by-year/u
     UserFinancialsModule,
     UserFinancialByYearModule,
     FundsOverviewModule,
+    FundsOverviewByYearModule,
    
   ],
   providers: [LoanActionsService],

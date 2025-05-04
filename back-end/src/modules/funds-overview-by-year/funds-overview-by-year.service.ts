@@ -58,7 +58,7 @@ export class FundsOverviewByYearService {
 
   async recordSpecialFundWithdrawalByName(year: number, fundName: string, amount: number) {
     const record = await this.getOrCreateOverview(year);
-    if (!record["fund_details_withdrawn"] || !record["fund_details_withdrawn"][fundName]) {
+    if (!record["fund_details_donated"] || !record["fund_details_donated"][fundName]) {
       throw new Error('No such fund to withdraw from');
     }
     record["fund_details_withdrawn"][fundName] = (record["fund_details_withdrawn"][fundName] || 0) + amount;
@@ -70,6 +70,11 @@ export class FundsOverviewByYearService {
     const record = await this.getOrCreateOverview(year);
     record.total_loans_taken += 1;
     record.total_loans_amount += loanAmount;
+    return this.fundsOverviewByYearRepo.save(record);
+  }
+  async recordAddToLoan(year: number, amount: number) {
+    const record = await this.getOrCreateOverview(year);
+    record.total_loans_amount += amount;
     return this.fundsOverviewByYearRepo.save(record);
   }
 

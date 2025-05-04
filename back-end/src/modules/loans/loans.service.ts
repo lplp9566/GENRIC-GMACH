@@ -10,6 +10,7 @@ import { UsersService } from '../users/users.service';
 import { getYearFromDate } from '../../services/services';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { LoanActionDto, LoanPaymentActionType } from './loan-dto/loanTypes';
+import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 // cSpell:ignore Financials
 
 @Injectable()
@@ -23,6 +24,7 @@ export class LoansService {
     private readonly userFinancialsByYearService: UserFinancialByYearService,
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly usersService: UsersService,
+    private readonly fundsOverviewByYearService: FundsOverviewByYearService,
   ) {}
   async getLoans(): Promise<LoanEntity[]> {
     try {
@@ -33,11 +35,10 @@ export class LoansService {
   }
   async createLoan(loanData: Partial<LoanEntity>) {
     try {
-      await this.fundsOverviewService.addLoan(loanData.loan_amount!);
       const loanRecord = this.loansRepository.create(loanData);
       loanRecord.remaining_balance = loanRecord.loan_amount;
       loanRecord.total_installments =
-        loanRecord.loan_amount / loanRecord.monthly_payment;
+      loanRecord.loan_amount / loanRecord.monthly_payment;
       const year = getYearFromDate(loanRecord.loan_date);
       const user = await this.usersService.getUserById(Number(loanRecord.user));
       if (!user) {
@@ -48,6 +49,11 @@ export class LoansService {
       const tt = await this.userFinancialsService.recordLoanTaken(
         user,
         loanRecord.loan_amount,
+      );
+      await this.fundsOverviewService.addLoan(loanData.loan_amount!);
+      await this.fundsOverviewByYearService.recordLoanTaken(
+        year,
+        loanData.loan_amount!,
       );
       await this.userFinancialsByYearService.recordLoanTaken(
         user,
@@ -101,6 +107,7 @@ export class LoansService {
         this.userFinancialsByYearService.recordLoanTaken(loan.user, year, diff),
         this.userFinancialsService.recordLoanTaken(loan.user, diff),
         this.fundsOverviewService.addLoan(diff),
+        this.fundsOverviewByYearService.recordAddToLoan(year, diff),
       ]);
       return await this.paymentsRepository.save({
         loan,

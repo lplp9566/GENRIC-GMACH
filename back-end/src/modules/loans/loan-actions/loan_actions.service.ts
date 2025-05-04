@@ -16,6 +16,7 @@ import { PaymentDetailsEntity } from '../../users/payment-details/payment_detail
 import { UserFinancialByYearService } from '../../users/user-financials-by-year/user-financial-by-year.service';
 import { UserFinancialsService } from '../../users/user-financials/user-financials.service';
 import { UsersService } from '../../users/users.service';
+import { FundsOverviewByYearService } from 'src/modules/funds-overview-by-year/funds-overview-by-year.service';
 
 // cSpell:ignore Financials
 
@@ -33,6 +34,7 @@ export class LoanActionsService {
     private readonly userFin: UserFinancialsService,
     private readonly fundsOverview: FundsOverviewService,
     private readonly usersService: UsersService,
+    private readonly fundsOverviewByYearService: FundsOverviewByYearService,
   ) {}
   async handleLoanAction(dto: LoanActionDto): Promise<LoanPaymentEntity> {
     switch (dto.action_type) {
@@ -91,6 +93,7 @@ export class LoanActionsService {
         this.userFinByYear.recordLoanRepaid(loan.user, year, dto.amount),
         this.userFin.recordLoanRepaid(loan.user, dto.amount),
         this.fundsOverview.repayLoan(dto.amount),
+        this.fundsOverviewByYearService.recordLoanRepaid(year, dto.amount),
       ]);
       await this.computeLoanNetBalance(loan.id);
 

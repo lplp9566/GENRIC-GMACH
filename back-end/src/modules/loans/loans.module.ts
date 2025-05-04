@@ -11,6 +11,7 @@ import { FundsOverviewModule } from '../funds-overview/funds-overview.module';
 import { UsersService } from '../users/users.service';
 import { UsersModule } from '../users/users.module';
 import { UserFinancialsModule } from '../users/user-financials/user-financials.module';
+import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overview-by-year.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserFinancialsModule } from '../users/user-financials/user-financials.m
     UserFinancialByYearModule,
     UserFinancialsModule,
     FundsOverviewModule,
+    FundsOverviewByYearModule,
     forwardRef(() => UsersModule),
   ],
   providers: [LoansService],
