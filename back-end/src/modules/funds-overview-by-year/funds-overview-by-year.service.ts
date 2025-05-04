@@ -102,4 +102,14 @@ export class FundsOverviewByYearService {
     record.total_expenses += amount;
     return this.fundsOverviewByYearRepo.save(record);
   }
+  async recordInvestmentIn(year: number, amount: number) {
+    const record = await this.getOrCreateOverview(year);
+    record.total_investments_in += amount;
+    return this.fundsOverviewByYearRepo.save(record);
+  }
+  async recordInvestmentOut(year: number, amount: number) {
+    const record = await this.getOrCreateOverview(year);
+    record.total_investments_out += amount;
+    return this.fundsOverviewByYearRepo.save(record);
+  }
 } 

@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Expense } from './expenses.entity';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
-import { getYearFromDate } from 'src/services/services';
+import { getYearFromDate } from '../../services/services';
 
 @Injectable()
 export class ExpensesService {

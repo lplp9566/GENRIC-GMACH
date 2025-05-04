@@ -22,7 +22,7 @@ export class InvestmentsController {
     amount: number;
     date: Date;
   }) {
-    return this.investmentsService.addInvestment(body);
+    return this.investmentsService.addToInvestment(body);
   }
 
   // ✅ עדכון ערך השקעה

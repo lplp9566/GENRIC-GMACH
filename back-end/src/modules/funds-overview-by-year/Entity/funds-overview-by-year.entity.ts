@@ -21,7 +21,6 @@ export class FundsOverviewByYearEntity {
   total_loans_taken: number;
   @Column({ type: 'float' })
   total_loans_amount: number;
-
   @Column({ type: 'float' })
   total_loans_repaid: number;
 
@@ -32,10 +31,14 @@ export class FundsOverviewByYearEntity {
   total_fixed_deposits_withdrawn: number;
   @Column({ type: 'float', default: 0 })
   total_standing_order_return: number;
-  @Column({ type: 'json', nullable: true })
-  fund_details: Record<string, number>; 
   @Column({ type: 'float', default: 0 })
-  total_expenses: number; 
+  total_investments_out: number; 
+  @Column({ type: 'float', default: 0 })
+    total_investments_in: number;
+  @Column({ type: 'json', nullable: true })
+  fund_details: Record<string, number>;
+  @Column({ type: 'float', default: 0 })
+  total_expenses: number;
   total_donations: number;
 
   @AfterLoad()
