@@ -34,6 +34,8 @@ export class FundsOverviewByYearEntity {
   total_standing_order_return: number;
   @Column({ type: 'json', nullable: true })
   fund_details: Record<string, number>; 
+  @Column({ type: 'float', default: 0 })
+  total_expenses: number; 
   total_donations: number;
 
   @AfterLoad()
