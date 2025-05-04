@@ -7,6 +7,7 @@ import { UserFinancialByYearService } from '../users/user-financials-by-year/use
 import { getYearFromDate } from '../../services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 
 @Injectable()
 export class DonationsService {
@@ -17,6 +18,7 @@ export class DonationsService {
     private readonly userFinancialsyYearService: UserFinancialByYearService,
     private readonly userFinancialsService: UserFinancialsService,
     private readonly fundsOverviewService: FundsOverviewService,
+    private readonly fundsOvirewviewServiceByYear: FundsOverviewByYearService
   ) {}
 
   async getDonations() {
@@ -31,6 +33,7 @@ export class DonationsService {
     await this.userFinancialsyYearService.recordEquityDonation(user, year, donation.amount);
     await this.userFinancialsService.recordEquityDonation(user, donation.amount);
     await this.fundsOverviewService.addDonation(donation.amount);
+    await this.fundsOvirewviewServiceByYear.recordEquityDonation( year , donation.amount);
     this.donationsRepository.save(donation);
     return donation;
   }
@@ -42,6 +45,7 @@ export class DonationsService {
     await this.userFinancialsyYearService.recordSpecialFundDonation(user, year, donation.amount);
     await this.userFinancialsService.recordSpecialFundDonation(user, donation.amount);
     await this.fundsOverviewService.addSpecialFund(donation.donation_reason, donation.amount);
+    await this.fundsOvirewviewServiceByYear.recordSpecialFundDonationByName(year,donation.donation_reason, donation.amount);
     this.donationsRepository.save(donation);
     return donation;
   }

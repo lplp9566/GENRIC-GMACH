@@ -102,6 +102,7 @@ describe('LoanActionsService', () => {
         donations: [],
         requests: [],
         cashHoldings: [],
+        orderReturns: [],
       };
   
       const mockLoan: LoanEntity = {

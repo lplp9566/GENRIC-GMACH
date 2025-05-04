@@ -27,6 +27,7 @@ const mockFund: FundsOverviewEntity = {
   fund_principal : 1000,
   standing_order_return: 0,
   fund_details: {},
+  total_equity_donations: 0,
 };
 
 describe('FundsOverviewService', () => {

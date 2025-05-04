@@ -29,6 +29,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { DepositsModule } from './modules/deposits/deposits.module';
 import { CashHoldingsModule } from './modules/cash-holdings/cash-holdings.module';
 import { OrderReturnModule } from './modules/order-return/order-return.module';
+import { FundsOverviewByYearModule } from './modules/funds-overview-by-year/funds-overview-by-year.module';
 
 
 @Module({
@@ -69,6 +70,7 @@ import { OrderReturnModule } from './modules/order-return/order-return.module';
     DepositsModule,
     CashHoldingsModule,
     OrderReturnModule,
+    FundsOverviewByYearModule,
 
   ],
   providers: [ExpensesService],

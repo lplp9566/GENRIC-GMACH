@@ -74,6 +74,7 @@ export class FundsOverviewService {
       fund.fund_principal += amount;
       fund.available_funds += amount;
       fund.total_donations += amount;
+      fund.total_equity_donations += amount;
       await this.fundsOverviewRepository.save(fund);
       return fund;
     } catch (error) {
