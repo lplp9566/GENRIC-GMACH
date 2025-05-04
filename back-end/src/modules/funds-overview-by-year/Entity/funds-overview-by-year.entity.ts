@@ -41,6 +41,7 @@ export class FundsOverviewByYearEntity {
   fund_details_withdrawn: Record<string, number>;
   @Column({ type: 'float', default: 0 })
   total_expenses: number;
+    @Column({ type: 'float', default: 0 })
   total_donations: number;
 
   @AfterLoad()
