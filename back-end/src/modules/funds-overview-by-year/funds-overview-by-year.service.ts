@@ -26,7 +26,6 @@ export class FundsOverviewByYearService {
         total_standing_order_return: 0,
         total_special_funds_withdrawn: 0,
         total_expenses: 0,
-        fund_details: {},
       });
       await this.fundsOverviewByYearRepo.save(record);
     }
@@ -52,6 +51,7 @@ export class FundsOverviewByYearService {
       record["fund_details_donated"] = {};
     }
     record["fund_details_donated"][fundName] = (record["fund_details_donated"][fundName] || 0) + amount;
+    console.log(record["fund_details_donated"]);
     record.special_fund_donations += amount;
     return this.fundsOverviewByYearRepo.save(record);
   }

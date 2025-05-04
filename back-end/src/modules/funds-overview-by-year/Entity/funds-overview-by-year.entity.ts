@@ -35,8 +35,10 @@ export class FundsOverviewByYearEntity {
   total_investments_out: number; 
   @Column({ type: 'float', default: 0 })
     total_investments_in: number;
-  @Column({ type: 'json', nullable: true })
-  fund_details: Record<string, number>;
+  @Column({ type: 'json', nullable: true , default: {} })
+  fund_details_donated: Record<string, number>;
+  @Column({ type: 'json', nullable: true , default: {} })
+  fund_details_withdrawn: Record<string, number>;
   @Column({ type: 'float', default: 0 })
   total_expenses: number;
   total_donations: number;
