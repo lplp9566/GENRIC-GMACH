@@ -10,6 +10,7 @@ import { getYearFromDate } from '../../services/services';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { LoanActionDto, LoanPaymentActionType } from './loan-dto/loanTypes';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
+import { FundsFlowService } from './calcelete.service';
 // cSpell:ignore Financials
 
 @Injectable()
@@ -24,6 +25,7 @@ export class LoansService {
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly usersService: UsersService,
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
+    private readonly fundsFlowService:FundsFlowService
   ) {}
   async getLoans(): Promise<LoanEntity[]> {
     try {
@@ -34,6 +36,7 @@ export class LoansService {
   }
   async createLoan(loanData: Partial<LoanEntity>) {
     try {
+      await this.fundsFlowService.getCashFlowTotals(new Date("2025-05-05"), new Date("2025-09-05"),loanData);
       const loanRecord = this.loansRepository.create(loanData);
       loanRecord.remaining_balance = loanRecord.loan_amount;
       loanRecord.total_installments =

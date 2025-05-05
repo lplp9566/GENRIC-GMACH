@@ -17,4 +17,11 @@ export enum LoanPaymentActionType {
     MONTHLY_PAYMENT_CHANGE = 'MONTHLY_PAYMENT_CHANGE',
     DATE_OF_PAYMENT_CHANGE = 'DATE_OF_PAYMENT_CHANGE', 
   }
+  export interface CreateLoan {
+    loan_date: Date; 
+    loan_amount: number; 
+    monthly_payment: number;  
+    payment_date: number; 
+    user: number; 
+  }
   

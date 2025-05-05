@@ -1,4 +1,8 @@
 import { Entity } from "typeorm";
 
 @Entity('deposits')
-export class DepositsEntity {}
+export class DepositsEntity {
+    constrctor(
+        
+    ){}
+}

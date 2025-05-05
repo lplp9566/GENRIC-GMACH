@@ -9,6 +9,9 @@ import { FundsOverviewModule } from '../funds-overview/funds-overview.module';
 import { UsersModule } from '../users/users.module';
 import { UserFinancialsModule } from '../users/user-financials/user-financials.module';
 import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overview-by-year.module';
+import { FundsFlowService } from './calcelete.service';
+import { MonthlyDepositsModule } from '../monthly_deposits/monthly_deposits.module';
+import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
 
 @Module({
   imports: [
@@ -17,10 +20,12 @@ import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overv
     UserFinancialsModule,
     FundsOverviewModule,
     FundsOverviewByYearModule,
+    MonthlyDepositsModule,
+    MonthlyRatesModule,
     forwardRef(() => UsersModule),
   ],
-  providers: [LoansService],
+  providers: [LoansService,FundsFlowService, ],
   controllers: [LoansController],
-  exports: [LoansService, TypeOrmModule],
+  exports: [LoansService,FundsFlowService, TypeOrmModule],
 })
 export class LoansModule {}
