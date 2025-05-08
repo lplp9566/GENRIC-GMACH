@@ -5,6 +5,7 @@ import { InvestmentEntity } from './entity/investments.entity';
 import { InvestmentTransactionService } from './investment-transactions/investment-transactions.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { Repository } from 'typeorm';
+import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 
 describe('InvestmentsService', () => {
   let service: InvestmentsService;
@@ -45,8 +46,15 @@ describe('InvestmentsService', () => {
       providers: [
         InvestmentsService,
         { provide: getRepositoryToken(InvestmentEntity), useFactory: mockRepo },
-        { provide: InvestmentTransactionService, useValue: mockTransactionService },
+        {
+          provide: InvestmentTransactionService,
+          useValue: mockTransactionService,
+        },
         { provide: FundsOverviewService, useValue: mockFundsOverviewService },
+        {
+          provide: FundsOverviewByYearService,
+          useValue: FundsOverviewByYearService,
+        },
       ],
     }).compile();
 

@@ -8,6 +8,7 @@ import { UserFinancialByYearService } from '../users/user-financials-by-year/use
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { UserEntity } from '../users/user.entity';
+import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 
 const mockRepo = () => ({
   find: jest.fn(),
@@ -32,11 +33,33 @@ describe('MonthlyDepositsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MonthlyDepositsService,
-        { provide: getRepositoryToken(MonthlyDepositsEntity), useFactory: mockRepo },
-        { provide: UsersService, useValue: { getUserById: jest.fn(), updateUserMonthlyBalance: jest.fn() } },
-        { provide: UserFinancialByYearService, useValue: { recordMonthlyDeposit: jest.fn() } },
-        { provide: FundsOverviewService, useValue: { addMonthlyDeposit: jest.fn() } },
-        { provide: UserFinancialsService, useValue: { recordMonthlyDeposit: jest.fn() } },
+        {
+          provide: getRepositoryToken(MonthlyDepositsEntity),
+          useFactory: mockRepo,
+        },
+        {
+          provide: UsersService,
+          useValue: {
+            getUserById: jest.fn(),
+            updateUserMonthlyBalance: jest.fn(),
+          },
+        },
+        {
+          provide: UserFinancialByYearService,
+          useValue: { recordMonthlyDeposit: jest.fn() },
+        },
+        {
+          provide: FundsOverviewService,
+          useValue: { addMonthlyDeposit: jest.fn() },
+        },
+        {
+          provide: UserFinancialsService,
+          useValue: { recordMonthlyDeposit: jest.fn() },
+        },
+        {
+          provide: FundsOverviewByYearService,
+          useValue: FundsOverviewByYearService,
+        },
       ],
     }).compile();
 
@@ -71,7 +94,6 @@ describe('MonthlyDepositsService', () => {
       amount: 100,
       deposit_date: new Date(),
     } as MonthlyDepositsEntity;
-    
 
     (usersService.getUserById as jest.Mock).mockResolvedValue(user);
     repo.create.mockReturnValue(mockDeposit);

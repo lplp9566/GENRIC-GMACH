@@ -88,10 +88,6 @@ export class FundsFlowService {
     return total;
   }
 
-  /**
-   * מחזירה את הסכומים הכוללים של inflow ו־outflow בין שני תאריכים
-   * כולל סימולציה על הלוואה חדשה אם נשלחה
-   */
   async getCashFlowTotals(
     from: Date,
     to: Date,

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LoansService } from './loans.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { LoanEntity } from './loans.entity';
-import { LoanPaymentEntity } from './loan-actions/loan_actions.entity';
+import { LoanActionEntity } from './loan-actions/loan_actions.entity';
 import { Repository } from 'typeorm';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
@@ -13,6 +13,8 @@ import { UserEntity } from '../users/user.entity';
 import { PaymentDetailsEntity } from '../users/payment-details/payment_details.entity';
 import { UserFinancialEntity } from '../users/user-financials/user-financials.entity';
 import { payment_method, UserRole } from '../users/userTypes';
+import { FundsFlowService } from './calcelete.service';
+import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 
 const mockLoanRepo = () => ({
   find: jest.fn(),
@@ -25,15 +27,23 @@ const mockPaymentRepo = () => ({
   find: jest.fn(),
   save: jest.fn(),
 });
-
+const mockFundsOverviewByYearService = {
+  recordLoanTaken: jest.fn(),
+  recordAddToLoan: jest.fn(),
+};
+const mockFundsFlowService = {
+  getCashFlowTotals: jest.fn().mockResolvedValue(undefined),
+};
 describe('LoansService', () => {
   let service: LoansService;
   let loanRepo: jest.Mocked<Repository<LoanEntity>>;
-  let paymentRepo: jest.Mocked<Repository<LoanPaymentEntity>>;
+  let paymentRepo: jest.Mocked<Repository<LoanActionEntity>>;
   let usersService: UsersService;
   let fundsService: FundsOverviewService;
   let yearlyService: UserFinancialByYearService;
   let financialsService: UserFinancialsService;
+  let FundsOverviewServiceByYearService: UserFinancialByYearService;
+  let flowService: FundsFlowService;
 
   const mockUser: UserEntity = {
     id: 1,
@@ -83,21 +93,27 @@ describe('LoansService', () => {
       providers: [
         LoansService,
         { provide: getRepositoryToken(LoanEntity), useFactory: mockLoanRepo },
-        { provide: getRepositoryToken(LoanPaymentEntity), useFactory: mockPaymentRepo },
+        { provide: getRepositoryToken(LoanActionEntity), useFactory: mockPaymentRepo },
         { provide: UserFinancialsService, useValue: { recordLoanTaken: jest.fn() } },
         { provide: UserFinancialByYearService, useValue: { recordLoanTaken: jest.fn() } },
         { provide: FundsOverviewService, useValue: { addLoan: jest.fn() } },
         { provide: UsersService, useValue: { getUserById: jest.fn() } },
+        { provide: FundsOverviewByYearService,useValue: mockFundsOverviewByYearService },
+        { provide: FundsFlowService,useValue: mockFundsFlowService },
+
+
       ],
     }).compile();
 
     service = module.get<LoansService>(LoansService);
     loanRepo = module.get(getRepositoryToken(LoanEntity));
-    paymentRepo = module.get(getRepositoryToken(LoanPaymentEntity));
+    paymentRepo = module.get(getRepositoryToken(LoanActionEntity));
     usersService = module.get(UsersService);
     fundsService = module.get(FundsOverviewService);
     yearlyService = module.get(UserFinancialByYearService);
     financialsService = module.get(UserFinancialsService);
+    FundsOverviewServiceByYearService = module.get(UserFinancialByYearService);
+
   });
 
   it('should be defined', () => {
@@ -121,7 +137,7 @@ describe('LoansService', () => {
         user: mockUser,
       };
 
-      const mockPayment: LoanPaymentEntity = {
+      const mockPayment: LoanActionEntity = {
         id: 99,
         loan: mockLoan,
         amount: 200,
@@ -155,7 +171,7 @@ describe('LoansService', () => {
         user: mockUser,
       };
 
-      const mockPayment: LoanPaymentEntity = {
+      const mockPayment: LoanActionEntity = {
         id: 88,
         loan: mockLoan,
         amount: 200,
@@ -189,7 +205,7 @@ describe('LoansService', () => {
         user: mockUser,
       };
 
-      const mockPayment: LoanPaymentEntity = {
+      const mockPayment: LoanActionEntity = {
         id: 77,
         loan: mockLoan,
         amount: 15,

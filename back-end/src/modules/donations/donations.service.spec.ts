@@ -12,6 +12,7 @@ import { PaymentDetailsEntity } from '../users/payment-details/payment_details.e
 import { UserFinancialEntity } from '../users/user-financials/user-financials.entity';
 import { UserRole } from '../users/userTypes';
 import { DonationActionType } from './donationsTypes';
+import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 
 const mockDonationRepo = () => ({
   find: jest.fn(),
@@ -48,6 +49,7 @@ describe('DonationsService', () => {
       providers: [
         DonationsService,
         { provide: getRepositoryToken(DonationsEntity), useFactory: mockDonationRepo },
+        { provide: FundsOverviewByYearService,useValue: FundsOverviewByYearService },
         { provide: UsersService, useValue: { getUserById: jest.fn().mockResolvedValue(mockUser) } },
         { provide: UserFinancialByYearService, useValue: {
           recordEquityDonation: jest.fn(),
@@ -61,6 +63,7 @@ describe('DonationsService', () => {
           addDonation: jest.fn(),
           addSpecialFund: jest.fn()
         } },
+        
       ],
     }).compile();
 

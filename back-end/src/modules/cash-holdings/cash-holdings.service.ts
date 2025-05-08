@@ -8,7 +8,7 @@ import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import {
   CashHoldingRequest,
   CashHoldingsTypesRecordType,
-} from './cash-holdingsTypes';
+} from './cash-holdings-dto';
 
 @Injectable()
 export class CashHoldingsService {

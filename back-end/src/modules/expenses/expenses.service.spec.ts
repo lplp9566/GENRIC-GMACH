@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Expense } from './expenses.entity';
 import { Repository } from 'typeorm';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
+import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 
 const mockRepo = () => ({
   create: jest.fn(),
@@ -28,6 +29,10 @@ describe('ExpensesService', () => {
         ExpensesService,
         { provide: getRepositoryToken(Expense), useFactory: mockRepo },
         { provide: FundsOverviewService, useFactory: mockFundsOverviewService },
+        {
+          provide: FundsOverviewByYearService,
+          useValue: FundsOverviewByYearService,
+        },
       ],
     }).compile();
 
@@ -71,7 +76,9 @@ describe('ExpensesService', () => {
 
     it('should throw error if not found', async () => {
       repo.findOne.mockResolvedValue(null);
-      await expect(service.findOne(999)).rejects.toThrow('Expense with id 999 not found');
+      await expect(service.findOne(999)).rejects.toThrow(
+        'Expense with id 999 not found',
+      );
     });
   });
 

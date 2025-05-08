@@ -1,8 +1,27 @@
-import { Entity } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { UserEntity } from '../users/user.entity';
+import { DepositsActionsEntity } from './deposits-actions/deposits-actions.entity';
 
 @Entity('deposits')
 export class DepositsEntity {
-    constrctor(
-        
-    ){}
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @ManyToOne(() => UserEntity, (user) => user.donations)
+  user: UserEntity;
+
+  @Column()
+  start_date: Date;
+
+  @Column()
+  end_date: Date;
+
+  @Column()
+  amount:number;
+
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
+
+  @OneToMany(() => DepositsActionsEntity, (action) => action.deposit, { cascade: true })
+  actions: DepositsActionsEntity[]
 }

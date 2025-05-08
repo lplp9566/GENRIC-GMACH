@@ -6,7 +6,7 @@ import { UsersService } from '../users/users.service';
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { Repository } from 'typeorm';
-import { CashHoldingsTypesRecordType } from './cash-holdingsTypes';
+import { CashHoldingsTypesRecordType } from './cash-holdings-dto';
 
 const mockCashHoldingsRepository = () => ({
   find: jest.fn(),

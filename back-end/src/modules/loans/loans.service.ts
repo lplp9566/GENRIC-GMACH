@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoanEntity } from './loans.entity';
-import { LoanPaymentEntity } from './loan-actions/loan_actions.entity';
+import { LoanActionEntity } from './loan-actions/loan_actions.entity';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UsersService } from '../users/users.service';
@@ -18,8 +18,8 @@ export class LoansService {
   constructor(
     @InjectRepository(LoanEntity)
     private loansRepository: Repository<LoanEntity>,
-    @InjectRepository(LoanPaymentEntity)
-    private paymentsRepository: Repository<LoanPaymentEntity>,
+    @InjectRepository(LoanActionEntity)
+    private paymentsRepository: Repository<LoanActionEntity>,
     private readonly userFinancialsService: UserFinancialsService,
     private readonly userFinancialsByYearService: UserFinancialByYearService,
     private readonly fundsOverviewService: FundsOverviewService,
@@ -80,14 +80,14 @@ export class LoansService {
     }
   }
 
-  async getAllPements(): Promise<LoanPaymentEntity[]> {
+  async getAllPements(): Promise<LoanActionEntity[]> {
     try {
       return this.paymentsRepository.find({ relations: ['loan'] });
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
-  async changeLoanAmount(dto: LoanActionDto): Promise<LoanPaymentEntity> {
+  async changeLoanAmount(dto: LoanActionDto): Promise<LoanActionEntity> {
     const loan = await this.loansRepository.findOne({
       where: { id: dto.loanId },
       relations: ['user'],

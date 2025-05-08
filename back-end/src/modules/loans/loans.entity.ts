@@ -7,7 +7,7 @@ import {
   RelationId,
 } from 'typeorm';
 import { UserEntity } from '../users/user.entity';
-import { LoanPaymentEntity } from './loan-actions/loan_actions.entity';
+import { LoanActionEntity } from './loan-actions/loan_actions.entity';
 
 @Entity('loans')
 export class LoanEntity {
@@ -37,8 +37,8 @@ export class LoanEntity {
   initialMonthlyPayment: number;
   @Column({ type: 'float', nullable: true })
   total_installments: number;
-  @OneToMany(() => LoanPaymentEntity, (payment) => payment.loan, {
+  @OneToMany(() => LoanActionEntity, (payment) => payment.loan, {
     cascade: true,
   })
-  payments: LoanPaymentEntity[];
+  payments: LoanActionEntity[];
 }

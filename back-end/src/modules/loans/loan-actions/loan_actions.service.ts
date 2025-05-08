@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoanEntity } from '../loans.entity';
 import { Repository } from 'typeorm';
-import { LoanPaymentEntity } from './loan_actions.entity';
+import { LoanActionEntity } from './loan_actions.entity';
 import { FundsOverviewService } from '../../funds-overview/funds-overview.service';
 import { getYearFromDate } from '../../../services/services';
 import { LoansService } from '../loans.service';
@@ -25,8 +25,8 @@ export class LoanActionsService {
   constructor(
     @InjectRepository(LoanEntity)
     private readonly loansRepo: Repository<LoanEntity>,
-    @InjectRepository(LoanPaymentEntity)
-    private readonly paymentsRepo: Repository<LoanPaymentEntity>,
+    @InjectRepository(LoanActionEntity)
+    private readonly paymentsRepo: Repository<LoanActionEntity>,
     @InjectRepository(PaymentDetailsEntity)
     private readonly paymentDetailsRepo: Repository<PaymentDetailsEntity>,
     private readonly loansService: LoansService,
@@ -36,7 +36,7 @@ export class LoanActionsService {
     private readonly usersService: UsersService,
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
   ) {}
-  async handleLoanAction(dto: LoanActionDto): Promise<LoanPaymentEntity> {
+  async handleLoanAction(dto: LoanActionDto): Promise<LoanActionEntity> {
     switch (dto.action_type) {
       case LoanPaymentActionType.PAYMENT:
         return this.addLoanPayment(dto);
@@ -55,7 +55,7 @@ export class LoanActionsService {
     }
   }
 
-  async addLoanPayment(dto: LoanActionDto): Promise<LoanPaymentEntity> {
+  async addLoanPayment(dto: LoanActionDto): Promise<LoanActionEntity> {
     try {
       const loan = await this.loansRepo.findOne({
         where: { id: dto.loanId },
@@ -71,7 +71,7 @@ export class LoanActionsService {
       const newPayment = this.paymentsRepo.create({
         loan: loan,
         date: dto.date,
-        amount: dto.amount,
+        value: dto.amount,
         action_type: LoanPaymentActionType.PAYMENT,
       });
       if (loan.remaining_balance === 0) {
@@ -140,7 +140,7 @@ export class LoanActionsService {
     const paymentEntities = await this.getLoanPayments(loanId);
     const paymentEvents: PaymentEvent[] = paymentEntities.map((evt) => ({
       date: new Date(evt.date),
-      amount: evt.amount,
+      amount: evt.value,
       action_type: evt.action_type,
     }));
 

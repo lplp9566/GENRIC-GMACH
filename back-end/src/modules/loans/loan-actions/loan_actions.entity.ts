@@ -8,7 +8,7 @@ import {
 import { LoanEntity } from '../loans.entity';
 import { LoanPaymentActionType } from '../loan-dto/loanTypes';
 @Entity('loan_actions')
-export class LoanPaymentEntity {
+export class LoanActionEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -18,12 +18,11 @@ export class LoanPaymentEntity {
   @Column({
     type: 'enum',
     enum: LoanPaymentActionType,
-    default: LoanPaymentActionType.PAYMENT,
   })
   action_type: LoanPaymentActionType;
   @Column({ type: 'date', nullable: false })
   date: Date;
 
   @Column()
-  amount: number;
+  value: number;
 }

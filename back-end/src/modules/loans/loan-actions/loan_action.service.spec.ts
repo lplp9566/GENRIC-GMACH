@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LoanActionsService } from './loan_actions.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { LoanEntity } from '../loans.entity';
-import { LoanPaymentEntity } from './loan_actions.entity';
+import { LoanActionEntity } from './loan_actions.entity';
 import { PaymentDetailsEntity } from '../../users/payment-details/payment_details.entity';
 import { Repository } from 'typeorm';
 import { UserFinancialByYearService } from '../../users/user-financials-by-year/user-financial-by-year.service';
@@ -14,6 +14,7 @@ import { LoanPaymentActionType } from '../loan-dto/loanTypes';
 import { UserEntity } from '../../users/user.entity';
 import { UserFinancialEntity } from '../../users/user-financials/user-financials.entity';
 import { payment_method, UserRole } from '../../users/userTypes';
+import { FundsOverviewByYearService } from '../../funds-overview-by-year/funds-overview-by-year.service';
 
 const mockLoanRepo = () => ({
   findOne: jest.fn(),
@@ -34,7 +35,7 @@ const mockDetailsRepo = () => ({
 describe('LoanActionsService', () => {
   let service: LoanActionsService;
   let loansRepo: jest.Mocked<Repository<LoanEntity>>;
-  let paymentsRepo: jest.Mocked<Repository<LoanPaymentEntity>>;
+  let paymentsRepo: jest.Mocked<Repository<LoanActionEntity>>;
   let detailsRepo: jest.Mocked<Repository<PaymentDetailsEntity>>;
 
   beforeEach(async () => {
@@ -42,7 +43,7 @@ describe('LoanActionsService', () => {
       providers: [
         LoanActionsService,
         { provide: getRepositoryToken(LoanEntity), useFactory: mockLoanRepo },
-        { provide: getRepositoryToken(LoanPaymentEntity), useFactory: mockPaymentRepo },
+        { provide: getRepositoryToken(LoanActionEntity), useFactory: mockPaymentRepo },
         { provide: getRepositoryToken(PaymentDetailsEntity), useFactory: mockDetailsRepo },
         { provide: UserFinancialByYearService, useValue: { recordLoanRepaid: jest.fn() } },
         { provide: UserFinancialsService, useValue: { recordLoanRepaid: jest.fn() } },
@@ -53,12 +54,14 @@ describe('LoanActionsService', () => {
           changeDateOfPayment: jest.fn().mockResolvedValue({ id: 3 }),
         } },
         { provide: UsersService, useValue: { getUserById: jest.fn() } },
+                { provide: FundsOverviewByYearService,useValue: FundsOverviewByYearService },
+        
       ],
     }).compile();
 
     service = module.get<LoanActionsService>(LoanActionsService);
     loansRepo = module.get(getRepositoryToken(LoanEntity));
-    paymentsRepo = module.get(getRepositoryToken(LoanPaymentEntity));
+    paymentsRepo = module.get(getRepositoryToken(LoanActionEntity));
     detailsRepo = module.get(getRepositoryToken(PaymentDetailsEntity));
 
     jest.spyOn(service, 'getLoanPayments').mockResolvedValue([]);

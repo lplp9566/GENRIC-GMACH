@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { use } from 'passport';
 import { UserEntity } from '../user.entity';
 import { UserFinancialEntity } from './user-financials.entity';
-import { CashHoldingsTypesRecordType } from '../../cash-holdings/cash-holdingsTypes';
+import { CashHoldingsTypesRecordType } from '../../cash-holdings/cash-holdings-dto';
 // cSpell:ignore Financials
 
 @Injectable()

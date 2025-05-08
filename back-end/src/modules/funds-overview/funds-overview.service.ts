@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { log } from 'console';
 import { ApiResponse } from '../../utils/response.utils';
 import { first } from 'rxjs';
-import { CashHoldingsTypesRecordType } from '../cash-holdings/cash-holdingsTypes';
+import { CashHoldingsTypesRecordType } from '../cash-holdings/cash-holdings-dto';
 
 @Injectable()
 export class FundsOverviewService {
