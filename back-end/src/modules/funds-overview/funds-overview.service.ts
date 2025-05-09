@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FundsOverviewEntity } from './entity/funds-overview.entity';
 import { Repository } from 'typeorm';
@@ -15,11 +19,12 @@ export class FundsOverviewService {
   ) {}
   async getFundsOverviewRecord() {
     try {
-      const fund = await this.fundsOverviewRepository.find({ take: 1 }).then(r => r[0] ?? null);
+      const fund = await this.fundsOverviewRepository
+        .find({ take: 1 })
+        .then((r) => r[0] ?? null);
       return fund;
     } catch (error) {
       throw new BadRequestException(error.message);
-
     }
   }
 
@@ -32,15 +37,15 @@ export class FundsOverviewService {
 
       const newRecord = this.fundsOverviewRepository.create({
         own_equity: initialAmount,
-        fund_principal:initialAmount,
+        fund_principal: initialAmount,
         available_funds: initialAmount,
         monthly_deposits: 0,
         total_loaned_out: 0,
-        total_invested:0,
+        total_invested: 0,
         total_user_deposits: 0,
         standing_order_return: 0,
         total_expenses: 0,
-        total_donations:0,
+        total_donations: 0,
         Investment_profits: 0,
         special_funds: 0,
         fund_details: {},
@@ -94,15 +99,14 @@ export class FundsOverviewService {
   }
 
   async recordInvestmentEarnings(principal: number, profit: number) {
-          const fund = await this.getFundsOverviewRecord();
-      fund.available_funds += principal;
-      fund.available_funds += profit
-      fund.Investment_profits += profit;
-      fund.total_invested -= principal;
-      fund.own_equity += profit;
-      await this.fundsOverviewRepository.save(fund);
-      return fund;
-
+    const fund = await this.getFundsOverviewRecord();
+    fund.available_funds += principal;
+    fund.available_funds += profit;
+    fund.Investment_profits += profit;
+    fund.total_invested -= principal;
+    fund.own_equity += profit;
+    await this.fundsOverviewRepository.save(fund);
+    return fund;
   }
   async addLoan(amount: number) {
     const fund = await this.getFundsOverviewRecord();
@@ -125,7 +129,7 @@ export class FundsOverviewService {
       fund.own_equity += amount;
       fund.available_funds += amount;
       await this.fundsOverviewRepository.save(fund);
-      return fund
+      return fund;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -152,7 +156,7 @@ export class FundsOverviewService {
       if (!fund.fund_details[fundName]) {
         throw new Error('no mony in this fund');
       }
-      if(fund.fund_details[fundName] < amount) {
+      if (fund.fund_details[fundName] < amount) {
         throw new Error('not enough funds in this fund');
       }
       fund.fund_details[fundName] -= amount;
@@ -160,7 +164,7 @@ export class FundsOverviewService {
       fund.own_equity -= amount;
       fund.available_funds -= amount;
       await this.fundsOverviewRepository.save(fund);
-      return fund
+      return fund;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -173,7 +177,7 @@ export class FundsOverviewService {
       fund.own_equity -= amount;
       fund.fund_principal -= amount;
       await this.fundsOverviewRepository.save(fund);
-      return fund
+      return fund;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -185,7 +189,7 @@ export class FundsOverviewService {
       fund.available_funds += amount;
       fund.total_user_deposits += amount;
       await this.fundsOverviewRepository.save(fund);
-     return fund;
+      return fund;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -218,7 +222,7 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
-  async getFundDetails() {  
+  async getFundDetails() {
     try {
       const fund = await this.getFundsOverviewRecord();
       if (!fund) {
@@ -230,19 +234,18 @@ export class FundsOverviewService {
     }
   }
   async addToStandingOrderReturn(amount: number) {
-try {
-  const fund = await this.getFundsOverviewRecord();
-  if(!fund) {
-    throw new NotFoundException('Fund details not found');
-  }
-  fund.standing_order_return += amount;
-  fund.available_funds += amount;
-  fund.own_equity += amount;
-  fund.fund_principal += amount;
-  return this.fundsOverviewRepository.save(fund);
-
-} catch (error) {
-  throw new BadRequestException(error.message);
-}
+    try {
+      const fund = await this.getFundsOverviewRecord();
+      if (!fund) {
+        throw new NotFoundException('Fund details not found');
+      }
+      fund.standing_order_return += amount;
+      fund.available_funds += amount;
+      fund.own_equity += amount;
+      fund.fund_principal += amount;
+      return this.fundsOverviewRepository.save(fund);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }

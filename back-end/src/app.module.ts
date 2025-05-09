@@ -30,6 +30,7 @@ import { DepositsModule } from './modules/deposits/deposits.module';
 import { CashHoldingsModule } from './modules/cash-holdings/cash-holdings.module';
 import { OrderReturnModule } from './modules/order-return/order-return.module';
 import { FundsOverviewByYearModule } from './modules/funds-overview-by-year/funds-overview-by-year.module';
+import { DepositsActionsModule } from './modules/deposits/deposits-actions/deposits-actions.module';
 
 
 @Module({
@@ -68,6 +69,7 @@ import { FundsOverviewByYearModule } from './modules/funds-overview-by-year/fund
     InvestmentTransactionsModule, RequestsModule,
     AuthModule,
     DepositsModule,
+    DepositsActionsModule,
     CashHoldingsModule,
     OrderReturnModule,
     FundsOverviewByYearModule,

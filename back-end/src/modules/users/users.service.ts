@@ -73,13 +73,18 @@ export class UsersService {
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
-  async getUserById(id: number): Promise<UserEntity | null> {
-    const user = await this.usersRepository.findOne({
-      where: { id },
-      relations: ['payment_details'],
-    });
-    if (!user) throw new NotFoundException('User not found');
-    return user;
+  async getUserById(id: number) {
+    try {
+      const user = await this.usersRepository.findOne({
+        where: { id },
+        relations: ['payment_details'],
+      });
+      if (!user) throw new Error('User not found');
+      return user;
+      
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async getUserByIdNumber(id_number: string): Promise<UserEntity | null> {

@@ -28,15 +28,19 @@ export class LoanEntity {
 
   @Column({ type: 'int' })
   payment_date: number;
+
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
   @Column({ type: 'float', nullable: true })
   remaining_balance: number;
+
   @Column({ type: 'int' })
   initialMonthlyPayment: number;
+
   @Column({ type: 'float', nullable: true })
   total_installments: number;
+  
   @OneToMany(() => LoanActionEntity, (payment) => payment.loan, {
     cascade: true,
   })

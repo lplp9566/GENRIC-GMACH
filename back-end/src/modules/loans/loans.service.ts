@@ -39,8 +39,7 @@ export class LoansService {
       await this.fundsFlowService.getCashFlowTotals(new Date("2025-05-05"), new Date("2025-09-05"),loanData);
       const loanRecord = this.loansRepository.create(loanData);
       loanRecord.remaining_balance = loanRecord.loan_amount;
-      loanRecord.total_installments =
-      loanRecord.loan_amount / loanRecord.monthly_payment;
+      loanRecord.total_installments = loanRecord.loan_amount / loanRecord.monthly_payment;
       const year = getYearFromDate(loanRecord.loan_date);
       const user = await this.usersService.getUserById(Number(loanRecord.user));
       if (!user) {

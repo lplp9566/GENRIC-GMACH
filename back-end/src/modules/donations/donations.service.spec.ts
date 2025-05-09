@@ -41,7 +41,8 @@ describe('DonationsService', () => {
     donations: [],
     requests: [],
     cashHoldings: [],
-    orderReturns :[] 
+    orderReturns :[] ,
+    deposits: []
   };
 
   beforeEach(async () => {

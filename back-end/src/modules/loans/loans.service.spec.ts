@@ -140,7 +140,7 @@ describe('LoansService', () => {
       const mockPayment: LoanActionEntity = {
         id: 99,
         loan: mockLoan,
-        amount: 200,
+        value: 200,
         date: dto.date,
         action_type: LoanPaymentActionType.AMOUNT_CHANGE,
       };
@@ -174,7 +174,7 @@ describe('LoansService', () => {
       const mockPayment: LoanActionEntity = {
         id: 88,
         loan: mockLoan,
-        amount: 200,
+        value: 200,
         date: dto.date,
         action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
       };
@@ -208,7 +208,7 @@ describe('LoansService', () => {
       const mockPayment: LoanActionEntity = {
         id: 77,
         loan: mockLoan,
-        amount: 15,
+        value: 15,
         date: dto.date,
         action_type: LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
       };
