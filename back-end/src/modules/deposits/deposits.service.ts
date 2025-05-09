@@ -7,7 +7,7 @@ import { UserFinancialByYearService } from '../users/user-financials-by-year/use
 import { UserFinancialsService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
-import { getYearFromDate } from 'src/services/services';
+import { getYearFromDate } from '../../services/services';
 import { addWeeks } from 'date-fns';
 
 @Injectable()
