@@ -42,14 +42,12 @@ describe('ExpensesService', () => {
   });
 
   describe('create', () => {
-    it('should create and save an expense and add to funds overview', async () => {
+    it('should create and save an expense and add to funds overview ', async () => {
       const data = { amount: 100, expenseDate: new Date('2025-01-01') } as any;
       const created = { ...data, id: 1 };
       repo.create.mockReturnValue(created);
       repo.save.mockResolvedValue(created);
-
       const result = await service.create(data);
-
       expect(repo.create).toHaveBeenCalledWith(data);
       expect(fundsOverview.addExpense).toHaveBeenCalledWith(100);
       expect(repo.save).toHaveBeenCalledWith(created);
