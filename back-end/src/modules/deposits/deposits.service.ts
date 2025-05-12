@@ -75,7 +75,6 @@ export class DepositsService {
       }
       await this.fundsOverviewService.decreaseUserDepositsTotal(amount);
       const year = getYearFromDate(date);
-      console.log("lplplp")
       const user = deposit.user;
       await this.fundsOverviewService.decreaseUserDepositsTotal(amount);
       await this.fundsOverviewServiceByYear.recordFixedDepositWithdrawn(year,amount);

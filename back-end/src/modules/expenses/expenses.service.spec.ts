@@ -31,7 +31,7 @@ describe('ExpensesService', () => {
         { provide: FundsOverviewService, useFactory: mockFundsOverviewService },
         {
           provide: FundsOverviewByYearService,
-          useValue: FundsOverviewByYearService,
+          useValue: { recordExpense: jest.fn() },
         },
       ],
     }).compile();
@@ -43,7 +43,7 @@ describe('ExpensesService', () => {
 
   describe('create', () => {
     it('should create and save an expense and add to funds overview', async () => {
-      const data = { amount: 100 } as any;
+      const data = { amount: 100, expenseDate: new Date('2025-01-01') } as any;
       const created = { ...data, id: 1 };
       repo.create.mockReturnValue(created);
       repo.save.mockResolvedValue(created);

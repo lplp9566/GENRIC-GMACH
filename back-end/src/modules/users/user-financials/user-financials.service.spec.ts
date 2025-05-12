@@ -61,6 +61,7 @@ describe('UserFinancialsService', () => {
     donations: [],
     requests: [],
     cashHoldings: [],
+    deposits: [],
     orderReturns:[]
   };
 

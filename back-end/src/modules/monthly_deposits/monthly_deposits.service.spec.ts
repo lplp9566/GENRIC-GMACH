@@ -58,7 +58,7 @@ describe('MonthlyDepositsService', () => {
         },
         {
           provide: FundsOverviewByYearService,
-          useValue: FundsOverviewByYearService,
+          useValue: { recordMonthlyDeposit: jest.fn() },
         },
       ],
     }).compile();

@@ -53,6 +53,7 @@ describe('LoansService', () => {
     password: 'pass',
     email_address: 'test@example.com',
     id_number: '123456789',
+    deposits: [],
     phone_number: '0501234567',
     role: UserRole.committeeMember,
     is_admin: false,
@@ -169,7 +170,6 @@ describe('LoansService', () => {
         total_installments: 12,
         payments: [],
         user: mockUser,
-        deposits: [],
       };
 
       const mockPayment: LoanActionEntity = {

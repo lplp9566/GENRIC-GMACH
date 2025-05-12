@@ -33,7 +33,6 @@ export class DepositsActionsService {
       }
       switch (depositAction.action_type) {
         case DepositActionsType.ChangeReturnDate:
-          console.log("first")
           if (!depositAction.update_date) throw new Error('Update date not found');
   
           await this.depositsService.editEndDate(
@@ -52,7 +51,6 @@ export class DepositsActionsService {
            return this.depositsService.getDepositsActive();
            break
         case DepositActionsType.RemoveFromDeposit:
-          console.log("rrr")
           if (!depositAction.amount) throw new Error('Amount not found');
           await this.depositsService.withdrawDeposit(
             deposit,

@@ -7,12 +7,12 @@ import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
+import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { UserEntity } from '../users/user.entity';
 import { PaymentDetailsEntity } from '../users/payment-details/payment_details.entity';
 import { UserFinancialEntity } from '../users/user-financials/user-financials.entity';
 import { UserRole } from '../users/userTypes';
 import { DonationActionType } from './donationsTypes';
-import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 
 const mockDonationRepo = () => ({
   find: jest.fn(),
@@ -22,6 +22,7 @@ const mockDonationRepo = () => ({
 describe('DonationsService', () => {
   let service: DonationsService;
   let donationRepo: jest.Mocked<Repository<DonationsEntity>>;
+
   const mockUser: UserEntity = {
     id: 1,
     first_name: 'Test',
@@ -41,8 +42,8 @@ describe('DonationsService', () => {
     donations: [],
     requests: [],
     cashHoldings: [],
-    orderReturns :[] ,
-    deposits: []
+    orderReturns: [],
+    deposits: [],
   };
 
   beforeEach(async () => {
@@ -50,21 +51,41 @@ describe('DonationsService', () => {
       providers: [
         DonationsService,
         { provide: getRepositoryToken(DonationsEntity), useFactory: mockDonationRepo },
-        { provide: FundsOverviewByYearService,useValue: FundsOverviewByYearService },
-        { provide: UsersService, useValue: { getUserById: jest.fn().mockResolvedValue(mockUser) } },
-        { provide: UserFinancialByYearService, useValue: {
-          recordEquityDonation: jest.fn(),
-          recordSpecialFundDonation: jest.fn()
-        } },
-        { provide: UserFinancialService, useValue: {
-          recordEquityDonation: jest.fn(),
-          recordSpecialFundDonation: jest.fn()
-        } },
-        { provide: FundsOverviewService, useValue: {
-          addDonation: jest.fn(),
-          addSpecialFund: jest.fn()
-        } },
-        
+        {
+          provide: UsersService,
+          useValue: { getUserById: jest.fn().mockResolvedValue(mockUser) },
+        },
+        {
+          provide: UserFinancialByYearService,
+          useValue: {
+            recordEquityDonation: jest.fn(),
+            recordSpecialFundDonation: jest.fn(),
+            recordSpecialFundWithdrawalByName: jest.fn(),
+          },
+        },
+        {
+          provide: UserFinancialService,
+          useValue: {
+            recordEquityDonation: jest.fn(),
+            recordSpecialFundDonation: jest.fn(),
+          },
+        },
+        {
+          provide: FundsOverviewService,
+          useValue: {
+            addDonation: jest.fn(),
+            addSpecialFund: jest.fn(),
+            reduceFundAmount: jest.fn(),
+          },
+        },
+        {
+          provide: FundsOverviewByYearService,
+          useValue: {
+            recordEquityDonation: jest.fn(),
+            recordSpecialFundDonationByName: jest.fn(),
+            recordSpecialFundWithdrawalByName: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -90,10 +111,11 @@ describe('DonationsService', () => {
       date: new Date(),
       amount: 100,
       donation_reason: 'Equity',
-      action:DonationActionType.donation,
+      action: DonationActionType.donation,
     };
-    donationRepo.save = jest.fn().mockResolvedValue(donation);
+    donationRepo.save.mockResolvedValue(donation);
     const result = await service.createDonation(donation);
+    expect(donationRepo.save).toHaveBeenCalledWith(donation);
     expect(result).toEqual(donation);
   });
 
@@ -106,8 +128,49 @@ describe('DonationsService', () => {
       donation_reason: 'SpecialFund',
       action: DonationActionType.donation,
     };
-    donationRepo.save = jest.fn().mockResolvedValue(donation);
+    donationRepo.save.mockResolvedValue(donation);
+    const result = await service.createDonation(donation);
+    expect(donationRepo.save).toHaveBeenCalledWith(donation);
+    expect(result).toEqual(donation);
+  });
+
+  it('should handle fund withdrawal flow', async () => {
+    const donation: DonationsEntity = {
+      id: 1,
+      user: mockUser,
+      date: new Date(),
+      amount: 200,
+      donation_reason: 'CampFund',
+      action: DonationActionType.withdraw,
+    };
+    donationRepo.save.mockResolvedValue(donation);
     const result = await service.createDonation(donation);
     expect(result).toEqual(donation);
+  });
+
+  it('should throw if user not found', async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        DonationsService,
+        { provide: getRepositoryToken(DonationsEntity), useFactory: mockDonationRepo },
+        { provide: UsersService, useValue: { getUserById: jest.fn().mockResolvedValue(null) } },
+        { provide: UserFinancialByYearService, useValue: {} },
+        { provide: UserFinancialService, useValue: {} },
+        { provide: FundsOverviewService, useValue: {} },
+        { provide: FundsOverviewByYearService, useValue: {} },
+      ],
+    }).compile();
+
+    const localService = module.get<DonationsService>(DonationsService);
+    const badDonation: DonationsEntity = {
+      id: 1,
+      user: null as any,
+      date: new Date(),
+      amount: 200,
+      donation_reason: 'Equity',
+      action: DonationActionType.donation,
+    };
+
+    await expect(localService.createDonation(badDonation)).rejects.toThrow('User not found');
   });
 });

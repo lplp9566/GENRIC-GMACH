@@ -12,7 +12,7 @@ export class ExpensesService {
     @InjectRepository(Expense)
     private readonly expensesRepository: Repository<Expense>,
     private readonly fundsOverviewService: FundsOverviewService,
-    private readonly fundsOverviewByYearService: FundsOverviewByYearService, // Assuming this is the correct import
+    private readonly fundsOverviewByYearService: FundsOverviewByYearService,
   ) {}
 
   async create(expenseData: Partial<Expense>): Promise<Expense> {

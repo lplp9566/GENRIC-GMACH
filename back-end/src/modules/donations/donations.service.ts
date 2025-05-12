@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable, BadRequestException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DonationsEntity } from './donations.entity';
 import { Repository } from 'typeorm';
@@ -19,7 +24,7 @@ export class DonationsService {
     private readonly userFinancialsyYearService: UserFinancialByYearService,
     private readonly userFinancialsService: UserFinancialService,
     private readonly fundsOverviewService: FundsOverviewService,
-    private readonly fundsOvirewviewServiceByYear: FundsOverviewByYearService
+    private readonly fundsOvirewviewServiceByYear: FundsOverviewByYearService,
   ) {}
 
   async getDonations() {
@@ -30,11 +35,21 @@ export class DonationsService {
     const year = getYearFromDate(donation.date);
     const user = await this.usersService.getUserById(Number(donation.user));
     if (!user) throw new BadRequestException('User not found');
-    
-    await this.userFinancialsyYearService.recordEquityDonation(user, year, donation.amount);
-    await this.userFinancialsService.recordEquityDonation(user, donation.amount);
+
+    await this.userFinancialsyYearService.recordEquityDonation(
+      user,
+      year,
+      donation.amount,
+    );
+    await this.userFinancialsService.recordEquityDonation(
+      user,
+      donation.amount,
+    );
     await this.fundsOverviewService.addDonation(donation.amount);
-    await this.fundsOvirewviewServiceByYear.recordEquityDonation( year , donation.amount);
+    await this.fundsOvirewviewServiceByYear.recordEquityDonation(
+      year,
+      donation.amount,
+    );
     this.donationsRepository.save(donation);
     return donation;
   }
@@ -43,43 +58,59 @@ export class DonationsService {
     const year = getYearFromDate(donation.date);
     const user = await this.usersService.getUserById(Number(donation.user));
     if (!user) throw new BadRequestException('User not found');
-    await this.userFinancialsyYearService.recordSpecialFundDonation(user, year, donation.amount);
-    await this.userFinancialsService.recordSpecialFundDonation(user, donation.amount);
-    await this.fundsOverviewService.addSpecialFund(donation.donation_reason, donation.amount);
-    await this.fundsOvirewviewServiceByYear.recordSpecialFundDonationByName(year,donation.donation_reason, donation.amount);
+    await this.userFinancialsyYearService.recordSpecialFundDonation(
+      user,
+      year,
+      donation.amount,
+    );
+    await this.userFinancialsService.recordSpecialFundDonation(
+      user,
+      donation.amount,
+    );
+    await this.fundsOverviewService.addSpecialFund(
+      donation.donation_reason,
+      donation.amount,
+    );
+    await this.fundsOvirewviewServiceByYear.recordSpecialFundDonationByName(
+      year,
+      donation.donation_reason,
+      donation.amount,
+    );
     this.donationsRepository.save(donation);
     return donation;
   }
 
   async createDonation(donation: DonationsEntity) {
-    if(!donation){
+    if (!donation) {
       throw new BadRequestException('Donation is required');
     }
-    if(donation.action == DonationActionType.donation){
+    if (donation.action == DonationActionType.donation) {
       if (donation.donation_reason === 'Equity') {
         return await this.createEquityDonation(donation);
       } else {
         return await this.createFundDonation(donation);
       }
-    }
-    else if (donation.action == DonationActionType.withdraw){
+    } else if (donation.action == DonationActionType.withdraw) {
       return await this.withdrawSpecialFund(donation);
     }
-  
   }
   async withdrawSpecialFund(donation: DonationsEntity) {
     try {
-    const year = getYearFromDate(donation.date);
-    const user = await this.usersService.getUserById(Number(donation.user));
-    if (!user) throw new BadRequestException('User not found');
-    await this.fundsOverviewService.reduceFundAmount(donation.donation_reason, donation.amount);
-    await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(year, donation.donation_reason, donation.amount);
-return donation;
-} catch (error) {
+      const year = getYearFromDate(donation.date);
+      const user = await this.usersService.getUserById(Number(donation.user));
+      if (!user) throw new BadRequestException('User not found');
+      await this.fundsOverviewService.reduceFundAmount(
+        donation.donation_reason,
+        donation.amount,
+      );
+      await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(
+        year,
+        donation.donation_reason,
+        donation.amount,
+      );
+      return donation;
+    } catch (error) {
       throw new BadRequestException(error.message);
+    }
+  }
 }
-
-}
-
-
- }

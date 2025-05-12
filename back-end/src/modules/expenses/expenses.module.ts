@@ -10,7 +10,7 @@ import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overv
   imports: [
     TypeOrmModule.forFeature([Expense]),
     FundsOverviewModule,
-    FundsOverviewByYearModule 
+    FundsOverviewByYearModule,
   ],
   providers: [ExpensesService],
   controllers: [ExpensesController],

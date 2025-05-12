@@ -36,6 +36,7 @@ describe('UserFinancialByYearService', () => {
     donations: [],
     requests: [],
     cashHoldings: [],
+    deposits: [],
     orderReturns :[]   
   };
 
