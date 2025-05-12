@@ -11,6 +11,7 @@ import { PaymentDetailsModule } from '../../users/payment-details/payment-detail
 import { LoanActionsController } from './loan_actions.controller';
 import { UserFinancialByYearModule } from '../../users/user-financials-by-year/user-financial-by-year.module';
 import { FundsOverviewByYearModule } from '../../funds-overview-by-year/funds-overview-by-year.module';
+import { LoanActionBalanceService } from './loan_action_balance.service';
 // cSpell:ignore Financials
 
 @Module({
@@ -26,8 +27,8 @@ import { FundsOverviewByYearModule } from '../../funds-overview-by-year/funds-ov
     FundsOverviewByYearModule,
    
   ],
-  providers: [LoanActionsService],
+  providers: [LoanActionsService,LoanActionBalanceService],
   controllers: [LoanActionsController],
-  exports: [LoanActionsService, TypeOrmModule],
+  exports: [LoanActionsService,LoanActionBalanceService,  TypeOrmModule,],
 })
-export class LoanPaymentsModule {}
+export class LoanActionsModule {}

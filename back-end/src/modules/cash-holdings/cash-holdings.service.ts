@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CashHoldingsEntity } from './Entity/cash-holdings.entity';
 import { UsersService } from '../users/users.service';
-import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import {
   CashHoldingRequest,
@@ -16,7 +16,7 @@ export class CashHoldingsService {
     @InjectRepository(CashHoldingsEntity)
     private cashHoldingsRepository: Repository<CashHoldingsEntity>,
     private readonly UserService: UsersService,
-    private readonly userFinancialsService: UserFinancialsService,
+    private readonly userFinancialsService: UserFinancialService,
     private readonly fundsOverviewService: FundsOverviewService,
   ) {}
 

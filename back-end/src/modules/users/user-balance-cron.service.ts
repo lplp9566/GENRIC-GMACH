@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoanEntity } from '../loans/loans.entity';
 import { PaymentDetailsEntity } from "../users/payment-details/payment_details.entity";
+import { LoanActionBalanceService } from '../loans/loan-actions/loan_action_balance.service';
 
 @Injectable()
 export class UserBalanceCronService {
@@ -14,7 +15,7 @@ export class UserBalanceCronService {
   constructor(
     private readonly usersService: UsersService,
 
-    private readonly loanPaymentsService: LoanActionsService,
+    private readonly loanPaymentsService: LoanActionBalanceService,
 
     @InjectRepository(LoanEntity)
     private readonly loansRepo: Repository<LoanEntity>,

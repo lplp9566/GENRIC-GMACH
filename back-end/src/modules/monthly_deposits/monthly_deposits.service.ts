@@ -7,7 +7,7 @@ import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { getYearFromDate } from '../../services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
-import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 // cSpell:ignore Financials
 
@@ -20,7 +20,7 @@ export class MonthlyDepositsService {
     private readonly usersService: UsersService,
     private readonly userFinancialByYearService: UserFinancialByYearService,
     private readonly fundsOverviewService: FundsOverviewService,
-    private readonly userFinancialsService: UserFinancialsService,
+    private readonly userFinancialsService: UserFinancialService,
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
   ) {}
 

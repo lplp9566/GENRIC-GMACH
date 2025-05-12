@@ -1,8 +1,7 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { DepositsController } from './deposits.controller';
 import { DepositsService } from './deposits.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DepositsActionsModule } from './deposits-actions/deposits-actions.module';
 import { DepositsActionsEntity } from './deposits-actions/deposits-actions.entity';
 import { UserFinancialByYearModule } from '../users/user-financials-by-year/user-financial-by-year.module';
 import { UsersModule } from '../users/users.module';
@@ -15,8 +14,8 @@ import { DepositsEntity } from './deposits.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([DepositsEntity,DepositsActionsEntity]),
+    forwardRef(() => UsersModule),
     UserFinancialByYearModule,
-    UsersModule,
     UserFinancialsModule,
     FundsOverviewModule,
     MonthlyRatesModule,

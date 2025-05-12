@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
-import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { UserEntity } from '../users/user.entity';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 
@@ -27,7 +27,7 @@ describe('MonthlyDepositsService', () => {
   let usersService: UsersService;
   let yearlyService: UserFinancialByYearService;
   let fundsService: FundsOverviewService;
-  let userFinService: UserFinancialsService;
+  let userFinService: UserFinancialService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -53,7 +53,7 @@ describe('MonthlyDepositsService', () => {
           useValue: { addMonthlyDeposit: jest.fn() },
         },
         {
-          provide: UserFinancialsService,
+          provide: UserFinancialService,
           useValue: { recordMonthlyDeposit: jest.fn() },
         },
         {
@@ -68,7 +68,7 @@ describe('MonthlyDepositsService', () => {
     usersService = module.get(UsersService);
     yearlyService = module.get(UserFinancialByYearService);
     fundsService = module.get(FundsOverviewService);
-    userFinService = module.get(UserFinancialsService);
+    userFinService = module.get(UserFinancialService);
   });
 
   it('should be defined', () => {

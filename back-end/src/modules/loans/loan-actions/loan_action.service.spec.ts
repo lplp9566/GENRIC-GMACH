@@ -6,7 +6,7 @@ import { LoanActionEntity } from './loan_actions.entity';
 import { PaymentDetailsEntity } from '../../users/payment-details/payment_details.entity';
 import { Repository } from 'typeorm';
 import { UserFinancialByYearService } from '../../users/user-financials-by-year/user-financial-by-year.service';
-import { UserFinancialsService } from '../../users/user-financials/user-financials.service';
+import { UserFinancialService } from '../../users/user-financials/user-financials.service';
 import { FundsOverviewService } from '../../funds-overview/funds-overview.service';
 import { LoansService } from '../loans.service';
 import { UsersService } from '../../users/users.service';
@@ -46,7 +46,7 @@ describe('LoanActionsService', () => {
         { provide: getRepositoryToken(LoanActionEntity), useFactory: mockPaymentRepo },
         { provide: getRepositoryToken(PaymentDetailsEntity), useFactory: mockDetailsRepo },
         { provide: UserFinancialByYearService, useValue: { recordLoanRepaid: jest.fn() } },
-        { provide: UserFinancialsService, useValue: { recordLoanRepaid: jest.fn() } },
+        { provide: UserFinancialService, useValue: { recordLoanRepaid: jest.fn() } },
         { provide: FundsOverviewService, useValue: { repayLoan: jest.fn() } },
         { provide: LoansService, useValue: {
           changeLoanAmount: jest.fn().mockResolvedValue({ id: 1 }),

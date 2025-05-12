@@ -6,7 +6,7 @@ import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { getYearFromDate } from '../../services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
-import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { DonationActionType, IWindowDonations } from './donationsTypes';
 
@@ -17,7 +17,7 @@ export class DonationsService {
     private donationsRepository: Repository<DonationsEntity>,
     private readonly usersService: UsersService,
     private readonly userFinancialsyYearService: UserFinancialByYearService,
-    private readonly userFinancialsService: UserFinancialsService,
+    private readonly userFinancialsService: UserFinancialService,
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly fundsOvirewviewServiceByYear: FundsOverviewByYearService
   ) {}

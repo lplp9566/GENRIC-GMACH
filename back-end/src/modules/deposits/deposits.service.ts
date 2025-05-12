@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { DepositsEntity } from './deposits.entity';
 import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
-import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { getYearFromDate } from '../../services/services';
@@ -16,10 +16,10 @@ export class DepositsService {
     @InjectRepository(DepositsEntity)
     private readonly depositsRepo: Repository<DepositsEntity>,
     private readonly usersService: UsersService,
-    private readonly userFinancialsyYearService: UserFinancialByYearService,
-    private readonly userFinancialsService: UserFinancialsService,
+    private readonly userFinancialByYearService: UserFinancialByYearService,
+    private readonly userFinancialService: UserFinancialService,
     private readonly fundsOverviewService: FundsOverviewService,
-    private readonly fundsOvirewviewServiceByYear: FundsOverviewByYearService,
+    private readonly fundsOverviewServiceByYear: FundsOverviewByYearService,
   ) {}
   async getDeposits() {
     return await this.depositsRepo.find();
@@ -42,9 +42,9 @@ export class DepositsService {
       const user = await this.usersService.getUserById(Number(deposit.user));
       if(!user) throw new Error('User not found');
       await this.fundsOverviewService.addToDepositsTotal(deposit.initialDeposit);
-      await this.fundsOvirewviewServiceByYear.recordFixedDepositAdded(year,deposit.initialDeposit);
-      await this.userFinancialsService.recordFixedDepositAdded(user, deposit.initialDeposit);
-      await this.userFinancialsyYearService.recordFixedDepositAdded(user, year, deposit.initialDeposit);
+      await this.fundsOverviewServiceByYear.recordFixedDepositAdded(year,deposit.initialDeposit);
+      await this.userFinancialService.recordFixedDepositAdded(user, deposit.initialDeposit);
+      await this.userFinancialByYearService.recordFixedDepositAdded(user, year, deposit.initialDeposit);
       return await this.depositsRepo.save(deposit);
     } catch (error) {
         throw new BadRequestException(error.message);
@@ -78,9 +78,9 @@ export class DepositsService {
       console.log("lplplp")
       const user = deposit.user;
       await this.fundsOverviewService.decreaseUserDepositsTotal(amount);
-      await this.fundsOvirewviewServiceByYear.recordFixedDepositWithdrawn(year,amount);
-      await this.userFinancialsyYearService.recordFixedDepositWithdrawn(user, year, amount);
-      await this.userFinancialsService.recordFixedDepositWithdrawn(user, amount);
+      await this.fundsOverviewServiceByYear.recordFixedDepositWithdrawn(year,amount);
+      await this.userFinancialByYearService.recordFixedDepositWithdrawn(user, year, amount);
+      await this.userFinancialService.recordFixedDepositWithdrawn(user, amount);
        await this.depositsRepo.save(deposit);
        return this.getDepositsActive();
        ;

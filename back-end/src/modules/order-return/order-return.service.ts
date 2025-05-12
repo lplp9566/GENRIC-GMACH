@@ -4,7 +4,7 @@ import { In, Repository } from 'typeorm';
 import { OrderReturnEntity } from './Entity/order-return.entity';
 import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
-import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { getYearFromDate } from '../../services/services';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
@@ -16,7 +16,7 @@ export class OrderReturnService {
         private readonly orderReturnRepository: Repository<OrderReturnEntity>,
         private readonly usersService: UsersService,
         private readonly userFinancialsyYearService: UserFinancialByYearService,
-        private readonly userFinancialsService: UserFinancialsService,
+        private readonly userFinancialsService: UserFinancialService,
         private readonly fundsOverviewService: FundsOverviewService,
         private readonly fundsOverviewByYearService: FundsOverviewByYearService,
   ) {}

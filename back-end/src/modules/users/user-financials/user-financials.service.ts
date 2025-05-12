@@ -9,7 +9,7 @@ import { CashHoldingsTypesRecordType } from '../../cash-holdings/cash-holdings-d
 // cSpell:ignore Financials
 
 @Injectable()
-export class UserFinancialsService {
+export class UserFinancialService {
 constructor(
     @InjectRepository(UserFinancialEntity )
     private readonly userFinancialsRepository: Repository<UserFinancialEntity >,

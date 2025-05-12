@@ -5,7 +5,7 @@ import { DonationsEntity } from './donations.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
-import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserEntity } from '../users/user.entity';
 import { PaymentDetailsEntity } from '../users/payment-details/payment_details.entity';
@@ -56,7 +56,7 @@ describe('DonationsService', () => {
           recordEquityDonation: jest.fn(),
           recordSpecialFundDonation: jest.fn()
         } },
-        { provide: UserFinancialsService, useValue: {
+        { provide: UserFinancialService, useValue: {
           recordEquityDonation: jest.fn(),
           recordSpecialFundDonation: jest.fn()
         } },

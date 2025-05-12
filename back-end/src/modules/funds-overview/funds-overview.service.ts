@@ -222,13 +222,13 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
-  async getFundDetails() {
+  async getFundDetails(): Promise<FundsOverviewEntity> {
     try {
-      const fund = await this.getFundsOverviewRecord();
+      const fund = await this.fundsOverviewRepository.findOne({ where: {} });
       if (!fund) {
         throw new NotFoundException('Fund details not found');
       }
-      return fund.fund_details;
+      return fund
     } catch (error) {
       throw new BadRequestException(error.message);
     }

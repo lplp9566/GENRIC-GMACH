@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { LoanEntity } from './loans.entity';
 import { LoanActionEntity } from './loan-actions/loan_actions.entity';
 import { Repository } from 'typeorm';
-import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UsersService } from '../users/users.service';
@@ -41,7 +41,7 @@ describe('LoansService', () => {
   let usersService: UsersService;
   let fundsService: FundsOverviewService;
   let yearlyService: UserFinancialByYearService;
-  let financialsService: UserFinancialsService;
+  let financialsService: UserFinancialService;
   let FundsOverviewServiceByYearService: UserFinancialByYearService;
   let flowService: FundsFlowService;
 
@@ -94,7 +94,7 @@ describe('LoansService', () => {
         LoansService,
         { provide: getRepositoryToken(LoanEntity), useFactory: mockLoanRepo },
         { provide: getRepositoryToken(LoanActionEntity), useFactory: mockPaymentRepo },
-        { provide: UserFinancialsService, useValue: { recordLoanTaken: jest.fn() } },
+        { provide: UserFinancialService, useValue: { recordLoanTaken: jest.fn() } },
         { provide: UserFinancialByYearService, useValue: { recordLoanTaken: jest.fn() } },
         { provide: FundsOverviewService, useValue: { addLoan: jest.fn() } },
         { provide: UsersService, useValue: { getUserById: jest.fn() } },
@@ -111,7 +111,7 @@ describe('LoansService', () => {
     usersService = module.get(UsersService);
     fundsService = module.get(FundsOverviewService);
     yearlyService = module.get(UserFinancialByYearService);
-    financialsService = module.get(UserFinancialsService);
+    financialsService = module.get(UserFinancialService);
     FundsOverviewServiceByYearService = module.get(UserFinancialByYearService);
 
   });
@@ -169,6 +169,7 @@ describe('LoansService', () => {
         total_installments: 12,
         payments: [],
         user: mockUser,
+        deposits: [],
       };
 
       const mockPayment: LoanActionEntity = {

@@ -9,15 +9,15 @@ import { MonthlyDepositsModule } from '../monthly_deposits/monthly_deposits.modu
 import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
 import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
 import { UserFinancialsModule } from './user-financials/user-financials.module';
-import { LoanPaymentsModule } from '../loans/loan-actions/loan-actions.module';
 import { RequestsModule } from '../requests/requests.module';
+import { LoanActionsModule } from '../loans/loan-actions/loan-actions.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity, PaymentDetailsEntity]),
     forwardRef(() => MonthlyDepositsModule),
     forwardRef(() => MonthlyRatesModule),
-    forwardRef(() => LoanPaymentsModule),
+    forwardRef(() => LoanActionsModule),
     forwardRef(() => RequestsModule),
     PaymentDetailsModule,
     // cSpell:ignore Financials

@@ -16,7 +16,4 @@ export class MonthlyDepositsController {
         return this.monthlyDepositsService.recordMonthlyDeposit(paymentData);
         
     } 
-
-    
-  
 }

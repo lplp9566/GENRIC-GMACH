@@ -7,7 +7,7 @@ import { UserFinancialByYearService } from '../users/user-financials-by-year/use
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UsersService } from '../users/users.service';
 import { getYearFromDate } from '../../services/services';
-import { UserFinancialsService } from '../users/user-financials/user-financials.service';
+import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { LoanActionDto, LoanPaymentActionType } from './loan-dto/loanTypes';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { FundsFlowService } from './calcelete.service';
@@ -20,7 +20,7 @@ export class LoansService {
     private loansRepository: Repository<LoanEntity>,
     @InjectRepository(LoanActionEntity)
     private paymentsRepository: Repository<LoanActionEntity>,
-    private readonly userFinancialsService: UserFinancialsService,
+    private readonly userFinancialsService: UserFinancialService,
     private readonly userFinancialsByYearService: UserFinancialByYearService,
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly usersService: UsersService,
@@ -36,7 +36,8 @@ export class LoansService {
   }
   async createLoan(loanData: Partial<LoanEntity>) {
     try {
-      await this.fundsFlowService.getCashFlowTotals(new Date("2025-05-05"), new Date("2025-09-05"),loanData);
+   const success =  await this.fundsFlowService.getCashFlowTotals(new Date("2025-05-05"), loanData);
+   if(!success) throw new Error('you need the mony for the deposit');
       const loanRecord = this.loansRepository.create(loanData);
       loanRecord.remaining_balance = loanRecord.loan_amount;
       loanRecord.total_installments = loanRecord.loan_amount / loanRecord.monthly_payment;

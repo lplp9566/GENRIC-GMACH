@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserFinancialsService } from './user-financials.service';
+import { UserFinancialService } from './user-financials.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserFinancialEntity } from './user-financials.entity';
 import { UsersService } from '../users.service';
@@ -15,7 +15,7 @@ const mockRepo = () => ({
 });
 
 describe('UserFinancialsService', () => {
-  let service: UserFinancialsService;
+  let service: UserFinancialService;
   let repo: ReturnType<typeof mockRepo>;
   const mockPaymentDetails: PaymentDetailsEntity = {
     id: 1,
@@ -67,13 +67,13 @@ describe('UserFinancialsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UserFinancialsService,
+        UserFinancialService,
         { provide: getRepositoryToken(UserFinancialEntity), useFactory: mockRepo },
         { provide: UsersService, useValue: { getUserById: jest.fn() } },
       ],
     }).compile();
 
-    service = module.get<UserFinancialsService>(UserFinancialsService);
+    service = module.get<UserFinancialService>(UserFinancialService);
     repo = module.get(getRepositoryToken(UserFinancialEntity));
   });
 
