@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { DepositsService } from './deposits.service';
-import { DepositsEntity } from './deposits.entity';
+import { DepositsEntity } from './Entity/deposits.entity';
+
 
 @Controller('deposits')
 export class DepositsController {

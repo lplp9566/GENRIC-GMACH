@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { addMonths } from 'date-fns';
 import { MonthlyRatesEntity } from '../monthly_rates/monthly_rates.entity';
-import { LoanEntity } from './loans.entity';
+import { LoanEntity } from './Entity/loans.entity';
 import { UserEntity } from '../users/user.entity';
 import { DepositsService } from '../deposits/deposits.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';

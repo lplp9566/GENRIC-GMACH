@@ -6,16 +6,16 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
-import { LoanEntity } from '../loans/loans.entity';
 import { UserFinancialByYearEntity } from './user-financials-by-year/user-financial-by-year.entity';
 import { MonthlyDepositsEntity } from '../monthly_deposits/monthly_deposits.entity';
-import { DonationsEntity } from '../donations/donations.entity';
 import { UserFinancialEntity } from './user-financials/user-financials.entity';
 import { RequestEntity } from '../requests/entities/request.entity';
 import { UserRole } from './userTypes';
 import { CashHoldingsEntity } from '../cash-holdings/Entity/cash-holdings.entity';
 import { OrderReturnEntity } from '../order-return/Entity/order-return.entity';
-import { DepositsEntity } from '../deposits/deposits.entity';
+import { LoanEntity } from '../loans/Entity/loans.entity';
+import { DonationsEntity } from '../donations/Entity/donations.entity';
+import { DepositsEntity } from '../deposits/Entity/deposits.entity';
 // cSpell:ignore Financials
 @Entity('users')
 export class UserEntity {

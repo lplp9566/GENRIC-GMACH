@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { DonationsService } from './donations.service';
-import { DonationsEntity } from './donations.entity';
+import { DonationsEntity } from './Entity/donations.entity';
 
 @Controller('donations')
 export class DonationsController {

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExpensesService } from './expenses.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Expense } from './expenses.entity';
+import { Expense } from './Entity/expenses.entity';
 import { Repository } from 'typeorm';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';

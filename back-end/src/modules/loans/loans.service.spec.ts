@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoansService } from './loans.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { LoanEntity } from './loans.entity';
-import { LoanActionEntity } from './loan-actions/loan_actions.entity';
+import { LoanEntity } from './Entity/loans.entity';
+import { LoanActionEntity } from './loan-actions/Entity/loan_actions.entity';
 import { Repository } from 'typeorm';
 import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';

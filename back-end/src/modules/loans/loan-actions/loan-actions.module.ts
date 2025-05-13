@@ -1,11 +1,11 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { LoanActionEntity } from './loan_actions.entity';
+import { LoanActionEntity } from './Entity/loan_actions.entity';
 import { UserFinancialsModule } from '../../users/user-financials/user-financials.module';
 import { FundsOverviewModule } from '../../funds-overview/funds-overview.module';
 import { UsersModule } from '../../users/users.module';
 import { LoanActionsService } from './loan_actions.service';
-import { LoanEntity } from '../loans.entity';
+import { LoanEntity } from '../Entity/loans.entity';
 import { LoansModule } from '../loans.module';
 import { PaymentDetailsModule } from '../../users/payment-details/payment-details.module';
 import { LoanActionsController } from './loan_actions.controller';

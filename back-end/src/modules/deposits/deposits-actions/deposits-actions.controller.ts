@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { DepositsActionsService } from './deposits-actions.service';
-import { DepositsActionsEntity } from './deposits-actions.entity';
+import { DepositsActionsEntity } from './Entity/deposits-actions.entity';
 import { IDepositAction } from './depostits-actions-dto';
 
 @Controller('deposits-actions')

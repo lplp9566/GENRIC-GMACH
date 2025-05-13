@@ -1,8 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { LoanEntity } from './loans.entity';
-import { LoanActionEntity } from './loan-actions/loan_actions.entity';
+import { LoanActionEntity } from './loan-actions/Entity/loan_actions.entity';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UsersService } from '../users/users.service';
@@ -11,6 +10,7 @@ import { UserFinancialService } from '../users/user-financials/user-financials.s
 import { LoanActionDto, LoanPaymentActionType } from './loan-dto/loanTypes';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { FundsFlowService } from './calcelete.service';
+import { LoanEntity } from './Entity/loans.entity';
 // cSpell:ignore Financials
 
 @Injectable()

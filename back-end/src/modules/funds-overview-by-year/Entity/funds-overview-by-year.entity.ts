@@ -6,7 +6,7 @@ export class FundsOverviewByYearEntity {
   id: number;
 
   @Column({ type: 'int' })
-  year: number; // The year for which the overview is applicable
+  year: number; 
   @Column({ type: 'float' })
   total_monthly_deposits: number;
 

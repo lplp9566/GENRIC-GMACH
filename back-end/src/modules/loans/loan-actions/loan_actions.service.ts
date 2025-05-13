@@ -1,8 +1,8 @@
 import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LoanEntity } from '../loans.entity';
+import { LoanEntity } from '../Entity/loans.entity';
 import { Repository } from 'typeorm';
-import { LoanActionEntity } from './loan_actions.entity';
+import { LoanActionEntity } from './Entity/loan_actions.entity';
 import { FundsOverviewService } from '../../funds-overview/funds-overview.service';
 import { getYearFromDate } from '../../../services/services';
 import { LoansService } from '../loans.service';

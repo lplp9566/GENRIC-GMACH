@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { In, Repository } from 'typeorm';
-import { DepositsEntity } from '../deposits.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DepositsActionsEntity } from './deposits-actions.entity';
+import { DepositsActionsEntity } from './Entity/deposits-actions.entity';
 import { DepositsService } from '../deposits.service';
 import { DepositActionsType, IDepositAction } from './depostits-actions-dto';
+import { DepositsEntity } from '../Entity/deposits.entity';
 
 @Injectable()
 export class DepositsActionsService {

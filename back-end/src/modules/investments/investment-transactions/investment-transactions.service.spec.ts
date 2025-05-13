@@ -5,7 +5,7 @@ import { InvestmentTransactionEntity } from './entity/investment-transaction.ent
 import { InvestmentEntity } from '../entity/investments.entity';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
-import { TransactionType } from '../investmentsTypes';
+import { TransactionType } from '../investments_dto';
 
 describe('InvestmentTransactionService', () => {
   let service: InvestmentTransactionService;

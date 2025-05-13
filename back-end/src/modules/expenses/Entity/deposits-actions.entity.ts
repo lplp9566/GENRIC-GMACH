@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { DepositsEntity } from "../deposits.entity";
-import { DepositActionsType } from "./depostits-actions-dto";
+import { DepositActionsType } from "../depostits-actions-dto";
 @Entity("deposits_actions")
 export class DepositsActionsEntity {
     @PrimaryGeneratedColumn()

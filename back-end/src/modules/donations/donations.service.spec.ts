@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DonationsService } from './donations.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { DonationsEntity } from './donations.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
@@ -12,7 +11,8 @@ import { UserEntity } from '../users/user.entity';
 import { PaymentDetailsEntity } from '../users/payment-details/payment_details.entity';
 import { UserFinancialEntity } from '../users/user-financials/user-financials.entity';
 import { UserRole } from '../users/userTypes';
-import { DonationActionType } from './donationsTypes';
+import { DonationActionType } from './donations_dto';
+import { DonationsEntity } from './Entity/donations.entity';
 
 const mockDonationRepo = () => ({
   find: jest.fn(),

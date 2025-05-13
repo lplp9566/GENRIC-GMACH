@@ -1,12 +1,12 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { LoanEntity } from "../loans.entity";
 import { Repository } from "typeorm";
-import { LoanActionEntity } from "./loan_actions.entity";
+import { LoanActionEntity } from "./Entity/loan_actions.entity";
 import { PaymentDetailsEntity } from "../../users/payment-details/payment_details.entity"
 import { LoanPaymentActionType, PaymentEvent } from "../loan-dto/loanTypes";
 import { LoanActionsService } from "./loan_actions.service";
 import { differenceInMonths } from "date-fns";
+import { LoanEntity } from "../Entity/loans.entity";
 
 @Injectable()
 export class LoanActionBalanceService{

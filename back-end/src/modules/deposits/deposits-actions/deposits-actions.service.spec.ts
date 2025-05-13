@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DepositsActionsService } from './deposits-actions.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { DepositsActionsEntity } from './deposits-actions.entity';
-import { DepositsEntity } from '../deposits.entity';
+import { DepositsActionsEntity } from './Entity/deposits-actions.entity';
 import { Repository } from 'typeorm';
 import { DepositsService } from '../deposits.service';
 import { DepositActionsType, IDepositAction } from './depostits-actions-dto';
+import { DepositsEntity } from '../Entity/deposits.entity';
 
 function createMockDepositAction(partial: Partial<DepositsActionsEntity> = {}): DepositsActionsEntity {
   return {

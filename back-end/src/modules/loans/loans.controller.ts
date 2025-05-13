@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
 import { LoansService } from './loans.service';
-import { LoanEntity } from './loans.entity';
-import { LoanActionEntity } from './loan-actions/loan_actions.entity';
+import { LoanEntity } from './Entity/loans.entity';
+import { LoanActionEntity } from './loan-actions/Entity/loan_actions.entity';
 
 
 @Controller('loans')

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FundsFlowService } from './calcelete.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { MonthlyRatesEntity } from '../monthly_rates/monthly_rates.entity';
-import { LoanEntity } from './loans.entity';
+import { LoanEntity } from './Entity/loans.entity';
 import { UserEntity } from '../users/user.entity';
 import { DepositsService } from '../deposits/deposits.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';

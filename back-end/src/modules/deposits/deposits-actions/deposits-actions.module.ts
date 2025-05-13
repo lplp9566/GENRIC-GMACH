@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { DepositsActionsController } from './deposits-actions.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DepositsActionsService } from './deposits-actions.service';
-import { DepositsActionsEntity } from './deposits-actions.entity';
+import { DepositsActionsEntity } from './Entity/deposits-actions.entity';
 import { DepositsModule } from '../deposits.module';
-import { DepositsEntity } from '../deposits.entity';
+import { DepositsEntity } from '../Entity/deposits.entity';
 
 @Module({
   imports: [

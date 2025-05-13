@@ -5,7 +5,6 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DonationsEntity } from './donations.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
@@ -13,7 +12,8 @@ import { getYearFromDate } from '../../services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
-import { DonationActionType, IWindowDonations } from './donationsTypes';
+import { DonationActionType, IWindowDonations } from './donations_dto';
+import { DonationsEntity } from './Entity/donations.entity';
 
 @Injectable()
 export class DonationsService {
