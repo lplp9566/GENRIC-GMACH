@@ -1,3 +1,4 @@
+import { UserEntity } from '../../users/user.entity';
 import {
   Column,
   Entity,
@@ -6,8 +7,7 @@ import {
   PrimaryGeneratedColumn,
   RelationId,
 } from 'typeorm';
-import { UserEntity } from '../users/user.entity';
-import { LoanActionEntity } from './loan-actions/loan_actions.entity';
+import { LoanActionEntity } from '../loan-actions/Entity/loan_actions.entity';
 
 @Entity('loans')
 export class LoanEntity {

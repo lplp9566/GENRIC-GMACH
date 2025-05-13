@@ -70,19 +70,19 @@ describe('LoanActionsService', () => {
   });
 
   it('should route to changeLoanAmount when action_type is AMOUNT_CHANGE', async () => {
-    const dto = { loanId: 1, date: new Date(), amount: 1000, action_type: LoanPaymentActionType.AMOUNT_CHANGE };
+    const dto = { loanId: 1, date: new Date(), value: 1000, action_type: LoanPaymentActionType.AMOUNT_CHANGE };
     const result = await service.handleLoanAction(dto);
     expect(result.id).toBe(1);
   });
 
   it('should route to changeMonthlyPayment when action_type is MONTHLY_PAYMENT_CHANGE', async () => {
-    const dto = { loanId: 1, date: new Date(), amount: 200, action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE };
+    const dto = { loanId: 1, date: new Date(), value: 200, action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE };
     const result = await service.handleLoanAction(dto);
     expect(result.id).toBe(2);
   });
 
   it('should route to changeDateOfPayment when action_type is DATE_OF_PAYMENT_CHANGE', async () => {
-    const dto = { loanId: 1, date: new Date(), amount: 15, action_type: LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE };
+    const dto = { loanId: 1, date: new Date(), value: 15, action_type: LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE };
     const result = await service.handleLoanAction(dto);
     expect(result.id).toBe(3);
   });
@@ -91,7 +91,7 @@ describe('LoanActionsService', () => {
     const dto = {
       loanId: 1,
       date: new Date(),
-      amount: 100,
+      value: 100,
       action_type: LoanPaymentActionType.PAYMENT,
     };
 
@@ -99,7 +99,7 @@ describe('LoanActionsService', () => {
       id: 99,
       date: dto.date,
       loan: mockLoan,
-      value: dto.amount,
+      value: dto.value,
       action_type: LoanPaymentActionType.PAYMENT,
     } as LoanActionEntity);
 
@@ -107,7 +107,7 @@ describe('LoanActionsService', () => {
       id: 99,
       date: dto.date,
       loan: mockLoan,
-      value: dto.amount,
+      value: dto.value,
       action_type: LoanPaymentActionType.PAYMENT,
     });
 
@@ -145,7 +145,7 @@ describe('LoanActionsService', () => {
     const dto = {
       loanId: 1,
       date: new Date(),
-      amount: 100,
+      value: 100,
       action_type: 'INVALID_TYPE' as any,
     };
     await expect(service.handleLoanAction(dto)).rejects.toThrow('Unknown action type');

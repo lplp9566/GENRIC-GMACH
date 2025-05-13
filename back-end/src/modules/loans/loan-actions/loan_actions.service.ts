@@ -39,22 +39,28 @@ export class LoanActionsService {
     private readonly LoanActionBalanceService:LoanActionBalanceService
   ) {}
   async handleLoanAction(dto: LoanActionDto): Promise<LoanActionEntity> {
-    switch (dto.action_type) {
-      case LoanPaymentActionType.PAYMENT:
-        return this.addLoanPayment(dto);
-
-      case LoanPaymentActionType.AMOUNT_CHANGE:
-        return this.loansService.changeLoanAmount(dto);
-
-      case LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE:
-        return this.loansService.changeMonthlyPayment(dto);
-
-      case LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE:
-        return this.loansService.changeDateOfPayment(dto);
-
-      default:
-        throw new Error(`Unknown action type: ${dto.action_type}`);
+    try {
+      switch (dto.action_type) {
+        case LoanPaymentActionType.PAYMENT:
+          return this.addLoanPayment(dto);
+  
+        case LoanPaymentActionType.AMOUNT_CHANGE:
+          return this.loansService.changeLoanAmount(dto);
+  
+        case LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE:
+          return this.loansService.changeMonthlyPayment(dto);
+  
+        case LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE:
+          return this.loansService.changeDateOfPayment(dto);
+  
+        default:
+          throw new Error(`Unknown action type: ${dto.action_type}`);
+      }
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
+
+    
   }
 
   async addLoanPayment(dto: LoanActionDto): Promise<LoanActionEntity> {
@@ -73,7 +79,7 @@ export class LoanActionsService {
       const newPayment = this.paymentsRepo.create({
         loan: loan,
         date: dto.date,
-        value: dto.amount,
+        value: dto.value,
         action_type: LoanPaymentActionType.PAYMENT,
       });
       if (loan.remaining_balance === 0) {
@@ -83,7 +89,7 @@ export class LoanActionsService {
 
       await this.paymentsRepo.save(newPayment);
 
-      loan.remaining_balance -= dto.amount;
+      loan.remaining_balance -= dto.value;
       if (loan.remaining_balance < 0) loan.remaining_balance = 0;
       loan.total_installments = loan.remaining_balance / loan.monthly_payment;
 
@@ -92,10 +98,10 @@ export class LoanActionsService {
       const year = getYearFromDate(dto.date);
 
       await Promise.all([
-        this.userFinByYear.recordLoanRepaid(loan.user, year, dto.amount),
-        this.userFin.recordLoanRepaid(loan.user, dto.amount),
-        this.fundsOverview.repayLoan(dto.amount),
-        this.fundsOverviewByYearService.recordLoanRepaid(year, dto.amount),
+        this.userFinByYear.recordLoanRepaid(loan.user, year, dto.value),
+        this.userFin.recordLoanRepaid(loan.user, dto.value),
+        this.fundsOverview.repayLoan(dto.value),
+        this.fundsOverviewByYearService.recordLoanRepaid(year, dto.value),
       ]);
       await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
 

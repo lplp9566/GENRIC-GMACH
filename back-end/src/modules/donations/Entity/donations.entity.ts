@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { UserEntity } from '../users/user.entity';
-import { DonationActionType } from './donationsTypes';
+import { DonationActionType } from '../donations_dto';
+import { UserEntity } from '../../users/user.entity';
 
 @Entity('donations')
 export class DonationsEntity {

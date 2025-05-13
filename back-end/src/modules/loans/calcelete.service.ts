@@ -96,7 +96,7 @@ export class FundsFlowService {
   async getCashFlowTotals(from: Date, newLoan?: Partial<LoanEntity>) {
     const fund_details = await this.fundsOverviewService.getFundDetails();
     if(fund_details.available_funds<newLoan?.loan_amount!){
-      throw new BadRequestException('not available money to active loan');
+      throw new BadRequestException('not available money');
     }
     const deposits = await this.depositsService.getDepositsActive();
     if(deposits.length == 0) return true;

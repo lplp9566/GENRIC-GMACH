@@ -117,7 +117,7 @@ describe('FundsFlowService', () => {
           monthly_payment: 500,
           payment_date: 15,
         }),
-      ).rejects.toThrow('not available money to active loan');
+      ).rejects.toThrow('not available money');
     });
   });
 });

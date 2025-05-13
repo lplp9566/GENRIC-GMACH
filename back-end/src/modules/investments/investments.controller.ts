@@ -1,17 +1,15 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { InvestmentsService } from './investments.service';
+import { InvestmentInit } from './investments_dto';
 
 @Controller('investments')
 export class InvestmentsController {
   constructor(private readonly investmentsService: InvestmentsService) {}
 
   // ✅ יצירת השקעה ראשונית
-  @Post('create-initial')
-  async createInitialInvestment(@Body() body: {
-    investment_name: string;
-    amount: number;
-    start_date: Date;
-  }) {
+  @Post()
+  async createInitialInvestment(@Body() body: InvestmentInit
+) {
     return this.investmentsService.createInitialInvestment(body);
   }
 
@@ -62,8 +60,12 @@ export class InvestmentsController {
   }
 
   // ✅ שליפת כל ההשקעות
-  @Get('all')
+  @Get()
   async getAllInvestments() {
     return this.investmentsService.getAllInvestments();
+  }
+  @Get('active_investments')
+  async getActiveInvestments() {
+    return this.investmentsService.getActiveInvestments();
   }
 }

@@ -1,7 +1,7 @@
 export interface LoanActionDto{
     loanId: number; 
     date: Date;
-    amount: number 
+    value: number 
     action_type: LoanPaymentActionType;
     note?: string;
 }

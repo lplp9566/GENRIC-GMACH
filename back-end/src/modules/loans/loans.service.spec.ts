@@ -122,42 +122,56 @@ describe('LoansService', () => {
   });
 
   describe('changeLoanAmount', () => {
+    const dto = {
+      loanId: 1,
+      value: 1200,
+      date: new Date(),
+      action_type: LoanPaymentActionType.AMOUNT_CHANGE
+    };
+  
+    const mockLoan: LoanEntity = {
+      id: 1,
+      loan_amount: 1000,
+      remaining_balance: 1000,
+      monthly_payment: 100,
+      isActive: true,
+      loan_date: new Date(),
+      payment_date: 15,
+      initialMonthlyPayment: 100,
+      total_installments: 10,
+      payments: [],
+      user: mockUser,
+    };
+  
+    const mockPayment: LoanActionEntity = {
+      id: 99,
+      loan: mockLoan,
+      value: 200,
+      date: dto.date,
+      action_type: LoanPaymentActionType.AMOUNT_CHANGE,
+    };
+  
+    it('should throw error when there is not enough deposit', async () => {
+      mockFundsFlowService.getCashFlowTotals.mockResolvedValueOnce(false);
+      loanRepo.findOne.mockResolvedValue(mockLoan);
+  
+      await expect(service.changeLoanAmount(dto)).rejects.toThrow('you need the mony for the deposit');
+    });
+  
     it('should update loan amount and save payment event', async () => {
-      const dto = { loanId: 1, amount: 1200, date: new Date(), action_type: LoanPaymentActionType.AMOUNT_CHANGE };
-      const mockLoan: LoanEntity = {
-        id: 1,
-        loan_amount: 1000,
-        remaining_balance: 1000,
-        monthly_payment: 100,
-        isActive: true,
-        loan_date: new Date(),
-        payment_date: 15,
-        initialMonthlyPayment: 100,
-        total_installments: 10,
-        payments: [],
-        user: mockUser,
-      };
-
-      const mockPayment: LoanActionEntity = {
-        id: 99,
-        loan: mockLoan,
-        value: 200,
-        date: dto.date,
-        action_type: LoanPaymentActionType.AMOUNT_CHANGE,
-      };
-
+      mockFundsFlowService.getCashFlowTotals.mockResolvedValueOnce(true);
       loanRepo.findOne.mockResolvedValue(mockLoan);
       loanRepo.save.mockResolvedValue(mockLoan);
       paymentRepo.save.mockResolvedValue(mockPayment);
-
+  
       const result = await service.changeLoanAmount(dto);
       expect(result.id).toBe(99);
     });
   });
-
+  
   describe('changeMonthlyPayment', () => {
     it('should update loan monthly payment and save payment event', async () => {
-      const dto = { loanId: 1, amount: 200, date: new Date(), action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE };
+      const dto = { loanId: 1, value: 200, date: new Date(), action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE };
       const mockLoan: LoanEntity = {
         id: 1,
         remaining_balance: 1000,

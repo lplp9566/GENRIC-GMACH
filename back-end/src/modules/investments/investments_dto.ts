@@ -5,4 +5,12 @@ export enum TransactionType {
     WITHDRAWAL = 'WITHDRAWAL',
     MANAGEMENT_FEE = 'MANAGEMENT_FEE',
   }
-  
+  export interface InvestmentInit{
+        investment_name: string;
+        amount: number;
+        start_date: Date;
+        investment_by: string;
+        company_name: string;
+        investment_portfolio_number: string;
+  }
+    

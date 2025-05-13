@@ -36,7 +36,7 @@ export class LoansService {
   }
   async createLoan(loanData: Partial<LoanEntity>) {
     try {
-   const success =  await this.fundsFlowService.getCashFlowTotals(new Date("2025-05-05"), loanData);
+   const success =  await this.fundsFlowService.getCashFlowTotals(new Date(loanData.loan_date!), loanData);
    if(!success) throw new Error('you need the mony for the deposit');
       const loanRecord = this.loansRepository.create(loanData);
       loanRecord.remaining_balance = loanRecord.loan_amount;
@@ -88,17 +88,22 @@ export class LoansService {
     }
   }
   async changeLoanAmount(dto: LoanActionDto): Promise<LoanActionEntity> {
-    const loan = await this.loansRepository.findOne({
-      where: { id: dto.loanId },
-      relations: ['user'],
-    });
-    if (!loan) throw new Error('Loan not found');
-    if (!loan.isActive) {
-      throw new BadRequestException('Cannot operate on a closed loan');
-    }
     try {
-      const diff = dto.amount - loan.loan_amount;
-      loan.loan_amount = dto.amount;
+
+      const loan = await this.loansRepository.findOne({
+        where: { id: dto.loanId },
+        relations: ['user'],
+      });
+      if (!loan) throw new Error('Loan not found');
+      if (!loan.isActive) {
+        throw new Error('Cannot operate on a closed loan');
+      }
+      const demoLoan = {...loan}
+      demoLoan.loan_amount = dto.value + loan.remaining_balance
+      const diff = dto.value - loan.loan_amount;
+      loan.loan_amount = dto.value;
+      const success =  await this.fundsFlowService.getCashFlowTotals(dto.date, demoLoan);
+      if(!success) throw new Error('you need the mony for the deposit');
       loan.remaining_balance += diff;
       loan.total_installments = Math.ceil(
         loan.remaining_balance / loan.monthly_payment,
@@ -114,9 +119,9 @@ export class LoansService {
       return await this.paymentsRepository.save({
         loan,
         date: dto.date,
-        amount: diff,
+        value: diff,
         action_type: LoanPaymentActionType.AMOUNT_CHANGE,
-        note: dto.note || `שינוי סכום הלוואה ל-${dto.amount}`,
+        // note: dto.note || `שינוי סכום הלוואה ל-${dto.amount}`,
       });
     } catch (error) {
       console.error('❌ Error in editLoin:', error.message);
@@ -124,15 +129,15 @@ export class LoansService {
     }
   }
   async changeMonthlyPayment(dto: LoanActionDto) {
+    const loan = await this.loansRepository.findOne({
+      where: { id: dto.loanId },
+    });
+    if (!loan) throw new BadRequestException('Loan not found');
+    if (!loan.isActive) {
+      throw new BadRequestException('Cannot operate on a closed loan');
+    }
     try {
-      const loan = await this.loansRepository.findOne({
-        where: { id: dto.loanId },
-      });
-      if (!loan) throw new Error('Loan not found');
-      if (!loan.isActive) {
-        throw new BadRequestException('Cannot operate on a closed loan');
-      }
-      loan.monthly_payment = dto.amount;
+      loan.monthly_payment = dto.value;
       loan.total_installments = Math.ceil(
         loan.remaining_balance / loan.monthly_payment,
       );
@@ -140,12 +145,11 @@ export class LoansService {
       return await this.paymentsRepository.save({
         loan,
         date: dto.date,
-        amount: dto.amount,
+        value: dto.value,
         action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
-        note: dto.note || `שינוי תשלום חודשי ל-${dto.amount}`,
+        // note: dto.note || `שינוי תשלום חודשי ל-${dto.value}`,
       });
     } catch (error) {
-      console.error('❌ Error in editmontlyPayment:', error.message);
       throw new Error(error.message);
     }
   }
@@ -154,21 +158,21 @@ export class LoansService {
       const loan = await this.loansRepository.findOne({
         where: { id: dto.loanId },
       });
-      if (!loan) throw new Error('Loan not found');
+      if (!loan) throw new BadRequestException('Loan not found');
       if (!loan.isActive) {
         throw new BadRequestException('Cannot operate on a closed loan');
       }
-      if (dto.amount > 31 || dto.amount < 0) {
+      if (dto.value > 31 || dto.value < 0) {
         throw new Error('Invalid payment date');
       }
-      loan.payment_date = dto.amount;
+      loan.payment_date = dto.value;
       await this.loansRepository.save(loan);
       return await this.paymentsRepository.save({
         loan,
         date: dto.date,
-        amount: dto.amount,
+        value: dto.value,
         action_type: LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
-        note: dto.note || `שינוי תאריך תשלום ל-${dto.amount}`,
+        // note: dto.note || `שינוי תאריך תשלום ל-${dto.value}`,
       });
     } catch (error) {
       console.error('❌ Error in editDateOfPyment:', error.message);

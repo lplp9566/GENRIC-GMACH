@@ -5,8 +5,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserEntity } from '../users/user.entity';
-import { DepositsActionsEntity } from './deposits-actions/deposits-actions.entity';
+import { UserEntity } from '../../users/user.entity';
+import { DepositsActionsEntity } from '../deposits-actions/Entity/deposits-actions.entity';
 
 @Entity('deposits')
 export class DepositsEntity {

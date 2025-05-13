@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InvestmentEntity } from './entity/investments.entity';
 import { InvestmentTransactionService } from './investment-transactions/investment-transactions.service';
-import { TransactionType } from './investments_dto';
+import { InvestmentInit, TransactionType } from './investments_dto';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { getYearFromDate } from "../../services/services";
@@ -22,13 +22,10 @@ export class InvestmentsService {
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
   ) {}
 
-  async createInitialInvestment(dto: {
-    investment_name: string;
-    amount: number;
-    start_date: Date;
-  }) {
+  async createInitialInvestment(dto:InvestmentInit
+) {
     try {
-      const { investment_name, amount, start_date } = dto;
+      const { investment_name, amount, start_date ,company_name,investment_by,investment_portfolio_number} = dto;
       await this.fundsOverviewService.addInvestment(amount);
       const year = getYearFromDate(start_date);
       await this.fundsOverviewByYearService.recordInvestmentOut(year, amount);
@@ -37,6 +34,9 @@ export class InvestmentsService {
         total_principal_invested: amount,
         principal_remaining: amount,
         current_value: amount,
+        company_name,
+        investment_by,
+        investment_portfolio_number,
         start_date,
         last_update: start_date,
         is_active: true,
@@ -55,7 +55,7 @@ export class InvestmentsService {
     }
   }
 
-  async addToInvestment(dto: { id: number; amount: number; date: Date }) {
+  async addToInvestment(dto: { id: number; amount: number; date: Date, }) {
     try {
       const { id, amount, date } = dto;
       const investment = await this.findActiveInvestment(id);
@@ -224,7 +224,7 @@ export class InvestmentsService {
     return this.investmentRepo.find({ order: { last_update: 'DESC' } });
   }
 
-  private async findActiveInvestment(id: number): Promise<InvestmentEntity> {
+   async findActiveInvestment(id: number): Promise<InvestmentEntity> {
     try {
       const investment = await this.investmentRepo.findOne({
         where: { id, is_active: true },
@@ -236,5 +236,10 @@ export class InvestmentsService {
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+  async getActiveInvestments(): Promise<InvestmentEntity[]> {
+    
+    const investments = await this.investmentRepo.find({ where: { is_active: true } });
+    return investments;
   }
 }
