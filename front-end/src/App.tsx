@@ -4,6 +4,7 @@ import { Navbar } from './components/NavBar/NavBar';
 import { LoanDetails } from './pages/LoanDetels';
 import { NewLoan } from './pages/NewLoan';
 import Loans from './pages/Loans';
+import HomePage from './components/HomePage';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Box sx={{ mt: 10, px: 2 }}>
         <Routes>
           <Route path="/loans" element={<Loans />} />
+          <Route path="/Home" element={<HomePage />} />
           <Route path="/loans/new" element={<NewLoan />} />
           <Route path="/loans/:id" element={<LoanDetails />} />
         </Routes>
