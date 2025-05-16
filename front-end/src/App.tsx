@@ -1,29 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Container, Typography } from '@mui/material';
-import FundsOverview from "./componets/FundsOverview";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-const App: React.FC = () => {
-  const [fundsData, setFundsData] = useState(null);
-  const [users,setusers] =useState(null)
+import { Box } from '@mui/material';
+import { Navbar } from './componets/NavBar/NavBar';
+import { LoanDetails } from './pages/LoanDetels';
+import { NewLoan } from './pages/NewLoan';
+import Loans from './pages/Loans';
 
-  useEffect(() => {
-    axios.get('https://ahavat-chesed-2.onrender.com/funds-overview')
-      .then((response) => setFundsData(response.data))
-      .catch((error) => console.error("Error fetching data:", error));
-      axios.get('https://ahavat-chesed-2.onrender.com/users')
-      .then((response)=> setusers(response.data))
-
-  }, []);
+function App() {
   return (
-
-    <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" sx={{ mb: 3, textAlign: 'center', fontWeight: 'bold' }}>
-        מצב קרנות הגמ"ח 
-      </Typography>
-      {fundsData ? <FundsOverview data={fundsData} /> : <Typography>טוען נתונים...</Typography>}
-    </Container>
+    <BrowserRouter>
+      <Navbar />
+      <Box sx={{ mt: 10, px: 2 }}>
+        <Routes>
+          <Route path="/loans" element={<Loans />} />
+          <Route path="/loans/new" element={<NewLoan />} />
+          <Route path="/loans/:id" element={<LoanDetails />} />
+        </Routes>
+      </Box>
+    </BrowserRouter>
   );
-};
-
+}
 export default App;

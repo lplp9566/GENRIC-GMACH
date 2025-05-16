@@ -80,7 +80,7 @@ export class LoansService {
     }
   }
 
-  async getAllPements(): Promise<LoanActionEntity[]> {
+  async getAllActions(): Promise<LoanActionEntity[]> {
     try {
       return this.paymentsRepository.find({ relations: ['loan'] });
     } catch (error) {

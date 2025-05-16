@@ -1,0 +1,60 @@
+stages:
+  - install
+  - test
+  - build
+
+variables:
+  NODE_ENV: development
+
+cache:
+  paths:
+    - back-end/node_modules/
+    - front-end/node_modules/
+
+install_backend:
+  stage: install
+  image: node:18
+  script:
+    - cd back-end
+    - npm ci
+
+install_frontend:
+  stage: install
+  image: node:18
+  script:
+    - cd front-end
+    - npm ci
+
+test_backend:
+  stage: test
+  image: node:18
+  script:
+    - cd back-end
+    - npm run test
+
+# test_frontend:
+#   stage: test
+#   image: node:18
+#   script:
+#     - cd front-end
+#     - npm run test
+
+build_backend:
+  stage: build
+  image: node:18
+  script:
+    - cd back-end
+    - npm run build
+  artifacts:
+    paths:
+      - back-end/dist/
+
+build_frontend:
+  stage: build
+  image: node:18
+  script:
+    - cd front-end
+    - npm run build
+  artifacts:
+    paths:
+      - front-end/build/

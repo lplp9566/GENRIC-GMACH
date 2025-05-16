@@ -23,10 +23,6 @@ export class FundsFlowService {
     private readonly fundsOverviewService: FundsOverviewService
   ) {}
 
-  
-  /**
-   * מחזירה סה"כ הכנסות (inflow) בין שני תאריכים
-   */
   async calculateTotalMonthlyInflows(from: Date, to: Date): Promise<number> {
     if (to < from) throw new BadRequestException('End date must be after start date');
     const rates = await this.ratesRepo.find({ order: { year: 'ASC', month: 'ASC' } });
@@ -56,11 +52,6 @@ export class FundsFlowService {
     }
     return total;
   }
-
-  /**
-   * מחזירה סה"כ הוצאות (outflow) מהלוואות קיימות ו/או הלוואה חדשה בין שני תאריכים
-   * @param newLoan אופציונלי: הלוואה חדשה להצטרף לסימולציה
-   */
   async calculateLoanPaymentSum(
     from: Date,
     to: Date,
@@ -129,12 +120,12 @@ export class FundsFlowService {
       if (availableCash < requiredBalance) {
         console.log("❌ עד", checkpointDate.toISOString(), "is", availableCash, "need", requiredBalance);
         allGood = false;
+        throw new BadRequestException(`אתה יכול להוציא הלוואה רק על סכום ${requiredBalance-availableCash}`);        
       } else {
         console.log("✅ עד", checkpointDate.toISOString(),"is", availableCash, "need", requiredBalance);
         totalInflows += requiredBalance;
       }
     }
-  console.log(allGood)
     return allGood ;
   }
   
