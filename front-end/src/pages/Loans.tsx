@@ -14,7 +14,7 @@ const loansData = [
  const Loans = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-const { allUsers, status, error } = useSelector(
+const { allUsers } = useSelector(
     (state: RootState) => state.adminUsers
   );
   useEffect(() => {
