@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, TextField, Button, Typography, Paper } from '@mui/material';
 
 export const NewLoan = () => {

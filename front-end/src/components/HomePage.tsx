@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Typography, AppBar, Toolbar, Button, Grid, Card, CardContent, Avatar, Stack } from '@mui/material';
 
 const colors = {

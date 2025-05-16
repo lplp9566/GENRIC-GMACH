@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import  { useEffect } from 'react';
 import { Card, CardContent, Typography, Grid, Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { IUsers } from '../components/NavBar/Users/UsersDto';
 import { getAllUsers } from '../store/features/admin/adminUsersSlice';
 
 const loansData = [
