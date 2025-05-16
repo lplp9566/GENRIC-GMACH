@@ -2,6 +2,7 @@ export enum UserRole {
   president = 'president',
   committeeMember = 'committeeMember',
   member = 'member',
+  admin = 'admin',
 }
 
 export enum payment_method {

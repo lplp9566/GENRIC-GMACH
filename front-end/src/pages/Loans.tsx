@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, Typography, Grid, Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import { IUsers } from '../components/NavBar/Users/UsersDto';
+import { getAllUsers } from '../store/features/admin/adminUsersSlice';
 
 const loansData = [
   { id: 1, borrower: 'משה כהן', amount: 12000, status: 'פעילה' },
@@ -10,12 +14,23 @@ const loansData = [
 
  const Loans = () => {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
+const { allUsers, status, error } = useSelector(
+    (state: RootState) => state.adminUsers
+  );
+  useEffect(() => {
+    dispatch(getAllUsers() as any);
+  }, [dispatch]);
+  
+  useEffect(() => {
+    console.log("📦 allUsers:", allUsers);
+  }, [allUsers]);
+  
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h5" sx={{ color: '#1E3A3A' }}>
-          רשימת הלוואות
+        {allUsers?.length ?? 0}
         </Typography>
         <Button
           variant="contained"
@@ -35,7 +50,7 @@ const loansData = [
             >
               <CardContent>
                 <Typography variant="h6" sx={{ color: '#364E4E' }}>
-                  {loan.borrower}
+                {allUsers && allUsers.length > 0 ? allUsers[0].first_name : '---'}
                 </Typography>
                 <Typography>סכום: ₪{loan.amount.toLocaleString()}</Typography>
                 <Typography sx={{ color: getStatusColor(loan.status), mt: 1 }}>
