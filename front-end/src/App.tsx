@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
 import { Box } from '@mui/material';
 import { Navbar } from './components/NavBar/NavBar';
 import { LoanDetails } from './pages/LoanDetels';

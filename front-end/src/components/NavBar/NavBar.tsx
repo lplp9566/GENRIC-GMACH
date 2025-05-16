@@ -35,22 +35,30 @@ export const Navbar = () => {
 
   return (
     <>
-      <AppBar position="fixed" sx={{ backgroundColor: '#1E3A3A' ,direction:'rtl'}}>
-        <Toolbar>
-          {isMobile && (
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              onClick={toggleDrawer}
-              sx={{ mr: 2 }}
+      <AppBar position="fixed" sx={{ backgroundColor: '#1E3A3A', direction: 'rtl' }}>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* ימין – לוגו + שם */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
+              sx={{
+                backgroundColor: '#F0F0F0',
+                borderRadius: '50%',
+                p: 0.5,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 48,
+                width: 48,
+              }}
             >
-              <MenuIcon />
-            </IconButton>
-          )}
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            גמ"ח משפחתי
-          </Typography>
+              <img src="/לוגו.png" alt="לוגו אהבת חסד" style={{ height: 32 }} />
+            </Box>
+            <Typography variant="h6" sx={{ color: '#FFFFFF', fontWeight: 'bold' }}>
+              אהבת חסד
+            </Typography>
+          </Box>
+
+          {/* שמאל – תפריט */}
           {!isMobile && (
             <Box sx={{ display: 'flex', gap: 2 }}>
               {navItems.map((item) => (
@@ -58,16 +66,30 @@ export const Navbar = () => {
                   key={item.path}
                   component={Link}
                   to={item.path}
-                  sx={{ color: '#FFFFFF' }}
+                  sx={{ color: '#FFFFFF',marginLeft: '30%' }}
                 >
                   {item.label}
                 </Button>
               ))}
             </Box>
           )}
+
+          {/* כפתור תפריט למובייל */}
+          {isMobile && (
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={toggleDrawer}
+              sx={{ ml: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
         </Toolbar>
       </AppBar>
 
+      {/* Drawer למובייל */}
       <Drawer
         anchor="right"
         open={open}
