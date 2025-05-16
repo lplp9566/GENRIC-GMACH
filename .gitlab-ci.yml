@@ -54,7 +54,9 @@ build_frontend:
   image: node:18
   script:
     - cd front-end
-    - npm run build
+    - npm ci
+    - npx tsc -b      # ✅ מריץ TypeScript דרך npx
+    - npm run build   # או npx vite build אם אתה לא משתמש ב-script
   artifacts:
     paths:
-      - front-end/build/
+      - front-end/dist/ # או front-end/build תלוי ב־vite/react
