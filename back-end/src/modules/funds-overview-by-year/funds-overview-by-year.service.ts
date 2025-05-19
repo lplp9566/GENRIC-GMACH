@@ -31,7 +31,9 @@ export class FundsOverviewByYearService {
     }
     return record;
   }
-
+  async getAllFundsOverview(): Promise<FundsOverviewByYearEntity[]> {
+      return this.fundsOverviewByYearRepo.find({order: {year: 'ASC'}});
+  }
   async recordMonthlyDeposit(year: number, amount: number) {
     const record = await this.getOrCreateOverview(year);
     record.total_monthly_deposits += amount;

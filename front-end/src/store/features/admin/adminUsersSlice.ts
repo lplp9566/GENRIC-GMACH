@@ -20,6 +20,7 @@ axios.defaults.withCredentials = true;
     'admin/getAllUsers',
     async()=>{
         const response = await axios.get(`${BASE_URL}/users`|| "http://localhost:3000/users");
+        console.log(response)
         return response.data
     }
  )

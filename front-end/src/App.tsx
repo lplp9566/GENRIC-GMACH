@@ -5,6 +5,10 @@ import { LoanDetails } from './pages/LoanDetels';
 import { NewLoan } from './pages/NewLoan';
 import Loans from './pages/Loans';
 import HomePage from './components/HomePage';
+import FundsOverviewByYearTable from './components/FundsOvTable';
+import FundsOverviewPage from './components/FundsOverviewPage';
+import FundsOverviewByYearPage from './pages/FundsOverviewByYearPage';
+
 
 function App() {
   return (
@@ -14,8 +18,10 @@ function App() {
         <Routes>
           <Route path="/loans" element={<Loans />} />
           <Route path="/Home" element={<HomePage />} />
-          <Route path="/loans/new" element={<NewLoan />} />
-          <Route path="/loans/:id" element={<LoanDetails />} />
+          <Route path="/loans/new" element={<NewLoan  />} />
+          <Route path="/loans/:id" element={<FundsOverviewByYearTable />} />
+          <Route path="/funds" element={<FundsOverviewPage />} />
+          <Route path='FundsOverviewByYear' element={<FundsOverviewByYearPage />} />
         </Routes>
       </Box>
     </BrowserRouter>

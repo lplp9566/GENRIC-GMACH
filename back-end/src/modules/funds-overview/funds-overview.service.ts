@@ -127,6 +127,7 @@ export class FundsOverviewService {
       fund.fund_details[fundName] = (fund.fund_details[fundName] || 0) + amount;
       fund.special_funds += amount;
       fund.own_equity += amount;
+      fund.total_donations += amount
       fund.available_funds += amount;
       await this.fundsOverviewRepository.save(fund);
       return fund;

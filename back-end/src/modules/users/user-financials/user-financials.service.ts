@@ -56,7 +56,7 @@ async recordMonthlyDeposit(user: UserEntity, amount: number) {
       async recordSpecialFundDonation(user:UserEntity,amount:number){
         const record = await this.getOrCreateUserFinancials(user)
         record.total_special_fund_donations += amount ;
-        record.total_donations += amount
+        record.total_donations += amount ;
         return this.userFinancialsRepository.save(record)
       }
     async recordLoanTaken(user: UserEntity, amount: number) {
