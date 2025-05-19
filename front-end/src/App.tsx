@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { Navbar } from './components/NavBar/NavBar';
-import { LoanDetails } from './pages/LoanDetels';
 import { NewLoan } from './pages/NewLoan';
 import Loans from './pages/Loans';
 import HomePage from './components/HomePage';
