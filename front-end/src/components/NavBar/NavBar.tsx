@@ -16,7 +16,7 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import { useTheme } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
-import { Label } from '@mui/icons-material';
+
 
 const navItems = [
   { label: 'דף הבית', path: '/Home' },
