@@ -1,4 +1,4 @@
-import { FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, Typography, InputLabel } from "@mui/material";
+import { FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, Typography } from "@mui/material";
 import { allFields } from "./fields";
 
 interface Props {
