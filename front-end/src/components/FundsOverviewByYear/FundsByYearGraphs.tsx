@@ -83,95 +83,96 @@ const FundsByYearGraphs = () => {
   }
 
   return (
-<Paper
-  sx={{
-    mt: 5,
-    p: 3,
-    borderRadius: 5,
-    minHeight: 500,
-    background: "linear-gradient(90deg, #f7fafc 80%, #e3f5ff 100%)",
-    height:720
-  }}
->
-  <Box
-    sx={{
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "flex-start",
-    //   justifyContent: "space-between", // או: "center" אם אתה רוצה ריווח קבוע
-      maxHeight: "30%",
-      mx: "auto",
-      mb: 2
-    }}
-  >
-    {/* כפתור אקסל בצד שמאל (RTL) */}
-    <Button
-      variant="text"
+    <Paper
       sx={{
-        borderRadius: 2,
-        fontWeight: "bold",
-        gap: 1,
-        minWidth: 0,
-        p: 0,
-        left: 0,
-
-        "&:hover": { backgroundColor: "#f0f6ff" }
-      }}
-      onClick={exportToExcel}
-      startIcon={
-        <img src="/xlsx logo.png" alt="Excel" style={{ width: 32, height: 32 }} />
-      }
-    >
-    </Button>
-
-    {/* קופסת הסלקטים והכותרת */}
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        background: "rgba(255, 230, 240, 0.11)",
-        borderRadius: 3,
-        p: 2,
-        boxShadow: 1,
-        minWidth: 240,
-        maxWidth: 700,
-        mx: "auto",
-        maxHeight: "70%",
-        overflowY: "auto"
+        mt: 5,
+        p: 3,
+        background: "linear-gradient(90deg, #f7fafc 80%, #e3f5ff 100%)",
+        height: "85vh",
       }}
     >
-      <Typography
-        variant="h5"
-        fontWeight="bold"
-        gutterBottom
-        sx={{ display: "flex", justifyContent: "center" }}
-      >
-        גרפים כספיים וטבלה מפורטת לפי בחירה
-      </Typography>
       <Box
         sx={{
-          mb: 2,
           display: "flex",
-          gap: 2,
-          flexWrap: "wrap",
-          justifyContent: "center",
-          alignItems: "center",
+          flexDirection: "row",
+          alignItems: "flex-start",
+          //   justifyContent: "space-between", // או: "center" אם אתה רוצה ריווח קבוע
+          maxHeight: "30%",
+          mx: "auto",
+          mb: 2,
         }}
       >
-        <FundsFieldSelect
-          selectedFields={selectedFields}
-          onChange={handleFieldChange}
-        />
-        <FundsYearSelect
-          years={yearlyData.map((y) => y.year)}
-          selectedYears={selectedYears}
-          onChange={setSelectedYears}
-        />
+        {/* כפתור אקסל בצד שמאל (RTL) */}
+        <Button
+          variant="text"
+          sx={{
+            borderRadius: 2,
+            fontWeight: "bold",
+            gap: 1,
+            minWidth: 0,
+            p: 0,
+            left: 0,
+
+            "&:hover": { backgroundColor: "#f0f6ff" },
+          }}
+          onClick={exportToExcel}
+          startIcon={
+            <img
+              src="/xlsx logo.png"
+              alt="Excel"
+              style={{ width: 32, height: 32 }}
+            />
+          }
+        ></Button>
+
+        {/* קופסת הסלקטים והכותרת */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            background: "rgba(255, 230, 240, 0.11)",
+            borderRadius: 3,
+            p: 2,
+            boxShadow: 1,
+            minWidth: 240,
+            maxWidth: 700,
+            mx: "auto",
+            maxHeight: "70%",
+            overflowY: "auto",
+          }}
+        >
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            gutterBottom
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
+            גרפים כספיים וטבלה מפורטת לפי בחירה
+          </Typography>
+          <Box
+            sx={{
+              mb: 2,
+              display: "flex",
+              gap: 2,
+              flexWrap: "wrap",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <FundsFieldSelect
+              selectedFields={selectedFields}
+              onChange={handleFieldChange}
+            />
+            <FundsYearSelect
+              years={yearlyData.map((y) => y.year)}
+              selectedYears={selectedYears}
+              onChange={setSelectedYears}
+            />
+          </Box>
+          <FundsTabs value={selectedTab} onChange={setSelectedTab} />
+        </Box>
       </Box>
-      <FundsTabs value={selectedTab} onChange={setSelectedTab} />
-    </Box>
-  </Box>
 
       {selectedTab < 5 ? (
         <FundsGraphs
