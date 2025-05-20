@@ -100,6 +100,7 @@ const FundsByYearGraphs = () => {
       alignItems: "flex-start",
     //   justifyContent: "space-between", // או: "center" אם אתה רוצה ריווח קבוע
       width: "100%", 
+      maxHeight: "30%",
       mx: "auto",
       mb: 2
     }}
@@ -136,7 +137,9 @@ const FundsByYearGraphs = () => {
         boxShadow: 1,
         minWidth: 240,
         maxWidth: 700,
-        mx: "auto"
+        mx: "auto",
+        maxHeight: "70%",
+        overflowY: "auto"
       }}
     >
       <Typography
