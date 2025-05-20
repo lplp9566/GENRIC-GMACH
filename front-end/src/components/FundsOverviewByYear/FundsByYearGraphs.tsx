@@ -88,7 +88,7 @@ const FundsByYearGraphs = () => {
         mt: 5,
         p: 3,
         background: "linear-gradient(90deg, #f7fafc 80%, #e3f5ff 100%)",
-        height: "85vh",
+        // height: "85vh",
       }}
     >
       <Box

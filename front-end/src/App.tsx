@@ -12,13 +12,10 @@ import FundsOverviewByYearPage from './pages/FundsOverviewByYearPage';
 function App() {
   return (
     <BrowserRouter >
-    <Box
-    sx={{
-      maxHeight: '100vh',
-    }}
-    >
       <Navbar />
-      <Box sx={{ mt: 10, px: 2 }}>
+      <Box 
+      sx={{ mt: 10, px: 2 }}
+      >
         <Routes>
           <Route path="/loans" element={<Loans />} />
           <Route path="/Home" element={<HomePage />} />
@@ -27,7 +24,6 @@ function App() {
           <Route path="/funds" element={<FundsOverviewPage />} />
           <Route path='FundsOverviewByYear' element={<FundsOverviewByYearPage />} />
         </Routes>
-      </Box>
       </Box>
     </BrowserRouter>
   );

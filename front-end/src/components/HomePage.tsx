@@ -17,7 +17,7 @@ const stats = [
 
 const HomePage = () => {
   return (
-    <Box sx={{ p: 3, direction: 'rtl', backgroundColor: '#F9F9F9', minHeight: '100vh' }}>
+    <Box sx={{ p: 3, direction: 'rtl', backgroundColor: '#F9F9F9' }}>
       <Typography variant="h4" gutterBottom fontWeight="bold">
         ברוכים הבאים למערכת הגמ"ח המשפחתי
       </Typography>
