@@ -47,7 +47,7 @@ const FundsOverviewPage = () => {
         p: 4,
         direction: "rtl",
         backgroundColor: "#F4F6F8",
-        minHeight: "100vh",
+        minHeight: "82vh",
       }}
     >
       <Typography variant="h4" gutterBottom fontWeight="bold">
