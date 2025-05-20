@@ -39,7 +39,7 @@ const FundsOverviewPage = () => {
         { label: "פיקדונות", value: fundsOverview.total_user_deposits },
         { label: 'החזרי הו"ק', value: fundsOverview.standing_order_return },
         { label: " מזומן", value: fundsOverview.cash_holdings },
-        { label: "הוצאות", vallue: fundsOverview.total_expenses },
+        { label: "הוצאות", value: fundsOverview.total_expenses },
       ];
   return (
     <Box
@@ -47,7 +47,8 @@ const FundsOverviewPage = () => {
         p: 4,
         direction: "rtl",
         backgroundColor: "#F4F6F8",
-        // minHeight: "82vh",
+        height: "78vh",
+        overflow: "auto",
       }}
     >
       <Typography variant="h4" gutterBottom fontWeight="bold">
@@ -56,7 +57,7 @@ const FundsOverviewPage = () => {
 
       <Grid container spacing={2} sx={{ mb: 4 }}>
         {cardItems.map((item) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={item.label}>
+          <Grid item xs={6} sm={6} md={4} lg={3} key={item.label}>
             <Card
               sx={{
                 backgroundColor: "#fff",

@@ -43,16 +43,12 @@ export const Navbar = () => {
         sx={{
           backgroundColor: "#1E3A3A",
           direction: "rtl",
-          // height: "7vh", // גובה אחיד
         }}
       >
         <Toolbar
           sx={{
             justifyContent: "flex-start",
             gap: 2,
-            // height: "7vh",
-            flexWrap: "nowrap",
-            overflow: "hidden",
           }}
         >
           {/* לוגו + טקסט */}
@@ -61,7 +57,6 @@ export const Navbar = () => {
               sx={{
                 backgroundColor: "#F0F0F0",
                 borderRadius: "50%",
-                p: 0.5,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
