@@ -1,4 +1,4 @@
-import { Box, Tabs, Tab } from "@mui/material";
+import { Box, Tabs, Tab, useMediaQuery } from "@mui/material";
 interface Props {
   value: number;
   onChange: (tabIdx: number) => void;
@@ -12,15 +12,20 @@ const tabs = [
   { icon: "📋", label: "טבלה" },
 ];
 const  FundsTabs = ({ value, onChange }: Props)=> {
+    const isMobile = useMediaQuery("(max-width:600px)");
   return (
     <Tabs
       value={value}
       onChange={(_, newTab) => onChange(newTab)}
       indicatorColor="primary"
       textColor="primary"
-      sx={{ minHeight: 70, height: 70, mt: 0 }}
+      sx={{
+        maxWidth: "100%",
+        ".MuiTab-root": { minWidth: isMobile ? 70 : 100, px: 1 }
+      }}
       variant="fullWidth"
     >
+
       {tabs.map((t, i) => (
         <Tab
           key={i}

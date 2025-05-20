@@ -1,21 +1,21 @@
-import { FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, Typography } from "@mui/material";
+import { FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, Typography, useMediaQuery } from "@mui/material";
 import { allFields } from "./fields";
+
 
 interface Props {
   selectedFields: string[];
   onChange: (value: string[]) => void;
-  maxFields?: number;
-  warning?: boolean;
 }
 
-const FundsFieldSelect= ({ selectedFields, onChange, maxFields = 6, warning }: Props)=> {
+const FundsFieldSelect= ({ selectedFields, onChange}: Props)=> {
+    const isMobile = useMediaQuery("(max-width:600px)");
   const handleChange = (event: any) => {
     const { value } = event.target;
     const arr = typeof value === "string" ? value.split(",") : value;
     onChange(arr);
   };
   return (
-    <FormControl sx={{ minWidth: 170 }}>
+  <FormControl sx={{ minWidth: isMobile ? 110 : 170 }}>
       {/* <InputLabel>בחירת קטגוריות</InputLabel> */}
       <Select
         multiple
@@ -32,18 +32,12 @@ const FundsFieldSelect= ({ selectedFields, onChange, maxFields = 6, warning }: P
             key={f.key}
             value={f.key}
             dense
-            disabled={selectedFields.length >= maxFields && !selectedFields.includes(f.key)}
           >
             <Checkbox checked={selectedFields.includes(f.key)} />
             <ListItemText primary={f.label} />
           </MenuItem>
         ))}
       </Select>
-      {warning && (
-        <Typography color="error" variant="caption">
-          ניתן לבחור עד {maxFields} שדות בלבד!
-        </Typography>
-      )}
     </FormControl>
   );
 }

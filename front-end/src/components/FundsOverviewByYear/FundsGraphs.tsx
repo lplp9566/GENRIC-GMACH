@@ -4,6 +4,7 @@ import {
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   } from "recharts";
 import { allFields } from "./fields";
+import { useMediaQuery } from "@mui/material";
 
   const COLORS = allFields.map(f => f.color);
   
@@ -14,13 +15,14 @@ import { allFields } from "./fields";
     pieData: any[];
   }
   const FundsGraphs =({ type, data, selectedFields, pieData }: Props)=> {
+    const isMobile = useMediaQuery("(max-width:600px)");
     if (type === 0)
       return (
-        <ResponsiveContainer width="100%" height={370}>
+        <ResponsiveContainer width="100%" height={490}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="year" />
-            <YAxis />
+            <YAxis tickCount={7}/>
             <Tooltip formatter={(value) => `₪${Number(value).toLocaleString()}`} />
             <Legend />
             {selectedFields.map((key, idx) => (
@@ -38,11 +40,11 @@ import { allFields } from "./fields";
       );
     if (type === 1)
       return (
-        <ResponsiveContainer width="100%" height={370}>
+        <ResponsiveContainer width="100%" height={490}>
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="year" />
-            <YAxis />
+            <YAxis tickCount={7} />
             <Tooltip formatter={(value) => `₪${Number(value).toLocaleString()}`} />
             <Legend />
             {selectedFields.map((key, idx) => (
@@ -59,13 +61,13 @@ import { allFields } from "./fields";
       );
     if (type === 2)
       return (
-        <ResponsiveContainer width="100%" height={370}>
+        <ResponsiveContainer width="100%" height={490}>
           <PieChart>
             <Pie
               data={pieData}
               cx="50%"
               cy="50%"
-              outerRadius={110}
+              outerRadius={isMobile ? 150 : 220}
               fill="#8884d8"
               dataKey="value"
               label
@@ -82,7 +84,7 @@ import { allFields } from "./fields";
       );
     if (type === 3)
       return (
-        <ResponsiveContainer width="100%" height={370}>
+        <ResponsiveContainer width="100%" height={490}>
           <AreaChart data={data}>
             <defs>
               {selectedFields.map((key, idx) => (
@@ -94,7 +96,7 @@ import { allFields } from "./fields";
             </defs>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="year" />
-            <YAxis />
+            <YAxis tickCount={7} />
             <Tooltip formatter={(value) => `₪${Number(value).toLocaleString()}`} />
             <Legend />
             {selectedFields.map((key, idx) => (
@@ -112,8 +114,10 @@ import { allFields } from "./fields";
         </ResponsiveContainer>
       );
     if (type === 4)
+        console.log('pieData:', pieData);
       return (
-        <ResponsiveContainer width="100%" height={370}>
+        
+        <ResponsiveContainer width="100%" height={490}>
           <RadarChart data={pieData}>
             <PolarGrid />
             <PolarAngleAxis dataKey="name" tick={{ fontSize: 13 }} />
@@ -129,6 +133,8 @@ import { allFields } from "./fields";
             <Tooltip formatter={(value) => `₪${Number(value).toLocaleString()}`} />
           </RadarChart>
         </ResponsiveContainer>
+
+      
       );
     return null;
   }
