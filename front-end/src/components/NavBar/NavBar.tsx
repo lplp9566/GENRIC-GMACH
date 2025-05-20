@@ -42,11 +42,15 @@ export const Navbar = () => {
     <>
       <AppBar position="fixed" sx={{ backgroundColor: '#1E3A3A', direction: 'rtl',
           height: 56,       // גובה אחיד
-          minHeight: 76,    // תמיד 56 פיקסל
-          maxHeight: 76,
+          minHeight: 56,    // תמיד 56 פיקסל
+          maxHeight: 56,
        }}>
-        <Toolbar sx={{ justifyContent: 'flex-start', gap: 2, flexWrap: 'wrap',   // כנ"ל
-           height: 76,
+        <Toolbar sx={{ justifyContent: 'flex-start', gap: 2,   // כנ"ל
+          minHeight: 56,
+          height: 56,
+          maxHeight: 56,
+          flexWrap: "nowrap",   // לא wrap – זה שומר על גובה נמוך
+          overflow: "hidden" 
          }}>
           {/* לוגו + טקסט */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
