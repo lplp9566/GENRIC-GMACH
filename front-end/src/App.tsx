@@ -17,8 +17,6 @@ function App() {
       maxHeight: '100vh',
     }}
     >
-
-
       <Navbar />
       <Box sx={{ mt: 10, px: 2 }}>
         <Routes>
