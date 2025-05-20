@@ -40,7 +40,7 @@ import { useMediaQuery } from "@mui/material";
       );
     if (type === 1)
       return (
-        <ResponsiveContainer width="100%" height={490}>
+        <ResponsiveContainer width="100%" height="70%">
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="year" />

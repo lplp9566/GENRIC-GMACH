@@ -99,7 +99,6 @@ const FundsByYearGraphs = () => {
       flexDirection: "row",
       alignItems: "flex-start",
     //   justifyContent: "space-between", // או: "center" אם אתה רוצה ריווח קבוע
-      width: "100%", 
       maxHeight: "30%",
       mx: "auto",
       mb: 2
