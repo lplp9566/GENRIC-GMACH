@@ -11,7 +11,14 @@ import FundsOverviewByYearPage from './pages/FundsOverviewByYearPage';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter >
+    <Box
+    sx={{
+      maxHeight: '100vh',
+    }}
+    >
+
+
       <Navbar />
       <Box sx={{ mt: 10, px: 2 }}>
         <Routes>
@@ -22,6 +29,7 @@ function App() {
           <Route path="/funds" element={<FundsOverviewPage />} />
           <Route path='FundsOverviewByYear' element={<FundsOverviewByYearPage />} />
         </Routes>
+      </Box>
       </Box>
     </BrowserRouter>
   );

@@ -40,7 +40,7 @@ export const Navbar = () => {
 
   return (
     <>
-      <AppBar position="fixed" sx={{ backgroundColor: '#1E3A3A', direction: 'rtl' }}>
+      <AppBar position="fixed" sx={{ backgroundColor: '#1E3A3A', direction: 'rtl',maxHeight: "10%" }}>
         <Toolbar sx={{ justifyContent: 'flex-start', gap: 2, flexWrap: 'wrap' }}>
           {/* לוגו + טקסט */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

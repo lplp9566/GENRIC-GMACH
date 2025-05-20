@@ -90,7 +90,7 @@ const FundsByYearGraphs = () => {
     borderRadius: 5,
     minHeight: 500,
     background: "linear-gradient(90deg, #f7fafc 80%, #e3f5ff 100%)",
-    
+    maxHeight: "90%"
   }}
 >
   <Box
