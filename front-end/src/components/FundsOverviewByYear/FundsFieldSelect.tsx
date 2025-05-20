@@ -1,4 +1,4 @@
-import { FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, Typography, useMediaQuery } from "@mui/material";
+import { FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, useMediaQuery } from "@mui/material";
 import { allFields } from "./fields";
 
 

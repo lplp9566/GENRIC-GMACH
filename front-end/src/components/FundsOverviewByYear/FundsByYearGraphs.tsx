@@ -62,7 +62,7 @@ const FundsByYearGraphs = () => {
       obj["שנה"] = row.year;
       selectedFields.forEach((key) => {
         const label = allFields.find((f) => f.key === key)?.label ?? key;
-        obj[label] = row[key];
+        obj[label] = (row as Record<string, any>)[key];
       });
       return obj;
     });
