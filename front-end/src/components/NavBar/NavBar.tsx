@@ -42,12 +42,11 @@ export const Navbar = () => {
     <>
       <AppBar position="fixed" sx={{ backgroundColor: '#1E3A3A', direction: 'rtl',
           height: 56,       // גובה אחיד
-          minHeight: 56,    // תמיד 56 פיקסל
-          maxHeight: 56,
+          minHeight: 76,    // תמיד 56 פיקסל
+          maxHeight: 76,
        }}>
-        <Toolbar sx={{ justifyContent: 'flex-start', gap: 2, flexWrap: 'wrap',
-           minHeight: 56,   // כנ"ל
-           height: 56,
+        <Toolbar sx={{ justifyContent: 'flex-start', gap: 2, flexWrap: 'wrap',   // כנ"ל
+           height: 76,
          }}>
           {/* לוגו + טקסט */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -59,13 +58,14 @@ export const Navbar = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: 48,
-                width: 48,
+                height: 40,
+                width: 40,
+
               }}
             >
               <img src="/לוגו.png" alt="לוגו אהבת חסד" style={{ height: 32 }} />
             </Box>
-            <Typography variant="h6" sx={{ color: '#FFFFFF', fontWeight: 'bold' }}>
+            <Typography variant="h6" sx={{ color: '#FFFFFF', fontWeight: 'bold'}}>
               אהבת חסד
             </Typography>
           </Box>
@@ -78,7 +78,7 @@ export const Navbar = () => {
                   key={item.path}
                   component={Link}
                   to={item.path}
-                  sx={{ color: '#FFFFFF' }}
+                  sx={{ color: '#FFFFFF',fontSize: 18,}}
                 >
                   {item.label}
                 </Button>
