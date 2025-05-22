@@ -6,10 +6,11 @@ import FundsFieldSelect from "./FundsFieldSelect";
 import FundsYearSelect from "./FundsYearSelect";
 import FundsTabs from "./FundsTabs";
 import FundsGraphs from "./FundsGraphs";
-import FundsTable from "./FundsTable";
 import { AppDispatch, RootState } from "../../store/store";
 import { getFundsOverviewByYear } from "../../store/features/admin/adminFundsOverviewSlice";
 import * as XLSX from "xlsx";
+import FundsTable from "./Graphs/FundsTable";
+import LoadingIndicator from "../StatusComponents/LoadingIndicator";
 
 const DEFAULT_FIELDS = allFields.slice(0, 3).map((f) => f.key);
 const COLORS = allFields.map((f) => f.color);
@@ -28,7 +29,6 @@ const FundsByYearGraphs = () => {
     dispatch(getFundsOverviewByYear());
   }, [dispatch]);
 
-  // עיבוד הדאטה - לוקח רק ערכים שהם מספר
   const yearlyData = Array.isArray(fundsOverviewByYear)
     ? fundsOverviewByYear
     : [];
@@ -43,10 +43,7 @@ const FundsByYearGraphs = () => {
   const pieData = selectedFields.map((key, idx) => {
     // סוכם את הערך של השדה הזה בכל השנים שבחרו
     const total = filteredData.reduce(
-      (sum, year) => sum + (Number((year as Record<string, any>)[key]) || 0),
-      0
-    );
-
+      (sum, year) => sum + (Number((year as Record<string, any>)[key]) || 0),0);
     return {
       name: allFields.find((f) => f.key === key)?.label ?? key,
       value: total,
@@ -72,14 +69,12 @@ const FundsByYearGraphs = () => {
     XLSX.utils.book_append_sheet(wb, ws, "נתונים");
     XLSX.writeFile(wb, "export.xlsx");
   };
-  // ==== סוף ייצוא ====
-
   const handleFieldChange = (arr: string[]) => {
     setSelectedFields(arr);
   };
 
   if (!fundsOverviewByYear || yearlyData.length === 0) {
-    return <div>טוען נתונים...</div>;
+    return <LoadingIndicator />
   }
 
   return (
@@ -88,7 +83,6 @@ const FundsByYearGraphs = () => {
         mt: 5,
         p: 3,
         background: "linear-gradient(90deg, #f7fafc 80%, #e3f5ff 100%)",
-        // height: "85vh",
       }}
     >
       <Box
@@ -96,13 +90,11 @@ const FundsByYearGraphs = () => {
           display: "flex",
           flexDirection: "row",
           alignItems: "flex-start",
-          //   justifyContent: "space-between", // או: "center" אם אתה רוצה ריווח קבוע
           maxHeight: "30%",
           mx: "auto",
           mb: 2,
         }}
       >
-        {/* כפתור אקסל בצד שמאל (RTL) */}
         <Button
           variant="text"
           sx={{
@@ -123,9 +115,9 @@ const FundsByYearGraphs = () => {
               style={{ width: 32, height: 32 }}
             />
           }
-        ></Button>
+        >
 
-        {/* קופסת הסלקטים והכותרת */}
+        </Button>
         <Box
           sx={{
             display: "flex",

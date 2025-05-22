@@ -22,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "src/components/FundsOverviewPage.tsx"]
+  "include": ["src", "src/components/FundsOverview/FundsOverview.tsx"]
 }

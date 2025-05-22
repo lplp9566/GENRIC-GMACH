@@ -25,13 +25,12 @@ const  FundsTabs = ({ value, onChange }: Props)=> {
       }}
       variant="fullWidth"
     >
-
       {tabs.map((t, i) => (
         <Tab
           key={i}
           icon={
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: 28 }}>{t.icon}</span>
+              <span style={{ fontSize: 16 }}>{t.icon}</span>
               <span style={{ fontSize: 13 }}>{t.label}</span>
             </Box>
           }

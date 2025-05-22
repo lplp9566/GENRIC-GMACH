@@ -3,9 +3,9 @@ import { Box } from '@mui/material';
 import { Navbar } from './components/NavBar/NavBar';
 import { NewLoan } from './pages/NewLoan';
 import Loans from './pages/Loans';
-import HomePage from './components/HomePage';
+import HomePage from './components/HomePage/HomePage';
 import FundsOverviewByYearTable from './components/FundsOvTable';
-import FundsOverviewPage from './components/FundsOverviewPage';
+import FundsOverview from './components/FundsOverview/FundsOverview';
 import FundsOverviewByYearPage from './pages/FundsOverviewByYearPage';
 
 
@@ -21,7 +21,7 @@ function App() {
           <Route path="/Home" element={<HomePage />} />
           <Route path="/loans/new" element={<NewLoan  />} />
           <Route path="/loans/:id" element={<FundsOverviewByYearTable />} />
-          <Route path="/funds" element={<FundsOverviewPage />} />
+          <Route path="/funds" element={<FundsOverview />} />
           <Route path='FundsOverviewByYear' element={<FundsOverviewByYearPage />} />
         </Routes>
       </Box>
