@@ -3,6 +3,7 @@ import LineChartGraph from "./Graphs/LineChartGraph";
 import BarChartGraph from "./Graphs/BarChartGraph";
 import PieChartGraph from "./Graphs/PieChartGraph";
 import RadarChartGraph from "./Graphs/RadarChartGraph";
+import AreaChartGraph from "./Graphs/AreaChartGraph";
 
   const COLORS = allFields.map(f => f.color);
   
@@ -28,10 +29,9 @@ import RadarChartGraph from "./Graphs/RadarChartGraph";
       );
     if (type === 3)
       return (
-       <BarChartGraph COLORS={COLORS} data={data} selectedFields={selectedFields}/>
+    <AreaChartGraph COLORS={COLORS} data={data} selectedFields={selectedFields}/>
       );
     if (type === 4)
-        console.log('pieData:', pieData);
       return (
         <RadarChartGraph RadarData={pieData}/>
       );

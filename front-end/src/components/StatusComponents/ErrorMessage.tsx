@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import React from 'react'
 interface Props {
-    errorMessage: string
+    errorMessage: string | null | undefined;
 }
 const ErrorMessage: React.FC<Props> = ({errorMessage}) => {
   return (
