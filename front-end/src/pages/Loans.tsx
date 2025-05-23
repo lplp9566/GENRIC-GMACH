@@ -2,9 +2,7 @@ import { useEffect } from 'react';
 import { Card, CardContent, Typography, Grid, Box, Button, ThemeProvider, CssBaseline } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../store/store';
-import { getAllUsers } from '../store/features/admin/adminUsersSlice';
-
+import { AppDispatch, RootState } from '../store/store';
 // Icons
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -16,70 +14,9 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // עבור �
 import TrendingDownIcon from '@mui/icons-material/TrendingDown'; // עבור יתרה שנותרה
 import PaymentsIcon from '@mui/icons-material/Payments'; // עבור תשלום חודשי
 import { loanTheme } from '../components/Loans/LoanTheme';
+import { getAllLoans } from '../store/features/admin/adminLoanSlice';
+import { ILoan } from '../components/Loans/LoaDto';
 
-// ממשק חדש לנתוני הלוואה
-interface Loan {
-  id: number;
-  borrower: string; // נשאיר את זה זמנית, או נקשר למשתמש אמיתי
-  loan_amount: number;
-  loan_date: string; // YYYY-MM-DD
-  monthly_payment: number;
-  payment_date: number; // יום בחודש
-  isActive: boolean;
-  remaining_balance: number;
-  initialMonthlyPayment?: number; // אופציונלי, כפי שהיה בקוד שלך
-  total_instalments: number;
-}
-
-
-// נתוני הלוואות מעודכנים (נתוני דמה)
-const loansData: Loan[] = [
-  {
-    id: 1,
-    borrower: 'משה כהן',
-    loan_amount: 12000,
-    loan_date: '2024-03-15',
-    monthly_payment: 250,
-    payment_date: 10,
-    isActive: true,
-    remaining_balance: 7500,
-    total_instalments: 36,
-  },
-  {
-    id: 2,
-    borrower: 'יוסף לוי',
-    loan_amount: 8000,
-    loan_date: '2023-01-01',
-    monthly_payment: 150,
-    payment_date: 5,
-    isActive: false, // הלוואה שולמה
-    remaining_balance: 0,
-    total_instalments: 24,
-  },
-  {
-    id: 3,
-    borrower: 'רבקה ישראלי',
-    loan_amount: 15000,
-    loan_date: '2024-05-20',
-    monthly_payment: 500,
-    payment_date: 1,
-    isActive: true,
-    remaining_balance: 14500,
-    total_instalments: 30,
-  },
-  {
-    id: 4,
-    borrower: 'דוד כץ',
-    loan_amount: 5001,
-    loan_date: '2025-05-05',
-    monthly_payment: 100,
-    payment_date: 5,
-    isActive: true,
-    remaining_balance: 4800,
-    initialMonthlyPayment: 1,
-    total_instalments: 48
-  },
-];
 
 // Helper function for status colors
 const getStatusColor = (isActive: boolean, remainingBalance: number) => {
@@ -123,18 +60,21 @@ const getStatusIcon = (isActive: boolean, remainingBalance: number) => {
 
 const Loans = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { allUsers } = useSelector(
-    (state: RootState) => state.adminUsers
+  const dispatch = useDispatch<AppDispatch>();
+  const { allLoans } = useSelector(
+    (state: RootState) => state.adminLoansSlice
   );
+const loansData:ILoan[] = Array.isArray(allLoans) ? allLoans : [];
+
+  
 
   useEffect(() => {
-    dispatch(getAllUsers() as any);
+    dispatch(getAllLoans());
   }, [dispatch]);
 
   useEffect(() => {
-    console.log("📦 allUsers:", allUsers);
-  }, [allUsers]);
+    console.log("📦 allUsers:", allLoans);
+  }, [allLoans]);
 
   return (
     <ThemeProvider theme={loanTheme}>
@@ -163,7 +103,7 @@ const Loans = () => {
               <Card onClick={() => navigate(`/loans/${loan.id}`)}>
                 <CardContent>
                   <Typography variant="h6" sx={{ color: loanTheme.palette.text.primary, mb: 2 }}>
-                    פרטי הלוואה: {loan.borrower}
+                    פרטי הלוואה: {`${loan.user.first_name} ${loan.user.last_name}`}
                   </Typography>
 
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
@@ -190,7 +130,7 @@ const Loans = () => {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <CalendarTodayIcon sx={{ color: loanTheme.palette.text.secondary }} />
                     <Typography variant="body1" sx={{ color: loanTheme.palette.text.secondary }}>
-                      יום תשלום: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}>{loan.payment_date}</Typography>
+                      יום תשלום: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}>{loan.monthly_payment}</Typography>
                     </Typography>
                   </Box>
 
@@ -213,7 +153,7 @@ const Loans = () => {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <CalendarTodayIcon sx={{ color: loanTheme.palette.text.secondary }} />
                     <Typography variant="body1" sx={{ color: loanTheme.palette.text.secondary }}>
-                      סה"כ תשלומים: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}>{loan.total_instalments}</Typography>
+                      סה"כ תשלומים: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}>{loan.total_installments}</Typography>
                     </Typography>
                   </Box>
 
