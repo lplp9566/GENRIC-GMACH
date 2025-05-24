@@ -42,7 +42,7 @@ export const Navbar = () => {
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor: theme.palette.primary.main, // כחול-ים עמוק
+          backgroundColor: "#003366"  ,
           direction: "rtl",
           boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.15)', // צל מעט בולט
         }}

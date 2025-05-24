@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { LoansService } from './loans.service';
 import { LoanEntity } from './Entity/loans.entity';
 import { LoanActionEntity } from './loan-actions/Entity/loan_actions.entity';
@@ -16,8 +16,10 @@ export class LoansController {
   async getLoans() {
     return this.loansService.getLoans();
   }
-  @Get('loan/:id')
-  async getLoan(@Body('id') id: number) {
+  @Get(':id')
+  async getLoan(
+    @Param('id', ParseIntPipe) id: number
+  ){
     return this.loansService.getLoanById(id);
   }
 

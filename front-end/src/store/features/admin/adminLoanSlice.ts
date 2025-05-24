@@ -1,15 +1,17 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Status } from "../../../components/NavBar/Users/UsersDto";
 import axios from "axios";
-import { ILoan } from "../../../components/Loans/LoaDto";
+import { ILoan, ILoanAction } from "../../../components/Loans/LoanDto";
 
 interface AdminLoanType {
-    allLoans:ILoan[] |null
+    allLoans:ILoan[] 
+    loanActions:ILoanAction[],
         status:Status,
         error: string | null;
 }
 const initialState:AdminLoanType = {
-    allLoans:null ,
+    allLoans:[] ,
+    loanActions:[],
     error :null ,
     status :'idle'
 }
@@ -23,6 +25,14 @@ const initialState:AdminLoanType = {
         return response.data
     }
  )
+ export const getAllLoanActions = createAsyncThunk(
+    'admin/getAllLoanActions',
+    async()=>{
+        const response = await axios.get(`${BASE_URL}/loan-actions`)
+        console.log(response)
+        return response.data
+    }
+)
  export const AdminLoansSlice =createSlice({
     name:'adminLoans',
     initialState,
@@ -31,7 +41,7 @@ const initialState:AdminLoanType = {
         builder 
         .addCase(getAllLoans.pending,(state)=>{
             state.status ='pending',
-            state.allLoans = null,
+            state.allLoans = [],
             state.error = null
         })
         .addCase(getAllLoans.fulfilled,(state,action)=>{
@@ -40,9 +50,24 @@ const initialState:AdminLoanType = {
             state.error = null
         })
         .addCase(getAllLoans.rejected,(state,action)=>{
-            state.allLoans = null,
+            state.allLoans = [],
             state.error = action.error.message || null,
             state.status = 'rejected'
+        })
+        .addCase(getAllLoanActions.pending,(state)=>{
+            state.status ='pending',
+            state.loanActions = [],
+            state.error = null
+        })
+        .addCase(getAllLoanActions.fulfilled,(state,action)=>{
+            state.loanActions = action.payload
+            state.status ='fulfilled' ,
+            state.error = null
+        })
+        .addCase(getAllLoanActions.rejected,(state,action)=>{
+            state.loanActions = [],
+            state.error = action.error.message || null,
+            state.status = 'rejected'   
         })
     }
  }) 

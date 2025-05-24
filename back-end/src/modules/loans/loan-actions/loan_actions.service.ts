@@ -130,5 +130,16 @@ export class LoanActionsService {
       throw new Error(error.message);
     }
   }
- 
+ async getAllActions(): Promise<LoanActionEntity[]> {
+    try {
+      const actions = await this.paymentsRepo.find({
+        order: { date: 'ASC' },
+        relations: ['loan', 'loan.user'],
+      });
+      return actions;
+    } catch (error) {
+      console.error('❌ Error in getAllActions:', error.message);
+      throw new Error(error.message);
+    }
+  }
 }
