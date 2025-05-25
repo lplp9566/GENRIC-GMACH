@@ -22,7 +22,7 @@ export class LoanEntity {
 
   @Column({ type: 'date' })
   loan_date: Date;
-  @Column({type:'text'})
+  @Column({type:'text',  nullable: true})
   purpose: string; //ropes
 
   @Column({ type: 'float' })
