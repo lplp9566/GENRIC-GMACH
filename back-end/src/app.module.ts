@@ -47,8 +47,8 @@ import { DepositsActionsModule } from './modules/deposits/deposits-actions/depos
         autoLoadEntities: true,
         synchronize: true,
         ssl: process.env.NODE_ENV === 'production'
-          ? { rejectUnauthorized: false } 
-          : false, // ללא SSL בלוקאלי
+          ? { rejectUnauthorized: true } 
+          : true, // ללא SSL בלוקאלי
       }),
     }),
     

@@ -16,6 +16,7 @@ export interface ILoan {
   };
   loan_amount: number;
   loan_date: string;
+    purpose: string; 
   monthly_payment: number;
   isActive: boolean;
   remaining_balance: number;

@@ -22,6 +22,8 @@ export class LoanEntity {
 
   @Column({ type: 'date' })
   loan_date: Date;
+  @Column({type:'text'})
+  purpose: string; //ropes
 
   @Column({ type: 'float' })
   monthly_payment: number;
