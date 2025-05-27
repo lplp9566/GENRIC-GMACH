@@ -34,6 +34,7 @@ describe('LoanActionsService', () => {
     remaining_balance: 1000,
     initialMonthlyPayment: 100,
     total_installments: 10,
+    purpose: 'Test Loan',
     payments: [],
     user: { id: 1 } as UserEntity,
   };

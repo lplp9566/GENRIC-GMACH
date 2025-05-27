@@ -69,6 +69,10 @@ const limit = opts.limit && opts.limit > 0 ? Math.min(opts.limit, 100) : 50;
 
   async createLoan(loanData: Partial<LoanEntity>) {
     try {
+          const fund_details = await this.fundsOverviewService.getFundDetails();
+    if(fund_details.available_funds<loanData?.loan_amount!){
+      throw new BadRequestException('אין מספיק כסף במערכת להוציא הלוואה על סכום זה');
+    }
       const loanRecord = this.loansRepository.create(loanData);
       loanRecord.remaining_balance = loanRecord.loan_amount;
       loanRecord.total_installments = loanRecord.loan_amount / loanRecord.monthly_payment;

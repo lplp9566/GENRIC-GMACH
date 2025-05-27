@@ -139,6 +139,7 @@ describe('LoansService', () => {
       payment_date: 15,
       initialMonthlyPayment: 100,
       total_installments: 10,
+      purpose: 'Test Loan',
       payments: [],
       user: mockUser,
     };
@@ -182,6 +183,7 @@ describe('LoansService', () => {
         payment_date: 15,
         initialMonthlyPayment: 100,
         total_installments: 12,
+        purpose: 'Test Loan',
         payments: [],
         user: mockUser,
       };
@@ -207,6 +209,7 @@ describe('LoansService', () => {
     it('should update loan payment date and save payment event', async () => {
       const dto = { loanId: 1, amount: 15, date: new Date() } as any;
       const mockLoan: LoanEntity = {
+        purpose: 'Test Loan',
         id: 1,
         isActive: true,
         payment_date: 10,
