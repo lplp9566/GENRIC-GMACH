@@ -205,6 +205,7 @@ describe('LoansService', () => {
     });
   });
 
+  
   describe('changeDateOfPayment', () => {
     it('should update loan payment date and save payment event', async () => {
       const dto = { loanId: 1, amount: 15, date: new Date() } as any;
