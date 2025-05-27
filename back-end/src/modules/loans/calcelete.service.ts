@@ -110,10 +110,10 @@ export class FundsFlowService {
       ]);
       const availableFunds = fund_details.available_funds;
       const availableFundsAfterLoan = fund_details.available_funds - newLoan?.loan_amount!;
-      console.log(availableFunds,"available_funds")
-      console.log(availableFundsAfterLoan,"available_funds")
-      console.log(monthlyInflowsTotal,"totalInflows")
-      console.log(loanPaymentsInflowsTotal,"totalOutflows")
+      // console.log(availableFunds,"available_funds")
+      // console.log(availableFundsAfterLoan,"available_funds")
+      // console.log(monthlyInflowsTotal,"totalInflows")
+      // console.log(loanPaymentsInflowsTotal,"totalOutflows")
       const availableCash = monthlyInflowsTotal + availableFundsAfterLoan + loanPaymentsInflowsTotal;
       if (availableCash < requiredBalance) {
         console.log("❌ עד", checkpointDate.toISOString(), "is", availableCash, "need", requiredBalance);
