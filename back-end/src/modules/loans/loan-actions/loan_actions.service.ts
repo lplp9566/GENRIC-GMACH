@@ -59,8 +59,6 @@ export class LoanActionsService {
     } catch (error) {
       throw new BadRequestException(error.message);
     }
-
-    
   }
 
   async addLoanPayment(dto: LoanActionDto): Promise<LoanActionEntity> {
@@ -103,9 +101,10 @@ export class LoanActionsService {
         this.fundsOverview.repayLoan(dto.value),
         this.fundsOverviewByYearService.recordLoanRepaid(year, dto.value),
       ]);
-      await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
-
+      await this.LoanActionBalanceService.computeLoanNetBalance(loan.id)
+      
       return newPayment;
+
     } catch (error) {
       console.error('❌ Error in addPayment:', error.message);
       throw new BadRequestException(error.message);

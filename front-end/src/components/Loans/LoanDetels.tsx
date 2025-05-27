@@ -19,8 +19,9 @@ import {
   ThemeProvider
 } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { getAllLoanActions } from '../../store/features/admin/adminLoanSlice';
+
 import { loanTheme } from './LoanTheme';
+import { getAllLoanActions } from '../../store/features/admin/adminLoanSlice';
 
 export const LoanDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();

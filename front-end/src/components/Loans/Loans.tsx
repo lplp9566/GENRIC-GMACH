@@ -1,7 +1,7 @@
 
 import { ThemeProvider } from '@emotion/react';
 import { loanTheme } from './LoanTheme';
-import { Box, Button, Card, CardContent, CssBaseline, Grid, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Chip, CssBaseline, Grid, Typography } from '@mui/material';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; 
 import TrendingDownIcon from '@mui/icons-material/TrendingDown'; 
@@ -13,9 +13,10 @@ import { ILoan } from './LoanDto';
 import { useNavigate } from 'react-router-dom';
 interface LoanProps{
   loansData: ILoan[];
+  total: number
   user?: any
 }
-const Loans : React.FC<LoanProps> = ({loansData, user}) => {
+const Loans : React.FC<LoanProps> = ({loansData, user, total}) => {
     const { getStatusColor, getStatusText, getStatusIcon } = useLoanHelpers();
       const navigate = useNavigate();
   return (
@@ -26,7 +27,7 @@ const Loans : React.FC<LoanProps> = ({loansData, user}) => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <PeopleOutlineIcon sx={{ fontSize: 40, color: loanTheme.palette.primary.main }} />
             <Typography variant="h4" component="h1" sx={{ color: loanTheme.palette.text.primary, fontWeight: 700 }}>
-              סה"כ הלוואות: {loansData.length}
+              סה"כ הלוואות: {total}
             </Typography>
           </Box>
           <Button
@@ -44,8 +45,28 @@ const Loans : React.FC<LoanProps> = ({loansData, user}) => {
             <Grid item xs={12} sm={6} md={4} key={loan.id}>
               <Card onClick={() => navigate(`/loans/${loan.id}`)}>
                 <CardContent>
+                   <Chip
+                  label={`#${loan.id}`}
+                  size="small"
+                  color="primary"
+                  sx={{
+                    position: 'absolute',
+                    top: 8,
+                    left: 8,
+                    fontWeight: 700,
+                  }}
+                />
+
+                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', }}>
+                    <Typography variant="h5" sx={{ color: loanTheme.palette.text.primary, mb: 2, marginLeft: '100px'  }}>
+                      {user ? `${user.first_name} ${user.last_name}` : `${loan.user.first_name} ${loan.user.last_name}`}
+                    </Typography>
+                    <Typography variant="subtitle1" sx={{ color: loanTheme.palette.text.secondary, mb: 2 }}>
+                      {loan.user.id}
+                    </Typography>
+                  </div>
                   <Typography variant="h6" sx={{ color: loanTheme.palette.text.primary, mb: 2 }}>
-                      פרטי הלוואה: {user ?`${user.first_name} ${user.last_name}` : `${loan.user.first_name} ${loan.user.last_name}`}
+                      פרטי הלוואה: {loan.purpose}
                     
                   </Typography>
 

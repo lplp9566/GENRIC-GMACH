@@ -87,7 +87,7 @@ export class FundsFlowService {
   async getCashFlowTotals(from: Date, newLoan?: Partial<LoanEntity>) {
     const fund_details = await this.fundsOverviewService.getFundDetails();
     if(fund_details.available_funds<newLoan?.loan_amount!){
-      throw new BadRequestException('not available money');
+      throw new BadRequestException('אין מספיק כסף במערכת להוציא הלוואה על סכום זה');
     }
     const deposits = await this.depositsService.getDepositsActive();
     if(deposits.length == 0) return true;
@@ -115,8 +115,6 @@ export class FundsFlowService {
       console.log(monthlyInflowsTotal,"totalInflows")
       console.log(loanPaymentsInflowsTotal,"totalOutflows")
       const availableCash = monthlyInflowsTotal + availableFundsAfterLoan + loanPaymentsInflowsTotal;
-  
-      // שלב 4: השוואה
       if (availableCash < requiredBalance) {
         console.log("❌ עד", checkpointDate.toISOString(), "is", availableCash, "need", requiredBalance);
         allGood = false;

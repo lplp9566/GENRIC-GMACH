@@ -11,6 +11,7 @@ import { LoanActionDto, LoanPaymentActionType } from './loan-dto/loanTypes';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { FundsFlowService } from './calcelete.service';
 import { LoanEntity } from './Entity/loans.entity';
+import { FindLoansOpts, PaginatedResult } from 'src/common';
 // cSpell:ignore Financials
 
 @Injectable()
@@ -27,17 +28,47 @@ export class LoansService {
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
     private readonly fundsFlowService:FundsFlowService
   ) {}
-  async getLoans(): Promise<LoanEntity[]> {
+  async getLoans(opts:FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
+    const page  = opts.page  && opts.page  > 0 ? opts.page  : 1;
+const limit = opts.limit && opts.limit > 0 ? Math.min(opts.limit, 100) : 50;
     try {
-      return this.loansRepository.find({ relations: ['user'] });
+      const where = opts.userId? { user: { id: opts.userId } } : {};
+      const [data, total] = await this.loansRepository.findAndCount({
+        where,
+        relations: ['user'],      
+        skip: (page - 1) * limit,
+        take: limit,
+        order: { loan_date: 'DESC' }
+      });
+      const pageCount = Math.ceil(total / limit);
+      return { data, total, page, pageCount };
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
+  async checkLoan(
+    loanData: Partial<LoanEntity>
+  ): Promise<{ ok: true } | { ok: false; error: string }> {
+    try {
+      const fromDate = new Date(loanData.loan_date!);
+      const success = await this.fundsFlowService.getCashFlowTotals(
+        fromDate,
+        loanData
+      );
+      // אם הפונקציה מחזירה false, נתייחס לזה כשגיאה
+      if (!success) {
+        return { ok: false, error: 'לא מספיק כסף במערכת' };
+      }
+      return { ok: true };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.log(message)
+      return { ok: false, error: message };
+    }
+  }
+
   async createLoan(loanData: Partial<LoanEntity>) {
     try {
-   const success =  await this.fundsFlowService.getCashFlowTotals(new Date(loanData.loan_date!), loanData);
-   if(!success) throw new Error('you need the mony for the deposit');
       const loanRecord = this.loansRepository.create(loanData);
       loanRecord.remaining_balance = loanRecord.loan_amount;
       loanRecord.total_installments = loanRecord.loan_amount / loanRecord.monthly_payment;
@@ -62,7 +93,6 @@ export class LoansService {
         year,
         loanRecord.loan_amount,
       );
-
       return loanRecord;
     } catch (error) {
       throw new BadRequestException(error.message);
