@@ -10,7 +10,6 @@ import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UsersService } from '../users/users.service';
 import { LoanPaymentActionType } from './loan-dto/loanTypes';
 import { UserEntity } from '../users/user.entity';
-import { PaymentDetailsEntity } from '../users/payment-details/payment_details.entity';
 import { UserFinancialEntity } from '../users/user-financials/user-financials.entity';
 import { payment_method, UserRole } from '../users/userTypes';
 import { FundsFlowService } from './calcelete.service';
@@ -208,7 +207,7 @@ describe('LoansService', () => {
   
   describe('changeDateOfPayment', () => {
     it('should update loan payment date and save payment event', async () => {
-      
+
       const dto = { loanId: 1, amount: 15, date: new Date() } as any;
       const mockLoan: LoanEntity = {
         purpose: 'Test Loan',
