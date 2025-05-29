@@ -19,7 +19,6 @@ import {
   ThemeProvider
 } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-
 import { loanTheme } from './LoanTheme';
 import { getAllLoanActions } from '../../store/features/admin/adminLoanSlice';
 

@@ -16,7 +16,7 @@ export interface ILoan {
   };
   loan_amount: number;
   loan_date: string;
-    purpose: string; 
+  purpose: string;
   monthly_payment: number;
   isActive: boolean;
   remaining_balance: number;
@@ -30,7 +30,19 @@ export interface ILoanAction {
   date: string;
   value: number;
 }
- export enum LoanPaymentActionType {
+export interface ICreateLoan {
+  user: number;
+  loan_amount: number;
+  loan_date: string;
+  purpose: string;
+  monthly_payment: number;
+  payment_date: number;
+}
+export interface ILoanCheckResponse {
+  ok: boolean;
+  error: string;
+}
+export enum LoanPaymentActionType {
   PAYMENT = "PAYMENT",
   AMOUNT_CHANGE = "AMOUNT_CHANGE",
   MONTHLY_PAYMENT_CHANGE = "MONTHLY_PAYMENT_CHANGE",

@@ -1,12 +1,11 @@
 
 import { ThemeProvider } from '@emotion/react';
 import { loanTheme } from './LoanTheme';
-import { Box, Button, Card, CardContent, Chip, CssBaseline, Grid, Typography } from '@mui/material';
+import { Box, Card, CardContent, Chip, CssBaseline, Grid, Typography } from '@mui/material';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; 
 import TrendingDownIcon from '@mui/icons-material/TrendingDown'; 
 import PaymentsIcon from '@mui/icons-material/Payments'; 
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { useLoanHelpers } from '../../Hooks/LoanHooks/LoanHooksStatus';
 import { ILoan } from './LoanDto';
@@ -30,14 +29,7 @@ const Loans : React.FC<LoanProps> = ({loansData, user, total}) => {
               סה"כ הלוואות: {total}
             </Typography>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<AddCircleOutlineIcon />}
-            onClick={() => navigate('/loans/new')}
-            color="primary"
-          >
-            הלוואה חדשה
-          </Button>
+
         </Box>
 
         <Grid container spacing={4}>
