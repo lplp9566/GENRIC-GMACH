@@ -11,7 +11,7 @@ import { LoanActionDto, LoanPaymentActionType } from './loan-dto/loanTypes';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { FundsFlowService } from './calcelete.service';
 import { LoanEntity } from './Entity/loans.entity';
-import { FindLoansOpts, LoanStatus, PaginatedResult } from 'src/common';
+import { FindLoansOpts, LoanStatus, PaginatedResult } from '../../common/index';
 // cSpell:ignore Financials
 
 @Injectable()
