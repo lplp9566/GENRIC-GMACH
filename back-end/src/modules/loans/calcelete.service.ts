@@ -98,11 +98,12 @@ export class FundsFlowService {
     ]
       .map(dateStr => new Date(dateStr))
       .sort((a, b) => a.getTime() - b.getTime());
+    // console.log(uniqueDates,"uniqueDates")
     for (const checkpointDate of uniqueDates) {
       // שלב 2: סך כל ההפקדות שפוקעות עד התאריך הזה
       const relevantDeposits = deposits.filter(d => new Date(d.end_date) <= checkpointDate);
       const requiredBalance = relevantDeposits.reduce((sum, d) => sum + d.current_balance, 0) - totalInflows;
-      console.log(requiredBalance,"requiredBalance")
+      // console.log(requiredBalance,"requiredBalance")
       // שלב 3: חישוב תזרים עד אותו תאריך
       const [monthlyInflowsTotal, loanPaymentsInflowsTotal] = await Promise.all([
         this.calculateTotalMonthlyInflows(from, checkpointDate),
@@ -111,16 +112,23 @@ export class FundsFlowService {
       const availableFunds = fund_details.available_funds;
       const availableFundsAfterLoan = fund_details.available_funds - newLoan?.loan_amount!;
       // console.log(availableFunds,"available_funds")
-      // console.log(availableFundsAfterLoan,"available_funds")
-      // console.log(monthlyInflowsTotal,"totalInflows")
-      // console.log(loanPaymentsInflowsTotal,"totalOutflows")
+      // console.log(availableFundsAfterLoan,"availableFundsAfterLoan")
+      // console.log(monthlyInflowsTotal,"monthlyInflowsTotal")
+      // console.log(loanPaymentsInflowsTotal,"loanPaymentsInflowsTotal")
       const availableCash = monthlyInflowsTotal + availableFundsAfterLoan + loanPaymentsInflowsTotal;
+      // console.log(availableCash,"availableCash")
       if (availableCash < requiredBalance) {
-        console.log("❌ עד", checkpointDate.toISOString(), "is", availableCash, "need", requiredBalance);
+        // console.log("❌ עד", checkpointDate.toISOString(), "is", availableCash, "need", requiredBalance);
         allGood = false;
-        throw new BadRequestException(`אתה יכול להוציא הלוואה רק על סכום ${requiredBalance-availableCash}`);        
+        if(availableCash< requiredBalance){
+          throw new BadRequestException(`אין מספיק כסף במערכת להוציא הלוואה על סכום זה, עד ${checkpointDate.toISOString().slice(0, 10)} יהיה זמין רק  ${availableCash} שח, וצריך ${requiredBalance} שח`);
+        }
+        else {
+          throw new BadRequestException(`אתה יכול להוציא הלוואה רק על סכום ${availableCash-requiredBalance} ש"ח, עד ${checkpointDate.toISOString()}   יהיה  בקרן רק  ${availableCash} שח, וצריך ${requiredBalance} שח`);
+        }
+        // throw new BadRequestException(`אתה יכול להוציא הלוואה רק על סכום ${availableCash-requiredBalance} `);        
       } else {
-        console.log("✅ עד", checkpointDate.toISOString(),"is", availableCash, "need", requiredBalance);
+        // console.log("✅ עד", checkpointDate.toISOString(),"is", availableCash, "need", requiredBalance);
         totalInflows += requiredBalance;
       }
     }

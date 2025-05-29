@@ -1,11 +1,17 @@
 export  interface FindLoansOpts {
-  page?: number;
-  limit?: number;
-  userId?: number;
+  page: number;
+  limit: number;
+  status:LoanStatus;
+  
 }
 export interface PaginatedResult<T> {
   data: T[];
   total: number;
   page: number;
   pageCount: number;
+}
+export enum LoanStatus {
+  ALL      = 'all',
+  ACTIVE   = 'active',
+  INACTIVE = 'inactive',
 }

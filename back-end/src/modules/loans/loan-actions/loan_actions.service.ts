@@ -80,9 +80,7 @@ export class LoanActionsService {
         value: dto.value,
         action_type: LoanPaymentActionType.PAYMENT,
       });
-      if (loan.remaining_balance === 0) {
-        loan.isActive = false;
-      }
+
       await this.loansRepo.save(loan);
 
       await this.paymentsRepo.save(newPayment);
@@ -90,7 +88,9 @@ export class LoanActionsService {
       loan.remaining_balance -= dto.value;
       if (loan.remaining_balance < 0) loan.remaining_balance = 0;
       loan.total_installments = loan.remaining_balance / loan.monthly_payment;
-
+            if (loan.remaining_balance === 0) {
+        loan.isActive = false;
+      }
       await this.loansRepo.save(loan);
 
       const year = getYearFromDate(dto.date);
