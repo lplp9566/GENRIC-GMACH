@@ -1,12 +1,13 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { Navbar } from './components/NavBar/NavBar';
-import { NewLoan } from './pages/NewLoan';
 import LoansPage from './pages/LoansPage';
 import HomePage from './components/HomePage/HomePage';
 import FundsOverview from './components/FundsOverview/FundsOverview';
 import FundsOverviewByYearPage from './pages/FundsOverviewByYearPage';
 import LoanDetels from './components/Loans/LoanDetels';
+import NewLoan from './components/Loans/NewLoan/NewLoan';
+
 
 
 function App() {

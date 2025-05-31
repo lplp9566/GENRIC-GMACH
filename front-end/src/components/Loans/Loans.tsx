@@ -109,7 +109,7 @@ const Loans : React.FC<LoanProps> = ({loansData, user, total}) => {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <CalendarTodayIcon sx={{ color: loanTheme.palette.text.secondary }} />
                     <Typography variant="body1" sx={{ color: loanTheme.palette.text.secondary }}>
-                      סה"כ תשלומים: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}>{loan.total_installments}</Typography>
+                      סה"כ תשלומים: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}> {Math.ceil(loan.total_installments)}</Typography>
                     </Typography>
                   </Box>
 

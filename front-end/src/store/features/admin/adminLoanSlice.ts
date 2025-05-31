@@ -14,11 +14,12 @@ interface AdminLoanType {
   loanActions: ILoanAction[];
   status: Status;
   checkLoanStatus: Status;
+  createLoanStatus: Status;
   error: string | null;
   page: number;
   pageCount: number;
   total: number;
-  checkLoan: ILoanCheckResponse;
+  checkLoanResponse: ILoanCheckResponse;
 }
 const initialState: AdminLoanType = {
   allLoans: [],
@@ -26,10 +27,11 @@ const initialState: AdminLoanType = {
   error: null,
   status: "idle",
   checkLoanStatus: "idle",
+  createLoanStatus: "idle",
   pageCount: 1,
   page: 1,
   total: 0,
-  checkLoan: {
+  checkLoanResponse: {
     ok: false,
     error: "",
   },
@@ -40,8 +42,8 @@ export const getAllLoans = createAsyncThunk<
   PaginatedResult<ILoan>,
   FindLoansOpts
 >("admin/getAllLoans", async (opts) => {
-    console.log("getAllLoans called with opts:", opts);
-    
+  console.log("getAllLoans called with opts:", opts);
+
   const response = await axios.get<PaginatedResult<ILoan>>(
     `${BASE_URL}/loans`,
     { params: opts }
@@ -56,6 +58,14 @@ export const checkLoan = createAsyncThunk(
       `${BASE_URL}/loans/check-loan`,
       loan
     );
+    console.log(response);
+    return response.data;
+  }
+);
+export const createLoan = createAsyncThunk(
+  "admin/createLoan",
+  async (loan: ICreateLoan) => {
+    const response = await axios.post<ILoan>(`${BASE_URL}/loans`, loan);
     console.log(response);
     return response.data;
   }
@@ -110,16 +120,29 @@ export const AdminLoansSlice = createSlice({
       })
       .addCase(checkLoan.pending, (state) => {
         state.checkLoanStatus = "pending";
-        state.checkLoan = { ok: false, error: "" };
+        state.checkLoanResponse = { ok: false, error: "" };
       })
       .addCase(checkLoan.fulfilled, (state, action) => {
-        state.checkLoan = action.payload;
+        state.checkLoanResponse = action.payload;
         state.checkLoanStatus = "fulfilled";
       })
-        .addCase(checkLoan.rejected, (state, action) => {
-            state.checkLoanStatus = "rejected";
-            state.checkLoan = { ok: false, error: action.error.message || "" };
-        });
+      .addCase(checkLoan.rejected, (state, action) => {
+        state.checkLoanStatus = "rejected";
+        state.checkLoanResponse = { ok: false, error: action.error.message || "" };
+      })
+      .addCase(createLoan.pending, (state) => {
+        state.createLoanStatus = "pending";
+        state.error = null;
+      })
+      .addCase(createLoan.fulfilled, (state, action) => {
+        state.allLoans.push(action.payload);
+        state.createLoanStatus = "fulfilled";
+        state.error = null;
+      })
+      .addCase(createLoan.rejected, (state, action) => {
+        state.createLoanStatus = "rejected";
+        state.error = action.error.message || "Failed to create loan";
+      });
   },
 });
 export const { setPage } = AdminLoansSlice.actions;

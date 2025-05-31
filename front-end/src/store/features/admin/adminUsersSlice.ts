@@ -5,13 +5,13 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 axios.defaults.withCredentials = true;
 
  interface AdminUsersType{
-    allUsers:IUser[] | null
+    allUsers:IUser[] | []
     status:Status,
     error: string | null;
 
  }
  const initialState:AdminUsersType ={
-    allUsers:null,
+    allUsers:[],
     status:"idle",
     error: null
  }
@@ -33,7 +33,7 @@ axios.defaults.withCredentials = true;
             .addCase(getAllUsers.pending,(state)=>{
                 state.status = "pending",
                 state.error = null,
-                state.allUsers = null
+                state.allUsers = []
             })
             .addCase(getAllUsers.fulfilled,(state,action)=>{
                 state.status = "fulfilled",
@@ -43,7 +43,7 @@ axios.defaults.withCredentials = true;
             .addCase(getAllUsers.rejected,(state,action)=>{
                 state.status = "rejected",
                 state.error = action.error.message || null,
-                state.allUsers = null
+                state.allUsers = []
             })
         }
     })

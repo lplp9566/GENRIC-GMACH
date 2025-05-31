@@ -20,9 +20,11 @@ import { getAllLoans, setPage } from "../store/features/admin/adminLoanSlice";
 import Loans from "../components/Loans/Loans";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
 import { LoanStatus } from "../common/indexTypes";
+import { useNavigate } from "react-router-dom";
 
 export const LoansPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
   const [filter, setFilter] = useState<LoanStatus>(LoanStatus.ALL);
   const { allLoans, page, pageCount, status, total } = useSelector(
     (s: RootState) => s.adminLoansSlice
@@ -68,7 +70,7 @@ export const LoansPage: React.FC = () => {
             }}
           >
             {/* Left: Add Loan */}
-            <Button variant="contained" color="primary">
+            <Button variant="contained" color="primary" onClick={() =>navigate("/loans/new")}>
               הוסף הלוואה
             </Button>
 
