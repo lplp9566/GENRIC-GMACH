@@ -38,7 +38,7 @@ export class LoansService {
         fromDate,
         loanData
       );
-      // אם הפונקציה מחזירה false, נתייחס לזה כשגיאה
+
       if (!success) {
         return { ok: false, error: 'לא מספיק כסף במערכת' };
       }

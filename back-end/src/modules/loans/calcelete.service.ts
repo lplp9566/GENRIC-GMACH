@@ -87,7 +87,7 @@ export class FundsFlowService {
   async getCashFlowTotals(from: Date, newLoan?: Partial<LoanEntity>) {
     const fund_details = await this.fundsOverviewService.getFundDetails();
     if(fund_details.available_funds<newLoan?.loan_amount!){
-      throw new BadRequestException('אין מספיק כסף במערכת להוציא הלוואה על סכום זה');
+      throw new BadRequestException('אתה לא יכול להוציא הלוואה על  ' + (fund_details.available_funds - newLoan?.loan_amount!) + ' ש"ח, במערכת יש כרגע ' + fund_details.available_funds + ' ש"ח');
     }
     const deposits = await this.depositsService.getDepositsActive();
     if(deposits.length == 0) return true;
