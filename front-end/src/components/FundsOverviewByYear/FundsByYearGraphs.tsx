@@ -26,6 +26,7 @@ const FundsByYearGraphs = () => {
   const [selectedYears, setSelectedYears] = useState<number[]>([]);
 
   useEffect(() => {
+    
     dispatch(getFundsOverviewByYear());
   }, [dispatch]);
 
