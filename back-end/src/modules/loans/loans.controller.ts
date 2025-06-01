@@ -3,6 +3,7 @@ import { LoansService } from './loans.service';
 import { LoanEntity } from './Entity/loans.entity';
 import { LoanActionEntity } from './loan-actions/Entity/loan_actions.entity';
 import { log } from 'console';
+import { FindLoansOpts } from 'src/common';
 export enum LoanStatus {
   ALL = 'all',
   ACTIVE = 'active',
@@ -21,36 +22,45 @@ export class LoansController {
   async checkLoan(@Body() loanData: Partial<LoanEntity>) {
     return this.loansService.checkLoan(loanData);
   }
- @Get()
+  @Get()
   findAll(
-    @Query('page',  new DefaultValuePipe(1),  ParseIntPipe)
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe)
     page: number,
-
     @Query('limit', new DefaultValuePipe(50), ParseIntPipe)
     limit: number,
-
-    // new: active כ־boolean, undefined = כל ההלוואות
-   @Query(
+    @Query(
       'status',
       new DefaultValuePipe(LoanStatus.ALL),
       new ParseEnumPipe(LoanStatus, {
         exceptionFactory: () =>
           new BadRequestException(
-            `status חייב להיות אחד מהערכים: ${Object.values(LoanStatus).join(', ')}`
+            `status חייב להיות אחד מהערכים: ${Object.values(LoanStatus).join(
+              ', ',
+            )}`,
           ),
       }),
     )
     status: LoanStatus,
-  
-
-    // במידה וצריך סינון לפי משתמש
-    // @Query('userId', new DefaultValuePipe(undefined), ParseIntPipe)
-    // userId?: number,
+    @Query('userId') userIdRaw?: number,
   ) {
-    // console.log(`Fetching loans with page: ${page}, limit: ${limit}, active: ${status}`);
-    return this.loansService.getLoans({ page, limit, status});
+    // let userId: number | undefined;
+    // if (userIdRaw !== undefined) {
+    //   // נסה לפרסר למספר
+    //   userId = parseInt(userIdRaw, 10);
+    //   if (isNaN(userId)) {
+    //     // אם המחרוזת לא מכילה מספר תקין
+    //     throw new BadRequestException('userId חייב להיות מספר תקין');
+    //   }
+    // }
+    const opts: FindLoansOpts = { page, limit };
+    if (status !== LoanStatus.ALL) {
+      opts.status = status;
+    }
+    if (userIdRaw !== undefined) {
+      opts.userId = userIdRaw;
+    }
+    return this.loansService.getLoans(opts);
   }
-
   @Get(':id')
   async getLoan(
     @Param('id', ParseIntPipe) id: number

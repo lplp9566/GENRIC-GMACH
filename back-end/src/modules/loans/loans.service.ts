@@ -64,10 +64,9 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
 
   } 
 
-  // (אם צריך) סינון לפי משתמש
-  // if (opts.userId !== undefined) {
-  //   where.user = { id: opts.userId };
-  // }
+  if (opts.userId ) {
+    where.user = { id: opts.userId };
+  }
 
   try {
     const [data, total] = await this.loansRepository.findAndCount({

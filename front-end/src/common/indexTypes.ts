@@ -9,7 +9,7 @@ export interface FindLoansOpts {
   status: LoanStatus;
   page?: number;
   limit?: number;
-  userId?: number;
+  userId?: number | undefined;
 }
 
 export enum LoanStatus {

@@ -24,16 +24,25 @@ import { useNavigate } from "react-router-dom";
 
 export const LoansPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<LoanStatus>(LoanStatus.ALL);
   const { allLoans, page, pageCount, status, total } = useSelector(
     (s: RootState) => s.adminLoansSlice
   );
+  const selectedUser = useSelector(
+    (state: RootState) => state.adminUsers.selectedUser
+  );
   const limit = 20;
 
   useEffect(() => {
-    dispatch(getAllLoans({ page, limit, status: filter }));
-  }, [dispatch, page, filter]);
+    if (selectedUser?.id) {
+      dispatch(
+        getAllLoans({ page, limit, status: filter, userId: selectedUser.id })
+      );
+    } else {
+      dispatch(getAllLoans({ page, limit, status: filter }));
+    }
+  }, [dispatch, page, filter, selectedUser]);
 
   const handleFilterChange = (e: SelectChangeEvent) => {
     setFilter(e.target.value as LoanStatus);
@@ -70,7 +79,11 @@ export const LoansPage: React.FC = () => {
             }}
           >
             {/* Left: Add Loan */}
-            <Button variant="contained" color="primary" onClick={() =>navigate("/loans/new")}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate("/loans/new")}
+            >
               הוסף הלוואה
             </Button>
 
@@ -112,7 +125,7 @@ export const LoansPage: React.FC = () => {
           מציג {allLoans.length} מתוך {total}
         </Typography>
       </Box> */}
-        {status === "pending" && <LoadingIndicator  />}
+      {status === "pending" && <LoadingIndicator />}
 
       {/* LOANS TABLE */}
       <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>

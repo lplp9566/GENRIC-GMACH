@@ -1,7 +1,8 @@
 export  interface FindLoansOpts {
   page: number;
   limit: number;
-  status:LoanStatus;
+  status?:LoanStatus;
+  userId?: number;
   
 }
 export interface PaginatedResult<T> {
