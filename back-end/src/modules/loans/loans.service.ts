@@ -89,7 +89,8 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
     try {
           const fund_details = await this.fundsOverviewService.getFundDetails();
     if(fund_details.available_funds<loanData?.loan_amount!){
-      throw new BadRequestException('אין מספיק כסף במערכת להוציא הלוואה על סכום זה');
+      throw new BadRequestException('אתה לא יכול להוציא הלוואה על  ' + (loanData.loan_amount) + ' ש"ח, במערכת יש כרגע ' + fund_details.available_funds + ' ש"ח');
+
     }
       const loanRecord = this.loansRepository.create(loanData);
       loanRecord.remaining_balance = loanRecord.loan_amount;

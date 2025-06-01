@@ -87,7 +87,7 @@ export class FundsFlowService {
   async getCashFlowTotals(from: Date, newLoan?: Partial<LoanEntity>) {
     const fund_details = await this.fundsOverviewService.getFundDetails();
     if(fund_details.available_funds<newLoan?.loan_amount!){
-      throw new BadRequestException('אתה לא יכול להוציא הלוואה על  ' + (fund_details.available_funds - newLoan?.loan_amount!) + ' ש"ח, במערכת יש כרגע ' + fund_details.available_funds + ' ש"ח');
+      throw new BadRequestException('אתה לא יכול להוציא הלוואה על  ' + (newLoan!.loan_amount) + ' ש"ח, במערכת יש כרגע ' + fund_details.available_funds + ' ש"ח');
     }
     const deposits = await this.depositsService.getDepositsActive();
     if(deposits.length == 0) return true;
@@ -121,7 +121,7 @@ export class FundsFlowService {
         // console.log("❌ עד", checkpointDate.toISOString(), "is", availableCash, "need", requiredBalance);
         allGood = false;
         if(availableCash< requiredBalance){
-          throw new BadRequestException(`אין מספיק כסף במערכת להוציא הלוואה על סכום זה, עד ${checkpointDate.toISOString().slice(0, 10)} יהיה זמין רק  ${availableCash} שח, וצריך ${requiredBalance} שח`);
+          throw new BadRequestException(`אם תאשר הלוואה זו לא תעמוד בהחזרי ההפקדות , עד ${checkpointDate.toISOString().slice(0, 10)} יהיה זמין רק  ${availableCash} שח, וצריך ${requiredBalance} שח`);
         }
         else {
           throw new BadRequestException(`אתה יכול להוציא הלוואה רק על סכום ${availableCash-requiredBalance} ש"ח, עד ${checkpointDate.toISOString()}   יהיה  בקרן רק  ${availableCash} שח, וצריך ${requiredBalance} שח`);

@@ -141,7 +141,7 @@ export const AdminLoansSlice = createSlice({
       })
       .addCase(createLoan.rejected, (state, action) => {
         state.createLoanStatus = "rejected";
-        state.error = action.error.message || "Failed to create loan";
+        state.error = action.error.message! ;
       });
   },
 });

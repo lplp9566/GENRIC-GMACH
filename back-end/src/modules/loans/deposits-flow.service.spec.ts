@@ -117,7 +117,7 @@ describe('FundsFlowService', () => {
           monthly_payment: 500,
           payment_date: 15,
         }),
-      ).rejects.toThrow('אין מספיק כסף במערכת להוציא הלוואה על סכום זה');
+      ).rejects.toThrow('אתה לא יכול להוציא הלוואה על  5000 ש"ח, במערכת יש כרגע 1000 ש"ח');      
     });
   });
 });
