@@ -31,7 +31,6 @@ const CheckLoanModal: React.FC<Props> = ({ onClose, loan }) => {
     checkLoanStatus,
     checkLoanResponse,
     createLoanStatus,
-    error: createError,
   } = useSelector((state: RootState) => state.adminLoansSlice);
 
   useEffect(() => {
