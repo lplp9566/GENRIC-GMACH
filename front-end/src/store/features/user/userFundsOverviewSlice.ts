@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { IFundsOverview, IUserFundsOverviewByYear } from "../../../components/FundsOverview/FundsOverviewDto";
+import { IUserFundsOverviewByYear } from "../../../components/FundsOverview/FundsOverviewDto";
 import { Status } from "../../../components/NavBar/Users/UsersDto";
 import axios from "axios";
 
