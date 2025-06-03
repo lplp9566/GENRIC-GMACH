@@ -71,7 +71,6 @@ describe('UserFinancialByYearService', () => {
     const mockCreated = { id: 1, year: 2025, user: mockUser } as any;
     repo.create.mockReturnValue(mockCreated);
     repo.save.mockResolvedValue(mockCreated);
-
     const result = await service['getOrCreateFinancialRecord'](mockUser, 2025);
     expect(result).toEqual(mockCreated);
   });
