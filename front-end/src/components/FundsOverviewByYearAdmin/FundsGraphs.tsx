@@ -1,11 +1,13 @@
-import { allFields } from "./fields";
+import { AdminAllFields, UserAdminAllFields } from "./fields";
 import LineChartGraph from "./Graphs/LineChartGraph";
 import BarChartGraph from "./Graphs/BarChartGraph";
 import PieChartGraph from "./Graphs/PieChartGraph";
 import RadarChartGraph from "./Graphs/RadarChartGraph";
 import AreaChartGraph from "./Graphs/AreaChartGraph";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
-  const COLORS = allFields.map(f => f.color);
+
   
   interface Props {
     type: number;
@@ -14,6 +16,8 @@ import AreaChartGraph from "./Graphs/AreaChartGraph";
     pieData: any[];
   }
   const FundsGraphs =({ type, data, selectedFields, pieData }: Props)=> {
+    const {selectedUser} = useSelector((state: RootState) => state.adminUsers);
+      const COLORS = !selectedUser ? AdminAllFields.map(f => f.color) : UserAdminAllFields.map(f => f.color);
     if (type === 0)
       return (
         <LineChartGraph data={data} selectedFields={selectedFields} COLORS={COLORS} />

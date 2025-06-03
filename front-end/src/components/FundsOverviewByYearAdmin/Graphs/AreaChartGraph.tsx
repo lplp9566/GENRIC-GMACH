@@ -1,12 +1,15 @@
 import React from 'react'
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { allFields } from '../fields'
+import { AdminAllFields, UserAdminAllFields } from '../fields'
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 interface AreaChartGraphProps {
   data: any[];
   selectedFields: string[];
   COLORS: string[];
 }
 const AreaChartGraph: React.FC<AreaChartGraphProps> = ({data, selectedFields, COLORS}) => {
+  const {selectedUser} = useSelector((state: RootState) => state.adminUsers);
   return (
  <ResponsiveContainer width="100%" height={350}>
           <AreaChart data={data}>
@@ -28,7 +31,7 @@ const AreaChartGraph: React.FC<AreaChartGraphProps> = ({data, selectedFields, CO
                 key={key}
                 type="monotone"
                 dataKey={key}
-                name={allFields.find(f => f.key === key)?.label}
+                name={!selectedUser ? AdminAllFields.find(f => f.key === key)?.label : UserAdminAllFields.find(f => f.key === key)?.label}
                 stroke={COLORS[idx % COLORS.length]}
                 fill={`url(#color${key})`}
                 strokeWidth={2}

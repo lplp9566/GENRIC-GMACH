@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Paper, Typography, Box, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { allFields } from "./fields";
+import { AdminAllFields, UserAdminAllFields } from "./fields";
 import FundsFieldSelect from "./FundsFieldSelect";
 import FundsYearSelect from "./FundsYearSelect";
 import FundsTabs from "./FundsTabs";
@@ -11,28 +11,42 @@ import { getFundsOverviewByYear } from "../../store/features/admin/adminFundsOve
 import * as XLSX from "xlsx";
 import FundsTable from "./Graphs/FundsTable";
 import LoadingIndicator from "../StatusComponents/LoadingIndicator";
+import { getUserFundsOverview } from "../../store/features/user/userFundsOverviewSlice";
 
-const DEFAULT_FIELDS = allFields.slice(0, 3).map((f) => f.key);
-const COLORS = allFields.map((f) => f.color);
+
 
 const FundsByYearGraphs = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { fundsOverviewByYear } = useSelector(
+  const {selectedUser} = useSelector((state: RootState) => state.adminUsers);
+  const {fundsOverview} =useSelector((state: RootState) => state.UserFundsOverviewSlice);
+   const { fundsOverviewByYear } = useSelector(
     (state: RootState) => state.adminFundsOverviewReducer
   );
+  const dispatch = useDispatch<AppDispatch>();
+
+const DEFAULT_FIELDS = !selectedUser ? AdminAllFields.slice(0, 3).map((f) => f.key) : UserAdminAllFields.slice(0, 3).map((f) => f.key);
+const COLORS = !selectedUser ? AdminAllFields.map((f) => f.color) : UserAdminAllFields.map((f) => f.color);
+  const {mode} = useSelector((state: RootState) => state.mapModeSlice);
   const [selectedFields, setSelectedFields] =
     useState<string[]>(DEFAULT_FIELDS);
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedYears, setSelectedYears] = useState<number[]>([]);
 
   useEffect(() => {
-    
-    dispatch(getFundsOverviewByYear());
-  }, [dispatch]);
-
-  const yearlyData = Array.isArray(fundsOverviewByYear)
+    if(mode === 'admin' && !selectedUser){
+      dispatch(getFundsOverviewByYear()); 
+       }
+       else if(mode === 'admin' && selectedUser){
+         dispatch(getUserFundsOverview(selectedUser.id));
+       }
+  }, [dispatch, mode, selectedUser]);
+const yearlyData = !selectedUser
+  ? Array.isArray(fundsOverviewByYear)
     ? fundsOverviewByYear
-    : [];
+    : []
+  : Array.isArray(fundsOverview)
+  ? fundsOverview
+  : [];
+
   useEffect(() => {
     if (yearlyData.length > 0) {
       setSelectedYears(yearlyData.map((y) => y.year));
@@ -41,12 +55,12 @@ const FundsByYearGraphs = () => {
 
   // Pie Data
   const filteredData = yearlyData.filter((y) => selectedYears.includes(y.year));
-  const pieData = selectedFields.map((key, idx) => {
+  const pieData =  selectedFields.map((key, idx) => {
     // סוכם את הערך של השדה הזה בכל השנים שבחרו
     const total = filteredData.reduce(
       (sum, year) => sum + (Number((year as Record<string, any>)[key]) || 0),0);
     return {
-      name: allFields.find((f) => f.key === key)?.label ?? key,
+      name: !selectedUser ? AdminAllFields.find((f) => f.key === key)?.label ?? key : UserAdminAllFields.find((f) => f.key === key)?.label ?? key,
       value: total,
       color: COLORS[idx % COLORS.length],
     };
@@ -59,9 +73,10 @@ const FundsByYearGraphs = () => {
       // הוספת עמודה של שנה
       obj["שנה"] = row.year;
       selectedFields.forEach((key) => {
-        const label = allFields.find((f) => f.key === key)?.label ?? key;
+        const label = !selectedUser ? AdminAllFields.find((f) => f.key === key)?.label ?? key : UserAdminAllFields.find((f) => f.key === key)?.label ?? key;
         obj[label] = (row as Record<string, any>)[key];
       });
+      console.log(obj)
       return obj;
     });
 

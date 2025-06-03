@@ -11,7 +11,26 @@ export class UserFinancialByYearService {
     @InjectRepository(UserFinancialByYearEntity)
     private userFinancialsByYearRepository: Repository<UserFinancialByYearEntity>,
   ) {}
-  async getUserFinancials() {
+  async getUserFinancialsByUser(user: number) {
+    const  records = this.userFinancialsByYearRepository.find(
+      { where: { user: { id: user } } },
+    );
+    return (await records).map((record) => ({
+      // user : record.user.id,
+      id: record.id,
+      year: record.year,
+      total_monthly_deposits: record.total_monthly_deposits,
+      total_equity_donations: record.total_equity_donations,
+      special_fund_donations: record.special_fund_donations,
+      total_loans_amount: record.total_loans_taken,
+      total_loan_repaid: record.total_loans_repaid,
+      total_fixed_deposits_added: record.total_fixed_deposits_added,
+      total_fixed_deposits_withdrawn: record.total_fixed_deposits_withdrawn,
+      total_standing_order_return: record.total_standing_order_return,
+      total_donations: record.total_donations
+    }));
+  }
+async getUserFinancialsByYear() {
     return this.userFinancialsByYearRepository.find();
   }
 

@@ -1,4 +1,4 @@
-import FundsByYearGraphs from "../components/FundsOverviewByYear/FundsByYearGraphs"
+import FundsByYearGraphs from "../components/FundsOverviewByYearAdmin/FundsByYearGraphs"
 
 const FundsOverviewByYearPage = () => {
   return (

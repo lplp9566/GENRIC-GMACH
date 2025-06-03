@@ -6,7 +6,7 @@ export class FundsOverviewByYearEntity {
   id: number;
 
   @Column({ type: 'int' })
-  year: number; 
+  year: number;
   @Column({ type: 'float' })
   total_monthly_deposits: number;
 
@@ -15,12 +15,16 @@ export class FundsOverviewByYearEntity {
 
   @Column({ type: 'float' })
   special_fund_donations: number;
+
   @Column({ type: 'float' })
-  total_special_funds_withdrawn: number; // Total amount loaned out
+  total_special_funds_withdrawn: number;
+
   @Column({ type: 'int' })
   total_loans_taken: number;
+
   @Column({ type: 'float' })
   total_loans_amount: number;
+
   @Column({ type: 'float' })
   total_loans_repaid: number;
 
@@ -29,19 +33,26 @@ export class FundsOverviewByYearEntity {
 
   @Column({ type: 'float', default: 0 })
   total_fixed_deposits_withdrawn: number;
+
   @Column({ type: 'float', default: 0 })
   total_standing_order_return: number;
+
   @Column({ type: 'float', default: 0 })
-  total_investments_out: number; 
+  total_investments_out: number;
+
   @Column({ type: 'float', default: 0 })
-    total_investments_in: number;
-  @Column({ type: 'json', nullable: true , default: {} })
+  total_investments_in: number;
+
+  @Column({ type: 'json', nullable: true, default: {} })
   fund_details_donated: Record<string, number>;
-  @Column({ type: 'json', nullable: true , default: {} })
+
+  @Column({ type: 'json', nullable: true, default: {} })
   fund_details_withdrawn: Record<string, number>;
+
   @Column({ type: 'float', default: 0 })
   total_expenses: number;
-    @Column({ type: 'float', default: 0 })
+
+  @Column({ type: 'float', default: 0 })
   total_donations: number;
 
   @AfterLoad()

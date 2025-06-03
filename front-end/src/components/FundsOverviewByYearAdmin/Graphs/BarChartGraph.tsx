@@ -1,12 +1,15 @@
 import React from 'react'
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { allFields } from '../fields';
+import { AdminAllFields, UserAdminAllFields } from '../fields';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 interface BarChartGraphProps {
   data: any[];
   selectedFields: string[];
   COLORS: string[];
 }
 const BarChartGraph : React.FC<BarChartGraphProps> = ({data, selectedFields, COLORS}) => {
+const {selectedUser} = useSelector((state: RootState) => state.adminUsers);
   return (
     <ResponsiveContainer width="100%" height={350}>
               <BarChart data={data}>
@@ -19,7 +22,7 @@ const BarChartGraph : React.FC<BarChartGraphProps> = ({data, selectedFields, COL
                   <Bar
                     key={key}
                     dataKey={key}
-                    name={allFields.find(f => f.key === key)?.label}
+                    name={ !selectedUser ? AdminAllFields.find(f => f.key === key)?.label : UserAdminAllFields.find(f => f.key === key)?.label}
                     fill={COLORS[idx % COLORS.length]}
                     barSize={35}
                   />

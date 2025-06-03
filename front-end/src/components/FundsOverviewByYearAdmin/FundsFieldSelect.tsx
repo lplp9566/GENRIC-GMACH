@@ -1,5 +1,7 @@
 import { FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, useMediaQuery } from "@mui/material";
-import { allFields } from "./fields";
+import { AdminAllFields, UserAdminAllFields } from "./fields";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 
 interface Props {
@@ -8,6 +10,7 @@ interface Props {
 }
 
 const FundsFieldSelect= ({ selectedFields, onChange}: Props)=> {
+  const {selectedUser}=useSelector((state: RootState) => state.adminUsers);
     const isMobile = useMediaQuery("(max-width:600px)");
   const handleChange = (event: any) => {
     const { value } = event.target;
@@ -27,7 +30,7 @@ const FundsFieldSelect= ({ selectedFields, onChange}: Props)=> {
         renderValue={() => "בחירת קטגוריות"}
         MenuProps={{ PaperProps: { style: { maxHeight: 250 } } }}
       >
-        {allFields.map((f) => (
+        {!selectedUser && AdminAllFields.map((f) => (
           <MenuItem
             key={f.key}
             value={f.key}
@@ -37,6 +40,18 @@ const FundsFieldSelect= ({ selectedFields, onChange}: Props)=> {
             <ListItemText primary={f.label} />
           </MenuItem>
         ))}
+        {
+          selectedUser && UserAdminAllFields.map((f) => (
+            <MenuItem
+              key={f.key}
+              value={f.key}
+              dense
+            >
+              <Checkbox checked={selectedFields.includes(f.key)} />
+              <ListItemText primary={f.label} />
+            </MenuItem>
+          ))
+        }
       </Select>
     </FormControl>
   );

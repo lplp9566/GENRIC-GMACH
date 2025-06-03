@@ -14,7 +14,9 @@ import {
 } from "@mui/material";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
-import { allFields } from "../fields";
+import { AdminAllFields, UserAdminAllFields } from "../fields";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
 
 interface Props {
   data: any[];
@@ -22,6 +24,7 @@ interface Props {
 }
 
 const FundsTable = ({ data, selectedFields }: Props) => {
+  const {selectedUser} = useSelector((state: RootState) => state.adminUsers);
   const [openFull, setOpenFull] = useState(false);
 
   const TableContent = (
@@ -31,7 +34,7 @@ const FundsTable = ({ data, selectedFields }: Props) => {
           <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>שנה</TableCell>
           {selectedFields.map((key) => (
             <TableCell sx={{ fontWeight: 'bold', py: 1.5 }} key={key}>
-              {allFields.find((f) => f.key === key)?.label}
+              {!selectedUser ? AdminAllFields.find((f) => f.key === key)?.label : UserAdminAllFields.find((f) => f.key === key)?.label}
             </TableCell>
           ))}
         </TableRow>

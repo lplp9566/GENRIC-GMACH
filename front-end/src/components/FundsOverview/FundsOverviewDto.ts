@@ -38,3 +38,16 @@ export interface IFundsOverview {
     total_donations: number;
   }
   
+  export interface  IUserFundsOverviewByYear {
+    id: number;
+    year: number;
+    total_monthly_deposits: number;
+    total_equity_donations: number;
+    special_fund_donations: number;
+    total_loans_taken: number;
+    total_loans_repaid: number;
+    total_fixed_deposits_added: number;
+    total_fixed_deposits_withdrawn: number;
+    total_standing_order_return: number;
+    total_donations: number;
+  }

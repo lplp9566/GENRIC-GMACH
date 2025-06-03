@@ -9,7 +9,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { allFields } from "../fields";
+import { AdminAllFields, UserAdminAllFields } from "../fields";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
 interface LineChartGrapeProps {
   data: any[];
   selectedFields: string[];
@@ -20,6 +22,7 @@ const LineChartGraph: React.FC<LineChartGrapeProps> = ({
   selectedFields,
   COLORS,
 }) => {
+  const { selectedUser } = useSelector((state: RootState) => state.adminUsers);
   return (
     <ResponsiveContainer width="100%" height={350}>
       <LineChart data={data}>
@@ -33,7 +36,11 @@ const LineChartGraph: React.FC<LineChartGrapeProps> = ({
             key={key}
             type="monotone"
             dataKey={key}
-            name={allFields.find((f) => f.key === key)?.label}
+            name={
+              !selectedUser
+                ? AdminAllFields.find((f) => f.key === key)?.label
+                : UserAdminAllFields.find((f) => f.key === key)?.label
+            }
             stroke={COLORS[idx % COLORS.length]}
             strokeWidth={2}
           />
