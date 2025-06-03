@@ -1,6 +1,6 @@
 import { Controller, Get, ParseIntPipe, Query, Req, UseGuards } from '@nestjs/common';
 import { UserFinancialByYearService } from './user-financial-by-year.service';
-import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @Controller('user-financial-by-year')
 export class UserFinancialByYearController {
