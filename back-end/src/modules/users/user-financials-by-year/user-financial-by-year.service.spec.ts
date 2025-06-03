@@ -62,7 +62,7 @@ describe('UserFinancialByYearService', () => {
   it('should return all user financial records', async () => {
     const mockRecords = [{ id: 1 }] as any;
     repo.find.mockResolvedValue(mockRecords);
-    const result = await service.getUserFinancials();
+    const result = await service.getUserFinancialsByYear();
     expect(result).toEqual(mockRecords);
   });
 
