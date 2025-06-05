@@ -1,6 +1,6 @@
 import React from 'react'
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { AdminAllFields, UserAdminAllFields } from '../fields'
+import { AdminYearlyFinancialItems, UserAdminFinancialItems } from '../items'
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 interface AreaChartGraphProps {
@@ -31,7 +31,7 @@ const AreaChartGraph: React.FC<AreaChartGraphProps> = ({data, selectedFields, CO
                 key={key}
                 type="monotone"
                 dataKey={key}
-                name={!selectedUser ? AdminAllFields.find(f => f.key === key)?.label : UserAdminAllFields.find(f => f.key === key)?.label}
+                name={!selectedUser ? AdminYearlyFinancialItems.find(f => f.key === key)?.label : UserAdminFinancialItems.find(f => f.key === key)?.label}
                 stroke={COLORS[idx % COLORS.length]}
                 fill={`url(#color${key})`}
                 strokeWidth={2}

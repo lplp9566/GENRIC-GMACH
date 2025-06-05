@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
-import { AdminAllFields, UserAdminAllFields } from "../fields";
+import { AdminYearlyFinancialItems, UserAdminFinancialItems } from "../items";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 
@@ -34,7 +34,7 @@ const FundsTable = ({ data, selectedFields }: Props) => {
           <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>שנה</TableCell>
           {selectedFields.map((key) => (
             <TableCell sx={{ fontWeight: 'bold', py: 1.5 }} key={key}>
-              {!selectedUser ? AdminAllFields.find((f) => f.key === key)?.label : UserAdminAllFields.find((f) => f.key === key)?.label}
+              {!selectedUser ? AdminYearlyFinancialItems.find((f) => f.key === key)?.label : UserAdminFinancialItems.find((f) => f.key === key)?.label}
             </TableCell>
           ))}
         </TableRow>

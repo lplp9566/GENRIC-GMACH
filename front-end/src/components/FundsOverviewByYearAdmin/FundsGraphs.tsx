@@ -1,4 +1,4 @@
-import { AdminAllFields, UserAdminAllFields } from "./fields";
+import { AdminYearlyFinancialItems, UserAdminFinancialItems } from "./items";
 import LineChartGraph from "./Graphs/LineChartGraph";
 import BarChartGraph from "./Graphs/BarChartGraph";
 import PieChartGraph from "./Graphs/PieChartGraph";
@@ -17,7 +17,7 @@ import { RootState } from "../../store/store";
   }
   const FundsGraphs =({ type, data, selectedFields, pieData }: Props)=> {
     const {selectedUser} = useSelector((state: RootState) => state.adminUsers);
-      const COLORS = !selectedUser ? AdminAllFields.map(f => f.color) : UserAdminAllFields.map(f => f.color);
+      const COLORS = !selectedUser ? AdminYearlyFinancialItems.map(f => f.color) : UserAdminFinancialItems.map(f => f.color);
     if (type === 0)
       return (
         <LineChartGraph data={data} selectedFields={selectedFields} COLORS={COLORS} />

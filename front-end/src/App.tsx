@@ -3,10 +3,10 @@ import { Box } from '@mui/material';
 import { Navbar } from './components/NavBar/NavBar';
 import LoansPage from './pages/LoansPage';
 import HomePage from './components/HomePage/HomePage';
-import FundsOverview from './components/FundsOverview/FundsOverview';
 import FundsOverviewByYearPage from './pages/FundsOverviewByYearPage';
 import LoanDetels from './components/Loans/LoanDetels';
 import NewLoan from './components/Loans/NewLoan/NewLoan';
+import FundsOverviewDashboard from './pages/FundsOverviewDashboard';
 
 
 
@@ -22,7 +22,7 @@ function App() {
           <Route path="/Home" element={<HomePage />} />
           <Route path="/loans/new" element={<NewLoan  />} />
           <Route path="/loans/:id" element={<LoanDetels />} />
-          <Route path="/funds" element={<FundsOverview />} />
+          <Route path="/funds" element={<FundsOverviewDashboard />} />
           <Route path='FundsOverviewByYear' element={<FundsOverviewByYearPage />} />
         </Routes>
       </Box>

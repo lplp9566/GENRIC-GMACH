@@ -1,5 +1,5 @@
 import { FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, useMediaQuery } from "@mui/material";
-import { AdminAllFields, UserAdminAllFields } from "./fields";
+import { AdminYearlyFinancialItems, UserAdminFinancialItems } from "./items";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 
@@ -30,7 +30,7 @@ const FundsFieldSelect= ({ selectedFields, onChange}: Props)=> {
         renderValue={() => "בחירת קטגוריות"}
         MenuProps={{ PaperProps: { style: { maxHeight: 250 } } }}
       >
-        {!selectedUser && AdminAllFields.map((f) => (
+        {!selectedUser && AdminYearlyFinancialItems.map((f) => (
           <MenuItem
             key={f.key}
             value={f.key}
@@ -41,7 +41,7 @@ const FundsFieldSelect= ({ selectedFields, onChange}: Props)=> {
           </MenuItem>
         ))}
         {
-          selectedUser && UserAdminAllFields.map((f) => (
+          selectedUser && UserAdminFinancialItems.map((f) => (
             <MenuItem
               key={f.key}
               value={f.key}

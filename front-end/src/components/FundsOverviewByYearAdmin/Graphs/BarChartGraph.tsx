@@ -1,6 +1,6 @@
 import React from 'react'
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { AdminAllFields, UserAdminAllFields } from '../fields';
+import { AdminYearlyFinancialItems, UserAdminFinancialItems } from '../items';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 interface BarChartGraphProps {
@@ -22,7 +22,7 @@ const {selectedUser} = useSelector((state: RootState) => state.adminUsers);
                   <Bar
                     key={key}
                     dataKey={key}
-                    name={ !selectedUser ? AdminAllFields.find(f => f.key === key)?.label : UserAdminAllFields.find(f => f.key === key)?.label}
+                    name={ !selectedUser ? AdminYearlyFinancialItems.find(f => f.key === key)?.label : UserAdminFinancialItems.find(f => f.key === key)?.label}
                     fill={COLORS[idx % COLORS.length]}
                     barSize={35}
                   />

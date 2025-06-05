@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { AdminAllFields, UserAdminAllFields } from "../fields";
+import { AdminYearlyFinancialItems, UserAdminFinancialItems } from "../items";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 interface LineChartGrapeProps {
@@ -38,8 +38,8 @@ const LineChartGraph: React.FC<LineChartGrapeProps> = ({
             dataKey={key}
             name={
               !selectedUser
-                ? AdminAllFields.find((f) => f.key === key)?.label
-                : UserAdminAllFields.find((f) => f.key === key)?.label
+                ? AdminYearlyFinancialItems.find((f) => f.key === key)?.label
+                : UserAdminFinancialItems.find((f) => f.key === key)?.label
             }
             stroke={COLORS[idx % COLORS.length]}
             strokeWidth={2}

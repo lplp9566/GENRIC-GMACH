@@ -52,7 +52,6 @@ const FundsOverview: React.FC = () => {
     { label: 'החזרי הו"ק', value: fundsOverview.standing_order_return ,  Icon : MoneyOutlinedIcon},
     { label: "מזומן", value: fundsOverview.cash_holdings,  Icon : AttachMoneyIcon},
     { label: "הוצאות", value: fundsOverview.total_expenses ,  Icon : CreditCardOffIcon},
-
   ];
 
   const max = fundsOverview.own_equity;

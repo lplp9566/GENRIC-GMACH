@@ -24,7 +24,8 @@ export class FundsFlowService {
   ) {}
 
   async calculateTotalMonthlyInflows(from: Date, to: Date): Promise<number> {
-    if (to < from) throw new BadRequestException('End date must be after start date');
+    // console.log(from,'from',to,'to')
+    // if (to < from) throw new BadRequestException('End date must be after start date');
     const rates = await this.ratesRepo.find({ order: { year: 'ASC', month: 'ASC' } });
     const users = await this.usersRepo.find({ relations: ['payment_details'] });
     let total = 0;
@@ -57,7 +58,7 @@ export class FundsFlowService {
     to: Date,
     newLoan?: Partial<LoanEntity>,
   ): Promise<number> {
-    if (to < from) throw new BadRequestException('End date must be after start date');
+    // if (to < from) throw new BadRequestException('End date must be after start date');
     const existing = await this.loansRepo.find({ where: { isActive: true } });
     const loansToSimulate: LoanEntity[] = [...existing];
     if (newLoan) {
@@ -105,6 +106,7 @@ export class FundsFlowService {
       const requiredBalance = relevantDeposits.reduce((sum, d) => sum + d.current_balance, 0) - totalInflows;
       // console.log(requiredBalance,"requiredBalance")
       // שלב 3: חישוב תזרים עד אותו תאריך
+      if(checkpointDate<from) continue;
       const [monthlyInflowsTotal, loanPaymentsInflowsTotal] = await Promise.all([
         this.calculateTotalMonthlyInflows(from, checkpointDate),
         this.calculateLoanPaymentSum(from, checkpointDate, newLoan),

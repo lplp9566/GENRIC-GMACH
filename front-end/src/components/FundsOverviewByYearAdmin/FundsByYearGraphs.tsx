@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Paper, Typography, Box, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { AdminAllFields, UserAdminAllFields } from "./fields";
+import { AdminYearlyFinancialItems, UserAdminFinancialItems } from "./items";
 import FundsFieldSelect from "./FundsFieldSelect";
 import FundsYearSelect from "./FundsYearSelect";
 import FundsTabs from "./FundsTabs";
@@ -23,8 +23,8 @@ const FundsByYearGraphs = () => {
   );
   const dispatch = useDispatch<AppDispatch>();
 
-const DEFAULT_FIELDS = !selectedUser ? AdminAllFields.slice(0, 3).map((f) => f.key) : UserAdminAllFields.slice(0, 3).map((f) => f.key);
-const COLORS = !selectedUser ? AdminAllFields.map((f) => f.color) : UserAdminAllFields.map((f) => f.color);
+const DEFAULT_FIELDS = !selectedUser ? AdminYearlyFinancialItems.slice(0, 3).map((f) => f.key) : UserAdminFinancialItems.slice(0, 3).map((f) => f.key);
+const COLORS = !selectedUser ? AdminYearlyFinancialItems.map((f) => f.color) : UserAdminFinancialItems.map((f) => f.color);
   const {mode} = useSelector((state: RootState) => state.mapModeSlice);
   const [selectedFields, setSelectedFields] =
     useState<string[]>(DEFAULT_FIELDS);
@@ -60,7 +60,7 @@ const yearlyData = !selectedUser
     const total = filteredData.reduce(
       (sum, year) => sum + (Number((year as Record<string, any>)[key]) || 0),0);
     return {
-      name: !selectedUser ? AdminAllFields.find((f) => f.key === key)?.label ?? key : UserAdminAllFields.find((f) => f.key === key)?.label ?? key,
+      name: !selectedUser ? AdminYearlyFinancialItems.find((f) => f.key === key)?.label ?? key : UserAdminFinancialItems.find((f) => f.key === key)?.label ?? key,
       value: total,
       color: COLORS[idx % COLORS.length],
     };
@@ -73,7 +73,7 @@ const yearlyData = !selectedUser
       // הוספת עמודה של שנה
       obj["שנה"] = row.year;
       selectedFields.forEach((key) => {
-        const label = !selectedUser ? AdminAllFields.find((f) => f.key === key)?.label ?? key : UserAdminAllFields.find((f) => f.key === key)?.label ?? key;
+        const label = !selectedUser ? AdminYearlyFinancialItems.find((f) => f.key === key)?.label ?? key : UserAdminFinancialItems.find((f) => f.key === key)?.label ?? key;
         obj[label] = (row as Record<string, any>)[key];
       });
       console.log(obj)
