@@ -58,7 +58,7 @@ export class FundsFlowService {
     to: Date,
     newLoan?: Partial<LoanEntity>,
   ): Promise<number> {
-    // if (to < from) throw new BadRequestException('End date must be after start date');
+    if (to < from) throw new BadRequestException('End date must be after start date');
     const existing = await this.loansRepo.find({ where: { isActive: true } });
     const loansToSimulate: LoanEntity[] = [...existing];
     if (newLoan) {

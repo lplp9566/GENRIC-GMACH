@@ -231,4 +231,17 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
       throw new Error(error.message);
     }
   }
+  async recordLoanBalance(loanId: number, balance:number){
+    try {
+          const loan = await this.loansRepository.findOne({
+      where: { id: loanId },
+    })
+    if (!loan) throw new BadRequestException('Loan not found');
+    loan.balance = balance
+    await this.loansRepository.save(loan)
+    } catch (error) {
+      throw new Error(error.message);
+    }
+
+  }
 }

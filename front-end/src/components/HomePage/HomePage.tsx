@@ -9,7 +9,6 @@ import {
   Button,
 } from '@mui/material';
 import { ArrowForward } from '@mui/icons-material';
-
 const stats = [
   { label: 'סך ההפקדות', value: '₪245,000', color: 'success.main' },
   { label: 'סך ההלוואות הפעילות', value: '₪89,000', color: 'danger.main' },

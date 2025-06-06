@@ -42,6 +42,9 @@ export class LoanEntity {
 
   @Column({ type: 'float', nullable: true })
   total_installments: number;
+
+  @Column({ type: 'text', nullable: true })
+  balance: number;
   
   @OneToMany(() => LoanActionEntity, (payment) => payment.loan, {
     cascade: true,

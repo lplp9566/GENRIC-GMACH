@@ -6,7 +6,7 @@ export enum UserRole {
 }
 
 export enum payment_method {
-  direct_debit = 'direct_debit ',
+  direct_debit = 'direct_debit',
   credit_card = 'credit_card',
   bank_transfer = 'bank_transfer',
   cash = 'cash',

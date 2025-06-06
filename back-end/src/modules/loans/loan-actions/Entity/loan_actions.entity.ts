@@ -23,6 +23,6 @@ export class LoanActionEntity {
   @Column({ type: 'date', nullable: false })
   date: Date;
 
-  @Column()
+  @Column({ type: 'float' })
   value: number;
 }

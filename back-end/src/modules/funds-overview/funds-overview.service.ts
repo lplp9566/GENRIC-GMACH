@@ -17,11 +17,20 @@ export class FundsOverviewService {
     @InjectRepository(FundsOverviewEntity)
     private readonly fundsOverviewRepository: Repository<FundsOverviewEntity>,
   ) {}
-  async getFundsOverviewRecord() {
+  async getFundsOverviewRecord(): Promise<FundsOverviewEntity> {
     try {
-      const fund = await this.fundsOverviewRepository
-        .find({ take: 1 })
-        .then((r) => r[0] ?? null);
+      // נסה למצוא רשומה אחת (לפי סדר כלשהו, אבל כאן take: 1 מספיק כי אמורה להיות רק רשומה אחת)
+      let fund = await this.fundsOverviewRepository.findOne({ 
+        // אפשר לתת למשל where או כל תנאי. אם אין תנאים, findOne() יחזיר רשומה כלשהי
+        where: {}, 
+        order: { id: 'ASC' } 
+      });
+
+      if (!fund) {
+        // אם לא נמצאה אף רשומה, צור אחת חדשה עם 0 כערך התחלתי
+        fund = await this.initializeFundsOverview(0);
+      }
+
       return fund;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -30,7 +39,7 @@ export class FundsOverviewService {
 
   async initializeFundsOverview(initialAmount: number) {
     try {
-      const existingRecord = await this.getFundsOverviewRecord();
+ const existingRecord = await this.fundsOverviewRepository.findOne({ where: {} });
       if (existingRecord) {
         throw new Error('Funds overview already initialized');
       }
@@ -54,7 +63,7 @@ export class FundsOverviewService {
       });
 
       await this.fundsOverviewRepository.save(newRecord);
-      return ApiResponse.success(newRecord);
+      return newRecord;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

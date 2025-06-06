@@ -12,19 +12,22 @@ import {
   ListItemButton,
   ListItemText,
   useMediaQuery,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  SelectChangeEvent, // <-- ייבוא הסוג הנכון
+  Badge,
+  Autocomplete,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import PersonIcon from "@mui/icons-material/Person";
 import { useTheme } from "@mui/material/styles";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
-import { getAllUsers, setSelectedUser } from "../../store/features/admin/adminUsersSlice";
-
+import {
+  getAllUsers,
+  setSelectedUser,
+} from "../../store/features/admin/adminUsersSlice";
 
 const navItems = [
   { label: "דף הבית", path: "/Home" },
@@ -37,7 +40,7 @@ const navItems = [
   { label: "סטטיסטיקה", path: "/FundsOverviewByYear" },
 ];
 
-export const Navbar = () => {
+export const Navbar: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useDispatch<AppDispatch>();
@@ -57,36 +60,46 @@ export const Navbar = () => {
 
   const toggleDrawer = () => setOpen((prev) => !prev);
 
-  // הקפידו להשתמש ב־SelectChangeEvent<number>
-  const handleUserSelect = (event: SelectChangeEvent<number>) => {
-    const val = Number(event.target.value);
-    if (val === 0) {
+  const handleUserChange = (event: any, newValue: any) => {
+    console.log(event)
+    // newValue = אובייקט המשתמש הנבחר או null
+    if (newValue === null) {
       dispatch(setSelectedUser(null));
     } else {
-      const user = allUsers.find((u) => u.id === val) || null;
-      dispatch(setSelectedUser(user));
+      dispatch(setSelectedUser(newValue));
     }
   };
 
   return (
-    <Box>
+    <Box sx={{ flexGrow: 1, marginBottom: 0 }}>
+      {/* ========================= AppBar ========================= */}
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor: "#003366",
+          backgroundColor: "#003366", // כחול כהה
           direction: "rtl",
+          marginBottom: 0,
           boxShadow: "0px 3px 10px rgba(0, 0, 0, 0.15)",
+          zIndex: (th) => th.zIndex.drawer + 1,
         }}
       >
         <Toolbar
           sx={{
-            justifyContent: "space-between",
-            paddingRight: theme.spacing(3),
-            paddingLeft: theme.spacing(3),
+            display: "flex",
+            justifyContent: "flex-start",
+            gap: 2,
+            px: { xs: 1, md: 3 },
           }}
         >
           {/* לוגו + כותרת */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              flexShrink: 0,
+            }}
+          >
             <Box
               sx={{
                 backgroundColor: theme.palette.background.paper,
@@ -107,7 +120,10 @@ export const Navbar = () => {
             </Box>
             <Typography
               variant="h6"
+              component={Link}
+              to="/"
               sx={{
+                textDecoration: "none",
                 color: theme.palette.primary.contrastText,
                 fontWeight: "bold",
               }}
@@ -115,9 +131,16 @@ export const Navbar = () => {
               אהבת חסד
             </Typography>
           </Box>
-
           {!isMobile && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                flexGrow: 1,
+                ml: 3,
+              }}
+            >
               {navItems.map((item) => (
                 <Button
                   key={item.path}
@@ -126,8 +149,9 @@ export const Navbar = () => {
                   sx={{
                     color: theme.palette.primary.contrastText,
                     fontSize: "1rem",
-                    padding: "8px 16px",
+                    padding: "8px 12px",
                     borderRadius: "8px",
+                    textTransform: "none",
                     "&:hover": {
                       backgroundColor: "rgba(255, 255, 255, 0.15)",
                       boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.2)",
@@ -138,48 +162,62 @@ export const Navbar = () => {
                 </Button>
               ))}
 
-              <FormControl size="small" sx={{ minWidth: 180 }}>
-                <InputLabel
-                  id="select-user-navbar-label"
-                  sx={{ color: theme.palette.primary.contrastText }}
-                >
-                  {selectedUser
-                    ? `${selectedUser.first_name} ${selectedUser.last_name}`
-                    : "כל המשתמשים"}
-                </InputLabel>
-                <Select<number>
-                  labelId="select-user-navbar-label"
-                  value={selectedUser?.id ?? 0}
-                  label={
-                    selectedUser
-                      ? `${selectedUser.first_name} ${selectedUser.last_name}`
-                      : "כל המשתמשים"
-                  }
-                  onChange={handleUserSelect}
-                  sx={{
-                    color: theme.palette.primary.contrastText,
-                    ".MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgba(255,255,255,0.4)",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: theme.palette.primary.light,
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgba(255,255,255,0.7)",
-                    },
-                  }}
-                >
-                  <MenuItem value={0}>כל המשתמשים</MenuItem>
-                  {allUsers.map((user) => (
-                    <MenuItem key={user.id} value={user.id}>
-                      {user.first_name} {user.last_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              {/* ========================= Autocomplete “משתמשים” ========================= */}
+              <Autocomplete
+                options={allUsers}
+                getOptionLabel={(option) =>
+                  `${option.first_name} ${option.last_name}`
+                }
+                value={selectedUser}
+                onChange={handleUserChange}
+                isOptionEqualToValue={(option, value) =>
+                  option.id === value.id
+                }
+                size="small"
+                sx={{
+                  width: 200,
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: 1,
+                  "& .MuiOutlinedInput-root": {
+                    paddingRight: 0,
+                  },
+                  "& .MuiAutocomplete-input": {
+                    padding: "6px 8px",
+                  },
+                }}
+                popupIcon={<PersonIcon color="action" />}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    placeholder="כל המשתמשים"
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <PersonIcon color="primary" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    inputProps={{
+                      ...params.inputProps,
+                      "aria-label": "בחר משתמש",
+                    }}
+                  />
+                )}
+              />
+              <IconButton
+                size="large"
+                color="inherit"
+                sx={{ ml: 1 }}
+                aria-label="ספר התראות"
+              >
+                <Badge badgeContent={3} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
             </Box>
           )}
-
           {isMobile && (
             <IconButton
               edge="end"
@@ -194,15 +232,19 @@ export const Navbar = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Drawer למובייל */}
+      {/* Spacer כדי שהתוכן לא יסתיר מתחת ל-AppBar */}
+      <Toolbar />
+
+      {/* ========================= Drawer למובייל ========================= */}
       <Drawer
         anchor="right"
         open={open}
         onClose={toggleDrawer}
         sx={{
           "& .MuiDrawer-paper": {
-            backgroundColor: theme.palette.primary.dark,
-            color: theme.palette.primary.contrastText,
+            top: theme.mixins.toolbar.minHeight, // מתחת לגובה ה־AppBar
+            backgroundColor: "#003366",          // צבע כחול כהה תואם
+            color: "#FFFFFF",
             width: 250,
           },
         }}
@@ -217,42 +259,51 @@ export const Navbar = () => {
           >
             תפריט ניווט
           </Typography>
-          <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-            <InputLabel
-              id="select-user-mobile-label"
-              sx={{ color: theme.palette.primary.contrastText }}
-            >
-              {selectedUser
-                ? `${selectedUser.first_name} ${selectedUser.last_name}`
-                : "כל המשתמשים"}
-            </InputLabel>
-            <Select<number>
-              labelId="select-user-mobile-label"
-              value={selectedUser?.id ?? 0}
-              label={
-                selectedUser
-                  ? `${selectedUser.first_name} ${selectedUser.last_name}`
-                  : "כל המשתמשים"
-              }
-              onChange={handleUserSelect}
-              sx={{
-                color: theme.palette.primary.contrastText,
-                ".MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgba(255,255,255,0.4)",
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: theme.palette.primary.light,
-                },
-              }}
-            >
-              <MenuItem value={0}>כל המשתמשים</MenuItem>
-              {allUsers.map((user) => (
-                <MenuItem key={user.id} value={user.id}>
-                  {user.first_name} {user.last_name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+
+          {/* ========================= Autocomplete מובייל ========================= */}
+          <Autocomplete
+            options={allUsers}
+            getOptionLabel={(option) =>
+              `${option.first_name} ${option.last_name}`
+            }
+            value={selectedUser}
+            onChange={handleUserChange}
+            isOptionEqualToValue={(option, value) =>
+              option.id === value.id
+            }
+            size="small"
+            sx={{
+              mb: 2,
+              backgroundColor: "#FFFFFF",
+              borderRadius: 1,
+              "& .MuiOutlinedInput-root": {
+                paddingRight: 0,
+              },
+              "& .MuiAutocomplete-input": {
+                padding: "6px 8px",
+              },
+            }}
+            popupIcon={<PersonIcon color="action" />}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                placeholder="כל המשתמשים"
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PersonIcon color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+                inputProps={{
+                  ...params.inputProps,
+                  "aria-label": "בחר משתמש",
+                }}
+              />
+            )}
+          />
 
           <List>
             {navItems.map((item) => (
@@ -267,15 +318,37 @@ export const Navbar = () => {
                     "&:hover": {
                       backgroundColor: "rgba(255, 255, 255, 0.1)",
                     },
+                    textAlign: "right",
                   }}
                 >
-                  <ListItemText primary={item.label} sx={{ textAlign: "right" }} />
+                  <ListItemText primary={item.label} />
                 </ListItemButton>
               </ListItem>
             ))}
+            {/* לדוגמה, פריט נוסף של הודעות במובייל */}
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  /* כאן ניתן לפתוח דיאלוג התראות */
+                  toggleDrawer();
+                }}
+                sx={{
+                  color: theme.palette.primary.contrastText,
+                  paddingY: "12px",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  },
+                  textAlign: "right",
+                }}
+              >
+                <ListItemText primary="הודעות" />
+              </ListItemButton>
+            </ListItem>
           </List>
         </Box>
       </Drawer>
     </Box>
   );
 };
+
+export default Navbar;

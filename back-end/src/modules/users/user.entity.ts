@@ -22,12 +22,12 @@ export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({type: 'text'})
   first_name: string;
 
-  @Column()
+  @Column({type: 'text'})
   last_name: string;
-  @Column()
+  @Column({type: 'text'})
   id_number: string;
   @Column({
     type: 'date',
@@ -37,19 +37,19 @@ export class UserEntity {
     },
   })
   join_date: Date;
-  @Column()
+  @Column({type: 'text'})
   password: string;
 
-  @Column()
+  @Column({type: 'text'})
   email_address: string;
 
-  @Column()
+  @Column({type: 'text'})
   phone_number: string;
 
-  @Column()
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.committeeMember })
   role: UserRole;
 
-  @Column()
+  @Column({ type: 'boolean', default: false })
   is_admin: boolean;
   @OneToOne(
     () => PaymentDetailsEntity,

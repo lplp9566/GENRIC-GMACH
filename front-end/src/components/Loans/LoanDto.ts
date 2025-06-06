@@ -18,10 +18,12 @@ export interface ILoan {
   loan_date: string;
   purpose: string;
   monthly_payment: number;
+  payment_date: number;
   isActive: boolean;
   remaining_balance: number;
   initialMonthlyPayment: number;
   total_installments: number;
+  balance: number;
 }
 export interface ILoanAction {
   id: number;

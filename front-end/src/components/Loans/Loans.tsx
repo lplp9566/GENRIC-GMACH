@@ -1,138 +1,226 @@
+// LoansDashboardWithCircles.tsx
+import React from "react";
+import {
+  Box,
+  Card,
+  CardActionArea,
+  CardContent,
+  Chip,
+  Grid,
+  Typography,
+  Container,
+} from "@mui/material";
+import {
+  AttachMoney as AttachMoneyIcon,
+  CalendarToday as CalendarTodayIcon,
+  TrendingDown as TrendingDownIcon,
+  Flag as PurposeIcon,
+  AccountBalanceWallet as RemainingIcon,
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { ILoan } from "./LoanDto";
 
-import { ThemeProvider } from '@emotion/react';
-import { loanTheme } from './LoanTheme';
-import { Box, Card, CardContent, Chip, CssBaseline, Grid, Typography } from '@mui/material';
-import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; 
-import TrendingDownIcon from '@mui/icons-material/TrendingDown'; 
-import PaymentsIcon from '@mui/icons-material/Payments'; 
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import { useLoanHelpers } from '../../Hooks/LoanHooks/LoanHooksStatus';
-import { ILoan } from './LoanDto';
-import { useNavigate } from 'react-router-dom';
-interface LoanProps{
+interface LoanProps {
   loansData: ILoan[];
-  total: number
-  user?: any
+  total: number;
 }
-const Loans : React.FC<LoanProps> = ({loansData, user, total}) => {
-    const { getStatusColor, getStatusText, getStatusIcon } = useLoanHelpers();
-      const navigate = useNavigate();
+
+const LoansDashboardWithCircles: React.FC<LoanProps> = ({ loansData, total }) => {
+  const navigate = useNavigate();
+  const totalAmount = loansData.reduce((sum, loan) => sum + loan.loan_amount, 0);
+
   return (
- <ThemeProvider theme={loanTheme}>
-      <CssBaseline />
-      <Box sx={{ p: 4, backgroundColor: loanTheme.palette.background.default, minHeight: '100vh', direction: 'rtl' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <PeopleOutlineIcon sx={{ fontSize: 40, color: loanTheme.palette.primary.main }} />
-            <Typography variant="h4" component="h1" sx={{ color: loanTheme.palette.text.primary, fontWeight: 700 }}>
-              סה"כ הלוואות: {total}
+    <Box
+      sx={{
+        backgroundColor: "#F5F5F5",
+        minHeight: "100vh",
+        pt: 4,
+        pb: 6,
+        direction: "rtl",
+      }}
+    >
+      <Container maxWidth="lg">
+        {/* שני העיגולים למעלה */}
+        <Box display="flex" justifyContent="center" gap={4} mb={4}>
+          <Box
+            sx={{
+              width: 120,
+              height: 120,
+              borderRadius: "50%",
+              bgcolor: "#FFFFFF",
+              boxShadow: 2,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
+              מספר הלוואות
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: "#006CF0" }}>
+              {total}
             </Typography>
           </Box>
 
+          <Box
+            sx={{
+              width: 120,
+              height: 120,
+              borderRadius: "50%",
+              bgcolor: "#FFFFFF",
+              boxShadow: 2,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
+              סה״כ הלוואות
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: "#006CF0" }}>
+              ₪{totalAmount.toLocaleString()}
+            </Typography>
+          </Box>
         </Box>
 
+        {/* רשימת הכרטיסים */}
         <Grid container spacing={4}>
           {loansData.map((loan) => (
             <Grid item xs={12} sm={6} md={4} key={loan.id}>
-              <Card onClick={() => navigate(`/loans/${loan.id}`)}>
-                <CardContent>
-                   <Chip
-                  label={`#${loan.id}`}
-                  size="small"
-                  color="primary"
-                  sx={{
-                    position: 'absolute',
-                    top: 8,
-                    left: 8,
-                    fontWeight: 700,
-                  }}
-                />
+              <Card
+                sx={{
+                  borderRadius: 2,
+                  boxShadow: 2,
+                  transition: "transform 0.2s, boxShadow 0.2s",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: 6,
+                  },
+                }}
+              >
+                <CardActionArea onClick={() => navigate(`/loans/${loan.id}`)}>
+                  <CardContent sx={{ pt: 2, pb: 3, px: 3 }}>
+                    {/* צ'יפ סטטוס */}
+                    <Box display="flex" justifyContent="flex-end" mb={1}>
+                      <Chip
+                        label={loan.isActive ? "פעיל" : "סגור"}
+                        size="small"
+                        sx={{
+                          backgroundColor: loan.isActive ? "#D2F7E1" : "#F0F0F0",
+                          color: loan.isActive ? "#28A960" : "#6B6B6B",
+                          fontWeight: 600,
+                          fontSize: "0.8rem",
+                        }}
+                      />
+                    </Box>
 
-                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', }}>
-                    <Typography variant="h5" sx={{ color: loanTheme.palette.text.primary, mb: 2, marginLeft: '100px'  }}>
-                      {user ? `${user.first_name} ${user.last_name}` : `${loan.user.first_name} ${loan.user.last_name}`}
-                    </Typography>
-                    <Typography variant="subtitle1" sx={{ color: loanTheme.palette.text.secondary, mb: 2 }}>
-                      {loan.user.id}
-                    </Typography>
-                  </div>
-                  <Typography variant="h6" sx={{ color: loanTheme.palette.text.primary, mb: 2 }}>
-                      פרטי הלוואה: {loan.purpose}
-                    
-                  </Typography>
-
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <AttachMoneyIcon sx={{ color: loanTheme.palette.text.secondary }} />
-                    <Typography variant="body1" sx={{ color: loanTheme.palette.text.secondary }}>
-                      סכום הלוואה: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}>₪{loan.loan_amount.toLocaleString()}</Typography>
-                    </Typography>
-                  </Box>
-
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <CalendarTodayIcon sx={{ color: loanTheme.palette.text.secondary }} />
-                    <Typography variant="body1" sx={{ color: loanTheme.palette.text.secondary }}>
-                      תאריך הלוואה: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}>{loan.loan_date}</Typography>
-                    </Typography>
-                  </Box>
-
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <PaymentsIcon sx={{ color: loanTheme.palette.text.secondary }} />
-                    <Typography variant="body1" sx={{ color: loanTheme.palette.text.secondary }}>
-                      תשלום חודשי: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}>₪{loan.monthly_payment.toLocaleString()}</Typography>
-                    </Typography>
-                  </Box>
-
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <CalendarTodayIcon sx={{ color: loanTheme.palette.text.secondary }} />
-                    <Typography variant="body1" sx={{ color: loanTheme.palette.text.secondary }}>
-                      יום תשלום: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}>{loan.monthly_payment}</Typography>
-                    </Typography>
-                  </Box>
-
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <TrendingDownIcon sx={{ color: loanTheme.palette.text.secondary }} />
-                    <Typography variant="body1" sx={{ color: loanTheme.palette.text.secondary }}>
-                      יתרה לסילוק: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}>₪{loan.remaining_balance.toLocaleString()}</Typography>
-                    </Typography>
-                  </Box>
-                  
-                  {loan.initialMonthlyPayment !== undefined && ( // הצג רק אם קיים
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                      <PaymentsIcon sx={{ color: loanTheme.palette.text.secondary }} />
-                      <Typography variant="body1" sx={{ color: loanTheme.palette.text.secondary }}>
-                        תשלום חודשי התחלתי: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}>₪{loan.initialMonthlyPayment.toLocaleString()}</Typography>
+                    {/* שם לווה */}
+                    <Box textAlign="right" mb={2}>
+                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                        {loan.user.first_name} {loan.user.last_name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.2 }}>
+                        הלוואה #{loan.id}
                       </Typography>
                     </Box>
-                  )}
 
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <CalendarTodayIcon sx={{ color: loanTheme.palette.text.secondary }} />
-                    <Typography variant="body1" sx={{ color: loanTheme.palette.text.secondary }}>
-                      סה"כ תשלומים: <Typography component="span" variant="body1" sx={{ fontWeight: 600, color: loanTheme.palette.text.primary }}> {Math.ceil(loan.total_installments)}</Typography>
-                    </Typography>
-                  </Box>
+                    {/* שלוש שורות Grid: */}
+                    <Grid container spacing={1} mb={2}>
+                      {/* שורה 1: מטרת ההלוואה | סכום */}
+                      <Grid item xs={6}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <PurposeIcon fontSize="small" sx={{ color: "#1C3C3C" }} />
+                          <Box textAlign="right">
+                            <Typography variant="body2" color="text.secondary">
+                              מטרת הלוואה
+                            </Typography>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#1C3C3C" }}>
+                              {loan.purpose}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <AttachMoneyIcon fontSize="small" sx={{ color: "#006CF0" }} />
+                          <Box textAlign="right">
+                            <Typography variant="body2" color="text.secondary">
+                              סכום
+                            </Typography>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#006CF0" }}>
+                              ₪{loan.loan_amount.toLocaleString()}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
 
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-                    {getStatusIcon(loan.isActive, loan.remaining_balance)}
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: getStatusColor(loan.isActive, loan.remaining_balance),
-                        fontWeight: 600,
-                      }}
-                    >
-                      סטטוס: {getStatusText(loan.isActive, loan.remaining_balance)}
-                    </Typography>
-                  </Box>
-                </CardContent>
+                      {/* שורה 2: יום תשלום | תשלום חודשי */}
+                      <Grid item xs={6}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <CalendarTodayIcon fontSize="small" sx={{ color: "#28A960" }} />
+                          <Box textAlign="right">
+                            <Typography variant="body2" color="text.secondary">
+                              יום תשלום
+                            </Typography>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#28A960" }}>
+                              {loan.payment_date} לחודש
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <AttachMoneyIcon fontSize="small" sx={{ color: "#28A960" }} />
+                          <Box textAlign="right">
+                            <Typography variant="body2" color="text.secondary">
+                              תשלום חודשי
+                            </Typography>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#28A960" }}>
+                              ₪{loan.monthly_payment.toLocaleString()}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+
+                      {/* שורה 3: תשלומים נשארו | יתרה לסילוק */}
+                      <Grid item xs={6}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <TrendingDownIcon fontSize="small" sx={{ color: "#1C3C3C" }} />
+                          <Box textAlign="right">
+                            <Typography variant="body2" color="text.secondary">
+                              תשלומים נשארו
+                            </Typography>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#1C3C3C" }}>
+                              {`${Math.ceil(loan.total_installments)} תשלומים`}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <RemainingIcon fontSize="small" sx={{ color: "#D35400" }} />
+                          <Box textAlign="right">
+                            <Typography variant="body2" color="text.secondary">
+                              יתרה לסילוק
+                            </Typography>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#D35400" }}>
+                              ₪{loan.remaining_balance.toLocaleString()}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </CardActionArea>
               </Card>
             </Grid>
           ))}
         </Grid>
-      </Box>
-    </ThemeProvider>
-  )
-}
+      </Container>
+    </Box>
+  );
+};
 
-export default Loans
+export default LoansDashboardWithCircles;

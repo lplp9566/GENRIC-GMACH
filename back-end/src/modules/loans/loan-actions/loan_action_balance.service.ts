@@ -7,6 +7,7 @@ import { LoanPaymentActionType, PaymentEvent } from "../loan-dto/loanTypes";
 import { LoanActionsService } from "./loan_actions.service";
 import { differenceInMonths } from "date-fns";
 import { LoanEntity } from "../Entity/loans.entity";
+import { LoansService } from "../loans.service";
 
 @Injectable()
 export class LoanActionBalanceService{
@@ -18,10 +19,10 @@ export class LoanActionBalanceService{
             @InjectRepository(PaymentDetailsEntity)
             private readonly paymentDetailsRepo: Repository<PaymentDetailsEntity>,
             @Inject(forwardRef(() => LoanActionsService))
-            private readonly LoanActionService:LoanActionsService
+            private readonly LoanActionService:LoanActionsService,
+            private readonly loanService: LoansService
     ){}
     async computeLoanNetBalance(loanId: number): Promise<number> {
-        // 1. טען את ההלוואה כולל המשתמש
         const loan = await this.loansRepo.findOne({
           where: { id: loanId },
           relations: ['user'],
@@ -98,7 +99,7 @@ export class LoanActionBalanceService{
           ...pd.loan_balances.filter((x) => x.loanId !== loan.id),
           { loanId: loan.id, balance: netBalance },
         ];
-    
+    await this.loanService.recordLoanBalance(loan.id, netBalance);
         // שמירה חזרה
         await this.paymentDetailsRepo.save(pd);
         return netBalance;

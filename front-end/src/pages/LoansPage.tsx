@@ -1,4 +1,3 @@
-// src/pages/LoansPage.tsx
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -48,106 +47,156 @@ export const LoansPage: React.FC = () => {
     setFilter(e.target.value as LoanStatus);
     dispatch(setPage(1));
   };
-
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
-      {/* HEADER PAPER */}
-      <Paper
-        elevation={3}
-        sx={{
-          p: 3,
-          mb: 4,
-          borderRadius: 2,
-          bgcolor: "beige",
-          width: "40%",
-          mx: "auto",
-          dir: "rtl",
-        }}
-      >
-        <Stack spacing={2}>
-          {/* Row 1: Title */}
-          <Typography variant="h5" align="center" fontWeight={600}>
-            ניהול הלוואות
-          </Typography>
-
-          {/* Row 2: Button & Select */}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            {/* Left: Add Loan */}
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => navigate("/loans/new")}
+    <Box sx={{ backgroundColor: "#F8F8F8"}}>
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
+        <Paper
+          elevation={3}
+          sx={{
+            p: 3,
+            mb: 4,
+            borderRadius: 2,
+            bgcolor: "#FFFFFF",
+            width: "40%",
+            mx: "auto",
+            dir: "rtl",
+          }}
+        >
+          <Stack spacing={2}>
+            {/* Row 1: Title */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
             >
-              הוסף הלוואה
-            </Button>
-
-            {/* Right: Filter Select */}
-            <FormControl size="small" sx={{ minWidth: 160 }}>
-              <InputLabel id="filter-status-label">מצב הלוואה</InputLabel>
-              <Select
-                labelId="filter-status-label"
-                value={filter}
-                label="מצב הלוואה"
-                onChange={handleFilterChange}
+              <Typography variant="h5" align="center" fontWeight={600}>
+                ניהול הלוואות
+              </Typography>
+              <img
+                width="48"
+                height="48"
+                src="https://img.icons8.com/color/48/loan.png"
+                alt="loan"
+              />
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Button
+                variant="contained"
+                onClick={() => navigate("/loans/new")}
+                sx={{
+                  backgroundColor: "green", // טורקיז כצבע ראשי לכפתור
+                  color: "#ffffff",
+                  "&:hover": {
+                    backgroundColor: "rgb(26, 29, 27)", // טורקיז כהה יותר במעבר עכבר
+                  },
+                }}
               >
-                <MenuItem value={LoanStatus.ALL}>הכל</MenuItem>
-                <MenuItem value={LoanStatus.ACTIVE}>פעילות</MenuItem>
-                <MenuItem value={LoanStatus.INACTIVE}>לא פעילות</MenuItem>
-              </Select>
-            </FormControl>
+                הוסף הלוואה
+              </Button>
+
+              {/* Right: Filter Select */}
+              <FormControl size="small" sx={{ minWidth: 160 }}>
+                <InputLabel
+                  id="filter-status-label"
+                  sx={{
+                    color: "#424242", // אפור כהה ורך יותר לכיתוב
+                    fontWeight: 500,
+                    // כשה־Select בפוקוס, שיהיה בצבע טורקיז:
+                    "&.Mui-focused": {
+                      color: "#2a8c82",
+                    },
+                  }}
+                >
+                  מצב הלוואה
+                </InputLabel>
+
+                <Select
+                  labelId="filter-status-label"
+                  value={filter}
+                  label="מצב הלוואה"
+                  onChange={handleFilterChange}
+                  sx={{
+                    bgcolor: "transparent",
+                    color: "#424242", // אפור כהה ורך יותר לטקסט בתוך ה־Select
+                    borderRadius: 1,
+                    // נוסיף גבול קונטינואס בכל המצבים:
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#B0B0B0", // אפור נייטרלי עדין לגבול ברירת מחדל
+                      borderWidth: 1,
+                    },
+                    // כשכפתור ה־Select נמצא במצב hover:
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#2a8c82", // טורקיז במעבר עכבר
+                    },
+                    // וכשה־Select בפוקוס:
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#2a8c82", // טורקיז בפוקוס
+                      borderWidth: 1.5,
+                    },
+                    // כדי שה־dropdown עצמו יקבל מעט מרווח פנימי:
+                    "& .MuiSelect-select": {
+                      padding: "6px 12px",
+                    },
+                  }}
+                >
+                  <MenuItem value={LoanStatus.ALL}>הכל</MenuItem>
+                  <MenuItem value={LoanStatus.ACTIVE}>פעילות</MenuItem>
+                  <MenuItem value={LoanStatus.INACTIVE}>לא פעילות</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          </Stack>
+        </Paper>
+
+        {status === "pending" && <LoadingIndicator />}
+
+        {/* LOANS TABLE */}
+        <Paper elevation={1} sx={{ p: 2, borderRadius: 2, bgcolor: "#FFFFFF" /* לבן נקי לטבלת ההלוואות */ }}>
+          <Loans loansData={allLoans} total={total} />
+        </Paper>
+
+        {/* PAGINATION */}
+        {pageCount > 1 && (
+          <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
+            <Pagination
+              count={pageCount}
+              page={page}
+              onChange={(_, v) => dispatch(setPage(v))}
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  color: "#424242", // צבע טקסט ברירת מחדל לכפתורי פאגינציה
+                  "&.Mui-selected": {
+                    backgroundColor: "#2a8c82", // רקע טורקיז לעמוד הנבחר
+                    color: "#FFFFFF", // טקסט לבן לעמוד הנבחר
+                    "&:hover": {
+                      backgroundColor: "#1e7b72", // טורקיז כהה יותר במעבר עכבר על עמוד נבחר
+                    },
+                  },
+                  "&:hover:not(.Mui-selected)": {
+                    backgroundColor: "#E0E0E0", // אפור בהיר במעבר עכבר על עמודים לא נבחרים
+                  },
+                },
+                "& .MuiPaginationItem-icon": {
+                  color: "#2a8c82", // צבע טורקיז לאייקוני החיצים
+                },
+              }}
+              showFirstButton
+              showLastButton
+              siblingCount={1}
+              boundaryCount={1}
+            />
           </Box>
-        </Stack>
-      </Paper>
-
-      {/* SUMMARY BOX */}
-      {/* <Box
-        sx={{
-          mb: 2,
-          mx: "auto",
-          maxWidth: 360,
-          px: 2,
-          py: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          bgcolor: "background.paper",
-          borderRadius: 1,
-          boxShadow: 1,
-        }}
-      >
-        <Typography variant="subtitle1">
-          מציג {allLoans.length} מתוך {total}
-        </Typography>
-      </Box> */}
-      {status === "pending" && <LoadingIndicator />}
-
-      {/* LOANS TABLE */}
-      <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
-        <Loans loansData={allLoans} total={total} />
-      </Paper>
-
-      {/* PAGINATION */}
-      {pageCount > 1 && (
-        <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
-          <Pagination
-            count={pageCount}
-            page={page}
-            onChange={(_, v) => dispatch(setPage(v))}
-            color="primary"
-            showFirstButton
-            showLastButton
-            siblingCount={1}
-            boundaryCount={1}
-          />
-        </Box>
-      )}
-    </Container>
+        )}
+      </Container>
+    </Box>
   );
 };
 
