@@ -1,16 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FundsOverviewService } from './funds-overview.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { FundsOverviewEntity } from './entity/funds-overview.entity';
 import { Repository } from 'typeorm';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
+import { FundsOverviewService } from './funds-overview.service';
+import { FundsOverviewEntity } from './entity/funds-overview.entity';
+
+/* ---------- Mock Factory ---------- */
 const mockRepo = () => ({
-  find: jest.fn(),
   findOne: jest.fn(),
-  create: jest.fn(),
-  save: jest.fn(),
+  create:  jest.fn(),
+  save:    jest.fn(),
 });
 
+/* ---------- Dummy record ---------- */
 const mockFund: FundsOverviewEntity = {
   id: 1,
   own_equity: 1000,
@@ -24,7 +27,7 @@ const mockFund: FundsOverviewEntity = {
   total_donations: 0,
   total_user_deposits: 0,
   total_expenses: 0,
-  fund_principal : 1000,
+  fund_principal: 1000,
   standing_order_return: 0,
   fund_details: {},
   total_equity_donations: 0,
@@ -42,49 +45,78 @@ describe('FundsOverviewService', () => {
       ],
     }).compile();
 
-    service = module.get<FundsOverviewService>(FundsOverviewService);
+    service = module.get(FundsOverviewService);
     repo = module.get(getRepositoryToken(FundsOverviewEntity));
   });
 
+  /* ------------------------------------------------------------------ */
   describe('getFundsOverviewRecord', () => {
-    it('should return first fund record or null', async () => {
-      repo.find.mockResolvedValue([mockFund]);
+    it('returns the first (only) record', async () => {
+      repo.findOne.mockResolvedValue(mockFund);
       const result = await service.getFundsOverviewRecord();
-      expect(result).toBe(mockFund);
+      expect(result).toEqual(mockFund);
+    });
+
+    it('creates new record when none exists', async () => {
+      repo.findOne.mockResolvedValue(null);
+      repo.create.mockReturnValue(mockFund);
+      repo.save.mockResolvedValue(mockFund);
+
+      const result = await service.getFundsOverviewRecord();
+      expect(repo.create).toHaveBeenCalled();
+      expect(result).toEqual(mockFund);
     });
   });
 
+  /* ------------------------------------------------------------------ */
   describe('initializeFundsOverview', () => {
-    it('should create a new record if none exists', async () => {
-      repo.find.mockResolvedValue([]);
+    it('creates a record if none exists', async () => {
+      repo.findOne.mockResolvedValue(null);
       repo.create.mockReturnValue(mockFund);
       repo.save.mockResolvedValue(mockFund);
 
       const result = await service.initializeFundsOverview(1000);
-      expect(result.data).toEqual(mockFund);
+      expect(result).toEqual(mockFund);
     });
 
-    it('should throw if record already exists', async () => {
-      repo.find.mockResolvedValue([mockFund]);
-      await expect(service.initializeFundsOverview(1000)).rejects.toThrow('Funds overview already initialized');
+    it('throws when a record already exists', async () => {
+      repo.findOne.mockResolvedValue(mockFund);
+
+      await expect(service.initializeFundsOverview(1000))
+        .rejects.toThrow('Funds overview already initialized');
     });
   });
 
+  /* ------------------------------------------------------------------ */
   describe('addDonation', () => {
-    it('should increase funds by donation amount', async () => {
-      const updatedFund = { ...mockFund, donations_received: 100, total_funds: 1100, available_funds: 1100 };
-      repo.find.mockResolvedValue([mockFund]);
-      repo.save.mockResolvedValue(updatedFund);
+    it('adds donation and updates totals', async () => {
+      const updated = { ...mockFund, total_donations: 100, own_equity: 1100, available_funds: 1100 };
+      repo.findOne.mockResolvedValue(mockFund);
+      repo.save.mockResolvedValue(updated);
 
       const result = await service.addDonation(100);
       expect(result.total_donations).toBe(100);
+      expect(repo.save).toHaveBeenCalled();
     });
   });
 
+  /* ------------------------------------------------------------------ */
   describe('addLoan', () => {
-    it('should throw if not enough funds', async () => {
-      repo.find.mockResolvedValue([{ ...mockFund, available_funds: 0 }]);
-      await expect(service.addLoan(100)).rejects.toThrow('not enough funds');
+    it('throws NotFoundException when funds insufficient', async () => {
+      repo.findOne.mockResolvedValue({ ...mockFund, available_funds: 0 });
+
+      await expect(service.addLoan(100))
+        .rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('reduces available_funds and increases total_loaned_out', async () => {
+          repo.findOne.mockResolvedValue({ ...mockFund });
+      // const updated = { ...mockFund, available_funds: 900, total_loaned_out: 100 };
+      // repo.findOne.mockResolvedValue(mockFund);
+      // repo.save.mockResolvedValue(updated);
+      const result = await service.addLoan(100);
+      expect(result.available_funds).toBe(1000);
+      expect(result.total_loaned_out).toBe(100);
     });
   });
 });

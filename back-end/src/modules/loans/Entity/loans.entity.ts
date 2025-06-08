@@ -16,13 +16,16 @@ export class LoanEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.loans, { onDelete: 'CASCADE' })
   user: UserEntity;
+  @Column({ type: 'int' })
+  initial_loan_amount: number;
 
   @Column({ type: 'float' })
   loan_amount: number;
 
   @Column({ type: 'date' })
   loan_date: Date;
-  @Column({type:'text',  nullable: true})
+
+  @Column({ type: 'text', nullable: true })
   purpose: string; //ropes
 
   @Column({ type: 'float' })
@@ -34,18 +37,28 @@ export class LoanEntity {
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @Column({ type: 'float', nullable: true })
+  @Column({ type: 'float' })
   remaining_balance: number;
 
-  @Column({ type: 'int' })
-  initialMonthlyPayment: number;
-
-  @Column({ type: 'float', nullable: true })
+  @Column({ type: 'float' })
   total_installments: number;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'float' })
+  total_remaining_payments: number;
+
+  @Column({ type: 'int' })
+  initial_monthly_payment: number;
+
+  @Column({ type: 'float', default: 0 })
   balance: number;
-  
+
+  @Column({ type: 'text', nullable: true })
+  guarantor1: string;
+
+  @Column({ type: 'text', nullable: true,default: null })
+  guarantor2: string;
+
+
   @OneToMany(() => LoanActionEntity, (payment) => payment.loan, {
     cascade: true,
   })

@@ -14,6 +14,7 @@ export interface ILoan {
     role: UserRole;
     is_admin: boolean;
   };
+  initial_loan_amount: number;
   loan_amount: number;
   loan_date: string;
   purpose: string;
@@ -21,9 +22,12 @@ export interface ILoan {
   payment_date: number;
   isActive: boolean;
   remaining_balance: number;
-  initialMonthlyPayment: number;
+  initial_monthly_payment: number;
   total_installments: number;
+  total_remaining_payments: number;
   balance: number;
+  guarantor1: string | null;
+  guarantor2: string | null;
 }
 export interface ILoanAction {
   id: number;
@@ -31,6 +35,12 @@ export interface ILoanAction {
   action_type: LoanPaymentActionType;
   date: string;
   value: number;
+}
+export interface ICreateLoanAction {
+  loanId: number;
+  value: number;
+  date: string;
+  action_type: LoanPaymentActionType;
 }
 export interface ICreateLoan {
   user: number;
@@ -50,3 +60,22 @@ export enum LoanPaymentActionType {
   MONTHLY_PAYMENT_CHANGE = "MONTHLY_PAYMENT_CHANGE",
   DATE_OF_PAYMENT_CHANGE = "DATE_OF_PAYMENT_CHANGE",
 }
+
+export const ActionTypes = [
+  {
+    label:'תשלום הלוואה',
+    value:LoanPaymentActionType.PAYMENT
+  },
+  {
+    label:'שינוי סכום הלוואה',
+    value:LoanPaymentActionType.AMOUNT_CHANGE
+  },  
+  {
+    label:'שינוי תשלום חודשי',
+    value:LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE
+  },
+  {
+    label:'שינוי יום תשלום בחודש',
+    value:LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE
+  },
+]

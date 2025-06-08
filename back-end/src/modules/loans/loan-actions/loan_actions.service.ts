@@ -86,6 +86,7 @@ export class LoanActionsService {
       await this.paymentsRepo.save(newPayment);
 
       loan.remaining_balance -= dto.value;
+      loan.total_remaining_payments +=1
       if (loan.remaining_balance < 0) loan.remaining_balance = 0;
       loan.total_installments = loan.remaining_balance / loan.monthly_payment;
             if (loan.remaining_balance === 0) {

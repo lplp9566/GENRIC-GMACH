@@ -32,7 +32,7 @@ export class LoanActionBalanceService{
         // 2. הגדרות בסיס
         const loanStartDate = new Date(loan.loan_date);
         const principal = loan.loan_amount;
-        const initialMonthlyPayment = loan.initialMonthlyPayment;
+        const initialMonthlyPayment = loan.initial_monthly_payment;
         const calculationDate = new Date();
     
         // 3. טען את כל התשלומים ושינויים

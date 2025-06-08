@@ -4,9 +4,9 @@ import { Navbar } from './components/NavBar/NavBar';
 import LoansPage from './pages/LoansPage';
 import HomePage from './components/HomePage/HomePage';
 import FundsOverviewByYearPage from './pages/FundsOverviewByYearPage';
-import LoanDetels from './components/Loans/LoanDetels';
 import NewLoan from './components/Loans/NewLoan/NewLoan';
 import FundsOverviewDashboard from './pages/FundsOverviewDashboard';
+import LoanDetailsPage from './components/Loans/LoanDetails/LoanDetailsPage';
 
 
 
@@ -21,7 +21,7 @@ function App() {
           <Route path="/loans" element={<LoansPage />} />
           <Route path="/Home" element={<HomePage />} />
           <Route path="/loans/new" element={<NewLoan  />} />
-          <Route path="/loans/:id" element={<LoanDetels />} />
+          <Route path="/loans/:id" element={<LoanDetailsPage />} />
           <Route path="/funds" element={<FundsOverviewDashboard />} />
           <Route path='FundsOverviewByYear' element={<FundsOverviewByYearPage />} />
         </Routes>

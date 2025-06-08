@@ -16,7 +16,11 @@ import { FundsOverviewByYearService } from '../../funds-overview-by-year/funds-o
 import { LoanActionBalanceService } from './loan_action_balance.service';
 
 const mockLoanRepo = () => ({ findOne: jest.fn(), save: jest.fn() });
-const mockPaymentRepo = () => ({ find: jest.fn(), create: jest.fn(), save: jest.fn() });
+const mockPaymentRepo = () => ({
+  find: jest.fn(),
+  create: jest.fn(),
+  save: jest.fn(),
+});
 const mockDetailsRepo = () => ({ findOne: jest.fn(), save: jest.fn() });
 
 describe('LoanActionsService', () => {
@@ -32,11 +36,16 @@ describe('LoanActionsService', () => {
     loan_date: new Date(),
     monthly_payment: 100,
     remaining_balance: 1000,
-    initialMonthlyPayment: 100,
+    initial_monthly_payment: 100,
     total_installments: 10,
     purpose: 'Test Loan',
     payments: [],
     user: { id: 1 } as UserEntity,
+    balance: 0,
+    initial_loan_amount: 1000,
+    total_remaining_payments: 100,
+    guarantor1: 'fgf',
+    guarantor2: 'fgf',
   };
 
   beforeEach(async () => {
@@ -44,19 +53,40 @@ describe('LoanActionsService', () => {
       providers: [
         LoanActionsService,
         { provide: getRepositoryToken(LoanEntity), useFactory: mockLoanRepo },
-        { provide: getRepositoryToken(LoanActionEntity), useFactory: mockPaymentRepo },
-        { provide: getRepositoryToken(PaymentDetailsEntity), useFactory: mockDetailsRepo },
-        { provide: UserFinancialByYearService, useValue: { recordLoanRepaid: jest.fn() } },
-        { provide: UserFinancialService, useValue: { recordLoanRepaid: jest.fn() } },
+        {
+          provide: getRepositoryToken(LoanActionEntity),
+          useFactory: mockPaymentRepo,
+        },
+        {
+          provide: getRepositoryToken(PaymentDetailsEntity),
+          useFactory: mockDetailsRepo,
+        },
+        {
+          provide: UserFinancialByYearService,
+          useValue: { recordLoanRepaid: jest.fn() },
+        },
+        {
+          provide: UserFinancialService,
+          useValue: { recordLoanRepaid: jest.fn() },
+        },
         { provide: FundsOverviewService, useValue: { repayLoan: jest.fn() } },
-        { provide: LoansService, useValue: {
+        {
+          provide: LoansService,
+          useValue: {
             changeLoanAmount: jest.fn().mockResolvedValue({ id: 1 }),
             changeMonthlyPayment: jest.fn().mockResolvedValue({ id: 2 }),
             changeDateOfPayment: jest.fn().mockResolvedValue({ id: 3 }),
-        }},
+          },
+        },
         { provide: UsersService, useValue: {} },
-        { provide: FundsOverviewByYearService, useValue: { recordLoanRepaid: jest.fn() } },
-        { provide: LoanActionBalanceService, useValue: { computeLoanNetBalance: jest.fn() } },
+        {
+          provide: FundsOverviewByYearService,
+          useValue: { recordLoanRepaid: jest.fn() },
+        },
+        {
+          provide: LoanActionBalanceService,
+          useValue: { computeLoanNetBalance: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -71,19 +101,34 @@ describe('LoanActionsService', () => {
   });
 
   it('should route to changeLoanAmount when action_type is AMOUNT_CHANGE', async () => {
-    const dto = { loanId: 1, date: new Date(), value: 1000, action_type: LoanPaymentActionType.AMOUNT_CHANGE };
+    const dto = {
+      loanId: 1,
+      date: new Date(),
+      value: 1000,
+      action_type: LoanPaymentActionType.AMOUNT_CHANGE,
+    };
     const result = await service.handleLoanAction(dto);
     expect(result.id).toBe(1);
   });
 
   it('should route to changeMonthlyPayment when action_type is MONTHLY_PAYMENT_CHANGE', async () => {
-    const dto = { loanId: 1, date: new Date(), value: 200, action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE };
+    const dto = {
+      loanId: 1,
+      date: new Date(),
+      value: 200,
+      action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
+    };
     const result = await service.handleLoanAction(dto);
     expect(result.id).toBe(2);
   });
 
   it('should route to changeDateOfPayment when action_type is DATE_OF_PAYMENT_CHANGE', async () => {
-    const dto = { loanId: 1, date: new Date(), value: 15, action_type: LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE };
+    const dto = {
+      loanId: 1,
+      date: new Date(),
+      value: 15,
+      action_type: LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
+    };
     const result = await service.handleLoanAction(dto);
     expect(result.id).toBe(3);
   });
@@ -149,6 +194,8 @@ describe('LoanActionsService', () => {
       value: 100,
       action_type: 'INVALID_TYPE' as any,
     };
-    await expect(service.handleLoanAction(dto)).rejects.toThrow('Unknown action type');
+    await expect(service.handleLoanAction(dto)).rejects.toThrow(
+      'Unknown action type',
+    );
   });
 });

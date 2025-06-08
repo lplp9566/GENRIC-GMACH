@@ -99,9 +99,17 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
       if (!user) {
         throw new Error('User not found');
       }
-      loanRecord.initialMonthlyPayment = loanData.monthly_payment!;
+      loanRecord.initial_monthly_payment = loanData.monthly_payment!;
+      loanRecord.initial_loan_amount = loanData.loan_amount!
+      loanRecord.total_remaining_payments = 0
+      if(loanData.guarantor1){
+        loanRecord.guarantor1 = loanData.guarantor1
+      }
+      if(loanData.guarantor2){
+        loanRecord.guarantor2 = loanData.guarantor2
+      }
       this.loansRepository.save(loanRecord);
-      const tt = await this.userFinancialsService.recordLoanTaken(
+       await this.userFinancialsService.recordLoanTaken(
         user,
         loanRecord.loan_amount,
       );
@@ -152,11 +160,12 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
       }
       const demoLoan = {...loan}
       demoLoan.loan_amount = dto.value + loan.remaining_balance
-      const diff = dto.value - loan.loan_amount;
-      loan.loan_amount = dto.value;
+      // console.log(dto.value, loan.remaining_balance)
+      const diff = dto.value;
+      loan.loan_amount =dto.value + loan.loan_amount ;
       const success =  await this.fundsFlowService.getCashFlowTotals(dto.date, demoLoan);
       if(!success) throw new Error('you need the mony for the deposit');
-      loan.remaining_balance += diff;
+      loan.remaining_balance += dto.value;
       loan.total_installments = Math.ceil(
         loan.remaining_balance / loan.monthly_payment,
       );

@@ -136,11 +136,17 @@ describe('LoansService', () => {
       isActive: true,
       loan_date: new Date(),
       payment_date: 15,
-      initialMonthlyPayment: 100,
+      initial_monthly_payment: 100,
       total_installments: 10,
       purpose: 'Test Loan',
       payments: [],
       user: mockUser,
+      balance : 0,
+      guarantor1: "uii",
+      guarantor2: "uyu",
+      initial_loan_amount: 1000,
+      total_remaining_payments: 10  
+
     };
   
     const mockPayment: LoanActionEntity = {
@@ -180,11 +186,16 @@ describe('LoansService', () => {
         loan_amount: 1200,
         loan_date: new Date(),
         payment_date: 15,
-        initialMonthlyPayment: 100,
+        initial_monthly_payment: 100,
         total_installments: 12,
         purpose: 'Test Loan',
         payments: [],
         user: mockUser,
+        balance : 0,
+        guarantor1: "uii",
+        guarantor2: "uyu",
+        initial_loan_amount: 1000,
+        total_remaining_payments: 12
       };
 
       const mockPayment: LoanActionEntity = {
@@ -218,10 +229,15 @@ describe('LoansService', () => {
         loan_date: new Date(),
         monthly_payment: 100,
         remaining_balance: 1000,
-        initialMonthlyPayment: 100,
+        initial_monthly_payment: 100,
         total_installments: 10,
         payments: [],
         user: mockUser,
+        balance : 0,
+        initial_loan_amount: 1000,
+        total_remaining_payments: 10,
+        guarantor1: "null",
+        guarantor2: "null"
       };
 
       const mockPayment: LoanActionEntity = {

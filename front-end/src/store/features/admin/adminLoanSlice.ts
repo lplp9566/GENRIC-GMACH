@@ -3,6 +3,7 @@ import { Status } from "../../../components/Users/UsersDto";
 import axios from "axios";
 import {
   ICreateLoan,
+  ICreateLoanAction,
   ILoan,
   ILoanAction,
   ILoanCheckResponse,
@@ -70,6 +71,17 @@ export const createLoan = createAsyncThunk(
     return response.data;
   }
 );
+export const createLoanAction = createAsyncThunk(
+  "admin/createLoanAction",
+  async (loanAction:ICreateLoanAction ) => {
+    const response = await axios.post<ICreateLoanAction>(
+      `${BASE_URL}/loan-actions`,
+      loanAction
+    );
+    console.log(response);
+    return response.data;
+  }
+)
 export const getAllLoanActions = createAsyncThunk(
   "admin/getAllLoanActions",
   async () => {
