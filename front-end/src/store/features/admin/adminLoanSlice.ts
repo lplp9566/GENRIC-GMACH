@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Status } from "../../../components/NavBar/Users/UsersDto";
+import { Status } from "../../../components/Users/UsersDto";
 import axios from "axios";
 import {
   ICreateLoan,

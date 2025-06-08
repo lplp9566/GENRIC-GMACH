@@ -16,7 +16,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store/store";
 import { getAllLoans, setPage } from "../store/features/admin/adminLoanSlice";
-import Loans from "../components/Loans/Loans";
+import Loans from "../components/Loans/LoansDeshbord/LoansDashbord";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
 import { LoanStatus } from "../common/indexTypes";
 import { useNavigate } from "react-router-dom";

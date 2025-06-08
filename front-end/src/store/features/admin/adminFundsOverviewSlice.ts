@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { IFundsOverview, IFundsOverviewByYear } from "../../../components/FundsOverview/FundsOverviewDto"
-import { Status } from "../../../components/NavBar/Users/UsersDto"
+import { Status } from "../../../components/Users/UsersDto"
 import axios from "axios"
 
 interface AdminFundsOverviewType {

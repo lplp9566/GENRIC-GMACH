@@ -1,4 +1,4 @@
-import { UserRole } from "../NavBar/Users/UsersDto";
+import { UserRole } from "../Users/UsersDto";
 
 export interface ILoan {
   id: number;

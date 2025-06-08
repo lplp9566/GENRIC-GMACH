@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IUser, Status } from "../../../components/NavBar/Users/UsersDto";
+import { IUser, Status } from "../../../components/Users/UsersDto";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 axios.defaults.withCredentials = true;
