@@ -21,6 +21,7 @@ import {
 } from "../../../store/features/admin/adminLoanSlice";
 import { toast } from "react-toastify";
 import { unwrapResult } from "@reduxjs/toolkit";
+import { setLoanModalMode } from "../../../store/features/Main/AppMode";
 
 interface Props {
   loan: ICreateLoan;
@@ -70,6 +71,7 @@ const CheckLoanModal: React.FC<Props> = ({ onClose, loan, type, dto ,onSubmit}) 
         }
         dispatch(setCheckLoanStatus("idle"));
         dispatch(setLoanActionStatus("idle"));
+         dispatch(setLoanModalMode(false))
       }
     } catch (err: any) {
       dispatch(setCheckLoanStatus("idle"));
