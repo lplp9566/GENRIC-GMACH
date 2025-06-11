@@ -31,9 +31,6 @@ export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit}) => {
 
   const handleModeChange = (e: SelectChangeEvent) =>
     setMode(e.target.value as ActionMode);
-
-
-
   return (
     <Box dir="rtl">
       <Paper elevation={2} sx={{ p: 2, borderRadius: 2, backgroundColor: "#E8F0FE"}}>

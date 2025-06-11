@@ -8,7 +8,7 @@ export class LoanActionsController {
   }
   
   @Post()
-  async addPayment(@Body() actionData: LoanActionDto) {
+  async addLoanAction(@Body() actionData: LoanActionDto) {
     return this.loanPaymentsService.handleLoanAction(actionData);
   }
   @Get()

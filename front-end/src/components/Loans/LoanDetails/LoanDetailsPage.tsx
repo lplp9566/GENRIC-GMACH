@@ -13,6 +13,7 @@ import Actions from "../LaonActions/Actions";
 import { ICreateLoanAction } from "../LoanDto";
 import ActionsTable from "./ActionsTable";
 import LoadingIndicator from "../../StatusComponents/LoadingIndicator";
+import useLoanSubmit from "../../../Hooks/LoanHooks/LoanActionsHooks";
 
 const LoanDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,11 +29,11 @@ const LoanDetailsPage: React.FC = () => {
   );
   console.log(LoanDetails);
 
-  const handleSubmit = async (dto: ICreateLoanAction ) => {
-    await dispatch(createLoanAction(dto)).unwrap();
-    await dispatch(getLoanDetails(loanId));
-  };
-
+  // const handleSubmit = async (dto: ICreateLoanAction ) => {
+  //   await dispatch(createLoanAction(dto)).unwrap();
+  //   await dispatch(getLoanDetails(loanId));
+  // };
+  const handleSubmit = useLoanSubmit(loanId);
   useEffect(() => {
     if (loanId) dispatch(getLoanDetails(loanId));
   }, [dispatch ]);

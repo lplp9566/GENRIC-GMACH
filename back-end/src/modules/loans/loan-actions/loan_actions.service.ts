@@ -39,6 +39,7 @@ export class LoanActionsService {
     private readonly LoanActionBalanceService:LoanActionBalanceService
   ) {}
   async handleLoanAction(dto: LoanActionDto): Promise<LoanActionEntity> {
+    console.log(dto)
     try {
       switch (dto.action_type) {
         case LoanPaymentActionType.PAYMENT:

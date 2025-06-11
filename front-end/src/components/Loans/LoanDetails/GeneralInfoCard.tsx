@@ -55,7 +55,7 @@ export const GeneralInfoCard: React.FC<Props> = ({ loan }) => {
     },
     {
       label: 'סה"כ תשלומים שנותרו',
-      value: loan.total_installments,
+      value: Math.ceil(loan.remaining_balance ),
       color: "text.primary",
     },
     {

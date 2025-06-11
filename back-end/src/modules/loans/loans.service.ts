@@ -39,7 +39,7 @@ export class LoansService {
         fromDate,
         loanData
       );
-
+     
       if (!success) {
         return { ok: false, error: 'לא מספיק כסף במערכת' };
       }
@@ -150,7 +150,7 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
   }
   async changeLoanAmount(dto: LoanActionDto): Promise<LoanActionEntity> {
     try {
-
+      
       const loan = await this.loansRepository.findOne({
         where: { id: dto.loanId },
         relations: ['user'],
@@ -159,18 +159,14 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
       if (!loan.isActive) {
         throw new Error('Cannot operate on a closed loan');
       }
-      const demoLoan = {...loan}
-      demoLoan.loan_amount = dto.value + loan.remaining_balance
-      // console.log(dto.value, loan.remaining_balance)
+      console.log(dto)
       const diff = dto.value;
-      loan.loan_amount =dto.value + loan.loan_amount ;
-      const success =  await this.fundsFlowService.getCashFlowTotals(dto.date, demoLoan);
-      if(!success) throw new Error('you need the mony for the deposit');
+      loan.loan_amount += dto.value;
       loan.remaining_balance += dto.value;
-      loan.total_installments = Math.ceil(
-        loan.remaining_balance / loan.monthly_payment,
-      );
+      loan.total_installments = loan.remaining_balance / loan.monthly_payment,
+      console.log(loan.loan_amount)
       await this.loansRepository.save(loan);
+      console.log(loan)
       const year = getYearFromDate(dto.date);
       await Promise.all([
         this.userFinancialsByYearService.recordLoanTaken(loan.user, year, diff),

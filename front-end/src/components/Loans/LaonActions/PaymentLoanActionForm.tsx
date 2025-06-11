@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Box, TextField, Button } from "@mui/material";
 import { ICreateLoanAction, LoanPaymentActionType } from "../LoanDto";
+import { toast } from "react-toastify";
 
 interface Props {
   loanId: number;
@@ -24,6 +25,7 @@ interface Props {
     });
     setAmount("");
     setDate("");
+    toast.success("התשלום נשלח בהצלחה");
   };
 
   return (

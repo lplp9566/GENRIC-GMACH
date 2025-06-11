@@ -78,7 +78,7 @@ export const ActionTypes = [
     value:LoanPaymentActionType.PAYMENT
   },
   {
-    label:'שינוי סכום הלוואה',
+    label:'הוספת סכום הלוואה',
     value:LoanPaymentActionType.AMOUNT_CHANGE
   },  
   {

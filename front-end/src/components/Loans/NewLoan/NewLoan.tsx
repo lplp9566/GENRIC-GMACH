@@ -19,7 +19,10 @@ import {
 } from "./NewLoanStyle";
 import { toast } from "react-toastify";
 import CheckLoanModal from "./CheckLoanModal";
-// Main form component
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../store/store";
+import { setLoanModalMode } from "../../../store/features/Main/AppMode";
+
 const NewLoanForm: React.FC = () => {
   const theme = useTheme();
   const today = new Date().toISOString().split("T")[0];
@@ -31,7 +34,8 @@ const NewLoanForm: React.FC = () => {
     payment_date: 1,
     user: 0,
   });
-  const [IsLoanCheckModalOpen, setCheckLoanModal] = useState<boolean>(false);
+    const dispatch = useDispatch<AppDispatch>();
+  const {LoanModalMode}= useSelector((state: RootState) => state.mapModeSlice);
   const handleFieldChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -42,7 +46,7 @@ const NewLoanForm: React.FC = () => {
         name === "purpose"
           ? value
           : name === "loan_date"
-          ? value // Ensure date is in string format
+          ? value 
           : Number(value),
     }));
   };
@@ -73,14 +77,13 @@ const NewLoanForm: React.FC = () => {
       toast.warn("אנא מלא מטרה להלוואה");
       return;
     }
-    // await dispatch(createLoan(newLoan)).unwrap();
-    setCheckLoanModal(true);
+    dispatch(setLoanModalMode(true))
   };
 
   return (
     <RootContainer>
-      {IsLoanCheckModalOpen && (
-        <CheckLoanModal onClose={() => setCheckLoanModal(false) }loan={newLoan} />
+      {LoanModalMode && (
+        <CheckLoanModal onClose={() => dispatch(setLoanModalMode(false)) }loan={newLoan} type="create"/>
       )}
       <FormCard>
         <Stack spacing={2} alignItems="center">

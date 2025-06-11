@@ -17,13 +17,15 @@ interface AdminLoanType {
   status: Status;
   checkLoanStatus: Status;
   createLoanStatus: Status;
+  loanDeleteStatus: Status;
+  createLoanActionStatus: Status;
   error: string | null;
   page: number;
   pageCount: number;
   total: number;
   loanDetails: ILoanWithPayment | null;
   checkLoanResponse: ILoanCheckResponse;
-  loanDeleteStatus: Status;
+
 }
 const initialState: AdminLoanType = {
   allLoans: [],
@@ -32,11 +34,13 @@ const initialState: AdminLoanType = {
   status: "idle",
   checkLoanStatus: "idle",
   createLoanStatus: "idle",
+  loanDeleteStatus: "idle",
+  createLoanActionStatus: "idle",
   pageCount: 1,
   page: 1,
   total: 0,
   loanDetails: null,
-  loanDeleteStatus: "idle",
+
   checkLoanResponse: {
     ok: false,
     error: "",
@@ -111,6 +115,12 @@ export const AdminLoansSlice = createSlice({
     setPage(state, action: PayloadAction<number>) {
       state.page = action.payload;
     },
+    setCheckLoanStatus(state, action: PayloadAction<Status>) {
+      state.checkLoanStatus = action.payload;
+    },
+    setLoanActionStatus(state, action: PayloadAction<Status>) {
+      state.createLoanActionStatus = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -182,7 +192,19 @@ export const AdminLoansSlice = createSlice({
         state.loanDeleteStatus = "rejected";
         state.error = action.error.message || null;
       })
+      .addCase(createLoanAction.pending, (state) => {
+        state.createLoanActionStatus = "pending";
+        state.error = null;
+      })
+      .addCase(createLoanAction.fulfilled, (state) => {
+        state.createLoanActionStatus = "fulfilled";
+        state.error = null;
+      })
+      .addCase(createLoanAction.rejected, (state, action) => {
+        state.createLoanActionStatus = "rejected";
+        state.error = action.error.message! ;
+      });
   },
 });
-export const { setPage } = AdminLoansSlice.actions;
+export const { setPage, setCheckLoanStatus ,setLoanActionStatus} = AdminLoansSlice.actions;
 export default AdminLoansSlice.reducer;

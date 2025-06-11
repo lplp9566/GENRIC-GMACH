@@ -9,34 +9,41 @@ import {
   useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { ICreateLoan } from "../LoanDto";
+import { ICreateLoan, ICreateLoanAction } from "../LoanDto";
 import { AppDispatch, RootState } from "../../../store/store";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { checkLoan, createLoan } from "../../../store/features/admin/adminLoanSlice";
+import {
+  checkLoan,
+  createLoan,
+  setCheckLoanStatus,
+  setLoanActionStatus,
+} from "../../../store/features/admin/adminLoanSlice";
 import { toast } from "react-toastify";
 import { unwrapResult } from "@reduxjs/toolkit";
 
 interface Props {
   loan: ICreateLoan;
   onClose: () => void;
+  type: "create" | "update";
+  dto?: ICreateLoanAction;
+  onSubmit?: (dto: ICreateLoanAction) => void;
 }
 
-const CheckLoanModal: React.FC<Props> = ({ onClose, loan }) => {
+const CheckLoanModal: React.FC<Props> = ({ onClose, loan, type, dto ,onSubmit}) => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const theme = useTheme();
 
-  const {
-    checkLoanStatus,
-    checkLoanResponse,
-    createLoanStatus,
-  } = useSelector((state: RootState) => state.adminLoansSlice);
+  const { checkLoanStatus, checkLoanResponse, createLoanStatus,createLoanActionStatus } = useSelector(
+    (state: RootState) => state.adminLoansSlice
+  );
 
   useEffect(() => {
+    console.log(checkLoanStatus);
     dispatch(checkLoan(loan));
-    return () => {
-    };
+
+    return () => {};
   }, [dispatch, loan]);
 
   const handleCreateLoan = async () => {
@@ -46,20 +53,35 @@ const CheckLoanModal: React.FC<Props> = ({ onClose, loan }) => {
     });
 
     try {
-      const actionResult = await dispatch(createLoan(loan));
-      unwrapResult(actionResult);
-      toast.dismiss(toastId);
-      toast.success("ההלוואה נוצרה בהצלחה!");
-      onClose();
-      navigate("/loans");
+      if (type === "create") {
+        const actionResult = await dispatch(createLoan(loan));
+        unwrapResult(actionResult);
+        toast.dismiss(toastId);
+        toast.success("ההלוואה נוצרה בהצלחה!");
+        onClose();
+        navigate("/loans");
+        dispatch(setCheckLoanStatus("idle"));
+      }
+      if(type === "update" &&onSubmit){
+        onSubmit(dto!);
+        toast.dismiss(toastId);
+        if(createLoanActionStatus === "fulfilled") {
+        toast.success("ההלוואה עודכנה בהצלחה!");
+        }
+        dispatch(setCheckLoanStatus("idle"));
+        dispatch(setLoanActionStatus("idle"));
+      }
     } catch (err: any) {
+      dispatch(setCheckLoanStatus("idle"));
       toast.dismiss(toastId);
       toast.error(err.message || "שגיאה ביצירת ההלוואה");
     }
   };
 
   const isActionDisabled =
-    checkLoanStatus === "pending" || createLoanStatus === "pending" || checkLoanStatus === "rejected";
+    checkLoanStatus === "pending" ||
+    createLoanStatus === "pending" ||
+    checkLoanStatus === "rejected";
 
   return (
     <Box
@@ -112,7 +134,7 @@ const CheckLoanModal: React.FC<Props> = ({ onClose, loan }) => {
             mb: 2,
           }}
         >
-          {checkLoanStatus === "pending" && (
+          {checkLoanStatus === "pending" || createLoanStatus === "pending" || createLoanActionStatus === "pending" &&  (
             <CircularProgress size={24} color="primary" />
           )}
 
@@ -121,13 +143,11 @@ const CheckLoanModal: React.FC<Props> = ({ onClose, loan }) => {
               ההלוואה תקינה וניתן ליצור אותה!
             </Typography>
           )}
-
           {checkLoanStatus === "fulfilled" && !checkLoanResponse.ok && (
             <Typography sx={{ color: "red", textAlign: "center" }}>
               לא ניתן ליצור הלוואה: {checkLoanResponse.error}
             </Typography>
           )}
-
           {checkLoanStatus === "rejected" && (
             <Typography sx={{ color: "red", textAlign: "center" }}>
               קרתה שגיאה בבדיקת ההלוואה.
@@ -136,6 +156,7 @@ const CheckLoanModal: React.FC<Props> = ({ onClose, loan }) => {
         </Box>
 
         <Box
+          dir="ltr"
           sx={{
             display: "flex",
             justifyContent: "flex-end",
@@ -143,26 +164,14 @@ const CheckLoanModal: React.FC<Props> = ({ onClose, loan }) => {
             mt: 2,
           }}
         >
-          <Button
-            onClick={onClose}
-            disabled={isActionDisabled}
-            sx={{ color: theme.palette.text.secondary }}
-          >
-            ביטול
-          </Button>
+          <Button onClick={onClose}>ביטול</Button>
           <Button
             variant="contained"
             color={checkLoanResponse.ok ? "success" : "warning"}
             onClick={handleCreateLoan}
             disabled={isActionDisabled}
-            sx={{
-              minWidth: 140,
-              boxShadow: theme.shadows[2],
-            }}
           >
-            {checkLoanResponse.ok
-              ? "אשר הלוואה"
-              : "אשר בכל זאת (לא מומלץ)"}
+            {checkLoanResponse.ok ? "אשר הלוואה" : "אשר בכל זאת "}
           </Button>
         </Box>
       </Box>
