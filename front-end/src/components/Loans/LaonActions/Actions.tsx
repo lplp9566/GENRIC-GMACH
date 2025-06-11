@@ -1,44 +1,78 @@
-import { Typography } from "@mui/material";
+// src/components/LoanActions/Actions.tsx
+import React, { useState } from "react";
+import {
+  Box,
+  Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+} from "@mui/material";
+import { ICreateLoanAction, LoanPaymentActionType } from "../LoanDto";
+import PaymentLoanActionForm from "./PaymentLoanActionForm";
+import DateOfPaymentChangeLoanForm from "./DateOfPaymentChangeLoanForm";
+import MonthlyPaymentChangeLoanForm from "./MonthlyPaymentChangeLoanForm";
+import AmountChangeLoanForm from "./AmountChangeLoanForm";
 
-
-interface Props {
+interface ActionsProps {
   loanId: number;
+  handleSubmit: (dto: ICreateLoanAction) => void;
 }
 
-const Actions: React.FC<Props> = ({ loanId }) => {
-    console.log(loanId)
-//   const dispatch = useDispatch<AppDispatch>();
-//   const [isLoading, setLoading] = useState(false);
+type ActionMode =
+  | LoanPaymentActionType.PAYMENT
+  | LoanPaymentActionType.AMOUNT_CHANGE
+  | LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE
+  | LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE;
 
-//   const handleAddAction = async () => {
-//     setLoading(true);
-//     try {
-//       await dispatch(
-//         createLoanAction({
-//           action_type: LoanPaymentActionType.AMOUNT_CHANGE,
-//           value: 100,
-//           date: new Date().toISOString(),
-//           loanId,
-//         })
-//       ).unwrap();
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit}) => {
+  const [mode, setMode] = useState<ActionMode>(LoanPaymentActionType.PAYMENT);
+
+  const handleModeChange = (e: SelectChangeEvent) =>
+    setMode(e.target.value as ActionMode);
+
+
 
   return (
-    // <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-    //   <Button
-    //     variant="contained"
-    //     onClick={handleAddAction}
-    //     disabled={isLoading}
-    //   >
-    //     הוסף שינוי סכום (+₪100)
-    //   </Button>
+    <Box dir="rtl">
+      <Paper elevation={2} sx={{ p: 2, borderRadius: 2, backgroundColor: "#E8F0FE"}}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="action-select-label">בחר פעולה</InputLabel>
+          <Select
+            labelId="action-select-label"
+            value={mode}
+            label="בחר פעולה"
+            onChange={handleModeChange}
+            sx={{ backgroundColor: "#FFF", borderRadius: 1 }}
+          >
+            <MenuItem value={LoanPaymentActionType.PAYMENT}>תשלום הלוואה</MenuItem>
+            <MenuItem value={LoanPaymentActionType.AMOUNT_CHANGE}>
+              שינוי סכום הלוואה
+            </MenuItem>
+            <MenuItem value={LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE}>
+              עדכון תשלום חודשי
+            </MenuItem>
+            <MenuItem value={LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE}>
+              שינוי יום תשלום
+            </MenuItem>
+          </Select>
+        </FormControl>
 
-    //   {/* אפשר להוסיף כאן כפתורים נוספים לסוגי פעולות אחרים */}
-    // </Box>
-    <Typography>כאן  תוכל לעשות את כל הפעילות על ההלואאה </Typography>
+        {mode === LoanPaymentActionType.PAYMENT && (
+          <PaymentLoanActionForm loanId={loanId} onSubmit={handleSubmit} />
+        )}
+        {mode === LoanPaymentActionType.AMOUNT_CHANGE && (
+          <AmountChangeLoanForm loanId={loanId} onSubmit={handleSubmit} />
+        )}
+        {mode === LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE && (
+          <MonthlyPaymentChangeLoanForm loanId={loanId} onSubmit={handleSubmit} />
+        )}
+        {mode === LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE && (
+          <DateOfPaymentChangeLoanForm loanId={loanId} onSubmit={handleSubmit} />
+        )}
+      </Paper>
+    </Box>
   );
 };
 

@@ -61,9 +61,9 @@ export class LoansController {
     }
     return this.loansService.getLoans(opts);
   }
-  @Get(':id')
+  @Get('/id')
   async getLoan(
-    @Param('id', ParseIntPipe) id: number
+    @Query('id', ParseIntPipe) id: number
   ){
     return this.loansService.getLoanById(id);
   }

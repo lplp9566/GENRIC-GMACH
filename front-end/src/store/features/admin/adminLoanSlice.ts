@@ -4,14 +4,15 @@ import axios from "axios";
 import {
   ICreateLoan,
   ICreateLoanAction,
-  ILoan,
+  ILoanWithUser,
   ILoanAction,
   ILoanCheckResponse,
+  ILoanWithPayment,
 } from "../../../components/Loans/LoanDto";
 import { FindLoansOpts, PaginatedResult } from "../../../common/indexTypes";
 
 interface AdminLoanType {
-  allLoans: ILoan[];
+  allLoans: ILoanWithUser[];
   loanActions: ILoanAction[];
   status: Status;
   checkLoanStatus: Status;
@@ -20,7 +21,9 @@ interface AdminLoanType {
   page: number;
   pageCount: number;
   total: number;
+  loanDetails: ILoanWithPayment | null;
   checkLoanResponse: ILoanCheckResponse;
+  loanDeleteStatus: Status;
 }
 const initialState: AdminLoanType = {
   allLoans: [],
@@ -32,6 +35,8 @@ const initialState: AdminLoanType = {
   pageCount: 1,
   page: 1,
   total: 0,
+  loanDetails: null,
+  loanDeleteStatus: "idle",
   checkLoanResponse: {
     ok: false,
     error: "",
@@ -40,16 +45,15 @@ const initialState: AdminLoanType = {
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const getAllLoans = createAsyncThunk<
-  PaginatedResult<ILoan>,
+  PaginatedResult<ILoanWithUser>,
   FindLoansOpts
 >("admin/getAllLoans", async (opts) => {
   console.log("getAllLoans called with opts:", opts);
 
-  const response = await axios.get<PaginatedResult<ILoan>>(
+  const response = await axios.get<PaginatedResult<ILoanWithUser>>(
     `${BASE_URL}/loans`,
     { params: opts }
   );
-  console.log(response);
   return response.data;
 });
 export const checkLoan = createAsyncThunk(
@@ -66,8 +70,7 @@ export const checkLoan = createAsyncThunk(
 export const createLoan = createAsyncThunk(
   "admin/createLoan",
   async (loan: ICreateLoan) => {
-    const response = await axios.post<ILoan>(`${BASE_URL}/loans`, loan);
-    console.log(response);
+    const response = await axios.post<ILoanWithUser>(`${BASE_URL}/loans`, loan);
     return response.data;
   }
 );
@@ -87,6 +90,17 @@ export const getAllLoanActions = createAsyncThunk(
   async () => {
     const response = await axios.get(`${BASE_URL}/loan-actions`);
     console.log(response);
+    return response.data;
+  }
+);
+export const getLoanDetails = createAsyncThunk(
+  "admin/getLoanDetails",
+  async (id: number) => {
+    const response = await axios.get(
+      `${BASE_URL}/loans/id`,
+      { params: { id } } 
+    );
+    console.log(response.data)
     return response.data;
   }
 );
@@ -154,7 +168,20 @@ export const AdminLoansSlice = createSlice({
       .addCase(createLoan.rejected, (state, action) => {
         state.createLoanStatus = "rejected";
         state.error = action.error.message! ;
-      });
+      })
+      .addCase(getLoanDetails.pending, (state) => {
+        state.loanDetails = null;
+        state.loanDeleteStatus = "pending";
+      })
+      .addCase(getLoanDetails.fulfilled, (state, action) => {
+        state.loanDetails = action.payload;
+        state.loanDeleteStatus = "fulfilled";
+      })
+      .addCase(getLoanDetails.rejected, (state, action) => {
+        state.loanDetails = null;
+        state.loanDeleteStatus = "rejected";
+        state.error = action.error.message || null;
+      })
   },
 });
 export const { setPage } = AdminLoansSlice.actions;

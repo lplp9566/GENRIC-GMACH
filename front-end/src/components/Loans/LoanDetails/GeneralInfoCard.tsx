@@ -7,14 +7,13 @@ import {
   Box,
   Chip,
 } from "@mui/material";
-import { ILoan } from "../LoanDto";
+import { ILoanWithPayment } from "../LoanDto";
 
 interface Props {
-  loan: ILoan;
+  loan: ILoanWithPayment;
 }
 
 export const GeneralInfoCard: React.FC<Props> = ({ loan }) => {
-  /** רשימת נתונים להצגה */
   const items = [
     {
       label: "סכום הלוואה ראשוני",

@@ -12,6 +12,7 @@ import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-over
 import { FundsFlowService } from './calcelete.service';
 import { LoanEntity } from './Entity/loans.entity';
 import { FindLoansOpts, LoanStatus, PaginatedResult } from '../../common/index';
+import { log } from 'console';
 // cSpell:ignore Financials
 
 @Injectable()
@@ -129,11 +130,11 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
     }
   }
 
-  async getLoanById(id: number): Promise<LoanEntity | null> {
+  async getLoanById(id: number): Promise<LoanEntity | null> {   
     try {
       return this.loansRepository.findOne({
         where: { id },
-        relations: ['payments'],
+        relations: ['actions'],
       });
     } catch (error) {
       throw new BadRequestException(error.message);

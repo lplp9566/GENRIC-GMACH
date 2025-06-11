@@ -17,10 +17,10 @@ import {
   Flag as PurposeIcon,
   AccountBalanceWallet as RemainingIcon,
 } from "@mui/icons-material";
-import { ILoan } from "../LoanDto";
+import { ILoanWithUser } from "../LoanDto";
 
 interface LoanCardProps {
-  loan: ILoan;
+  loan: ILoanWithUser;
   onClick: () => void;
 }
 

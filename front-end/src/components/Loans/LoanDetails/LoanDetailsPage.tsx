@@ -1,105 +1,117 @@
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Box,
-  Button,
-  Grid,
-  Typography,
-  Divider,
-} from "@mui/material";
+import { Box, Button, Grid, Typography, Divider, Avatar } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { AppDispatch, RootState } from "../../../store/store";
-import { getAllLoanActions } from "../../../store/features/admin/adminLoanSlice";
-
-/* קומפוננטות־בן */
+import {
+  createLoanAction,
+  getLoanDetails,
+} from "../../../store/features/admin/adminLoanSlice";
 import { GeneralInfoCard } from "./GeneralInfoCard";
-import { ActionsTable }   from "./ActionsTable";
-import Actions            from "../LaonActions/Actions";
+import Actions from "../LaonActions/Actions";
+import { ICreateLoanAction } from "../LoanDto";
+import ActionsTable from "./ActionsTable";
+import LoadingIndicator from "../../StatusComponents/LoadingIndicator";
 
 const LoanDetailsPage: React.FC = () => {
-  const { id }   = useParams<{ id: string }>();
-  const loanId   = Number(id);
+  const { id } = useParams<{ id: string }>();
+  const loanId = Number(id);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const loan = useSelector((s: RootState) =>
     s.adminLoansSlice.allLoans?.find((l) => l.id === loanId)
   );
-  const actions = useSelector((s: RootState) =>
-    s.adminLoansSlice.loanActions?.filter((a) => a.loan.id === loanId) || []
+  const LoanDetails = useSelector(
+    (s: RootState) => s.adminLoansSlice.loanDetails
   );
+  console.log(LoanDetails);
 
-  /* טעינת פעולות */
+  const handleSubmit = async (dto: ICreateLoanAction ) => {
+    await dispatch(createLoanAction(dto)).unwrap();
+    await dispatch(getLoanDetails(loanId));
+  };
+
   useEffect(() => {
-    if (loanId) dispatch(getAllLoanActions());
-  }, [dispatch, loanId]);
+    if (loanId) dispatch(getLoanDetails(loanId));
+  }, [dispatch ]);
 
-  /* מצב-טעינה */
-  if (!loan)
+  if (!loan || !LoanDetails)
     return (
-      <Box
-        sx={{
-          p: 4,
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          direction: "rtl",
-        }}
-      >
-        <Typography variant="h6" color="text.secondary">
-          טוען פרטי הלוואה…
-        </Typography>
-      </Box>
+    <LoadingIndicator/>
     );
 
-  /* ---------------------- דף ---------------------- */
   return (
     <Box
       sx={{
-        p: { xs: 2, md: 4 },
+        padding: "24px 0 10px 5px",
         minHeight: "100vh",
         direction: "rtl",
         backgroundColor: "#F5F7FA",
       }}
     >
-      {/* חזרה לרשימת־הלוואות */}
       <Button
         variant="text"
         onClick={() => navigate(-1)}
         startIcon={<ArrowBackIcon sx={{ ml: 1 }} />}
-        sx={{ mb: 4, color: "#555", "&:hover": { backgroundColor: "rgba(0,0,0,.04)" } }}
+        sx={{
+          mb: 4,
+          color: "#555",
+          "&:hover": { backgroundColor: "rgba(0,0,0,.04)" },
+        }}
       >
         חזור לדף הלוואות
       </Button>
 
-      {/* כותרת */}
-      <Typography variant="h3" sx={{ mb: 4, fontWeight: 700, display: "flex", justifyContent: "center" }}>
+      <Typography
+        variant="h3"
+        sx={{
+          mb: 4,
+          fontWeight: 700,
+          textAlign: "center",
+        }}
+      >
         פרטי הלוואה עבור:{" "}
         <Box component="span" sx={{ color: "#007BFF" }}>
           {loan.user.first_name} {loan.user.last_name}
         </Box>
+        /
+        <Box component="span" sx={{ color: "#007BFF" }}>
+          {loan.purpose}
+        </Box>
+
       </Typography>
+
       <Divider sx={{ mb: 5 }} />
 
-      {/* ----------  פריסה: טבלה | פעולות | פרטי-הלוואה ---------- */}
-      <Grid container spacing={2}>
-        {/* ימינה – טבלת פעולות */}
-        <Grid item xs={12} md={6}>
-          <ActionsTable actions={actions} />
-        </Grid>
+<Grid
+  container
+  spacing={4}
+  // על מסכים קטנים – סדר בטור, על מסכים גדולים – שורה מימין לשמאל
+  direction={{ xs: "column", md: "row-reverse" }}
+  // על desktop תפרוס בין הפריטים, על mobile תתיישר לימין
+  justifyContent={{ xs: "flex-start", md: "space-between" }}
+  alignItems="flex-start"
+  sx={{ width: "100%" }}
+>
+  {/* 1) פרטי הלוואה – יופיע ראשון במובייל, צד שמאל ב-desktop */}
+  <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "40%" } }}>
+    <GeneralInfoCard loan={LoanDetails} />
+  </Grid>
 
-        {/* אמצע – כפתורי פעולה */}
-        <Grid item xs={12} md={2}>
-          <Actions loanId={loanId}/>
-        </Grid>
+  {/* 2) Actions – באמצע ב-desktop, מתחת ב-mobile */}
+  {LoanDetails.isActive && (
+    <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "20%" } }}>
+      <Actions loanId={loanId} handleSubmit={handleSubmit} />
+    </Grid>
+  )}
 
-        {/* שמאלה – כרטיס מידע */}
-        <Grid item xs={12} md={4}>
-          <GeneralInfoCard loan={loan} />
-        </Grid>
-      </Grid>
+  {/* 3) טבלת פעולות – יופיע אחרון במובייל, צד ימין ב-desktop */}
+  <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "30%" } }}>
+    <ActionsTable actions={LoanDetails.actions ?? []} />
+  </Grid>
+</Grid>
     </Box>
   );
 };

@@ -15,21 +15,21 @@ interface Props {
   actions: ILoanAction[];
 }
 
-export const ActionsTable: React.FC<Props> = ({ actions }) => (
- /* ActionsTable.tsx */
+const ActionsTable: React.FC<Props> = ({ actions }) => (
+
   <Paper
     elevation={3}
     sx={{
       p: 3,
       borderRadius: 2,
       width: "100%", 
-      maxWidth: 400,         
+      // maxWidth: 400,         
     }}
   >
     <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
       פעולות על הלוואה
     </Typography>
-
+  {!actions.length && <Typography>לא נמצאו פעולות</Typography>}
     <Table
       size="small"
       sx={{
@@ -78,3 +78,4 @@ export const ActionsTable: React.FC<Props> = ({ actions }) => (
   </Paper>
 );
 
+export default ActionsTable;

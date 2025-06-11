@@ -62,5 +62,5 @@ export class LoanEntity {
   @OneToMany(() => LoanActionEntity, (payment) => payment.loan, {
     cascade: true,
   })
-  payments: LoanActionEntity[];
+  actions: LoanActionEntity[];
 }

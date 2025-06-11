@@ -3,11 +3,12 @@ import React from "react";
 import { Box, Container, Grid } from "@mui/material";
 import SummaryCard from "./SummaryCard";
 import LoanCard from "./LoanCard";
-import { ILoan } from "../LoanDto";
+import { ILoanWithUser } from "../LoanDto";
 import { useNavigate } from "react-router-dom";
 
+
 interface LoanProps {
-  loansData: ILoan[];
+  loansData: ILoanWithUser[];
   total: number;
 }
 

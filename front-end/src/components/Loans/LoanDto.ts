@@ -1,8 +1,5 @@
 import { UserRole } from "../Users/UsersDto";
-
-export interface ILoan {
-  id: number;
-  user: {
+export interface ILoanUser {
     id: number;
     first_name: string;
     last_name: string;
@@ -13,7 +10,10 @@ export interface ILoan {
     phone_number: string;
     role: UserRole;
     is_admin: boolean;
-  };
+}
+export interface ILoanWithUser {
+  id: number;
+  user: ILoanUser;
   initial_loan_amount: number;
   loan_amount: number;
   loan_date: string;
@@ -31,7 +31,7 @@ export interface ILoan {
 }
 export interface ILoanAction {
   id: number;
-  loan: ILoan;
+  loan: ILoanWithUser;
   action_type: LoanPaymentActionType;
   date: string;
   value: number;
@@ -60,6 +60,17 @@ export enum LoanPaymentActionType {
   MONTHLY_PAYMENT_CHANGE = "MONTHLY_PAYMENT_CHANGE",
   DATE_OF_PAYMENT_CHANGE = "DATE_OF_PAYMENT_CHANGE",
 }
+type ILoanBase = Omit<ILoanWithUser, 'user'>;
+
+export interface ILoanWithPayment extends ILoanBase {
+  actions:ILoanAction[] ;
+}
+// export interface LoanActionType {
+//   id: number;
+//   action_type: LoanPaymentActionType;
+//   date: string;
+//   value: number;
+// }
 
 export const ActionTypes = [
   {

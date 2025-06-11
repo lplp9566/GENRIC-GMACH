@@ -12,7 +12,7 @@ export class LoanActionEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => LoanEntity, (loan) => loan.payments, { onDelete: 'CASCADE' })
+  @ManyToOne(() => LoanEntity, (loan) => loan.actions, { onDelete: 'CASCADE' })
   loan: LoanEntity;
 
   @Column({
