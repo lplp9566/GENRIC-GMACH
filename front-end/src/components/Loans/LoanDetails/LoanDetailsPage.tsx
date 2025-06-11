@@ -1,16 +1,14 @@
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Box, Button, Grid, Typography, Divider, Avatar } from "@mui/material";
+import { Box, Button, Grid, Typography, Divider } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { AppDispatch, RootState } from "../../../store/store";
 import {
-  createLoanAction,
   getLoanDetails,
 } from "../../../store/features/admin/adminLoanSlice";
 import { GeneralInfoCard } from "./GeneralInfoCard";
 import Actions from "../LaonActions/Actions";
-import { ICreateLoanAction } from "../LoanDto";
 import ActionsTable from "./ActionsTable";
 import LoadingIndicator from "../../StatusComponents/LoadingIndicator";
 import useLoanSubmit from "../../../Hooks/LoanHooks/LoanActionsHooks";
