@@ -5,7 +5,7 @@ import { ICreateLoan, ICreateLoanAction, LoanPaymentActionType } from "../LoanDt
 import { AppDispatch, RootState } from "../../../store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoanModalMode } from "../../../store/features/Main/AppMode";
-import CheckLoanModal from "../NewLoan/CheckLoanModal";
+import CheckLoanModal from "../CheckLoanModal";
 
 interface Props {
   loanId: number;

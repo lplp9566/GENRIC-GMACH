@@ -9,7 +9,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { setLoanModalMode } from "../../../store/features/Main/AppMode";
-import CheckLoanModal from "../NewLoan/CheckLoanModal";
+import CheckLoanModal from "../CheckLoanModal";
 
 interface Props {
   loanId: number;

@@ -49,6 +49,8 @@ export interface ICreateLoan {
   purpose: string;
   monthly_payment: number;
   payment_date: number;
+  guarantor1?: string | null;
+  guarantor2?: string | null;
 }
 export interface ILoanCheckResponse {
   ok: boolean;

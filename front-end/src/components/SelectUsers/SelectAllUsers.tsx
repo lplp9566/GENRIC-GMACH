@@ -14,11 +14,19 @@ import {
 interface Props {
   onChange: (userId: number) => void;
   label?: string;
+  // מגדירים כאן גם אפשרות להעביר ערך נבחר
+  value?: number;
 }
 
-const SelectAllUsers: React.FC<Props> = ({ onChange, label = "בחר משתמש" }) => {
+const SelectAllUsers: React.FC<Props> = ({
+  onChange,
+  label = "בחר משתמש",
+  value,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
-  const allUsers = useSelector((state: RootState) => state.adminUsers.allUsers);
+  const allUsers = useSelector(
+    (state: RootState) => state.adminUsers.allUsers
+  );
 
   useEffect(() => {
     dispatch(getAllUsers());
@@ -32,26 +40,26 @@ const SelectAllUsers: React.FC<Props> = ({ onChange, label = "בחר משתמש"
     <FormControl fullWidth size="small">
       <InputLabel id="select-user-label">{label}</InputLabel>
       <Select
-      sx={{height: '55px', minHeight: '55px'}}
         labelId="select-user-label"
         label={label}
+        // אם קיבלנו value, נהפוך אותו למחרוזת, אחרת נעביר מחרוזת ריקה
+        value={value != null ? value.toString() : ""}
         onChange={handleChange}
+        sx={{ height: 55, minHeight: 55 }}
         inputProps={{ sx: { borderRadius: 2 } }}
-        // displayEmpty
         renderValue={(selected) => {
           if (!selected) {
             return <em>{label}</em>;
           }
           const user = allUsers.find((u) => u.id === Number(selected));
-          return user ? (
-            `${user.first_name} ${user.last_name}`
-          ) : (
-            <em>משתמש לא נמצא</em>
-          );
+          return user
+            ? `${user.first_name} ${user.last_name}`
+            : <em>משתמש לא נמצא</em>;
         }}
       >
         {allUsers.map((user) => (
-          <MenuItem key={user.id} value={String(user.id)}>
+          // כאן חשוב שה-value של כל MenuItem יתאים ל-type של value ומחרוזת
+          <MenuItem key={user.id} value={user.id.toString()}>
             {user.first_name} {user.last_name}
           </MenuItem>
         ))}

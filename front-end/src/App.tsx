@@ -4,7 +4,7 @@ import { Navbar } from './components/NavBar/NavBar';
 import LoansPage from './pages/LoansPage';
 import HomePage from './components/HomePage/HomePage';
 import FundsOverviewByYearPage from './pages/FundsOverviewByYearPage';
-import NewLoan from './components/Loans/NewLoan/NewLoan';
+import NewLoan from './components/Loans/NewLoan/NewLoanForm';
 import FundsOverviewDashboard from './pages/FundsOverviewDashboard';
 import LoanDetailsPage from './components/Loans/LoanDetails/LoanDetailsPage';
 

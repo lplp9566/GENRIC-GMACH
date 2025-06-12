@@ -16,7 +16,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store/store";
 import { getAllLoans, setPage } from "../store/features/admin/adminLoanSlice";
-import Loans from "../components/Loans/LoansDeshbord/LoansDashbord";
+import Loans from "../components/Loans/LoansDashboard/LoansDashboard";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
 import { LoanStatus } from "../common/indexTypes";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +24,7 @@ import { useNavigate } from "react-router-dom";
 export const LoansPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const [filter, setFilter] = useState<LoanStatus>(LoanStatus.ALL);
+  const [filter, setFilter] = useState<LoanStatus>(LoanStatus.ACTIVE);
   const { allLoans, page, pageCount, status, total } = useSelector(
     (s: RootState) => s.adminLoansSlice
   );
