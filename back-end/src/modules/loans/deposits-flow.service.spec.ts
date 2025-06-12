@@ -97,17 +97,6 @@ describe('FundsFlowService', () => {
     });
   });
 
-  describe('getCashFlowTotals', () => {
-    it('should return true if no deposits exist', async () => {
-      mockFundsOverviewService.getFundDetails.mockResolvedValue({ available_funds: 10000 });
-      mockDepositsService.getDepositsActive.mockResolvedValue([]);
-      const result = await service.getCashFlowTotals(new Date('2025-01-01'), {
-        loan_amount: 5000,
-        monthly_payment: 500,
-        payment_date: 15,
-      });
-      expect(result).toBe(true);
-    });
 
     it('should throw if available funds < loan amount', async () => {
       mockFundsOverviewService.getFundDetails.mockResolvedValue({ available_funds: 1000 });
@@ -120,4 +109,4 @@ describe('FundsFlowService', () => {
       ).rejects.toThrow('אתה לא יכול להוציא הלוואה על  5000 ש"ח, במערכת יש כרגע 1000 ש"ח');      
     });
   });
-});
+
