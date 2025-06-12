@@ -7,7 +7,7 @@ const LoadingIndicator = () => {
           display="flex"
           justifyContent="center"
           alignItems="center"
-          minHeight="80vh"
+          // minHeight="80vh"
           bgcolor="background.default"
           dir="rtl"
         >

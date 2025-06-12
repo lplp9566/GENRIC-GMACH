@@ -53,7 +53,6 @@ export class FundsOverviewByYearService {
       record["fund_details_donated"] = {};
     }
     record["fund_details_donated"][fundName] = (record["fund_details_donated"][fundName] || 0) + amount;
-    console.log(record["fund_details_donated"]);
     record.special_fund_donations += amount;
     return this.fundsOverviewByYearRepo.save(record);
   }

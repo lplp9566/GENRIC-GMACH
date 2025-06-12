@@ -52,7 +52,6 @@ export const getAllLoans = createAsyncThunk<
   PaginatedResult<ILoanWithUser>,
   FindLoansOpts
 >("admin/getAllLoans", async (opts) => {
-  console.log("getAllLoans called with opts:", opts);
 
   const response = await axios.get<PaginatedResult<ILoanWithUser>>(
     `${BASE_URL}/loans`,
@@ -132,7 +131,6 @@ export const AdminLoansSlice = createSlice({
           (state.page = action.payload.page),
           (state.pageCount = action.payload.pageCount),
           (state.total = action.payload.total),
-          console.log("all loans", action.payload.data);
         (state.status = "fulfilled"), (state.error = null);
       })
       .addCase(getAllLoans.rejected, (state, action) => {

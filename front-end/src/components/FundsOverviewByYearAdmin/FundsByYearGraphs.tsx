@@ -76,7 +76,6 @@ const yearlyData = !selectedUser
         const label = !selectedUser ? AdminYearlyFinancialItems.find((f) => f.key === key)?.label ?? key : UserAdminFinancialItems.find((f) => f.key === key)?.label ?? key;
         obj[label] = (row as Record<string, any>)[key];
       });
-      console.log(obj)
       return obj;
     });
 

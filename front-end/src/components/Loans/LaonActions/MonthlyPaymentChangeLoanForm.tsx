@@ -1,7 +1,11 @@
 // src/components/LoanActions/MonthlyPaymentChangeForm.tsx
 import React, { useState } from "react";
 import { Box, TextField, Button } from "@mui/material";
-import { ICreateLoanAction, LoanPaymentActionType } from "../LoanDto";
+import { ICreateLoan, ICreateLoanAction, LoanPaymentActionType } from "../LoanDto";
+import { AppDispatch, RootState } from "../../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoanModalMode } from "../../../store/features/Main/AppMode";
+import CheckLoanModal from "../NewLoan/CheckLoanModal";
 
 interface Props {
   loanId: number;
@@ -12,23 +16,45 @@ const MonthlyPaymentChangeLoanForm: React.FC<Props> = ({
   loanId,
   onSubmit,
 }) => {
+    const dispatch = useDispatch<AppDispatch>();
   const [monthly, setMonthly] = useState<number | "">(0);
   const [date, setDate] = useState<string>("");
+    const { LoanModalMode } = useSelector(
+      (state: RootState) => state.mapModeSlice
+    );
+  const Loan = useSelector((state: RootState) => state.adminLoansSlice.allLoans.find((loan) => loan.id === loanId));
   const isValid = monthly !== "" && date !== "";
-
+  if (!Loan) return null;
+  const newLoan: ICreateLoan = {
+    loan_amount: Loan.remaining_balance,
+    loan_date: Loan.loan_date,
+    purpose: Loan.purpose,
+    monthly_payment: Number(monthly),
+    payment_date: Loan.payment_date,
+    user: Loan.user.id,
+  }
+  const dto: ICreateLoanAction = {
+    action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
+    date: date,
+    loanId,
+    value: Number(monthly),
+  }
   const handle = () => {
     if (!isValid) return;
-    onSubmit({
-      action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
-      date: new Date().toISOString(),
-      loanId,
-      value: Number(monthly),
-    });
-    setMonthly("");
-    setDate("");
+  dispatch(setLoanModalMode(true))
   };
 
   return (
+    <Box>
+            {LoanModalMode && (
+        <CheckLoanModal
+          onClose={() => dispatch(setLoanModalMode(false))}
+          loan={newLoan}
+          type="update"
+         dto={dto}
+         onSubmit={onSubmit}
+        />
+      )}
     <Box
       component="form"
       noValidate
@@ -74,6 +100,8 @@ const MonthlyPaymentChangeLoanForm: React.FC<Props> = ({
         עדכן
       </Button>
     </Box>
+        </Box>
+
   );
 };
 export default MonthlyPaymentChangeLoanForm;

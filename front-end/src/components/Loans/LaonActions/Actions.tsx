@@ -8,6 +8,7 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  Typography,
 } from "@mui/material";
 import { ICreateLoanAction, LoanPaymentActionType } from "../LoanDto";
 import PaymentLoanActionForm from "./PaymentLoanActionForm";
@@ -18,6 +19,7 @@ import AmountChangeLoanForm from "./AmountChangeLoanForm";
 interface ActionsProps {
   loanId: number;
   handleSubmit: (dto: ICreateLoanAction) => void;
+  max : number
 }
 
 type ActionMode =
@@ -26,14 +28,15 @@ type ActionMode =
   | LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE
   | LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE;
 
-export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit}) => {
+export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit,max}) => {
   const [mode, setMode] = useState<ActionMode>(LoanPaymentActionType.PAYMENT);
 
   const handleModeChange = (e: SelectChangeEvent) =>
     setMode(e.target.value as ActionMode);
   return (
     <Box dir="rtl">
-      <Paper elevation={2} sx={{ p: 2, borderRadius: 2, backgroundColor: "#E8F0FE"}}>
+      <Paper elevation={2} sx={{ p: 2, borderRadius: 2, backgroundColor: "#FEFEFE"}}>
+        <Typography variant="h6" sx={{textAlign:"center", paddingBottom:2}}>פעולות להלוואה</Typography>
         <FormControl fullWidth size="small">
           <InputLabel id="action-select-label">בחר פעולה</InputLabel>
           <Select
@@ -57,7 +60,7 @@ export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit}) => {
         </FormControl>
 
         {mode === LoanPaymentActionType.PAYMENT && (
-          <PaymentLoanActionForm loanId={loanId} onSubmit={handleSubmit} />
+          <PaymentLoanActionForm loanId={loanId} onSubmit={handleSubmit} maxAmount={max}/>
         )}
         {mode === LoanPaymentActionType.AMOUNT_CHANGE && (
           <AmountChangeLoanForm loanId={loanId} onSubmit={handleSubmit} />

@@ -87,7 +87,6 @@ export class FundsFlowService {
 
   async getCashFlowTotals(from: Date, newLoan?: Partial<LoanEntity>) {
     const fund_details = await this.fundsOverviewService.getFundDetails();
-    console.log(fund_details.available_funds,"fund_details.available_funds",newLoan?.loan_amount,"newLoan?.loan_amount")
     if(fund_details.available_funds < newLoan?.loan_amount!){
       throw new BadRequestException('אתה לא יכול להוציא הלוואה על  ' + (newLoan!.loan_amount) + ' ש"ח, במערכת יש כרגע ' + fund_details.available_funds + ' ש"ח');
     }

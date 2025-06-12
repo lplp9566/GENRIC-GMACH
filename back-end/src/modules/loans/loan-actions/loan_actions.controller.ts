@@ -4,7 +4,6 @@ import { LoanActionDto } from "../loan-dto/loanTypes";
 @Controller("loan-actions")
 export class LoanActionsController {
   constructor(private readonly loanPaymentsService: LoanActionsService) {
-    console.log("🚀 LoanActionsController loaded");
   }
   
   @Post()

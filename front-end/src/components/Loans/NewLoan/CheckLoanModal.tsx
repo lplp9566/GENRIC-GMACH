@@ -22,6 +22,7 @@ import {
 import { toast } from "react-toastify";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { setLoanModalMode } from "../../../store/features/Main/AppMode";
+import LoadingIndicator from "../../StatusComponents/LoadingIndicator";
 
 interface Props {
   loan: ICreateLoan;
@@ -41,7 +42,6 @@ const CheckLoanModal: React.FC<Props> = ({ onClose, loan, type, dto ,onSubmit}) 
   );
 
   useEffect(() => {
-    console.log(checkLoanStatus);
     dispatch(checkLoan(loan));
 
     return () => {};
@@ -136,9 +136,13 @@ const CheckLoanModal: React.FC<Props> = ({ onClose, loan, type, dto ,onSubmit}) 
             mb: 2,
           }}
         >
-          {checkLoanStatus === "pending" || createLoanStatus === "pending" || createLoanActionStatus === "pending" &&  (
-            <CircularProgress size={24} color="primary" />
-          )}
+{(
+  checkLoanStatus === "pending" ||
+  createLoanStatus === "pending" ||
+  createLoanActionStatus === "pending"
+) && (
+  <LoadingIndicator />
+)}
 
           {checkLoanStatus === "fulfilled" && checkLoanResponse.ok && (
             <Typography sx={{ color: "green", textAlign: "center" }}>

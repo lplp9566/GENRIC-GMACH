@@ -8,7 +8,8 @@ import { LogoTitle }   from "./LogoTitle";
 import { DesktopLinks } from "./DesktopLinks";
 import MobileDrawer from "./MobileDrawer";
 
-const NAV_BG  = "#003366";
+// const NAV_BG  = "#003366";
+const NAV_BG  = "#113E21";
 const APP_BAR_H = 64;
 const BP_MOBILE = 960;
 

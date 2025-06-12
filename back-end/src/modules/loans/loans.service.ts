@@ -159,14 +159,11 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
       if (!loan.isActive) {
         throw new Error('Cannot operate on a closed loan');
       }
-      console.log(dto)
       const diff = dto.value;
       loan.loan_amount += dto.value;
       loan.remaining_balance += dto.value;
       loan.total_installments = loan.remaining_balance / loan.monthly_payment,
-      console.log(loan.loan_amount)
       await this.loansRepository.save(loan);
-      console.log(loan)
       const year = getYearFromDate(dto.date);
       await Promise.all([
         this.userFinancialsByYearService.recordLoanTaken(loan.user, year, diff),
@@ -196,9 +193,7 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
     }
     try {
       loan.monthly_payment = dto.value;
-      loan.total_installments = Math.ceil(
-        loan.remaining_balance / loan.monthly_payment,
-      );
+      loan.total_installments = loan.remaining_balance / loan.monthly_payment,
       await this.loansRepository.save(loan);
       return await this.paymentsRepository.save({
         loan,

@@ -22,7 +22,6 @@ export const getUserFundsOverview = createAsyncThunk(
         const response = await axios.get(
             `${BASE_URL}/user-financial-by-year/by-user/?id=${userId}`
         );
-        console.log(response.data)
         return response.data;
     }
 );

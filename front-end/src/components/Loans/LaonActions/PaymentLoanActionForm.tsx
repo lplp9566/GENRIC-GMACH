@@ -7,14 +7,20 @@ import { toast } from "react-toastify";
 interface Props {
   loanId: number;
   onSubmit: (dto: ICreateLoanAction) => void;
+  maxAmount : number
 }
 
- const PaymentForm: React.FC<Props> = ({ loanId, onSubmit }) => {
-  const [amount, setAmount] = useState<number | "">("");
+ const PaymentForm: React.FC<Props> = ({ loanId, onSubmit ,maxAmount}) => {
+  const [amount, setAmount] = useState<number | string>("");
   const [date, setDate]     = useState<string>("");
 
-  const isValid = amount !== "" && date !== "";
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value =   Number (e.target.value);
+    if(value > maxAmount) return toast.error("הסכום המקסימלי הוא " + maxAmount);
+    setAmount(value);
+  }
 
+  const isValid = amount !== "" && date !== "";
   const handle = () => {
     if (!isValid) return;
     onSubmit({
@@ -50,13 +56,14 @@ interface Props {
         label="סכום תשלום"
         value={amount}
         fullWidth
-        onChange={(e) => setAmount(e.target.value === "" ? "" : Number(e.target.value))}
+        InputProps={{ inputProps: { min: 0, max: maxAmount } }}
+        onChange={handleAmountChange}
         size="small"
         // sx={{ minWidth: 120 }}
       />
 
       <Button
-      sx={{bgcolor: isValid ? "green" : "grey.500" }}
+      sx={{bgcolor: isValid ? "#113E21" : "grey.500" }}
       fullWidth
         type="submit"
         variant="contained"
