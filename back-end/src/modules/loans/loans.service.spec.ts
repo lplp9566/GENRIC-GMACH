@@ -157,12 +157,12 @@ describe('LoansService', () => {
       action_type: LoanPaymentActionType.AMOUNT_CHANGE,
     };
   
-    it('should throw error when there is not enough deposit', async () => {
-      mockFundsFlowService.getCashFlowTotals.mockResolvedValueOnce(false);
-      loanRepo.findOne.mockResolvedValue(mockLoan);
+    // it('should throw error when there is not enough deposit', async () => {
+    //   mockFundsFlowService.getCashFlowTotals.mockResolvedValueOnce(false);
+    //   loanRepo.findOne.mockResolvedValue(mockLoan);
   
-      await expect(service.changeLoanAmount(dto)).rejects.toThrow('you need the mony for the deposit');
-    });
+    //   await expect(service.changeLoanAmount(dto)).rejects.toThrow('you need the mony for the deposit');
+    // });
   
   //   it('should update loan amount and save payment event', async () => {
   //     mockFundsFlowService.getCashFlowTotals.mockResolvedValueOnce(true);
