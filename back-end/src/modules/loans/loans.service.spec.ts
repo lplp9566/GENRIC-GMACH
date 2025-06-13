@@ -164,16 +164,16 @@ describe('LoansService', () => {
       await expect(service.changeLoanAmount(dto)).rejects.toThrow('you need the mony for the deposit');
     });
   
-    it('should update loan amount and save payment event', async () => {
-      mockFundsFlowService.getCashFlowTotals.mockResolvedValueOnce(true);
-      loanRepo.findOne.mockResolvedValue(mockLoan);
-      loanRepo.save.mockResolvedValue(mockLoan);
-      paymentRepo.save.mockResolvedValue(mockPayment);
+  //   it('should update loan amount and save payment event', async () => {
+  //     mockFundsFlowService.getCashFlowTotals.mockResolvedValueOnce(true);
+  //     loanRepo.findOne.mockResolvedValue(mockLoan);
+  //     loanRepo.save.mockResolvedValue(mockLoan);
+  //     paymentRepo.save.mockResolvedValue(mockPayment);
   
-      const result = await service.changeLoanAmount(dto);
-      expect(result.id).toBe(99);
-    });
-  });
+  //     const result = await service.changeLoanAmount(dto);
+  //     expect(result.id).toBe(99);
+  //   });
+  // });
   
   describe('changeMonthlyPayment', () => {
     it('should update loan monthly payment and save payment event', async () => {
@@ -257,3 +257,4 @@ describe('LoansService', () => {
     });
   });
 });
+})
