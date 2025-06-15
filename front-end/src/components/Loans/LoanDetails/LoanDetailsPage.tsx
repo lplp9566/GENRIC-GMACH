@@ -6,14 +6,9 @@ import {
   Box,
   Button,
   Grid,
-  Typography,
   Divider,
-  CircularProgress,
-  Paper,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import { AppDispatch, RootState } from "../../../store/store";
 import { getLoanDetails } from "../../../store/features/admin/adminLoanSlice";
 import ActionsTable from "../LoanDetails/ActionsTable";
@@ -46,10 +41,10 @@ const LoanDetailsPage: React.FC = () => {
   // חישוב אחוז החזר ויתרת הלוואה
   const principal = loan.loan_amount;
   const remaining = loanDetails.remaining_balance;
-  const repaid = principal - remaining;
+  // const repaid = principal - remaining;
   const balance = loanDetails.balance;
-  const percentRepaid =
-    principal > 0 ? Math.min((repaid / principal) * 100, 100) : 0;
+  // const percentRepaid =
+  //   principal > 0 ? Math.min((repaid / principal) * 100, 100) : 0;
 
   return (
     <Box
