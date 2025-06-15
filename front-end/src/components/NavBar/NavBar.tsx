@@ -24,7 +24,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <Box sx={{ flexGrow: 1, marginBottom: 0 }}>
-      <AppBar position="absolute" sx={{ background: NAV_BG, height: APP_BAR_H }}>
+      <AppBar position="fixed" sx={{ background: NAV_BG, height: APP_BAR_H }}>
         <Toolbar sx={{ minHeight: APP_BAR_H, gap: 2, direction: "rtl" }}>
           <LogoTitle />
 

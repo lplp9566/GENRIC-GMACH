@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Box, TextField, Button } from "@mui/material";
 import { ICreateLoanAction, LoanPaymentActionType } from "../LoanDto";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
 
 interface Props {
   loanId: number;
@@ -9,14 +11,27 @@ interface Props {
 }
 
 const DateOfPaymentChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
+  const loanDetails = useSelector(
+    (s: RootState) => s.adminLoansSlice.loanDetails
+  );
+
   const [date, setDate] = useState<string>("");
   const [day, setDay] = useState<number | string>("");
 
-  const handeleDayOfPayment = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDayOfPayment = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
     if (value > 28 || value < 0)
       return toast.error("אנא הכנס יום תשלום בין 1-28");
     setDay(value);
+  };
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedDate = new Date(e.target.value);
+    const loanDate = new Date(loanDetails?.loan_date!);
+    if (selectedDate < loanDate) {
+      toast.error("תאריך הפעולה לא יכול להיות לפני תאריך תחילת ההלוואה");
+      return;
+    }
+    setDate(e.target.value);
   };
   const isValid = day !== "" && date !== "";
 
@@ -55,7 +70,7 @@ const DateOfPaymentChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
         label="תאריך הפעולה"
         type="date"
         value={date}
-        onChange={(e) => setDate(e.target.value)}
+        onChange={handleDateChange}
         size="small"
         InputLabelProps={{ shrink: true }}
       />
@@ -63,7 +78,7 @@ const DateOfPaymentChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
         label="יום החיוב בחודש "
         value={day}
         fullWidth
-        onChange={handeleDayOfPayment}
+        onChange={handleDayOfPayment}
         size="small"
         // sx={{ minWidth: 120 }}
       />

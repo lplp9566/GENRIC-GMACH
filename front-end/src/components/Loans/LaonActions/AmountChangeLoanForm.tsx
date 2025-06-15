@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { setLoanModalMode } from "../../../store/features/Main/AppMode";
 import CheckLoanModal from "../CheckLoanModal";
+import { toast } from "react-toastify";
 
 interface Props {
   loanId: number;
@@ -17,6 +18,9 @@ interface Props {
 }
 
 const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
+    const loanDetails = useSelector(
+      (s: RootState) => s.adminLoansSlice.loanDetails
+    );
   const dispatch = useDispatch<AppDispatch>();
   const [newAmount, setNewAmount] = useState<number | "">("");
   const [date, setDate] = useState<string>("");
@@ -43,6 +47,19 @@ const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
     loanId,
     value: Number(newAmount),
   };
+      const handleDateChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+      ) => {
+        const selectedDate = new Date(e.target.value);
+        const loanDate = new Date(loanDetails?.loan_date!);
+        if (selectedDate < loanDate) {
+          toast.error(
+            "תאריך הפעולה לא יכול להיות לפני תאריך תחילת ההלוואה"
+          );
+          return;
+        }
+        setDate(e.target.value);
+      };
   const handle = () => {
     if (!isValid) return;
   dispatch(setLoanModalMode(true))
@@ -82,7 +99,7 @@ const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
           label="תאריך תשלום"
           type="date"
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={handleDateChange}
           size="small"
           InputLabelProps={{ shrink: true }}
         />

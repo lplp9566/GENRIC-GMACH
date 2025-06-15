@@ -159,9 +159,12 @@ export const LoansPage: React.FC = () => {
         {status === "pending" && <LoadingIndicator />}
 
         {/* LOANS TABLE */}
-        <Paper elevation={1} sx={{ p: 2, borderRadius: 2, bgcolor: "#FFFFFF" /* לבן נקי לטבלת ההלוואות */ }}>
+        {status === "fulfilled" &&
+                <Paper elevation={1} sx={{ p: 2, borderRadius: 2, bgcolor: "#FFFFFF" /* לבן נקי לטבלת ההלוואות */ }}>
           <Loans loansData={allLoans} total={total} />
         </Paper>
+          }
+
 
         {/* PAGINATION */}
         {pageCount > 1 && (

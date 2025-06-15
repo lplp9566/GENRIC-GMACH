@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { Box, TextField, Button } from "@mui/material";
 import { ICreateLoanAction, LoanPaymentActionType } from "../LoanDto";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
 
 interface Props {
   loanId: number;
@@ -11,6 +13,8 @@ interface Props {
 }
 
  const PaymentForm: React.FC<Props> = ({ loanId, onSubmit ,maxAmount}) => {
+  const loanDetails = useSelector((s: RootState) => s.adminLoansSlice.loanDetails);
+
   const [amount, setAmount] = useState<number | string>("");
   const [date, setDate]     = useState<string>("");
 
@@ -19,7 +23,19 @@ interface Props {
     if(value > maxAmount) return toast.error("הסכום המקסימלי הוא " + maxAmount);
     setAmount(value);
   }
-
+  const handleDateChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const selectedDate = new Date(e.target.value);
+    const loanDate = new Date(loanDetails?.loan_date!);
+    if (selectedDate < loanDate) {
+      toast.error(
+        "תאריך התשלום לא יכול להיות לפני תאריך תחילת ההלוואה"
+      );
+      return;
+    }
+    setDate(e.target.value);
+  };
   const isValid = amount !== "" && date !== "";
   const handle = () => {
     if (!isValid) return;
@@ -47,7 +63,7 @@ interface Props {
         label="תאריך תשלום"
         type="date"
         value={date}
-        onChange={(e) => setDate(e.target.value)}
+        onChange={handleDateChange}
         size="small"
         InputLabelProps={{ shrink: true }}
       />

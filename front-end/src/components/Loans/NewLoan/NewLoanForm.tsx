@@ -21,6 +21,7 @@ import { ICreateLoan } from "../LoanDto";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const steps = [
   "פרטי ההלוואה הבסיסיים",
@@ -46,8 +47,10 @@ const NewLoanForm: React.FC = () => {
   const allUsers = useSelector(
     (s: RootState) => s.adminUsers.allUsers ?? []
   );
-
+const selectedUser = useSelector((s:RootState)=> s.adminUsers.selectedUser)
   const today = new Date().toISOString().split("T")[0];
+    const navigate = useNavigate();
+  
   const [activeStep, setActiveStep] = useState(0);
   const [openModal, setOpenModal] = useState(false);
 
@@ -55,7 +58,7 @@ const NewLoanForm: React.FC = () => {
   const [newLoan, setNewLoan] = useState<
     Omit<ICreateLoan, "guarantor1" | "guarantor2">
   >({
-    user: 0,
+    user: selectedUser? selectedUser.id : 0,
     loan_amount: 0,
     purpose: "",
     loan_date: today,
@@ -228,10 +231,16 @@ const NewLoanForm: React.FC = () => {
 
           {/* STEP 1 */}
           {activeStep === 0 && (
+            // {userSelected ? (
+              
+            // ) }
             <Stack spacing={2}>
+              
               <SelectAllUsers
                 label="בחר משתמש"
-                value={newLoan.user}
+                
+                value={selectedUser? selectedUser.id : newLoan.user}
+                
                 onChange={(id) =>
                   setNewLoan((p) => ({ ...p, user: id }))
                 }
@@ -361,8 +370,8 @@ const NewLoanForm: React.FC = () => {
           >
             <Button
               type="button"
-              disabled={activeStep === 0}
-              onClick={() => setActiveStep((s) => s - 1)}
+              // disabled={activeStep === 0}
+              onClick={ activeStep === 0 ? () =>    navigate(-1) : () => setActiveStep((s) => s - 1)}
             >
               חזרה
             </Button>
