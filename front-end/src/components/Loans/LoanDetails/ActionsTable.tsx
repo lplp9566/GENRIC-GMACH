@@ -48,7 +48,6 @@ const sortedActions = useMemo(() => {
     } else if (currentSortField === "amount") {
       cmp = a.value - b.value;
     } else {
-      // custom ordering by index in ACTION_ORDER
       const idxA = ACTION_ORDER.indexOf(a.action_type);
       const idxB = ACTION_ORDER.indexOf(b.action_type);
       cmp = idxA - idxB;
@@ -63,7 +62,7 @@ const sortedActions = useMemo(() => {
 
   return (
     <Paper elevation={3} sx={{ p: 3, borderRadius: 2, width: "100%" }}>
-      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1,textAlign:"center" }}>
         פעולות על הלוואה
       </Typography>
       {actions.length === 0 && (
@@ -112,7 +111,8 @@ const sortedActions = useMemo(() => {
                   />
                 </TableCell>
                 <TableCell align="left" sx={{ fontWeight: 600, color: "#007BFF" }}>
-                  ₪{action.value.toLocaleString()}
+                  {action.action_type != LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE &&  "₪" }
+                 {action.value.toLocaleString()}
                 </TableCell>
               </TableRow>
             ))}

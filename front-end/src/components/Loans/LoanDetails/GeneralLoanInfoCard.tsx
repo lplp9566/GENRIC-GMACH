@@ -13,7 +13,7 @@ interface Props {
   loan: ILoanWithPayment;
 }
 
-export const GeneralInfoCard: React.FC<Props> = ({ loan }) => {
+export const GeneralLoanInfoCard: React.FC<Props> = ({ loan }) => {
   const items = [
     {
       label: "סכום הלוואה ראשוני",
@@ -83,7 +83,7 @@ export const GeneralInfoCard: React.FC<Props> = ({ loan }) => {
   return (
     <Card sx={{ borderRadius: 2, boxShadow: 3, p: 3 }}>
       <CardContent>
-        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
+        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3,textAlign:"center" }}>
           פרטי הלוואה כלליים
         </Typography>
 
