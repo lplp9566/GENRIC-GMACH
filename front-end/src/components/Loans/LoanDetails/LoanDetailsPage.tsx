@@ -70,7 +70,6 @@ const LoanDetailsPage: React.FC = () => {
       >
         חזור לדף הלוואות
       </Button>
-      +{" "}
       <LoanHeader
         firstName={loan.user.first_name}
         lastName={loan.user.last_name}
