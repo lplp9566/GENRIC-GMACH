@@ -2,19 +2,27 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { IFundsOverview, IFundsOverviewByYear } from "../../../components/FundsOverview/FundsOverviewDto"
 import { Status } from "../../../components/Users/UsersDto"
 import axios from "axios"
-
+export interface IRegulation{
+    id?: number,
+    regulation: string
+    
+}
 interface AdminFundsOverviewType {
     fundsOverview: IFundsOverview | null
     fundsOverviewByYear: IFundsOverviewByYear [] | null
     status: Status
     error: string | null
+    regulation: IRegulation[] | null
+    regulationStatus: Status
 }
 
 const initialSlice:AdminFundsOverviewType={
     fundsOverview:null,
     fundsOverviewByYear:null,
     status:"idle",
-    error: null
+    error: null,
+    regulation: null,
+    regulationStatus:"idle"
 }
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -29,6 +37,20 @@ export const getFundsOverviewByYear = createAsyncThunk(
     '/admin/getFundsOverviewByYear',
     async()=>{
         const response = await axios.get(`${BASE_URL}/funds-overview-by-year`|| "http://localhost:3000/funds-overview-by-year");
+        return response.data
+    }
+)
+export const getRegulation = createAsyncThunk(
+    '/admin/getRegulation',
+    async()=>{
+        const response = await axios.get(`${BASE_URL}/regulation`);
+        return response.data
+    }
+)
+export const UpdateRegulation = createAsyncThunk(
+    '/admin/updateRegulation',
+    async(regulation:IRegulation)=>{
+        const response = await axios.post(`${BASE_URL}/regulation`,regulation);
         return response.data
     }
 )
@@ -58,6 +80,19 @@ export const getFundsOverviewByYear = createAsyncThunk(
         })
         .addCase(getFundsOverviewByYear.rejected,(state,action)=>{
             state.status = "rejected"
+            state.error = action.error.message || null
+        })
+        .addCase(getRegulation.pending,(state)=>{
+            state.regulationStatus = "pending"
+            state.error = null
+            state.regulation = null
+        })
+        .addCase(getRegulation.fulfilled,(state,action)=>{
+            state.regulationStatus = "fulfilled"
+            state.regulation = action.payload
+        })
+        .addCase(getRegulation.rejected,(state,action)=>{
+            state.regulationStatus = "rejected"
             state.error = action.error.message || null
         })
     }

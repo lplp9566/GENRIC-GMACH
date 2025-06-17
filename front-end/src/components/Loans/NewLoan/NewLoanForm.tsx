@@ -124,7 +124,7 @@ const NewLoanForm: React.FC = () => {
               type="button"
               onClick={() =>
                 activeStep === 0
-                  ? navigate(-1)
+                  ? navigate("/loans")
                   : handleBack()
               }
             >
