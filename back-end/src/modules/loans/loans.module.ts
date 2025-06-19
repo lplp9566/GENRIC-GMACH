@@ -11,8 +11,8 @@ import { UserFinancialsModule } from '../users/user-financials/user-financials.m
 import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overview-by-year.module';
 import { FundsFlowService } from './calcelete.service';
 import { MonthlyDepositsModule } from '../monthly_deposits/monthly_deposits.module';
-import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
 import { DepositsModule } from '../deposits/deposits.module';
+import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates.module';
 
 @Module({
   imports: [
@@ -22,8 +22,8 @@ import { DepositsModule } from '../deposits/deposits.module';
     FundsOverviewModule,
     FundsOverviewByYearModule,
     MonthlyDepositsModule,
-    MonthlyRatesModule,
     DepositsModule,
+    RoleMonthlyRatesModule,
     forwardRef(() => UsersModule),
   ],
   providers: [LoansService,FundsFlowService, ],

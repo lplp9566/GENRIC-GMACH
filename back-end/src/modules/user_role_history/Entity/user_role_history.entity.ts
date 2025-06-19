@@ -13,6 +13,12 @@ export class UserRoleHistoryEntity {
   @ManyToOne(() => MembershipRoleEntity, { onDelete: 'SET NULL' })
   role: MembershipRoleEntity;
 
-  @Column({ type: 'date' })
-  from_date: Date; 
+  @Column({
+    type: 'date',
+    transformer: {
+      to:   (value: Date)   => value,          
+      from: (value: string) => new Date(value) 
+    }
+  })
+  from_date: Date;
 }

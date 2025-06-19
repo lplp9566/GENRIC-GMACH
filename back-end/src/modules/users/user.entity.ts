@@ -12,7 +12,6 @@ import { UserFinancialByYearEntity } from './user-financials-by-year/user-financ
 import { MonthlyDepositsEntity } from '../monthly_deposits/monthly_deposits.entity';
 import { UserFinancialEntity } from './user-financials/user-financials.entity';
 import { RequestEntity } from '../requests/entities/request.entity';
-import { UserRole } from './userTypes';
 import { CashHoldingsEntity } from '../cash-holdings/Entity/cash-holdings.entity';
 import { OrderReturnEntity } from '../order-return/Entity/order-return.entity';
 import { LoanEntity } from '../loans/Entity/loans.entity';
@@ -49,9 +48,6 @@ export class UserEntity {
 
   @Column({ type: 'text' })
   phone_number: string;
-
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.committeeMember })
-  role: UserRole;
 
   @Column({ type: 'boolean', default: false })
   is_admin: boolean;

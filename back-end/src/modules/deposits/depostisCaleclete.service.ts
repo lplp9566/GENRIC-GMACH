@@ -2,57 +2,117 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { addMonths } from 'date-fns';
-import { MonthlyRatesEntity } from '../monthly_rates/monthly_rates.entity';
 import { UserEntity } from '../users/user.entity';
 import { LoanEntity } from '../loans/Entity/loans.entity';
+import { RoleMonthlyRateEntity } from '../role_monthly_rates/Entity/role_monthly_rates.entity';
 
 
 
 @Injectable()
 export class FundsFlowService {
   constructor(
-    @InjectRepository(MonthlyRatesEntity)
-    private readonly ratesRepo: Repository<MonthlyRatesEntity>,
+
 
     @InjectRepository(LoanEntity)
     private readonly loansRepo: Repository<LoanEntity>,
 
     @InjectRepository(UserEntity)
     private readonly usersRepo: Repository<UserEntity>,
+    @InjectRepository(RoleMonthlyRateEntity)
+    private readonly rateRepository: Repository<RoleMonthlyRateEntity>,
   ) {}
 
   /**
    * מחזירה סה"כ הכנסות (inflow) בין שני תאריכים
    */
-  async calculateTotalInflows(from: Date, to: Date): Promise<number> {
-    if (to < from) throw new BadRequestException('End date must be after start date');
-    const rates = await this.ratesRepo.find({ order: { year: 'ASC', month: 'ASC' } });
-    const users = await this.usersRepo.find({ relations: ['payment_details'] });
-    let total = 0;
+async calculateTotalInflows(
+    startDate: Date,
+    endDate: Date = new Date(),
+  ): Promise<number> {
+    if (endDate < startDate) {
+      throw new BadRequestException('End date must be on or after start date');
+    }
+
+    // 1. Load all monthly rates, ordered by effective_from ascending
+    const allRates = await this.rateRepository.find({
+      relations: ['role'],
+      order: { effective_from: 'ASC' },
+    });
+
+    // 2. Load all users with their payment details and full role history
+    const users = await this.usersRepo.find({
+      relations: ['payment_details', 'roleHistory', 'roleHistory.role'],
+    });
+
+    let totalInflows = 0;
+
     for (const user of users) {
-      const raw = user.payment_details?.charge_date;
-      const chargeDay = parseInt(raw as string, 10);
-      if (!chargeDay || chargeDay < 1 || chargeDay > 31) continue;
-      let current = new Date(from.getFullYear(), from.getMonth(), 1);
-      while (current <= to) {
-        const rate = rates
-          .filter(r => r.role === user.role)
-          .filter(r =>
-            r.year < current.getFullYear() ||
-            (r.year === current.getFullYear() && r.month - 1 <= current.getMonth()),
-          )
-          .pop();
-        if (rate) {
-          const eventDate = new Date(current.getFullYear(), current.getMonth(), chargeDay);
-          if (eventDate >= from && eventDate <= to) {
-            total += rate.amount;
-          }
+      // 3. Determine the charge day of month
+      const rawCharge = user.payment_details?.charge_date;
+      const chargeDay = parseInt(rawCharge as string, 10);
+      if (!chargeDay || chargeDay < 1 || chargeDay > 31) {
+        // skip users without a valid charge day
+        continue;
+      }
+
+      // 4. Sort this user's role history by start date ascending
+      const roleHistory = (user.roleHistory || []).sort(
+        (a, b) => a.from_date.getTime() - b.from_date.getTime(),
+      );
+      if (roleHistory.length === 0) {
+        // skip users with no recorded role changes
+        continue;
+      }
+
+      // 5. Compute month indices for loop
+      const startYM = startDate.getFullYear() * 12 + startDate.getMonth();
+      const endYM   = endDate.getFullYear()   * 12 + endDate.getMonth();
+
+      // 6. For each month index in [startYM..endYM]:
+      for (let ym = startYM; ym <= endYM; ym++) {
+        const year  = Math.floor(ym / 12);
+        const month = ym % 12; // 0 = January, ..., 11 = December
+
+        // 6a. Compute the billing date for this month
+        const billingDate = new Date(year, month, chargeDay);
+        if (billingDate < startDate || billingDate > endDate) {
+          // not within the requested range
+          continue;
         }
-        current = addMonths(current, 1);
+
+        // 6b. Find which role was active on the first of this month
+        const monthStart = new Date(year, month, 1);
+        const activeRecord = roleHistory
+          .filter(r => r.from_date.getTime() <= monthStart.getTime())
+          .sort(
+            (a, b) =>
+              b.from_date.getTime() - a.from_date.getTime(),
+          )[0];
+        if (!activeRecord) {
+          // no role yet assigned
+          continue;
+        }
+
+        // 6c. Find the most recent rate for that role on or before monthStart
+        const applicableRate = allRates
+          .filter(r =>
+            r.role.id === activeRecord.role.id &&
+            r.effective_from.getTime() <= monthStart.getTime(),
+          )
+          .pop(); // last in the ascending-effective_from array
+        if (!applicableRate) {
+          // no rate defined yet
+          continue;
+        }
+
+        // 6d. Accumulate
+        totalInflows += applicableRate.amount;
       }
     }
-    return total;
+    console.log(totalInflows)
+    return totalInflows;
   }
+
 
   /**
    * מחזירה סה"כ הוצאות (outflow) מהלוואות קיימות ו/או הלוואה חדשה בין שני תאריכים

@@ -11,7 +11,6 @@ import { UserEntity } from './user.entity';
 import * as bcrypt from 'bcrypt';
 import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
 import { MonthlyDepositsService } from '../monthly_deposits/monthly_deposits.service';
-import { MonthlyRatesService } from '../monthly_rates/monthly_rates.service';
 import { UserRoleHistoryEntity } from '../user_role_history/Entity/user_role_history.entity';
 import { UserRoleHistoryService } from '../user_role_history/user_role_history.service';
 import { MembershipRoleEntity } from '../membership_roles/Entity/membership_rols.entity';
@@ -35,9 +34,6 @@ export class UsersService {
 
     @Inject(forwardRef(() => MonthlyDepositsService))
     private readonly monthlyDepositsService: MonthlyDepositsService,
-
-    @Inject(forwardRef(() => MonthlyRatesService))
-    private readonly monthlyRatesService: MonthlyRatesService,
     @Inject(forwardRef(() => UserRoleHistoryService))
     private readonly userRoleHistoryService: UserRoleHistoryService,
   ) {}
@@ -234,7 +230,6 @@ async calculateTotalDue(userId: number): Promise<number> {
         const balanceData = await this.calculateUserMonthlyBalance(user);
         return {
           user: `${user.first_name} ${user.last_name}`,
-          role: user.role,
           ...balanceData,
         };
       }),

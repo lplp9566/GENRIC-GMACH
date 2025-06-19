@@ -1,9 +1,4 @@
-export enum UserRole {
-  president = 'president',
-  committeeMember = 'committeeMember',
-  member = 'member',
-  admin = 'admin',
-}
+
 
 export enum payment_method {
   direct_debit = 'direct_debit',
@@ -27,7 +22,6 @@ export interface IUserCreate {
   email_address: string
   phone_number: string
   is_admin: boolean
-  role: UserRole
   currentRole :number
 }
 export interface IPaymentDetails{

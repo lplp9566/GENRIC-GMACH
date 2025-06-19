@@ -7,9 +7,9 @@ import { UserFinancialByYearModule } from '../users/user-financials-by-year/user
 import { UsersModule } from '../users/users.module';
 import { UserFinancialsModule } from '../users/user-financials/user-financials.module';
 import { FundsOverviewModule } from '../funds-overview/funds-overview.module';
-import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
 import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overview-by-year.module';
 import { DepositsEntity } from './Entity/deposits.entity';
+import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates.module';
 
 
 
@@ -20,8 +20,8 @@ import { DepositsEntity } from './Entity/deposits.entity';
     UserFinancialByYearModule,
     UserFinancialsModule,
     FundsOverviewModule,
-    MonthlyRatesModule,
     FundsOverviewByYearModule,
+    RoleMonthlyRatesModule
   ],
   controllers: [DepositsController],
   providers: [DepositsService],

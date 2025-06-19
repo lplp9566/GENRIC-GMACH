@@ -17,7 +17,6 @@ import { ExpensesModule } from './modules/expenses/expenses.module';
 import { PaymentDetailsModule } from './modules/users/payment-details/payment-details.module';
 import { MonthlyDepositsModule } from './modules/monthly_deposits/monthly_deposits.module';
 import { DonationsModule } from './modules/donations/donations.module';
-import { MonthlyRatesModule } from './modules/monthly_rates/monthly_rates.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailModule } from './modules/mail/mail.module';
 import { UserFinancialsModule } from './modules/users/user-financials/user-financials.module';
@@ -68,7 +67,6 @@ import { UserRoleHistoryModule } from './modules/user_role_history/user_role_his
     PaymentDetailsModule,
     MonthlyDepositsModule,
     DonationsModule,
-    MonthlyRatesModule,
     MailModule,
     UserFinancialsModule,
     InvestmentsModule, 
