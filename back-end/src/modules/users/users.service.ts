@@ -15,6 +15,7 @@ import { MonthlyRatesService } from '../monthly_rates/monthly_rates.service';
 import { UserRoleHistoryEntity } from '../user_role_history/Entity/user_role_history.entity';
 import { UserRoleHistoryService } from '../user_role_history/user_role_history.service';
 import { MembershipRoleEntity } from '../membership_roles/Entity/membership_rols.entity';
+import { RoleMonthlyRateEntity } from '../role_monthly_rates/Entity/role_monthly_rates.entity';
 
 @Injectable()
 export class UsersService {
@@ -26,6 +27,11 @@ export class UsersService {
 
     @InjectRepository(PaymentDetailsEntity)
     private paymentDetailsRepository: Repository<PaymentDetailsEntity>,
+      @InjectRepository(UserRoleHistoryEntity)
+    private readonly roleHistoryRepo: Repository<UserRoleHistoryEntity>,
+
+    @InjectRepository(RoleMonthlyRateEntity)
+    private readonly ratesRepo: Repository<RoleMonthlyRateEntity>,
 
     @Inject(forwardRef(() => MonthlyDepositsService))
     private readonly monthlyDepositsService: MonthlyDepositsService,
@@ -67,7 +73,7 @@ export class UsersService {
       const newUser = this.usersRepository.create(userData);
       const paymentDetails = this.paymentDetailsRepository.create(paymentData);
       const savedUser = await this.usersRepository.save(newUser);
-
+      console.log(savedUser.current_role)
       newUser.payment_details = paymentDetails;
       await this.userRoleHistoryService.createUserRoleHistory({
         from_date: newUser.join_date,
@@ -110,59 +116,84 @@ export class UsersService {
     });
   }
 
-  async calculateTotalDue(user: UserEntity): Promise<number> {
-    const currentDate = new Date();
-    let totalDue = 0;
+async calculateTotalDue(userId: number): Promise<number> {
+  // 1. שליפת המשתמש ובדיקות
+  const user = await this.usersRepository.findOne({
+    where: { id: userId },
+    relations: ['payment_details'],
+  });
+  if (!user) throw new BadRequestException('User not found');
+  if (!user.payment_details?.charge_date) {
+    throw new BadRequestException('Missing payment details');
+  }
 
-    if (!user.payment_details || !user.payment_details.charge_date) {
-      throw new Error(`Missing payment details for user ${user.id}`);
-    }
+  // 2. היסטוריית הדרגות, ממוינת לפי תאריך עולה
+  const history = await this.roleHistoryRepo.find({
+    where: { user: { id: userId } },
+    relations: ['role'],
+    order: { from_date: 'ASC' },
+  });
+  if (history.length === 0) {
+    throw new BadRequestException('No role history for user');
+  }
 
-    const rates = await this.monthlyRatesService.getRatesForRole(user.role);
+  // 3. תעריפים לכל הדרגות
+  const allRates = await this.ratesRepo.find({ relations: ['role'] });
+  if (allRates.length === 0) {
+    throw new BadRequestException('No monthly rates defined');
+  }
 
-    if (rates.length === 0) {
-      throw new Error(`No monthly rates found for role ${user.role}`);
-    }
+  // 4. נקודת ההתחלה – ראש החודש הראשון
+  const firstFrom = history[0].from_date instanceof Date
+    ? history[0].from_date
+    : new Date(history[0].from_date);
+  let iter = new Date(firstFrom.getFullYear(), firstFrom.getMonth(), 1);
 
-    let lastRate = rates[0];
-    const userJoinYear = user.join_date.getFullYear();
-    const userJoinMonth = user.join_date.getMonth() + 1;
+  // 5. נקודת הסיום – ראש החודש הנוכחי
+  const today = new Date();
+  const end = new Date(today.getFullYear(), today.getMonth()+1, 1);
 
-    const chargeDay = Number(user.payment_details.charge_date);
+  let totalDue = 0;
 
-    for (let year = userJoinYear; year <= currentDate.getFullYear(); year++) {
-      for (
-        let month = year === userJoinYear ? userJoinMonth : 1;
-        month <= 12;
-        month++
-      ) {
-        if (
-          year === currentDate.getFullYear() &&
-          month > currentDate.getMonth() + 1
-        ) {
-          break;
-        }
+  // 6. לולאה חודש־חודש מ־iter ועד לרגע end (כולל יוני)
+  while (iter.getTime() <= end.getTime()) {
+    console.log('⏳ Month:', iter.toISOString().slice(0,7));
 
-        if (
-          year === currentDate.getFullYear() &&
-          month === currentDate.getMonth() + 1
-        ) {
-          if (currentDate.getDate() < chargeDay) {
-            break;
-          }
-        }
+    // א. בחר את הדרגה שהייתה פעילה באותו חודש
+    const active = history
+      .filter(h => new Date(h.from_date).getTime() <= iter.getTime())
+      .sort((a,b) => +new Date(b.from_date) - +new Date(a.from_date))[0];
 
-        const newRate = rates.find((r) => r.year === year && r.month === month);
-        if (newRate) {
-          lastRate = newRate;
-        }
+    if (!active) {
+      console.log('  ✖ No active role, skipping');
+    } else {
+      console.log('  ✔ Active role id:', active.role.id);
 
-        totalDue += lastRate.amount;
+      // ב. מצא את התעריף האחרון שהחל עד אותו חודש
+      const rate = allRates
+        .filter(r =>
+          r.role.id === active.role.id &&
+          new Date(r.effective_from).getTime() <= iter.getTime()
+        )
+        .sort((a,b) => +new Date(b.effective_from) - +new Date(a.effective_from))[0];
+
+      if (rate) {
+        console.log('  💰 Using rate:', rate.amount);
+        totalDue += rate.amount;
+      } else {
+        console.log('  ✖ No rate found, skipping');
       }
     }
 
-    return totalDue;
+    // מעבר לחודש הבא
+    iter.setMonth(iter.getMonth()+1);
   }
+
+  console.log('🏁 totalDue:', totalDue);
+  return totalDue;
+}
+
+
   async getUserTotalDeposits(userId: number): Promise<number> {
     const UserTotalDeposits =
       await this.monthlyDepositsService.getUserTotalDeposits(userId);
@@ -172,10 +203,10 @@ export class UsersService {
   async calculateUserMonthlyBalance(
     user: UserEntity,
   ): Promise<{ total_due: number; total_paid: number; balance: number }> {
-    const totalDue = await this.calculateTotalDue(user);
+    const totalDue = await this.calculateTotalDue(user.id);
     const totalPaid = await this.getUserTotalDeposits(user.id);
     const balance = totalPaid - totalDue;
-
+        console.log(totalDue,"totalDue",totalPaid,"totalPaid",balance,"balance");
     return { total_due: totalDue, total_paid: totalPaid, balance };
   }
 
@@ -191,6 +222,7 @@ export class UsersService {
     const balanceData = await this.calculateUserMonthlyBalance(user);
     paymentDetails.monthly_balance = balanceData.balance;
     await this.paymentDetailsRepository.save(paymentDetails);
+
     return paymentDetails.monthly_balance;
   }
   async getAllUsersBalances(): Promise<

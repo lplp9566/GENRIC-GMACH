@@ -13,6 +13,7 @@ import { RequestsModule } from '../requests/requests.module';
 import { LoanActionsModule } from '../loans/loan-actions/loan-actions.module';
 import { UserRoleHistoryModule } from '../user_role_history/user_role_history.module';
 import { MembershipRolesModule } from '../membership_roles/membership_roles.module';
+import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { MembershipRolesModule } from '../membership_roles/membership_roles.modu
     PaymentDetailsModule,
     // cSpell:ignore Financials
     UserFinancialsModule,
+    RoleMonthlyRatesModule
   ],
   controllers: [UsersController],
   providers: [UsersService, UserBalanceCronService],

@@ -25,14 +25,26 @@ export class UserRoleHistoryService {
     private readonly usersService: UsersService,
     private readonly membershipRolesService: MembershipRolesService,
   ) {}
-  async createUserRoleHistory(dto: CreateUserRoleHistoryDto) {
-    // const user = await this.userRepo.findOne({ where: { id: dto.userId } });
-    // if (!user) throw new BadRequestException('User not found');
-    // const role = await this.membershipRolesService.findById(dto.roleId);
-    // if (!role) throw new BadRequestException('Role not found');
-    if(!dto.roleId || dto.userId)
-    await this.usersService.setCurrentRole(dto.userId, dto.roleId);
-    return this.userRoleHistoryRepo.save(dto);
+    async createUserRoleHistory(dto: CreateUserRoleHistoryDto) {
+    // 1. טעינת המשתמש
+    const user = await this.userRepo.findOne({ where: { id: dto.userId } });
+    if (!user) throw new BadRequestException('User not found');
+
+    // 2. טעינת הדרגה
+    const role = await this.membershipRolesService.findById(dto.roleId);
+    if (!role) throw new BadRequestException('Role not found');
+
+    // 3. עדכון current_role בטבלת users
+    await this.usersService.setCurrentRole(user.id, role.id);
+
+    // 4. יצירת היסטוריית הדרגה
+    const history = this.userRoleHistoryRepo.create({
+      user,
+      role,
+      from_date: dto.from_date,
+    });
+
+    return this.userRoleHistoryRepo.save(history);
   }
   // async getUserRoleHistory(userId: number) {
   //     return await this.userRoleHistoryRepo.find({ where: { user: userId } });

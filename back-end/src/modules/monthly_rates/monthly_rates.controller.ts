@@ -10,10 +10,10 @@ export class MonthlyRatesController {
 async getAllRates(): Promise<MonthlyRatesEntity[]> {
   return this.monthlyRatesService.getAllRates();
 }
-  @Get('/:role')
-  async getRatesForRole(role:string): Promise<MonthlyRatesEntity[]> {
-    return this.monthlyRatesService.getRatesForRole(role);
-  }
+  // @Get('/:role')
+  // async getRatesForRole(role:string): Promise<MonthlyRatesEntity[]> {
+  //   return this.monthlyRatesService.getRatesForRole(role);
+  // }
 
   @Post()
   async addRate(@Body() rate: MonthlyRatesEntity): Promise<MonthlyRatesEntity> {

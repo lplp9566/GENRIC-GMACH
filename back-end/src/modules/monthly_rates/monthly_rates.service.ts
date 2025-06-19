@@ -10,14 +10,14 @@ export class MonthlyRatesService {
     private monthlyRatesRepository: Repository<MonthlyRatesEntity>,
   ) {}
 
-  async getRatesForRole(role: string): Promise<MonthlyRatesEntity[]> {
-    return this.monthlyRatesRepository
-      .createQueryBuilder('rate')
-      .where('rate.role = :role', { role })
-      .orderBy('rate.year', 'ASC')
-      .addOrderBy('rate.month', 'ASC')
-      .getMany();
-  }
+  // async getRatesForRole(role: string): Promise<MonthlyRatesEntity[]> {
+  //   return this.monthlyRatesRepository
+  //     .createQueryBuilder('rate')
+  //     .where('rate.role = :role', { role })
+  //     .orderBy('rate.year', 'ASC')
+  //     .addOrderBy('rate.month', 'ASC')
+  //     .getMany();
+  // }
 
   async addRate(rate: MonthlyRatesEntity): Promise<MonthlyRatesEntity> {
     try {
