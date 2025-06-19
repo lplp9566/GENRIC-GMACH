@@ -1,6 +1,8 @@
 import {
   Column,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -16,18 +18,20 @@ import { OrderReturnEntity } from '../order-return/Entity/order-return.entity';
 import { LoanEntity } from '../loans/Entity/loans.entity';
 import { DonationsEntity } from '../donations/Entity/donations.entity';
 import { DepositsEntity } from '../deposits/Entity/deposits.entity';
+import { UserRoleHistoryEntity } from '../user_role_history/Entity/user_role_history.entity';
+import { MembershipRoleEntity } from '../membership_roles/Entity/membership_rols.entity';
 // cSpell:ignore Financials
 @Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({type: 'text'})
+  @Column({ type: 'text' })
   first_name: string;
 
-  @Column({type: 'text'})
+  @Column({ type: 'text' })
   last_name: string;
-  @Column({type: 'text'})
+  @Column({ type: 'text' })
   id_number: string;
   @Column({
     type: 'date',
@@ -37,13 +41,13 @@ export class UserEntity {
     },
   })
   join_date: Date;
-  @Column({type: 'text'})
+  @Column({ type: 'text' })
   password: string;
 
-  @Column({type: 'text'})
+  @Column({ type: 'text' })
   email_address: string;
 
-  @Column({type: 'text'})
+  @Column({ type: 'text' })
   phone_number: string;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.committeeMember })
@@ -57,6 +61,13 @@ export class UserEntity {
     { cascade: true },
   )
   payment_details: PaymentDetailsEntity;
+  @ManyToOne(() => MembershipRoleEntity, { nullable: true, eager: true })
+  current_role: MembershipRoleEntity;
+
+  @OneToMany(() => UserRoleHistoryEntity, (history) => history.user, {
+    cascade: true,
+  })
+  roleHistory: UserRoleHistoryEntity[];
 
   @OneToMany(() => LoanEntity, (loan) => loan.user, { cascade: true })
   loans: LoanEntity[];
@@ -81,14 +92,18 @@ export class UserEntity {
     cascade: true,
   })
   donations: DonationsEntity[];
+
   @OneToMany(() => RequestEntity, (request) => request.user, { cascade: true })
   requests: RequestEntity[];
+
   @OneToMany(() => CashHoldingsEntity, (holding) => holding.user, {
     cascade: true,
   })
   cashHoldings: CashHoldingsEntity[];
+
   @OneToMany(() => OrderReturnEntity, (order) => order.user, { cascade: true })
   orderReturns: OrderReturnEntity[];
+
   @OneToMany(() => DepositsEntity, (deposit) => deposit.user, { cascade: true })
   deposits: DepositsEntity[];
 }

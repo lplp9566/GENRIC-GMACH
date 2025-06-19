@@ -1,4 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserRoleHistoryEntity } from './Entity/user_role_history.entity';
+import { Repository } from 'typeorm';
+import { UsersService } from '../users/users.service';
+import { UserEntity } from '../users/user.entity';
+import { CreateUserRoleHistoryDto } from './user_role_history.controller';
+import { MembershipRolesService } from '../membership_roles/membership_roles.service';
+// interface ICreateUserRoleHistory {
 
+// }
 @Injectable()
-export class UserRoleHistoryService {}
+export class UserRoleHistoryService {
+  constructor(
+    @InjectRepository(UserRoleHistoryEntity)
+    private readonly userRoleHistoryRepo: Repository<UserRoleHistoryEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>,
+    @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService,
+    private readonly membershipRolesService: MembershipRolesService,
+  ) {}
+  async createUserRoleHistory(dto: CreateUserRoleHistoryDto) {
+    // const user = await this.userRepo.findOne({ where: { id: dto.userId } });
+    // if (!user) throw new BadRequestException('User not found');
+    // const role = await this.membershipRolesService.findById(dto.roleId);
+    // if (!role) throw new BadRequestException('Role not found');
+    if(!dto.roleId || dto.userId)
+    await this.usersService.setCurrentRole(dto.userId, dto.roleId);
+    return this.userRoleHistoryRepo.save(dto);
+  }
+  // async getUserRoleHistory(userId: number) {
+  //     return await this.userRoleHistoryRepo.find({ where: { user: userId } });
+  // }
+  async getUserRoleHistory(userId: number) {
+    const user = await this.usersService.getUserById(userId);
+    return await this.userRoleHistoryRepo.find({ where: { user } });
+  }
+  async getAllUserRoleHistory() {
+    return await this.userRoleHistoryRepo.find();
+  }
+}

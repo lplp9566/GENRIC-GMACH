@@ -18,7 +18,7 @@ export class UsersController {
     },
   ) {
     const { userData, paymentData } = body;
-    return this.usersService.createUserWithPayment(userData, paymentData);
+    return this.usersService.createUserAndPaymentInfo(userData, paymentData);
   }
   // @UseGuards(JwtAuthGuard, AdminGuard)
   @Get()

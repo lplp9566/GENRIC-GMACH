@@ -8,6 +8,7 @@ import { MembershipRolesModule } from '../membership_roles/membership_roles.modu
 @Module({
   imports: [TypeOrmModule.forFeature([RoleMonthlyRateEntity]),MembershipRolesModule], 
   controllers: [RoleMonthlyRatesController],
-  providers: [RoleMonthlyRatesService,TypeOrmModule]
+  providers: [RoleMonthlyRatesService,TypeOrmModule],
+  exports: [RoleMonthlyRatesService,TypeOrmModule],
 })
 export class RoleMonthlyRatesModule {}

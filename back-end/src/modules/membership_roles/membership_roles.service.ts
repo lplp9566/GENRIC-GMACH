@@ -15,4 +15,7 @@ export class MembershipRolesService {
     async createMemberShip(name: string) {
         return await this.membershipRolesRepository.save({ name });
     }
+    async findById(id: number) {
+        return await this.membershipRolesRepository.findOne({ where: { id } });
+    }
 }

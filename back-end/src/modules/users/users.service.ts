@@ -12,12 +12,17 @@ import * as bcrypt from 'bcrypt';
 import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
 import { MonthlyDepositsService } from '../monthly_deposits/monthly_deposits.service';
 import { MonthlyRatesService } from '../monthly_rates/monthly_rates.service';
+import { UserRoleHistoryEntity } from '../user_role_history/Entity/user_role_history.entity';
+import { UserRoleHistoryService } from '../user_role_history/user_role_history.service';
+import { MembershipRoleEntity } from '../membership_roles/Entity/membership_rols.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
+    @InjectRepository(MembershipRoleEntity)
+    private membershipRolesRepo: Repository<MembershipRoleEntity>,
 
     @InjectRepository(PaymentDetailsEntity)
     private paymentDetailsRepository: Repository<PaymentDetailsEntity>,
@@ -27,6 +32,8 @@ export class UsersService {
 
     @Inject(forwardRef(() => MonthlyRatesService))
     private readonly monthlyRatesService: MonthlyRatesService,
+    @Inject(forwardRef(() => UserRoleHistoryService))
+    private readonly userRoleHistoryService: UserRoleHistoryService,
   ) {}
 
   async getUserPaymentDetails(
@@ -37,9 +44,10 @@ export class UsersService {
     });
   }
 
-  async createUserWithPayment(
+  async createUserAndPaymentInfo(
     userData: Partial<UserEntity>,
     paymentData: Partial<PaymentDetailsEntity>,
+    // roleData: Partial<UserRoleHistoryEntity>,
   ): Promise<UserEntity> {
     try {
       if (
@@ -58,8 +66,14 @@ export class UsersService {
 
       const newUser = this.usersRepository.create(userData);
       const paymentDetails = this.paymentDetailsRepository.create(paymentData);
-      newUser.payment_details = paymentDetails;
+      const savedUser = await this.usersRepository.save(newUser);
 
+      newUser.payment_details = paymentDetails;
+      await this.userRoleHistoryService.createUserRoleHistory({
+        from_date: newUser.join_date,
+        userId: savedUser.id,
+        roleId: savedUser.current_role.id,
+      });
       return this.usersRepository.save(newUser);
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -81,7 +95,6 @@ export class UsersService {
       });
       if (!user) throw new Error('User not found');
       return user;
-      
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -93,7 +106,7 @@ export class UsersService {
 
   async getAllUsers(): Promise<UserEntity[]> {
     return this.usersRepository.find({
-      relations: ['payment_details'],
+      relations: ['payment_details', 'current_role'],
     });
   }
 
@@ -196,5 +209,16 @@ export class UsersService {
     );
 
     return balances;
+  }
+  async setCurrentRole(userId: number, roleId: number) {
+    const role = await this.membershipRolesRepo.findOne({
+      where: { id: roleId },
+    });
+    if (!role) throw new BadRequestException('Role not found');
+
+await this.usersRepository.update(
+  { id: userId },          // ← קריטריון ברור שלא יכול להיות ריק
+  { current_role: role },  // ← השדה בעEntity שלך
+);
   }
 }

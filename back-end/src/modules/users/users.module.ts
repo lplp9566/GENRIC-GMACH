@@ -11,6 +11,8 @@ import { MonthlyRatesModule } from '../monthly_rates/monthly_rates.module';
 import { UserFinancialsModule } from './user-financials/user-financials.module';
 import { RequestsModule } from '../requests/requests.module';
 import { LoanActionsModule } from '../loans/loan-actions/loan-actions.module';
+import { UserRoleHistoryModule } from '../user_role_history/user_role_history.module';
+import { MembershipRolesModule } from '../membership_roles/membership_roles.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { LoanActionsModule } from '../loans/loan-actions/loan-actions.module';
     forwardRef(() => MonthlyRatesModule),
     forwardRef(() => LoanActionsModule),
     forwardRef(() => RequestsModule),
+    forwardRef(() => UserRoleHistoryModule),
+    forwardRef(() => MembershipRolesModule),
     PaymentDetailsModule,
     // cSpell:ignore Financials
     UserFinancialsModule,
