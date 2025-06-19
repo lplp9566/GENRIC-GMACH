@@ -1,4 +1,4 @@
-import { MembershipRoleEntity } from "src/modules/membership_roles/Entity/membership_rols.entity";
+import { MembershipRoleEntity } from "../../membership_roles/Entity/membership_rols.entity";
 import { UserEntity } from "src/modules/users/user.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
