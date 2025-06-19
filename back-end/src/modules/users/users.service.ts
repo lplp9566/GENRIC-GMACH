@@ -217,8 +217,8 @@ export class UsersService {
     if (!role) throw new BadRequestException('Role not found');
 
 await this.usersRepository.update(
-  { id: userId },          // ← קריטריון ברור שלא יכול להיות ריק
-  { current_role: role },  // ← השדה בעEntity שלך
+  { id: userId },        
+  { current_role: role }, 
 );
   }
 }
