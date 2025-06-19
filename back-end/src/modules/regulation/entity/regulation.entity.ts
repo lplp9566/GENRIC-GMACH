@@ -7,4 +7,5 @@ export class RegulationEntity {
 
      @Column({type: 'text'})
      regulation: string
+
 }

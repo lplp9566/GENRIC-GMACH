@@ -31,7 +31,12 @@ import { CashHoldingsModule } from './modules/cash-holdings/cash-holdings.module
 import { OrderReturnModule } from './modules/order-return/order-return.module';
 import { FundsOverviewByYearModule } from './modules/funds-overview-by-year/funds-overview-by-year.module';
 import { DepositsActionsModule } from './modules/deposits/deposits-actions/deposits-actions.module';
-import { RegulationModule } from './regulation/regulation.module';
+import { RegulationModule } from './modules/regulation/regulation.module';
+import { MembershipRolesModule } from './modules/membership_roles/membership_roles.module';
+import { RoleMonthlyRatesModule } from './modules/role_monthly_rates/role_monthly_rates.module';
+import { UserRoleHistoryService } from './modules/user_role_history/user_role_history.service';
+import { UserRoleHistoryController } from './modules/user_role_history/user_role_history.controller';
+import { UserRoleHistoryModule } from './modules/user_role_history/user_role_history.module';
 
 
 @Module({
@@ -75,9 +80,13 @@ import { RegulationModule } from './regulation/regulation.module';
     OrderReturnModule,
     FundsOverviewByYearModule,
     RegulationModule,
+    MembershipRolesModule,
+    RoleMonthlyRatesModule,
+    UserRoleHistoryModule,
 
   ],
-  providers: [ExpensesService],
+  providers: [ExpensesService, UserRoleHistoryService],
+  controllers: [UserRoleHistoryController],
 
 
 
