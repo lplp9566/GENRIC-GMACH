@@ -7,6 +7,7 @@ import FundsOverviewByYearPage from './pages/FundsOverviewByYearPage';
 import NewLoan from './components/Loans/NewLoan/NewLoanForm';
 import FundsOverviewDashboard from './pages/FundsOverviewDashboard';
 import LoanDetailsPage from './components/Loans/LoanDetails/LoanDetailsPage';
+import UsersPage from './components/Users/UsersComponets';
 
 
 
@@ -24,6 +25,7 @@ function App() {
           <Route path="/loans/:id" element={<LoanDetailsPage />} />
           <Route path="/funds" element={<FundsOverviewDashboard />} />
           <Route path='FundsOverviewByYear' element={<FundsOverviewByYearPage />} />
+          <Route path="/users" element={<UsersPage/>} />
         </Routes>
       </Box>
     </BrowserRouter>

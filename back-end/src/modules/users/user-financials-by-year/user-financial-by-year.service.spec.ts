@@ -4,7 +4,6 @@ import { UserFinancialByYearService } from './user-financial-by-year.service';
 import { UserFinancialByYearEntity } from './user-financial-by-year.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../user.entity';
-import { UserRole } from '../userTypes';
 
 const mockRepo = () => ({
   find: jest.fn(),
@@ -26,7 +25,6 @@ describe('UserFinancialByYearService', () => {
     password: 'pass',
     email_address: 'test@example.com',
     phone_number: '0501234567',
-    role: UserRole.committeeMember ,
     is_admin: false,
     payment_details: {} as any,
     loans: [],
@@ -37,7 +35,9 @@ describe('UserFinancialByYearService', () => {
     requests: [],
     cashHoldings: [],
     deposits: [],
-    orderReturns :[]   
+    orderReturns :[] ,
+    current_role: {} as any,
+    roleHistory: []  
   };
 
   beforeEach(async () => {

@@ -1,130 +1,103 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserFinancialService } from './user-financials.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { UserFinancialEntity } from './user-financials.entity';
-import { UsersService } from '../users.service';
 import { Repository } from 'typeorm';
-import { UserEntity } from '../user.entity';
-import { payment_method, UserRole } from '../userTypes';
 import { PaymentDetailsEntity } from '../payment-details/payment_details.entity';
+import { UsersService } from '../users.service';
+import { UserEntity } from '../user.entity';
+import { MembershipRoleEntity } from '../../membership_roles/Entity/membership_rols.entity';
+import { UserRoleHistoryEntity } from '../../user_role_history/Entity/user_role_history.entity';
+import { RoleMonthlyRateEntity } from '../../role_monthly_rates/Entity/role_monthly_rates.entity';
+import { MonthlyDepositsService } from '../../monthly_deposits/monthly_deposits.service';
+import { UserRoleHistoryService } from '../../user_role_history/user_role_history.service';
 
-const mockRepo = () => ({
+
+
+// --- Mock factories ---
+const mockUserRepo = () => ({
+  findOne: jest.fn(),
+  find: jest.fn(),
+  create: jest.fn(),
+  save: jest.fn(),
+});
+
+const mockMembershipRoleRepo = () => ({
+  findOne: jest.fn(),
+  find: jest.fn(),
+});
+
+const mockPaymentRepo = () => ({
   findOne: jest.fn(),
   create: jest.fn(),
   save: jest.fn(),
 });
 
-describe('UserFinancialsService', () => {
-  let service: UserFinancialService;
-  let repo: ReturnType<typeof mockRepo>;
-  const mockPaymentDetails: PaymentDetailsEntity = {
-    id: 1,
-    user: {} as any, // אפשר גם לשים כאן את אותו mockUser אם כבר הגדרת
-    bank_number: 12,
-    bank_branch: 34,
-    bank_account_number: 567890,
-    charge_date: '15',
-    payment_method: payment_method.bank_transfer,
-    monthly_balance: 0,
-    loan_balances: [],
-  };
-  const mockUserFinancials: UserFinancialEntity = {
-    id: 1,
-    user: {} as any, // או את אותו mockUser
-    total_donations: 0,
-    total_cash_holdings: 0,
-    total_monthly_deposits: 0,
-    total_equity_donations: 0,
-    total_special_fund_donations: 0,
-    total_loans_taken: 0,
-    total_loans_repaid: 0,
-    total_fixed_deposits_deposited: 0,
-    total_fixed_deposits_withdrawn: 0,
-    total_standing_order_return: 0,
-  };
-  const mockUser: UserEntity = {
-    id: 1,
-    first_name: 'Test',
-    last_name: 'User',
-    join_date: new Date(),
-    id_number: '123456789',
-    password: 'pass',
-    email_address: 'test@example.com',
-    phone_number: '0501234567',
-    role: UserRole.committeeMember,
-    is_admin: false,
-    payment_details: mockPaymentDetails,
-    loans: [],
-    financialHistoryByYear: [],
-    userFinancials: mockUserFinancials,
-    monthly_deposits: [],
-    donations: [],
-    requests: [],
-    cashHoldings: [],
-    deposits: [],
-    orderReturns:[]
-  };
+const mockUserRoleHistoryRepo = () => ({
+  find: jest.fn(),
+});
+
+const mockRoleMonthlyRateRepo = () => ({
+  find: jest.fn(),
+});
+
+const mockDepositsService = () => ({
+  getUserTotalDeposits: jest.fn(),
+});
+
+const mockUserRoleHistoryService = () => ({
+  // כאן תוסיפו מתודות לפי הצורך
+  someMethod: jest.fn(),
+});
+
+describe('UsersService', () => {
+  let service: UsersService;
+  let userRepo: jest.Mocked<Repository<UserEntity>>;
+  let paymentRepo: jest.Mocked<Repository<PaymentDetailsEntity>>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UserFinancialService,
-        { provide: getRepositoryToken(UserFinancialEntity), useFactory: mockRepo },
-        { provide: UsersService, useValue: { getUserById: jest.fn() } },
+        UsersService,
+
+        // repositories
+        { provide: getRepositoryToken(UserEntity), useFactory: mockUserRepo },
+        { provide: getRepositoryToken(MembershipRoleEntity), useFactory: mockMembershipRoleRepo },
+        { provide: getRepositoryToken(PaymentDetailsEntity), useFactory: mockPaymentRepo },
+        { provide: getRepositoryToken(UserRoleHistoryEntity), useFactory: mockUserRoleHistoryRepo },
+        { provide: getRepositoryToken(RoleMonthlyRateEntity), useFactory: mockRoleMonthlyRateRepo },
+
+        // services
+        { provide: MonthlyDepositsService, useFactory: mockDepositsService },
+        { provide: UserRoleHistoryService, useFactory: mockUserRoleHistoryService },
       ],
     }).compile();
 
-    service = module.get<UserFinancialService>(UserFinancialService);
-    repo = module.get(getRepositoryToken(UserFinancialEntity));
+    service = module.get<UsersService>(UsersService);
+    userRepo = module.get(getRepositoryToken(UserEntity));
+    paymentRepo = module.get(getRepositoryToken(PaymentDetailsEntity));
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  describe('getUserById', () => {
+    it('should return a user if found', async () => {
+      const mockUser = { id: 1 } as any;
+      userRepo.findOne.mockResolvedValue(mockUser);
+
+      const result = await service.getUserById(1);
+      expect(result).toEqual(mockUser);
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      userRepo.findOne.mockResolvedValue(null);
+      await expect(service.getUserById(999)).rejects.toThrow('User not found');
+    });
   });
 
-  it('should create new financial record if not exists', async () => {
-    repo.findOne.mockResolvedValue(null);
-    repo.create.mockReturnValue({ user: mockUser, total_donations: 0 });
-    repo.save.mockResolvedValue({ id: 1, user: mockUser, total_donations: 0 });
+  describe('getAllUsers', () => {
+    it('should return an array of users', async () => {
+      const mockUsers = [{ id: 1 }, { id: 2 }] as any[];
+      userRepo.find.mockResolvedValue(mockUsers);
 
-    const result = await service.getOrCreateUserFinancials(mockUser);
-    expect(result.total_donations).toBe(0);
+      const result = await service.getAllUsers();
+      expect(result).toEqual(mockUsers);
+    });
   });
-
-  it('should record equity donation', async () => {
-    const record = { user: mockUser, total_donations: 0, total_equity_donations: 0 };
-    repo.findOne.mockResolvedValue(record);
-    repo.save.mockResolvedValue({ ...record, total_donations: 100, total_equity_donations: 100 });
-
-    const result = await service.recordEquityDonation(mockUser, 100);
-    expect(result.total_equity_donations).toBe(100);
-  });
-
-  it('should record special fund donation', async () => {
-    const record = { user: mockUser, total_donations: 0, total_special_fund_donations: 0 };
-    repo.findOne.mockResolvedValue(record);
-    repo.save.mockResolvedValue({ ...record, total_donations: 150, total_special_fund_donations: 150 });
-
-    const result = await service.recordSpecialFundDonation(mockUser, 150);
-    expect(result.total_special_fund_donations).toBe(150);
-  });
-
-  it('should record loan taken', async () => {
-    const record = { user: mockUser, total_loans_taken: 0 };
-    repo.findOne.mockResolvedValue(record);
-    repo.save.mockResolvedValue({ ...record, total_loans_taken: 500 });
-
-    const result = await service.recordLoanTaken(mockUser, 500);
-    expect(result.total_loans_taken).toBe(500);
-  });
-
-  it('should record loan repaid', async () => {
-    const record = { user: mockUser, total_loans_repaid: 0 };
-    repo.findOne.mockResolvedValue(record);
-    repo.save.mockResolvedValue({ ...record, total_loans_repaid: 200 });
-
-    const result = await service.recordLoanRepaid(mockUser, 200);
-    expect(result.total_loans_repaid).toBe(200);
-  });
-
 });

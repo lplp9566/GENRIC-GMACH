@@ -16,6 +16,7 @@
     "@fontsource/roboto": "^5.2.5",
     "@mui/icons-material": "^6.4.11",
     "@mui/material": "^6.4.11",
+    "@mui/x-data-grid": "^8.5.3",
     "@mui/x-date-pickers": "^8.5.0",
     "@reduxjs/toolkit": "^2.7.0",
     "axios": "^1.9.0",

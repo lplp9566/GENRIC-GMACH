@@ -11,7 +11,7 @@ import { UsersService } from '../users/users.service';
 import { LoanPaymentActionType } from './loan-dto/loanTypes';
 import { UserEntity } from '../users/user.entity';
 import { UserFinancialEntity } from '../users/user-financials/user-financials.entity';
-import { payment_method, UserRole } from '../users/userTypes';
+import { payment_method } from '../users/userTypes';
 import { FundsFlowService } from './calcelete.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 
@@ -54,8 +54,9 @@ describe('LoansService', () => {
     id_number: '123456789',
     deposits: [],
     phone_number: '0501234567',
-    role: UserRole.committeeMember,
+    current_role:{id : 1,name:"hh"},
     is_admin: false,
+    roleHistory: [],
     payment_details: {
       id: 1,
       user: {} as UserEntity,

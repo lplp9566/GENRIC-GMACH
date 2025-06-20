@@ -10,7 +10,6 @@ import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-over
 import { UserEntity } from '../users/user.entity';
 import { PaymentDetailsEntity } from '../users/payment-details/payment_details.entity';
 import { UserFinancialEntity } from '../users/user-financials/user-financials.entity';
-import { UserRole } from '../users/userTypes';
 import { DonationActionType } from './donations_dto';
 import { DonationsEntity } from './Entity/donations.entity';
 
@@ -32,7 +31,6 @@ describe('DonationsService', () => {
     id_number: '123456789',
     email_address: 'test@example.com',
     phone_number: '0501234567',
-    role: UserRole.committeeMember,
     is_admin: false,
     payment_details: {} as PaymentDetailsEntity,
     loans: [],
@@ -44,6 +42,8 @@ describe('DonationsService', () => {
     cashHoldings: [],
     orderReturns: [],
     deposits: [],
+    current_role: { id: 1, name: 'Member' },
+    roleHistory: [],
   };
 
   beforeEach(async () => {

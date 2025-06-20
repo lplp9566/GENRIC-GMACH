@@ -11,9 +11,7 @@ import { UsersService } from '../users/users.service';
 import { UserEntity } from '../users/user.entity';
 import { CreateUserRoleHistoryDto } from './user_role_history.controller';
 import { MembershipRolesService } from '../membership_roles/membership_roles.service';
-// interface ICreateUserRoleHistory {
 
-// }
 @Injectable()
 export class UserRoleHistoryService {
   constructor(

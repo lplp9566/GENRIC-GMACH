@@ -1,12 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { UserEntity } from './user.entity';
-import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
-import { MonthlyDepositsService } from '../monthly_deposits/monthly_deposits.service';
-import { MonthlyRatesService } from '../monthly_rates/monthly_rates.service';
 import { Repository } from 'typeorm';
 
+import { UsersService } from './users.service';
+import { UserEntity } from './user.entity';
+import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
+
+import { MonthlyDepositsService } from '../monthly_deposits/monthly_deposits.service';
+import { UserRoleHistoryEntity } from '../user_role_history/Entity/user_role_history.entity';
+import { MembershipRoleEntity } from '../membership_roles/Entity/membership_rols.entity';
+import { RoleMonthlyRateEntity } from '../role_monthly_rates/Entity/role_monthly_rates.entity';
+import { UserRoleHistoryService } from '../user_role_history/user_role_history.service';
+
+// --- Mock factories ---
 const mockUserRepo = () => ({
   findOne: jest.fn(),
   find: jest.fn(),
@@ -14,18 +20,31 @@ const mockUserRepo = () => ({
   save: jest.fn(),
 });
 
-const mockPaymentRepo = () => ({
+const mockMembershipRoleRepo = () => ({
+  findOne: jest.fn(),
+  find: jest.fn(),
+});
+
+const mockPaymentDetailsRepo = () => ({
   findOne: jest.fn(),
   create: jest.fn(),
   save: jest.fn(),
 });
 
-const mockDepositsService = () => ({
+const mockUserRoleHistoryRepo = () => ({
+  find: jest.fn(),
+});
+
+const mockRoleMonthlyRateRepo = () => ({
+  find: jest.fn(),
+});
+
+const mockMonthlyDepositsService = () => ({
   getUserTotalDeposits: jest.fn(),
 });
 
-const mockRatesService = () => ({
-  getRatesForRole: jest.fn(),
+const mockUserRoleHistoryService = () => ({
+  // הוסיפו כאן מתודות לפי הצורך
 });
 
 describe('UsersService', () => {
@@ -37,10 +56,17 @@ describe('UsersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
+
+        // repositories
         { provide: getRepositoryToken(UserEntity), useFactory: mockUserRepo },
-        { provide: getRepositoryToken(PaymentDetailsEntity), useFactory: mockPaymentRepo },
-        { provide: MonthlyDepositsService, useFactory: mockDepositsService },
-        { provide: MonthlyRatesService, useFactory: mockRatesService },
+        { provide: getRepositoryToken(MembershipRoleEntity), useFactory: mockMembershipRoleRepo },
+        { provide: getRepositoryToken(PaymentDetailsEntity), useFactory: mockPaymentDetailsRepo },
+        { provide: getRepositoryToken(UserRoleHistoryEntity), useFactory: mockUserRoleHistoryRepo },
+        { provide: getRepositoryToken(RoleMonthlyRateEntity), useFactory: mockRoleMonthlyRateRepo },
+
+        // services
+        { provide: MonthlyDepositsService, useFactory: mockMonthlyDepositsService },
+        { provide: UserRoleHistoryService, useFactory: mockUserRoleHistoryService },
       ],
     }).compile();
 
@@ -53,6 +79,7 @@ describe('UsersService', () => {
     it('should return a user if found', async () => {
       const mockUser = { id: 1 } as any;
       userRepo.findOne.mockResolvedValue(mockUser);
+
       const result = await service.getUserById(1);
       expect(result).toEqual(mockUser);
     });
@@ -67,6 +94,7 @@ describe('UsersService', () => {
     it('should return an array of users', async () => {
       const mockUsers = [{ id: 1 }, { id: 2 }] as any[];
       userRepo.find.mockResolvedValue(mockUsers);
+
       const result = await service.getAllUsers();
       expect(result).toEqual(mockUsers);
     });
