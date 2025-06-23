@@ -22,13 +22,16 @@ import { paymentMethod } from "../MunthlyPaymentsDto";
 import SelectAllUsers from "../../SelectUsers/SelectAllUsers";
 import { createMonthlyPayment } from "../../../store/features/admin/adminMonthlyPayments";
 import { payment_method } from "../../Users/UsersDto";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const AddPaymentModal: React.FC = () => {
   const open = useSelector(
     (s: RootState) => s.mapModeSlice.MonthlyPaymentModalMode
   );
   const dispatch = useDispatch<AppDispatch>();
-  
+    const navigate = useNavigate();
+
 
 //  const selectedUser = useSelector(
 //     (state: RootState) => state.adminUsers.selectedUser
@@ -47,6 +50,7 @@ const AddMonthlyPaymentStatus = useSelector(
 
   const handleClose = () => {
     dispatch(setMonthlyPaymentModalMode(false));
+    navigate("/paymentsPage");
     
     //  if (selectedUser) {
     //       dispatch(getMonthlyPaymentsByUserId(selectedUser.id));
@@ -58,15 +62,25 @@ const AddMonthlyPaymentStatus = useSelector(
   };
 
   const handleSubmit = () => {
-    dispatch(
-      createMonthlyPayment({
-        amount: newPayment.amount,
-        payment_method: newPayment.method,
-        deposit_date: newPayment.depositDate,
+        const promise = dispatch(
+          createMonthlyPayment({
+            amount: newPayment.amount,
+            payment_method: newPayment.method,
+            deposit_date: newPayment.depositDate,
         user: newPayment.userId,
         description: newPayment.description,
       })
     );
+    toast.promise(
+        promise,
+        {
+            pending: "מוסיף תשלום חדש…",
+            success: "התשלום נוסף בהצלחה! 👌",
+            error: "שגיאה בהוספת התשלום 💥",
+        },
+        { autoClose: 3000 }
+    );
+
     handleClose();
   };
 

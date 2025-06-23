@@ -22,11 +22,11 @@ export interface IPaymentDetails {
   loan_balances: { loanId: number; balance: number }[];
 }
 export enum payment_method {
-  credit_card   = 'credit_card',
-  direct_debit  = 'direct_debit', 
+  direct_debit = 'direct_debit',
+  credit_card = 'credit_card',
   bank_transfer = 'bank_transfer',
-  cash          = 'cash',
-  other         = 'other',          
+  cash = 'cash',
+  other = 'other',
 }
 
 export enum UserRole {

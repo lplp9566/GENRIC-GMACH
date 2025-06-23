@@ -33,6 +33,7 @@ export const paymentMethod = [
     {
         label:'אחר',
         value : "other"
+        
     }
 ]
 

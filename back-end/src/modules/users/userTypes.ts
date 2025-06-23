@@ -5,7 +5,7 @@ export enum payment_method {
   credit_card = 'credit_card',
   bank_transfer = 'bank_transfer',
   cash = 'cash',
-  outer = 'outer',
+  other = 'other',
 }
 
 export interface ICreateUser {
