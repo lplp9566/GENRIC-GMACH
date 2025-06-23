@@ -1,8 +1,6 @@
 import { Box, Button, Paper, Stack, Typography } from '@mui/material'
-import { useNavigate } from 'react-router-dom';
-
 const MonthlyPaymentHeader = () => {
-      const navigate = useNavigate();
+      // const navigate = useNavigate();
 
   return (
     <div>
