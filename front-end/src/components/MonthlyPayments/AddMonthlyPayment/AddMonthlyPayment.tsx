@@ -38,8 +38,7 @@ export const AddPaymentModal: React.FC = () => {
 //   );
   const today = new Date().toISOString().slice(0, 10);
 
-const AddMonthlyPaymentStatus = useSelector(
-    (state: RootState) => state.AdminMonthlyPaymentsSlice.AddMonthlyPaymentStatus)
+
   const [newPayment, setNewPayment] = useState({
     userId: 0,
     amount: 0,
@@ -49,16 +48,7 @@ const AddMonthlyPaymentStatus = useSelector(
   });
 
   const handleClose = () => {
-    dispatch(setMonthlyPaymentModalMode(false));
-    navigate("/paymentsPage");
-    
-    //  if (selectedUser) {
-    //       dispatch(getMonthlyPaymentsByUserId(selectedUser.id));
-    //     }
-    //     else{
-    //     dispatch(gatAllMonthlyPayments());
-    //     }
-
+    dispatch(setMonthlyPaymentModalMode(false))
   };
 
   const handleSubmit = () => {
@@ -80,8 +70,15 @@ const AddMonthlyPaymentStatus = useSelector(
         },
         { autoClose: 3000 }
     );
+     promise
+    .then(() => {
+      dispatch(setMonthlyPaymentModalMode(false));
+      navigate("/paymentsPage");                  
+    })
+    .catch(() => {
 
-    handleClose();
+    });
+    
   };
 
   return (

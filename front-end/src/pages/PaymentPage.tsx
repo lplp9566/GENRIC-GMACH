@@ -7,13 +7,12 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
-import { createMonthlyPayment, gatAllMonthlyPayments, getMonthlyPaymentsByUserId } from "../store/features/admin/adminMonthlyPayments";
+import {  gatAllMonthlyPayments, getMonthlyPaymentsByUserId } from "../store/features/admin/adminMonthlyPayments";
 import MonthlyPaymentHeader from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentHeader";
 import MonthlyPaymentsSummaryCard from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentsSummaryCard";
 import MonthlyPaymentTable from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentTable";
 import MonthlyPaymentFiltering from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentFiltering";
 import { AddPaymentModal } from "../components/MonthlyPayments/AddMonthlyPayment/AddMonthlyPayment";
-import { INewMonthlyPayment } from "../components/MonthlyPayments/MunthlyPaymentsDto";
 
 export default function PaymentsPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -38,7 +37,6 @@ const paymentModal = useSelector(
 
   }, [dispatch, selectedUser, paymentModal]);
 
-  // תאריך נוכחי
   const today = new Date();
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth() + 1;
@@ -63,7 +61,7 @@ const paymentModal = useSelector(
   const months = useMemo(
     () =>
       Array.from(new Set(paymentsThisYear.map((p) => p.month))).sort(
-        (a, b) => b - a
+        (a, b) => a - b
       ),
     [paymentsThisYear]
   );
