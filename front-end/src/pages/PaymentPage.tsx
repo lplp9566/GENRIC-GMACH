@@ -7,7 +7,7 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
-import { gatAllMonthlyPayments } from "../store/features/admin/adminMonthlyPayments";
+import { gatAllMonthlyPayments, getMonthlyPaymentsByUserId } from "../store/features/admin/adminMonthlyPayments";
 import MonthlyPaymentHeader from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentHeader";
 import MonthlyPaymentsSummaryCard from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentsSummaryCard";
 import MonthlyPaymentTable from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentTable";
@@ -18,11 +18,19 @@ export default function PaymentsPage() {
   const payments = useSelector(
     (s: RootState) => s.AdminMonthlyPaymentsSlice.allPayments
   );
-
-  // טען את כל התשלומים כשנכנסים
+  const selectedUser = useSelector(
+    (state: RootState) => state.adminUsers.selectedUser
+  );
+  console.log(selectedUser)
   useEffect(() => {
+    if (selectedUser) {
+      dispatch(getMonthlyPaymentsByUserId(selectedUser.id));
+    }
+    else{
     dispatch(gatAllMonthlyPayments());
-  }, [dispatch]);
+    }
+
+  }, [dispatch, selectedUser]);
 
   // תאריך נוכחי
   const today = new Date();

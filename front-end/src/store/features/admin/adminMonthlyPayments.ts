@@ -22,6 +22,18 @@ export const gatAllMonthlyPayments = createAsyncThunk
         return response.data
     }
 );
+export const getMonthlyPaymentsByUserId = createAsyncThunk
+(
+    '/admin/getMonthlyPaymentsByUserId',
+    async (userId: number) => {
+        const response = await axios.get<IMonthlyPayment[]>(`${BASE_URL}/monthly-deposits/user`
+            , {
+            params: { userId }
+        }
+        );
+        return response.data;
+    }
+);
 export const AdminMonthlyPaymentsSlice = createSlice({
     name:"adminMonthlyPayments",
     initialState,
@@ -38,7 +50,19 @@ export const AdminMonthlyPaymentsSlice = createSlice({
         .addCase(gatAllMonthlyPayments.rejected, (state, action) => {
             state.GetPaymentsStatus = "rejected";
             state.error = action.error.message || null;
-        });
+        })
+        .addCase(getMonthlyPaymentsByUserId.pending, (state) => {
+            state.GetPaymentsStatus = "pending";
+        })
+        .addCase(getMonthlyPaymentsByUserId.fulfilled, (state, action) => {
+            state.GetPaymentsStatus = "fulfilled";
+            state.allPayments = action.payload;
+        })        
+        .addCase(getMonthlyPaymentsByUserId.rejected, (state, action) => {
+            state.GetPaymentsStatus = "rejected";
+            state.error = action.error.message || null;
+        })
+
     }
 })
 export default AdminMonthlyPaymentsSlice.reducer

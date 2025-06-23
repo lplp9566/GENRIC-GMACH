@@ -48,6 +48,20 @@ export class MonthlyDepositsService {
       throw new BadRequestException(error.message);
     }
   }
+  async getUserDeposits(userId: number): Promise<MonthlyDepositsEntity[]> {
+    try {
+      const result = await this.monthlyDepositsRepository.find({
+        where: {
+          user: { id: userId },
+        },
+        order: { year: 'ASC', month: 'ASC' },
+        relations: ['user']
+      });
+      return result;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
   async recordMonthlyDeposit(payment_details: Partial<MonthlyDepositsEntity>) {
     try {
       // ✅ בדיקת תקינות
