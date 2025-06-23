@@ -1,5 +1,5 @@
 // PaymentsPage.tsx
-import  { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from "react";
 import {
   Container,
   Grid,
@@ -8,25 +8,37 @@ import {
   InputLabel,
   Select,
   MenuItem,
-} from '@mui/material';
+} from "@mui/material";
 
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../store/store';
-import { gatAllMonthlyPayments } from '../store/features/admin/adminMonthlyPayments';
-import MonthlyPaymentHeader from '../components/MonthlyPayments/MonthlyPaymentHeader';
-import MonthlyPaymentTable from '../components/MonthlyPayments/MonthlyPaymentTable';
-import SummaryCard from '../components/Loans/LoansDashboard/SummaryCard';
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store/store";
+import { gatAllMonthlyPayments } from "../store/features/admin/adminMonthlyPayments";
+import MonthlyPaymentHeader from "../components/MonthlyPayments/MonthlyPaymentHeader";
+import MonthlyPaymentTable from "../components/MonthlyPayments/MonthlyPaymentTable";
+import SummaryCard from "../components/Loans/LoansDashboard/SummaryCard";
 
 // מחזיר את השם העברי של חודש (1–12)
 const hebrewMonthNames = [
-  'ינואר','פברואר','מרץ','אפריל','מאי','יוני',
-  'יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר',
+  "ינואר",
+  "פברואר",
+  "מרץ",
+  "אפריל",
+  "מאי",
+  "יוני",
+  "יולי",
+  "אוגוסט",
+  "ספטמבר",
+  "אוקטובר",
+  "נובמבר",
+  "דצמבר",
 ];
 const getHebrewMonthName = (m: number) => hebrewMonthNames[m - 1] || String(m);
 
 export default function PaymentsPage() {
   const dispatch = useDispatch<AppDispatch>();
-  const payments = useSelector((s: RootState) => s.AdminMonthlyPaymentsSlice.allPayments);
+  const payments = useSelector(
+    (s: RootState) => s.AdminMonthlyPaymentsSlice.allPayments
+  );
 
   // טען את כל התשלומים כשנכנסים
   useEffect(() => {
@@ -40,7 +52,8 @@ export default function PaymentsPage() {
 
   // שנים קיימות בדאטה
   const years = useMemo(
-    () => Array.from(new Set(payments.map(p => p.year))).sort((a, b) => b - a),
+    () =>
+      Array.from(new Set(payments.map((p) => p.year))).sort((a, b) => b - a),
     [payments]
   );
   const [selectedYear, setSelectedYear] = useState(
@@ -49,7 +62,7 @@ export default function PaymentsPage() {
 
   // תשלומים לשנה נבחרת
   const paymentsThisYear = useMemo(
-    () => payments.filter(p => p.year === selectedYear),
+    () => payments.filter((p) => p.year === selectedYear),
     [payments, selectedYear]
   );
   // const sumYear = paymentsThisYear.reduce((sum, p) => sum + p.amount, 0);
@@ -57,7 +70,10 @@ export default function PaymentsPage() {
 
   // חודשים קיימים בשנה זו
   const months = useMemo(
-    () => Array.from(new Set(paymentsThisYear.map(p => p.month))).sort((a, b) => b - a),
+    () =>
+      Array.from(new Set(paymentsThisYear.map((p) => p.month))).sort(
+        (a, b) => b - a
+      ),
     [paymentsThisYear]
   );
   // selectedMonth === 0 פירושו “כל החודשים”
@@ -74,67 +90,91 @@ export default function PaymentsPage() {
 
   // קבע תשלומים על פי חודש (או כל החודשים)
   const paymentsThisMonth = useMemo(
-    () => selectedMonth === 0
-      ? paymentsThisYear
-      : paymentsThisYear.filter(p => p.month === selectedMonth),
+    () =>
+      selectedMonth === 0
+        ? paymentsThisYear
+        : paymentsThisYear.filter((p) => p.month === selectedMonth),
     [paymentsThisYear, selectedMonth]
   );
   const sumMonth = paymentsThisMonth.reduce((sum, p) => sum + p.amount, 0);
   const countMonth = paymentsThisMonth.length;
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4, direction: 'rtl' }}>
+    <Container sx={{ py: 4, direction: "rtl", bgcolor: "#e8f5e9" }}>
       {/* כותרת עליונה + פעולות */}
       <MonthlyPaymentHeader />
-
-       <Box display="flex" justifyContent="center" gap={2} mb={4}>
+      <Box
+        sx={{
+          backgroundColor: "#e8f5e9",
+          minHeight: "100vh",
+          pt: 4,
+          pb: 6,
+          direction: "rtl",
+        }}
+      >
+        <Box sx={{bgcolor:"red", padding: 2, borderRadius: 2, mb: 4}}>
+        <Box display="flex" justifyContent="center"  gap={2} mb={4}>
           <SummaryCard label="מספר הוראות קבע" value={countMonth} />
-          <SummaryCard label="סה״כ הוראות קבע" value={`₪${sumMonth.toLocaleString()}`} />
+          <SummaryCard
+            label="סה״כ הוראות קבע"
+            value={`₪${sumMonth.toLocaleString()}`}
+          />
         </Box>
-
-      {/* סינון */}
-      <Box mb={2}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs>
-            <Grid container spacing={1} justifyContent="center">
-              <Grid item xs={6} sm="auto">
-                <FormControl fullWidth size="small">
-                  <InputLabel id="year-select-label">שנה</InputLabel>
-                  <Select
-                    labelId="year-select-label"
-                    value={selectedYear}
-                    label="שנה"
-                    onChange={e => setSelectedYear(Number(e.target.value))}
-                  >
-                    {years.map(y => (
-                      <MenuItem key={y} value={y}>{y}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6} sm="auto">
-                <FormControl fullWidth size="small">
-                  <InputLabel id="month-select-label">חודש</InputLabel>
-                  <Select
-                    labelId="month-select-label"
-                    value={selectedMonth}
-                    label="חודש"
-                    onChange={e => setSelectedMonth(Number(e.target.value))}
-                  >
-                    <MenuItem value={0}>כל החודשים</MenuItem>
-                    {months.map(m => (
-                      <MenuItem key={m} value={m}>
-                        {getHebrewMonthName(m)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+        <Box
+          sx={{ mb: 4, p: 2, bgcolor: "#fff", borderRadius: 2, boxShadow: 1 }}
+        >
+          {/* סינון */}
+          <Box mb={2}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs>
+                <Grid container spacing={1} justifyContent="center">
+                  <Grid item xs={6} sm="auto">
+                    <FormControl fullWidth size="small">
+                      <InputLabel id="year-select-label">שנה</InputLabel>
+                      <Select
+                        labelId="year-select-label"
+                        value={selectedYear}
+                        label="שנה"
+                        onChange={(e) =>
+                          setSelectedYear(Number(e.target.value))
+                        }
+                      >
+                        {years.map((y) => (
+                          <MenuItem key={y} value={y}>
+                            {y}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={6} sm="auto">
+                    <FormControl fullWidth size="small">
+                      <InputLabel id="month-select-label">חודש</InputLabel>
+                      <Select
+                        labelId="month-select-label"
+                        value={selectedMonth}
+                        label="חודש"
+                        onChange={(e) =>
+                          setSelectedMonth(Number(e.target.value))
+                        }
+                      >
+                        <MenuItem value={0}>כל החודשים</MenuItem>
+                        {months.map((m) => (
+                          <MenuItem key={m} value={m}>
+                            {getHebrewMonthName(m)}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
-        </Grid>
+          </Box>
+          <MonthlyPaymentTable paymentsThisMonth={paymentsThisMonth} />
+        </Box>
       </Box>
-      <MonthlyPaymentTable paymentsThisMonth={paymentsThisMonth} />
+      </Box>
     </Container>
   );
 }

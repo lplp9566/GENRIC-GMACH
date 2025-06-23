@@ -5,7 +5,7 @@ interface MonthlyPaymentProps {
 } 
 const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({ paymentsThisMonth }) => {
   return (
-    <div>   <Paper sx={{ borderRadius: 2, overflow: 'auto' }}>
+    <div>   <Paper sx={{ borderRadius: 2, overflow: 'auto',padding: 2, boxShadow: 1, }}>
         <Table size="small" sx={{ minWidth: 650 }}>
           <TableHead sx={{ bgcolor: 'grey.100' }}>
             <TableRow>
