@@ -1,39 +1,17 @@
 // PaymentsPage.tsx
 import { useState, useMemo, useEffect } from "react";
 import {
-  Container,
-  Grid,
   Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-
+  Container,
 } from "@mui/material";
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import { gatAllMonthlyPayments } from "../store/features/admin/adminMonthlyPayments";
-import MonthlyPaymentHeader from "../components/MonthlyPayments/MonthlyPaymentHeader";
-import MonthlyPaymentTable from "../components/MonthlyPayments/MonthlyPaymentTable";
-import SummaryCard from "../components/Loans/LoansDashboard/SummaryCard";
-
-// מחזיר את השם העברי של חודש (1–12)
-const hebrewMonthNames = [
-  "ינואר",
-  "פברואר",
-  "מרץ",
-  "אפריל",
-  "מאי",
-  "יוני",
-  "יולי",
-  "אוגוסט",
-  "ספטמבר",
-  "אוקטובר",
-  "נובמבר",
-  "דצמבר",
-];
-const getHebrewMonthName = (m: number) => hebrewMonthNames[m - 1] || String(m);
+import MonthlyPaymentHeader from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentHeader";
+import MonthlyPaymentsSummaryCard from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentsSummaryCard";
+import MonthlyPaymentTable from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentTable";
+import MonthlyPaymentFiltering from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentFiltering";
 
 export default function PaymentsPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -131,14 +109,7 @@ export default function PaymentsPage() {
 
           }}
         >
-          <Box display="flex" justifyContent="center" gap={3} mb={4} flexWrap="wrap">
-            <SummaryCard label="מספר הוראות קבע" value={countMonth} />
-            <SummaryCard
-              label="סה״כ הוראות קבע"
-              value={`₪${sumMonth.toLocaleString()}`}
-            />
-          </Box>
-
+          <MonthlyPaymentsSummaryCard countMonth={countMonth} sumMonth={sumMonth} />
           <Box
             sx={{
               mb: 4,
@@ -148,53 +119,14 @@ export default function PaymentsPage() {
               boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
             }}
           >
-            <Box mb={2}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs>
-                  <Grid container spacing={2} justifyContent="flex-end"> 
-                    <Grid item xs={6} sm="auto">
-                      <FormControl fullWidth size="small">
-                        <InputLabel id="year-select-label">שנה</InputLabel>
-                        <Select
-                          labelId="year-select-label"
-                          value={selectedYear}
-                          label="שנה"
-                          onChange={(e) =>
-                            setSelectedYear(Number(e.target.value))
-                          }
-                        >
-                          {years.map((y) => (
-                            <MenuItem key={y} value={y}>
-                              {y}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={6} sm="auto">
-                      <FormControl fullWidth size="small">
-                        <InputLabel id="month-select-label">חודש</InputLabel>
-                        <Select
-                          labelId="month-select-label"
-                          value={selectedMonth}
-                          label="חודש"
-                          onChange={(e) =>
-                            setSelectedMonth(Number(e.target.value))
-                          }
-                        >
-                          <MenuItem value={0}>כל החודשים</MenuItem>
-                          {months.map((m) => (
-                            <MenuItem key={m} value={m}>
-                              {getHebrewMonthName(m)}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Box>
+            <MonthlyPaymentFiltering
+              selectedYear={selectedYear}
+              setSelectedYear={setSelectedYear}
+              selectedMonth={selectedMonth}
+              setSelectedMonth={setSelectedMonth}
+              years={years}
+              months={months}
+            />
             <MonthlyPaymentTable paymentsThisMonth={paymentsThisMonth} />
           </Box>
         </Box>

@@ -1,5 +1,5 @@
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
-import { IMonthlyPayment, paymentMethod } from './MunthlyPaymentsDto'
+import { IMonthlyPayment, paymentMethod } from '../MunthlyPaymentsDto'
 interface MonthlyPaymentProps {
     paymentsThisMonth: IMonthlyPayment[]
 } 

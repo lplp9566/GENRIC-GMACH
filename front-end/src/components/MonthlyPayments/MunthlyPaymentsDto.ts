@@ -28,3 +28,18 @@ export const paymentMethod = [
         value : "other"
     }
 ]
+
+ export const hebrewMonthNames = [
+  "ינואר",
+  "פברואר",
+  "מרץ",
+  "אפריל",
+  "מאי",
+  "יוני",
+  "יולי",
+  "אוגוסט",
+  "ספטמבר",
+  "אוקטובר",
+  "נובמבר",
+  "דצמבר",
+];
