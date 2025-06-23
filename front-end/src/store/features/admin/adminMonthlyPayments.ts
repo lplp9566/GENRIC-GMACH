@@ -6,7 +6,7 @@ import axios from "axios";
 interface AdminMonthlyPaymentsType {
   allPayments: IMonthlyPayment[] | [];
   GetPaymentsStatus: Status;
-  AddMonthlyPaymentStatus?: Status;
+  AddMonthlyPaymentStatus: Status;
   error: string | null;
 }
 const initialState: AdminMonthlyPaymentsType = {

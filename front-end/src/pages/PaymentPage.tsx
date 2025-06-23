@@ -7,12 +7,13 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
-import { gatAllMonthlyPayments, getMonthlyPaymentsByUserId } from "../store/features/admin/adminMonthlyPayments";
+import { createMonthlyPayment, gatAllMonthlyPayments, getMonthlyPaymentsByUserId } from "../store/features/admin/adminMonthlyPayments";
 import MonthlyPaymentHeader from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentHeader";
 import MonthlyPaymentsSummaryCard from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentsSummaryCard";
 import MonthlyPaymentTable from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentTable";
 import MonthlyPaymentFiltering from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentFiltering";
 import { AddPaymentModal } from "../components/MonthlyPayments/AddMonthlyPayment/AddMonthlyPayment";
+import { INewMonthlyPayment } from "../components/MonthlyPayments/MunthlyPaymentsDto";
 
 export default function PaymentsPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -25,6 +26,8 @@ export default function PaymentsPage() {
 const paymentModal = useSelector(
     (state: RootState) => state.mapModeSlice.MonthlyPaymentModalMode
   );
+
+
   useEffect(() => {
     if (selectedUser) {
       dispatch(getMonthlyPaymentsByUserId(selectedUser.id));
@@ -33,7 +36,7 @@ const paymentModal = useSelector(
     dispatch(gatAllMonthlyPayments());
     }
 
-  }, [dispatch, selectedUser]);
+  }, [dispatch, selectedUser, paymentModal]);
 
   // תאריך נוכחי
   const today = new Date();

@@ -15,7 +15,7 @@ export interface INewMonthlyPayment {
     amount:number
     deposit_date:string
     description?:string
-    method:payment_method
+    payment_method:payment_method
 }
 export const paymentMethod = [
     {
