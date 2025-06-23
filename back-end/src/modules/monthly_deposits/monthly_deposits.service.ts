@@ -5,7 +5,7 @@ import { MonthlyDepositsEntity } from "./monthly_deposits.entity";
 import { UserEntity } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
-import { getYearFromDate } from '../../services/services';
+import { getMonthFromDate, getYearFromDate } from '../../services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
@@ -26,7 +26,7 @@ export class MonthlyDepositsService {
 
   async getAllDeposits(): Promise<MonthlyDepositsEntity[]> {
     try {
-      const allDeposits = this.monthlyDepositsRepository.find();
+      const allDeposits = this.monthlyDepositsRepository.find({order: {year: 'ASC', month: 'ASC'},relations:["user"]});
       if (!allDeposits) {
         throw new Error('no dMonthlyDeposits fund');
       }
@@ -55,9 +55,9 @@ export class MonthlyDepositsService {
         throw new Error('Missing required fields');
       }
   
-      const year = await getYearFromDate(payment_details.deposit_date);
-  
-      // ✅ שליפת משתמש
+      const year =  getYearFromDate(payment_details.deposit_date);
+      const month =  getMonthFromDate(payment_details.deposit_date);
+
       const user = await this.usersService.getUserById(Number(payment_details.user));
       if (!user) {
         throw new Error('User not found');
@@ -65,8 +65,12 @@ export class MonthlyDepositsService {
   
       const newDeposit = this.monthlyDepositsRepository.create({
         user: user,
+        description: payment_details.description,
+        payment_method: payment_details.payment_method,
         amount: payment_details.amount,
         deposit_date: payment_details.deposit_date,
+        year: year,
+        month: month
       });
       await this.monthlyDepositsRepository.save(newDeposit);
       await Promise.all([

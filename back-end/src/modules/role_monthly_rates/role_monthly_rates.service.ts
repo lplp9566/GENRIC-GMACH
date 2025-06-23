@@ -10,7 +10,7 @@ export class RoleMonthlyRatesService {
         private readonly roleMonthlyRatesRepository: Repository<RoleMonthlyRateEntity>,
     ) {}
     async getRoleMonthlyRates(): Promise<RoleMonthlyRateEntity[]> {
-        return await this.roleMonthlyRatesRepository.find();
+        return await this.roleMonthlyRatesRepository.find({relations: ['role']});
     }
     async createRoleMonthlyRate(roleMonthlyRate: RoleMonthlyRateEntity) {
         return await this.roleMonthlyRatesRepository.save(roleMonthlyRate);

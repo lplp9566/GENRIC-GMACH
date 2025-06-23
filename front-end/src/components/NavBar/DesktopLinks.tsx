@@ -15,6 +15,7 @@ const navItems = [
   { label: "פקדונות", path: "/deposits" },
   { label: "נתונים כללים", path: "/funds" },
   { label: "סטטיסטיקה", path: "/FundsOverviewByYear" },
+  {label: "תשלומים חודשיים " , path:"/paymentsPage"}
 ];
 
 export const DesktopLinks: React.FC = () => (

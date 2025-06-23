@@ -6,50 +6,83 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Button,
-  Card,
-  CardContent,
-  CardActions,
+  Fab,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   Typography,
-  Grid,
   IconButton,
+  Divider,
+  Chip,
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import AddIcon from '@mui/icons-material/Add';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
 import { mockUsers, User } from './MookUsrs';
 
 const UsersPage: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [adminFilter, setAdminFilter] = useState('all');
+  const todayDay = new Date().getDate().toString();
 
-  const filteredUsers = useMemo(() => {
-    return mockUsers.filter((user: User) => {
-      const fullName = `${user.first_name} ${user.last_name}`;
-      const matchesSearch =
-        fullName.includes(searchValue) ||
-        user.id_number.includes(searchValue) ||
-        user.email_address.includes(searchValue);
-      if (!matchesSearch) return false;
+  const filteredAndSorted = useMemo(() => {
+    const list = mockUsers.filter((user: User) => {
+      const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+      const val = searchValue.toLowerCase();
+      const matches =
+        fullName.includes(val) ||
+        user.id_number.includes(val) ||
+        user.email_address.toLowerCase().includes(val);
+      if (!matches) return false;
       if (roleFilter !== 'all' && user.current_role !== Number(roleFilter)) return false;
       if (adminFilter === 'yes' && !user.is_admin) return false;
       if (adminFilter === 'no' && user.is_admin) return false;
       return true;
     });
-  }, [searchValue, roleFilter, adminFilter]);
+    return [...list].sort((a, b) => {
+      const aDue = a.payment_details.charge_date === todayDay;
+      const bDue = b.payment_details.charge_date === todayDay;
+      if (aDue && !bDue) return -1;
+      if (!aDue && bDue) return 1;
+      return 0;
+    });
+  }, [searchValue, roleFilter, adminFilter, todayDay]);
 
   return (
-    <Box p={4} sx={{ backgroundColor: '#f5ebdd', minHeight: '100vh' }}>
+    <Box
+      sx={{
+        direction: 'rtl',
+        backgroundColor: '#f0f2f5',
+        minHeight: '100vh',
+        p: { xs: 2, sm: 4 },
+        fontFamily: 'Roboto, sans-serif',
+      }}
+    >
       {/* Toolbar */}
-      <Box mb={4} display="flex" flexWrap="wrap" gap={2} alignItems="center">
+      <Box
+        mb={4}
+        display="flex"
+        flexWrap="wrap"
+        gap={2}
+        alignItems="center"
+        p={2}
+        sx={{ backgroundColor: '#fff', borderRadius: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.05)', direction: 'rtl' }}
+      >
         <TextField
-          label="חיפוש"
+          label="חיפוש משתמש..."
           variant="outlined"
           size="small"
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
+          sx={{ flexGrow: 1, minWidth: 200 }}
         />
-        <FormControl size="small">
+        <FormControl size="small" sx={{ minWidth: 120 }}>
           <InputLabel id="role-label">דרגה</InputLabel>
           <Select
             labelId="role-label"
@@ -57,18 +90,18 @@ const UsersPage: React.FC = () => {
             label="דרגה"
             onChange={(e) => setRoleFilter(e.target.value)}
           >
-            <MenuItem value="all">הכל</MenuItem>
-            <MenuItem value="1">1</MenuItem>
-            <MenuItem value="2">2</MenuItem>
-            <MenuItem value="3">3</MenuItem>
+            <MenuItem value="all">כל הדרגות</MenuItem>
+            <MenuItem value="1">דרגה 1</MenuItem>
+            <MenuItem value="2">דרגה 2</MenuItem>
+            <MenuItem value="3">דרגה 3</MenuItem>
           </Select>
         </FormControl>
-        <FormControl size="small">
-          <InputLabel id="admin-label">Admin</InputLabel>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel id="admin-label">מנהל</InputLabel>
           <Select
             labelId="admin-label"
             value={adminFilter}
-            label="Admin"
+            label="מנהל"
             onChange={(e) => setAdminFilter(e.target.value)}
           >
             <MenuItem value="all">הכל</MenuItem>
@@ -76,47 +109,58 @@ const UsersPage: React.FC = () => {
             <MenuItem value="no">לא</MenuItem>
           </Select>
         </FormControl>
-        <Box flexGrow={1} />
-        <Button variant="contained" sx={{ backgroundColor: '#2a8c82' }}>
-          + משתמש חדש
-        </Button>
+        <Fab
+          variant="extended"
+          color="primary"
+          onClick={() => console.log('Add New User')}
+          sx={{ ml: 'auto', backgroundColor: '#2e7d32', '&:hover': { backgroundColor: '#1b5e20' } }}
+        >
+          <AddIcon sx={{ mr: 1 }} />
+          משתמש חדש
+        </Fab>
       </Box>
 
-      {/* Grid of User Cards */}
-      <Grid container spacing={3}>
-        {filteredUsers.map((user) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={user.id}>
-            <Card sx={{ backgroundColor: '#dceee9' }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  {user.first_name} {user.last_name}
-                </Typography>
-                <Typography variant="body2">ת.ז.: {user.id_number}</Typography>
-                <Typography variant="body2">הצטרף: {user.join_date}</Typography>
-                <Typography variant="body2">אימייל: {user.email_address}</Typography>
-                <Typography variant="body2">טלפון: {user.phone_number}</Typography>
-                <Typography variant="body2">
-                  מאזן חודשי: {user.payment_details.monthly_balance}
-                </Typography>
-                <Typography variant="body2">
-                  דרגה: {user.current_role}
-                </Typography>
-                <Typography variant="body2">
-                  Admin: {user.is_admin ? '✔️' : '✖️'}
-                </Typography>
-              </CardContent>
-              <CardActions sx={{ justifyContent: 'flex-end' }}>
-                <IconButton onClick={() => console.log('View', user.id)}>
+      {/* Accordion list: only names shown initially */}
+      {filteredAndSorted.map((user: User) => (
+        <Accordion key={user.id} sx={{ mb: 2 }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Box display="flex" justifyContent="space-between" width="100%">
+              <Typography variant="subtitle1" fontWeight={600}>
+                {user.first_name} {user.last_name}
+              </Typography>
+              {user.payment_details.charge_date === todayDay && (
+                <Chip label="חיוב היום" color="warning" size="small" />
+              )}
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Divider sx={{ mb: 2, borderColor: '#eee' }} />
+            <Box display="flex" flexDirection="column" gap={1}>
+              <Typography variant="body2">ת.ז.: {user.id_number}</Typography>
+              <Typography variant="body2">דרגה: {user.current_role}</Typography>
+              <Typography variant="body2">אימייל: {user.email_address}</Typography>
+              <Typography variant="body2">טלפון: {user.phone_number}</Typography>
+              <Typography variant="body2">
+                מאזן חודשי: {user.payment_details.monthly_balance}₪
+              </Typography>
+              <Box display="flex" justifyContent="flex-end">
+                <IconButton onClick={() => console.log('View', user.id)} color="primary">
                   <VisibilityIcon />
                 </IconButton>
-                <IconButton onClick={() => console.log('Edit', user.id)}>
+                <IconButton onClick={() => console.log('Edit', user.id)} color="primary">
                   <EditIcon />
                 </IconButton>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+              </Box>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
+      ))}
+
+      {!filteredAndSorted.length && (
+        <Typography textAlign="center" color="text.secondary">
+          לא נמצאו משתמשים.
+        </Typography>
+      )}
     </Box>
   );
 };

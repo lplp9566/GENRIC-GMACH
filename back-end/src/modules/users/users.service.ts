@@ -153,7 +153,7 @@ async calculateTotalDue(userId: number): Promise<number> {
 
   // 6. לולאה חודש־חודש מ־iter ועד לרגע end (כולל יוני)
   while (iter.getTime() <= end.getTime()) {
-    console.log('⏳ Month:', iter.toISOString().slice(0,7));
+    // console.log('⏳ Month:', iter.toISOString().slice(0,7));
 
     // א. בחר את הדרגה שהייתה פעילה באותו חודש
     const active = history
@@ -161,9 +161,9 @@ async calculateTotalDue(userId: number): Promise<number> {
       .sort((a,b) => +new Date(b.from_date) - +new Date(a.from_date))[0];
 
     if (!active) {
-      console.log('  ✖ No active role, skipping');
+      // console.log('  ✖ No active role, skipping');
     } else {
-      console.log('  ✔ Active role id:', active.role.id);
+      // console.log('  ✔ Active role id:', active.role.id);
 
       // ב. מצא את התעריף האחרון שהחל עד אותו חודש
       const rate = allRates
@@ -174,10 +174,10 @@ async calculateTotalDue(userId: number): Promise<number> {
         .sort((a,b) => +new Date(b.effective_from) - +new Date(a.effective_from))[0];
 
       if (rate) {
-        console.log('  💰 Using rate:', rate.amount);
+        // console.log('  💰 Using rate:', rate.amount);
         totalDue += rate.amount;
-      } else {
-        console.log('  ✖ No rate found, skipping');
+      } else {        // console.log('  ✖ No rate found, skipping');
+
       }
     }
 
@@ -185,7 +185,7 @@ async calculateTotalDue(userId: number): Promise<number> {
     iter.setMonth(iter.getMonth()+1);
   }
 
-  console.log('🏁 totalDue:', totalDue);
+  // console.log('🏁 totalDue:', totalDue);
   return totalDue;
 }
 
@@ -202,7 +202,7 @@ async calculateTotalDue(userId: number): Promise<number> {
     const totalDue = await this.calculateTotalDue(user.id);
     const totalPaid = await this.getUserTotalDeposits(user.id);
     const balance = totalPaid - totalDue;
-        console.log(totalDue,"totalDue",totalPaid,"totalPaid",balance,"balance");
+        // console.log(totalDue,"totalDue",totalPaid,"totalPaid",balance,"balance");
     return { total_due: totalDue, total_paid: totalPaid, balance };
   }
 
