@@ -27,8 +27,8 @@ export class MonthlyDepositsController {
   async getUserTotalDeposits(@Body() params: { userId: number }) {
     return this.monthlyDepositsService.getUserTotalDeposits(params.userId);
   }
-@Get('user')
-async getUserDeposits(@Query('userId', ParseIntPipe) userId: number) {
-  return this.monthlyDepositsService.getUserDeposits(userId);
-}
+  @Get('user')
+  async getUserDeposits(@Query('userId', ParseIntPipe) userId: number) {
+    return this.monthlyDepositsService.getUserDeposits(userId);
+  }
 }

@@ -15,6 +15,7 @@ const navItems = [
   { label: "פקדונות", path: "/deposits" },
   { label: "נתונים כללים", path: "/funds" },
   { label: "סטטיסטיקה", path: "/FundsOverviewByYear" },
+  { label: "תשלומים חודשיים", path: "/paymentsPage" }
 ];
 
  const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({

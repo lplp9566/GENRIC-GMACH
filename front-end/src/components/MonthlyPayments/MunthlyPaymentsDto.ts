@@ -10,6 +10,13 @@ export  interface  IMonthlyPayment {
      description?:string
      payment_method:payment_method
 }
+export interface INewMonthlyPayment {
+    user:number
+    amount:number
+    deposit_date:string
+    description?:string
+    method:payment_method
+}
 export const paymentMethod = [
     {
         label:'כרטיס אשראי',

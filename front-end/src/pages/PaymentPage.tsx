@@ -12,6 +12,7 @@ import MonthlyPaymentHeader from "../components/MonthlyPayments/MainMonthlyPayme
 import MonthlyPaymentsSummaryCard from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentsSummaryCard";
 import MonthlyPaymentTable from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentTable";
 import MonthlyPaymentFiltering from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentFiltering";
+import { AddPaymentModal } from "../components/MonthlyPayments/AddMonthlyPayment/AddMonthlyPayment";
 
 export default function PaymentsPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,7 +22,9 @@ export default function PaymentsPage() {
   const selectedUser = useSelector(
     (state: RootState) => state.adminUsers.selectedUser
   );
-  console.log(selectedUser)
+const paymentModal = useSelector(
+    (state: RootState) => state.mapModeSlice.MonthlyPaymentModalMode
+  );
   useEffect(() => {
     if (selectedUser) {
       dispatch(getMonthlyPaymentsByUserId(selectedUser.id));
@@ -88,6 +91,7 @@ export default function PaymentsPage() {
 
 
   return (
+    
     <Container
       sx={{
         py: 4,
@@ -96,6 +100,9 @@ export default function PaymentsPage() {
         fontFamily: 'Heebo, Arial, sans-serif',
       }}
     >
+      {paymentModal && (
+        <AddPaymentModal/>
+      )}
       <MonthlyPaymentHeader />
       <Box
         sx={{

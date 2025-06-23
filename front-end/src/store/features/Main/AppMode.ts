@@ -5,11 +5,13 @@ axios.defaults.withCredentials = true;
 interface AppModeType {
     mode : 'admin' | 'user'
     LoanModalMode: boolean
+    MonthlyPaymentModalMode?: boolean
 }
 
 const initialState:AppModeType = {
     LoanModalMode:false,
-    mode:'admin'
+    mode:'admin',
+    MonthlyPaymentModalMode:false
 }
 export const AppModeSlice = createSlice({
     name:'AppMode',
@@ -20,8 +22,11 @@ export const AppModeSlice = createSlice({
         },
         setLoanModalMode(state,action){
             state.LoanModalMode = action.payload
+        },
+        setMonthlyPaymentModalMode(state, action) {
+            state.MonthlyPaymentModalMode = action.payload
         }
     }
 })
-export const {setAppMode,setLoanModalMode} = AppModeSlice.actions
+export const {setAppMode,setLoanModalMode,setMonthlyPaymentModalMode} = AppModeSlice.actions
 export default AppModeSlice.reducer

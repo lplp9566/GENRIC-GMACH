@@ -1,6 +1,9 @@
 import { Box, Button, Paper, Stack, Typography } from '@mui/material'
+import { useDispatch } from 'react-redux';
+import { setMonthlyPaymentModalMode } from '../../../store/features/Main/AppMode';
 const MonthlyPaymentHeader = () => {
-      // const navigate = useNavigate();
+  const dispatch = useDispatch();
+
 
   return (
     <div>
@@ -44,7 +47,7 @@ const MonthlyPaymentHeader = () => {
             >
               <Button
                 variant="contained"
-                // onClick={() => navigate("/loans/new")}
+                onClick={() => dispatch(setMonthlyPaymentModalMode(true))}
                 sx={{
                   backgroundColor: "green", // טורקיז כצבע ראשי לכפתור
                   color: "#ffffff",
