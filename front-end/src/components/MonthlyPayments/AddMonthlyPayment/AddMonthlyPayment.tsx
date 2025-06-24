@@ -5,7 +5,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  IconButton,
   Typography,
   TextField,
   FormControl,
@@ -13,8 +12,8 @@ import {
   Select,
   MenuItem,
   Button,
+  Box,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { setMonthlyPaymentModalMode } from "../../../store/features/Main/AppMode";
@@ -30,16 +29,16 @@ export const AddPaymentModal: React.FC = () => {
     (s: RootState) => s.mapModeSlice.MonthlyPaymentModalMode
   );
   const dispatch = useDispatch<AppDispatch>();
-    const navigate = useNavigate();
-
-
-//  const selectedUser = useSelector(
-//     (state: RootState) => state.adminUsers.selectedUser
-//   );
+  const navigate = useNavigate();
   const today = new Date().toISOString().slice(0, 10);
 
-
-  const [newPayment, setNewPayment] = useState({
+  const [newPayment, setNewPayment] = useState<{
+    userId: number;
+    amount: number;
+    depositDate: string;
+    method: payment_method;
+    description: string;
+  }>({
     userId: 0,
     amount: 0,
     depositDate: today,
@@ -48,37 +47,37 @@ export const AddPaymentModal: React.FC = () => {
   });
 
   const handleClose = () => {
-    dispatch(setMonthlyPaymentModalMode(false))
+    dispatch(setMonthlyPaymentModalMode(false));
   };
 
   const handleSubmit = () => {
-        const promise = dispatch(
-          createMonthlyPayment({
-            amount: newPayment.amount,
-            payment_method: newPayment.method,
-            deposit_date: newPayment.depositDate,
-        user: newPayment.userId,
-        description: newPayment.description,
-      })
-    );
-    toast.promise(
-        promise,
-        {
-            pending: "מוסיף תשלום חדש…",
-            success: "התשלום נוסף בהצלחה! 👌",
-            error: "שגיאה בהוספת התשלום 💥",
-        },
-        { autoClose: 3000 }
-    );
-     promise
-    .then(() => {
-      dispatch(setMonthlyPaymentModalMode(false));
-      navigate("/paymentsPage");                  
-    })
-    .catch(() => {
+    const payload = {
+      user: newPayment.userId,
+      amount: newPayment.amount,
+      deposit_date: newPayment.depositDate,
+      payment_method: newPayment.method,
+      description: newPayment.description,
+    };
+    const promise = dispatch(createMonthlyPayment(payload)).unwrap();
 
-    });
-    
+    toast.promise(
+      promise,
+      {
+        pending: "מוסיף תשלום חדש…",
+        success: "התשלום נוסף בהצלחה! 👌",
+        error: "שגיאה בהוספת התשלום 💥",
+      },
+      { autoClose: 3000 }
+    );
+
+    promise
+      .then(() => {
+        handleClose();
+        navigate("/paymentsPage");
+      })
+      .catch(() => {
+        // שגיאה כבר הודגמה ב-toast
+      });
   };
 
   return (
@@ -87,115 +86,156 @@ export const AddPaymentModal: React.FC = () => {
       onClose={handleClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{ sx: { borderRadius: 2 } }}
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+          bgcolor: "#e8f5e9",
+        },
+      }}
     >
-      <DialogTitle sx={{ pr: 1 }}>
-        הוספת תשלום חדש
-        <IconButton
-          onClick={handleClose}
-          sx={{ position: "absolute", top: 8, left: 8 }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-
-      <Typography variant="body2" color="text.secondary" sx={{ px: 3, mb: 2 }}>
-        הזן את פרטי התשלום החדש
-      </Typography>
-
-      <DialogContent
+      <DialogTitle
+        component="div"
         sx={{
-          px: 3,
-          pt: 0,
-          pb: 2,
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
+          bgcolor: "green",
+          color: "#fff",
+          py: 2,
+          textAlign: "center",
         }}
       >
-        {/* Select User */}
-        <SelectAllUsers
-          //   value={newPayment.userId}
-          onChange={(id) => setNewPayment((p) => ({ ...p, userId: id }))}
-          label="בחר משתמש"
-          value={newPayment.userId}
-        />
+        <Typography variant="h6" sx={{ fontWeight: 700, m: 0 }}>
+          הוספת הוראת קבע חדשה
+        </Typography>
+      </DialogTitle>
 
-        {/* Amount */}
-        <TextField
-          label="סכום (₪)"
-          size="small"
-          fullWidth
-          value={newPayment.amount}
-          onChange={(e) =>
-            setNewPayment((p) => ({ ...p, amount: +e.target.value }))
-          }
-        />
+      <DialogContent sx={{ px: 4, pt: 3, pb: 2 }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ mb: 3, textAlign: "center" }}
+        >
+          אנא מלא/י את כל השדות המסומנים בכוכבית
+        </Typography>
 
-        {/* Date */}
-        <TextField
-          label="תאריך"
-          type="date"
-          size="small"
-          fullWidth
-          InputLabelProps={{ shrink: true }}
-          value={newPayment.depositDate}
-          onChange={(e) =>
-            setNewPayment((p) => ({ ...p, depositDate: e.target.value }))
-          }
-        />
+        <Box
+          component="form"
+          noValidate
+          autoComplete="off"
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+        >
+          <SelectAllUsers
+            value={newPayment.userId}
+            onChange={(id) => setNewPayment((p) => ({ ...p, userId: id }))}
+            label="בחר משתמש*"
+            color="success"
+          />
 
-        {/* Payment Method */}
-        <FormControl fullWidth size="small">
-          <InputLabel id="method-label">אמצעי תשלום</InputLabel>
-          <Select
-            labelId="method-label"
-            value={newPayment.method}
-            label="אמצעי תשלום"
+          <TextField
+            label="סכום (₪)*"
+            type="number"
+            size="small"
+            color="success"
+            fullWidth
+            value={newPayment.amount}
             onChange={(e) =>
               setNewPayment((p) => ({
                 ...p,
-                method: e.target.value as payment_method,
+                amount: +e.target.value,
               }))
             }
-          >
-            {paymentMethod.map((pm) => (
-              <MenuItem key={pm.value} value={pm.value}>
-                {pm.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+          />
 
-        {/* Description */}
-        <TextField
-          label="הערות (אופציונלי)"
-          size="small"
-          fullWidth
-          multiline
-          minRows={2}
-          value={newPayment.description}
-          onChange={(e) =>
-            setNewPayment((p) => ({ ...p, description: e.target.value }))
-          }
-        />
+          <TextField
+            label="תאריך*"
+            type="date"
+            size="small"
+            fullWidth
+            color="success"
+            InputLabelProps={{ shrink: true }}
+            value={newPayment.depositDate}
+            onChange={(e) =>
+              setNewPayment((p) => ({
+                ...p,
+                depositDate: e.target.value,
+              }))
+            }
+          />
+
+          <FormControl fullWidth size="small">
+            <InputLabel
+              id="method-label"
+              sx={{
+                color: "success.main",
+                "&.Mui-focused": { color: "success.dark" },
+              }}
+            >
+              אמצעי תשלום
+            </InputLabel>
+            <Select
+              labelId="method-label"
+              value={newPayment.method}
+              label="אמצעי תשלום*"
+              color="success"
+              onChange={(e) =>
+                setNewPayment((p) => ({
+                  ...p,
+                  method: e.target.value as payment_method,
+                }))
+              }
+            >
+              {paymentMethod.map((pm) => (
+                <MenuItem key={pm.value} value={pm.value}>
+                  {pm.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            label="הערות"
+            size="small"
+            fullWidth
+            color="success"
+            multiline
+            minRows={3}
+            value={newPayment.description}
+            onChange={(e) =>
+              setNewPayment((p) => ({
+                ...p,
+                description: e.target.value,
+              }))
+            }
+          />
+        </Box>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
+      <DialogActions
+        sx={{
+          px: 4,
+          pb: 3,
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <Button onClick={handleClose}>ביטול</Button>
         <Button
           variant="contained"
           onClick={handleSubmit}
           disabled={
-            !newPayment.userId || newPayment.amount <= 0 || !newPayment.method
+            newPayment.userId === 0 ||
+            newPayment.amount <= 0 ||
+            !newPayment.method
           }
           sx={{
-            bgcolor: "#2e7d32",
+            bgcolor: "#1976d2",
             color: "#fff",
-            "&:hover": { bgcolor: "#1b5e20" },
+            px: 3,
+            py: 1,
+            borderRadius: 2,
+            "&:hover": { bgcolor: "#115293" },
           }}
         >
-          הוספת תשלום
+          הוסף הוראת קבע
         </Button>
       </DialogActions>
     </Dialog>

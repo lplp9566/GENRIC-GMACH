@@ -13,12 +13,16 @@ import { getFundsOverview } from "../../store/features/admin/adminFundsOverviewS
 import { RootState } from "../../store/store";
 import LoadingIndicator from "../StatusComponents/LoadingIndicator";
 import GemachRegulationsModal from "./GemachRegulationsModal";
+import { AddPaymentModal } from "../MonthlyPayments/AddMonthlyPayment/AddMonthlyPayment";
+import { setMonthlyPaymentModalMode } from "../../store/features/Main/AppMode";
 const HomePage: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     dispatch(getFundsOverview());
   }, [dispatch]);
-
+const paymentModal = useSelector(
+    (state: RootState) => state.mapModeSlice.MonthlyPaymentModalMode
+  );
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const { fundsOverview, status } = useSelector(
@@ -29,7 +33,7 @@ const HomePage: React.FC = () => {
       description: "רישום תשלום דמי חבר",
       icon: <AccountBalanceWallet />,
       color: "linear-gradient(to right, #2563eb, #1db954)",
-      onclick: () => navigate("/payment"),
+      onclick: () => dispatch(setMonthlyPaymentModalMode(true)),
     },
     {
       label: "משתמש",
@@ -110,7 +114,9 @@ const HomePage: React.FC = () => {
               </Grid>
             ))}
           </Grid>
-
+     {paymentModal && (
+        <AddPaymentModal/>
+      )}
           <Box mt={10}>
             <Typography variant="h5" fontWeight={700} mb={2} textAlign="center">
               פעולות מהירות

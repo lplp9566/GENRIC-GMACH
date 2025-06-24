@@ -16,12 +16,14 @@ interface Props {
   label?: string;
   // מגדירים כאן גם אפשרות להעביר ערך נבחר
   value?: number;
+  color?: "primary" | "secondary" | "error" | "info" | "success" | "warning";
 }
 
 const SelectAllUsers: React.FC<Props> = ({
   onChange,
   label = "בחר משתמש",
   value,
+  color
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const allUsers = useSelector(
@@ -38,10 +40,11 @@ const SelectAllUsers: React.FC<Props> = ({
 
   return (
     <FormControl fullWidth size="small">
-      <InputLabel id="select-user-label">{label}</InputLabel>
+      <InputLabel id="select-user-label" sx={{ color: color }}>{label}</InputLabel>
       <Select
         labelId="select-user-label"
         label={label}
+        color={color ?? "primary"} // אם לא הועבר צבע, נשתמש בצבע ברירת מחדל
         // אם קיבלנו value, נהפוך אותו למחרוזת, אחרת נעביר מחרוזת ריקה
         value={value != null ? value.toString() : ""}
         onChange={handleChange}
