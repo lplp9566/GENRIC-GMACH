@@ -1,8 +1,10 @@
 import { Box, Button, Paper, Stack, Typography } from '@mui/material'
 import { useDispatch } from 'react-redux';
 import { setMonthlyPaymentModalMode } from '../../../../store/features/Main/AppMode';
+import { useNavigate } from 'react-router-dom';
 const MonthlyPaymentHeader = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
 
   return (
@@ -20,7 +22,6 @@ const MonthlyPaymentHeader = () => {
           }}
         >
           <Stack spacing={2}>
-            {/* Row 1: Title */}
             <Box
               sx={{
                 display: "flex",
@@ -49,10 +50,10 @@ const MonthlyPaymentHeader = () => {
                 variant="contained"
                 onClick={() => dispatch(setMonthlyPaymentModalMode(true))}
                 sx={{
-                  backgroundColor: "green", // טורקיז כצבע ראשי לכפתור
+                  backgroundColor: "green", 
                   color: "#ffffff",
                   "&:hover": {
-                    backgroundColor: "rgb(26, 29, 27)", // טורקיז כהה יותר במעבר עכבר
+                    backgroundColor: "rgb(26, 29, 27)", 
                   },
                 }}
               >
@@ -60,7 +61,7 @@ const MonthlyPaymentHeader = () => {
               </Button>
               <Button
                 variant="outlined"
-                // onClick={() => navigate("/loans/manage")}
+                onClick={() => navigate("/rankPage")}
                 sx={{
                   borderColor: "#2a8c82",
                   color: "#2a8c82",

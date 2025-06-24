@@ -9,6 +9,7 @@ import PaymentsPage from './Admin/pages/PaymentPage';
 import FundsOverviewByYearPage from './Admin/pages/FundsOverviewByYearPage';
 import LoanDetailsPage from './Admin/components/Loans/LoanDetails/LoanDetailsPage';
 import FundsOverviewDashboard from './Admin/pages/FundsOverviewDashboard';
+import RankPage from './Admin/pages/RankPage';
 
 
 
@@ -28,6 +29,7 @@ function App() {
           <Route path='FundsOverviewByYear' element={<FundsOverviewByYearPage />} />
           <Route path="/users" element={<UsersPage/>} />
           <Route path='paymentsPage' element=  {<PaymentsPage/>}/>
+          <Route path='/rankPage' element={<RankPage/>} />
         </Routes>
       </Box>
     </BrowserRouter>

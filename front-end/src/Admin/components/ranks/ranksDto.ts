@@ -1,0 +1,21 @@
+
+export interface  IMembershipRank {
+  id: number;
+  name: string;}
+
+  export interface ICreateMembershipRank {
+  name: string;
+}
+
+  export  interface IMonthlyRank {
+    id: number;
+    name: string;
+    amount: number;
+    role :IMembershipRank;
+    effective_from: string;
+  }
+export interface ICreateMonthlyRank {
+  role: number;
+  amount: number;
+  effective_from: string
+}
