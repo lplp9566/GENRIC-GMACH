@@ -1,6 +1,7 @@
 import axios from "axios";
-import { IUser, Status } from "../../../components/Users/UsersDto";
+
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { IUser, Status } from "../../../Admin/components/Users/UsersDto";
 
 axios.defaults.withCredentials = true;
 

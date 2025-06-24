@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { IMonthlyPayment, INewMonthlyPayment } from "../../../components/MonthlyPayments/MunthlyPaymentsDto";
-import { Status } from "../../../components/Users/UsersDto";
+
 import axios from "axios";
+import { IMonthlyPayment, INewMonthlyPayment } from "../../../Admin/components/MonthlyPayments/MonthlyPaymentsDto";
+import { Status } from "../../../Admin/components/Users/UsersDto";
 
 interface AdminMonthlyPaymentsType {
   allPayments: IMonthlyPayment[] | [];

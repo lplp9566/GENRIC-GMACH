@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { IUserFundsOverviewByYear } from "../../../components/FundsOverview/FundsOverviewDto";
-import { Status } from "../../../components/Users/UsersDto";
 import axios from "axios";
+import { IUserFundsOverviewByYear } from "../../../Admin/components/FundsOverview/FundsOverviewDto";
+import { Status } from "../../../Admin/components/Users/UsersDto";
 
 interface UserFundsOverviewType {
     fundsOverview: IUserFundsOverviewByYear | [];

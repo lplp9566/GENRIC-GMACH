@@ -1,14 +1,14 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Box } from '@mui/material';
-import { Navbar } from './components/NavBar/NavBar';
-import LoansPage from './pages/LoansPage';
-import HomePage from './components/HomePage/HomePage';
-import FundsOverviewByYearPage from './pages/FundsOverviewByYearPage';
-import NewLoan from './components/Loans/NewLoan/NewLoanForm';
-import FundsOverviewDashboard from './pages/FundsOverviewDashboard';
-import LoanDetailsPage from './components/Loans/LoanDetails/LoanDetailsPage';
-import UsersPage from './components/Users/UsersComponets';
-import PaymentsPage from './pages/PaymentPage';
+import NewLoan from './Admin/components/Loans/NewLoan/NewLoanForm';
+import Navbar from './Admin/components/NavBar/NavBar';
+import LoansPage from './Admin/pages/LoansPage';
+import HomePage from './Admin/components/HomePage/HomePage';
+import UsersPage from './Admin/components/Users/UsersComponets';
+import PaymentsPage from './Admin/pages/PaymentPage';
+import FundsOverviewByYearPage from './Admin/pages/FundsOverviewByYearPage';
+import LoanDetailsPage from './Admin/components/Loans/LoanDetails/LoanDetailsPage';
+import FundsOverviewDashboard from './Admin/pages/FundsOverviewDashboard';
 
 
 

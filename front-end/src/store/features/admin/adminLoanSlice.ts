@@ -1,15 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Status } from "../../../components/Users/UsersDto";
 import axios from "axios";
-import {
-  ICreateLoan,
-  ICreateLoanAction,
-  ILoanWithUser,
-  ILoanAction,
-  ILoanCheckResponse,
-  ILoanWithPayment,
-} from "../../../components/Loans/LoanDto";
+
 import { FindLoansOpts, PaginatedResult } from "../../../common/indexTypes";
+import { ICreateLoan, ICreateLoanAction, ILoanAction, ILoanCheckResponse, ILoanWithPayment, ILoanWithUser } from "../../../Admin/components/Loans/LoanDto";
+import { Status } from "../../../Admin/components/Users/UsersDto";
 
 interface AdminLoanType {
   allLoans: ILoanWithUser[];
