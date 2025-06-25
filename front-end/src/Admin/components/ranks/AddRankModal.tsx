@@ -13,6 +13,10 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { RtlProvider } from "../../../Theme/rtl";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../store/store";
+import { createMembershipRank } from "../../../store/features/admin/adminRankSlice";
+import { toast } from "react-toastify";
 
 interface AddRankModalProps {
   open: boolean;
@@ -23,10 +27,20 @@ const AddRankModal: React.FC<AddRankModalProps> = ({
   open,
   onClose,
 }) => {
-    const [name, onChangeName] = React.useState("");
+      const dispatch = useDispatch<AppDispatch>();
+
+    const [name, setName] = React.useState("");
     const onSubmit = () => {
-        
-            onClose();
+   const promise= dispatch(createMembershipRank({ name }))
+        toast.promise(promise, {
+          pending: "ממתין...",
+            success: "הדרגה נוספה בהצלחה!",
+            error: "אירעה שגיאה בעת הוספת הדרגה.",
+    });
+        promise.then(() => {
+            setName("");
+          onClose();
+        });
     };
   return (
     <RtlProvider>
@@ -83,7 +97,7 @@ const AddRankModal: React.FC<AddRankModalProps> = ({
             <TextField
               label="שם דרגה *"
               value={name}
-              onChange={(e) => onChangeName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               fullWidth
               dir="rtl"
               variant="outlined"
