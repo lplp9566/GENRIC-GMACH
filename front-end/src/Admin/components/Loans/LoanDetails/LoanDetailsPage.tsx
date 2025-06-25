@@ -25,10 +25,10 @@ const LoanDetailsPage: React.FC = () => {
   const navigate = useNavigate();
 
   const loan = useSelector((s: RootState) =>
-    s.adminLoansSlice.allLoans?.find((l) => l.id === loanId)
+    s.AdminLoansSlice.allLoans?.find((l) => l.id === loanId)
   );
   const loanDetails = useSelector(
-    (s: RootState) => s.adminLoansSlice.loanDetails
+    (s: RootState) => s.AdminLoansSlice.loanDetails
   );
   const handleSubmit = useLoanSubmit(loanId);
 

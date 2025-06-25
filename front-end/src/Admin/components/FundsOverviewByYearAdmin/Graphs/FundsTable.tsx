@@ -24,7 +24,7 @@ interface Props {
 }
 
 const FundsTable = ({ data, selectedFields }: Props) => {
-  const {selectedUser} = useSelector((state: RootState) => state.adminUsers);
+  const {selectedUser} = useSelector((state: RootState) => state.AdminUsers);
   const [openFull, setOpenFull] = useState(false);
 
   const TableContent = (

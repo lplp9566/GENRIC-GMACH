@@ -44,7 +44,7 @@ const GemachRegulationsModal: React.FC<{
   const dispatch = useDispatch<AppDispatch>();
 
   const regulationArray = useSelector(
-    (state: RootState) => state.adminFundsOverviewReducer.regulation
+    (state: RootState) => state.AdminFundsOverviewReducer.regulation
   );
 
   const regulationUrl = regulationArray?.[0]?.regulation || '';

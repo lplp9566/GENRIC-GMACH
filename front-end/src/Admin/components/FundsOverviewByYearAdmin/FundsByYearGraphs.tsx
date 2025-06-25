@@ -16,10 +16,10 @@ import { getUserFundsOverview } from "../../../store/features/user/userFundsOver
 
 
 const FundsByYearGraphs = () => {
-  const {selectedUser} = useSelector((state: RootState) => state.adminUsers);
+  const {selectedUser} = useSelector((state: RootState) => state.AdminUsers);
   const {fundsOverview} =useSelector((state: RootState) => state.UserFundsOverviewSlice);
    const { fundsOverviewByYear } = useSelector(
-    (state: RootState) => state.adminFundsOverviewReducer
+    (state: RootState) => state.AdminFundsOverviewReducer
   );
   const dispatch = useDispatch<AppDispatch>();
 

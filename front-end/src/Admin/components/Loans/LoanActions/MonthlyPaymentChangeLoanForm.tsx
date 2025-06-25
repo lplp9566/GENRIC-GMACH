@@ -23,8 +23,8 @@ const MonthlyPaymentChangeLoanForm: React.FC<Props> = ({
     const { LoanModalMode } = useSelector(
       (state: RootState) => state.mapModeSlice
     );
-  const Loan = useSelector((state: RootState) => state.adminLoansSlice.allLoans.find((loan) => loan.id === loanId));
-    const loanDetails = useSelector((s: RootState) => s.adminLoansSlice.loanDetails);
+  const Loan = useSelector((state: RootState) => state.AdminLoansSlice.allLoans.find((loan) => loan.id === loanId));
+    const loanDetails = useSelector((s: RootState) => s.AdminLoansSlice.loanDetails);
   
   const isValid = monthly !== "" && date !== "";
   if (!Loan) return null;

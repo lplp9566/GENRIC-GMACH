@@ -46,7 +46,7 @@ const CheckLoanModal: React.FC<Props> = ({
     checkLoanResponse,
     createLoanStatus,
     createLoanActionStatus,
-  } = useSelector((state: RootState) => state.adminLoansSlice);
+  } = useSelector((state: RootState) => state.AdminLoansSlice);
 
   // ברגע שהקומפוננטה נטענת - מפעילים בדיקת הלוואה
   useEffect(() => {

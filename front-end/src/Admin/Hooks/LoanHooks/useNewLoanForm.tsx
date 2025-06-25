@@ -14,10 +14,10 @@ export const NEW_LOAN_STEPS = [
 export function useNewLoanForm() {
   // ----- state מתוך ה-store -----
   const allUsers = useSelector(
-    (s: RootState) => s.adminUsers.allUsers ?? []
+    (s: RootState) => s.AdminUsers.allUsers ?? []
   );
   const selectedUser = useSelector(
-    (s: RootState) => s.adminUsers.selectedUser
+    (s: RootState) => s.AdminUsers.selectedUser
   );
 
   // ----- תאריכים ו-constants -----

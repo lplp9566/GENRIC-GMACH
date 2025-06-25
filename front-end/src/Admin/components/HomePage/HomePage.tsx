@@ -26,7 +26,7 @@ const paymentModal = useSelector(
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const { fundsOverview, status } = useSelector(
-    (s: RootState) => s.adminFundsOverviewReducer
+    (s: RootState) => s.AdminFundsOverviewReducer
   );  const quickActions = [
     {
       label: "תשלום דמי חבר",

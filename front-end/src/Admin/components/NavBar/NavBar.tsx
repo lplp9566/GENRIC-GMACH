@@ -17,7 +17,7 @@ export const Navbar: React.FC = () => {
   const isMobile = useMediaQuery(`(max-width:${BP_MOBILE}px)`);
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const usersLoaded = useSelector((s: RootState) => s.adminUsers.allUsers.length);
+  const usersLoaded = useSelector((s: RootState) => s.AdminUsers.allUsers.length);
   useEffect(() => {
     if (usersLoaded === 0) dispatch(getAllUsers());
   }, [dispatch, usersLoaded]);

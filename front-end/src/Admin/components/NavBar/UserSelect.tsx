@@ -7,8 +7,8 @@ import { setSelectedUser } from "../../../store/features/admin/adminUsersSlice";
 
 export const UserSelect: React.FC<{ fullWidth?: boolean }> = ({ fullWidth }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const allUsers     = useSelector((s: RootState) => s.adminUsers.allUsers);
-  const selectedUser = useSelector((s: RootState) => s.adminUsers.selectedUser);
+  const allUsers     = useSelector((s: RootState) => s.AdminUsers.allUsers);
+  const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
 
   return (
     <Autocomplete

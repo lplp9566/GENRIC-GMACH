@@ -27,10 +27,10 @@ export const LoansPage: React.FC = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<LoanStatus>(LoanStatus.ACTIVE);
   const { allLoans, page, pageCount, status, total } = useSelector(
-    (s: RootState) => s.adminLoansSlice
+    (s: RootState) => s.AdminLoansSlice
   );
   const selectedUser = useSelector(
-    (state: RootState) => state.adminUsers.selectedUser
+    (state: RootState) => state.AdminUsers.selectedUser
   );
   const limit = 20;
 

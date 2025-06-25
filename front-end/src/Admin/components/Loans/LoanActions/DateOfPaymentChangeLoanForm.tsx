@@ -12,7 +12,7 @@ interface Props {
 
 const DateOfPaymentChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
   const loanDetails = useSelector(
-    (s: RootState) => s.adminLoansSlice.loanDetails
+    (s: RootState) => s.AdminLoansSlice.loanDetails
   );
 
   const [date, setDate] = useState<string>("");

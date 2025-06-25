@@ -20,7 +20,7 @@ export default function PaymentsPage() {
     (s: RootState) => s.AdminMonthlyPaymentsSlice.allPayments
   );
   const selectedUser = useSelector(
-    (state: RootState) => state.adminUsers.selectedUser
+    (state: RootState) => state.AdminUsers.selectedUser
   );
 const paymentModal = useSelector(
     (state: RootState) => state.mapModeSlice.MonthlyPaymentModalMode

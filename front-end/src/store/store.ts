@@ -5,15 +5,17 @@ import { AppModeSlice } from "./features/Main/AppMode";
 import { UserFundsOverviewSlice } from "./features/user/userFundsOverviewSlice";
 import { AdminFundsOverviewSlice } from "./features/admin/adminFundsOverviewSlice";
 import { AdminMonthlyPaymentsSlice } from "./features/admin/adminMonthlyPayments";
+import { AdminRankSlice } from "./features/admin/adminRankSlice";
 
 export const store = configureStore({
   reducer: {
-    adminUsers: AdminUsersSlice.reducer, 
-    adminFundsOverviewReducer: AdminFundsOverviewSlice.reducer,
-    adminLoansSlice: AdminLoansSlice.reducer,
+    AdminUsers: AdminUsersSlice.reducer, 
+    AdminFundsOverviewReducer: AdminFundsOverviewSlice.reducer,
+    AdminLoansSlice: AdminLoansSlice.reducer,
     mapModeSlice:AppModeSlice.reducer,
     UserFundsOverviewSlice:UserFundsOverviewSlice.reducer,
-    AdminMonthlyPaymentsSlice:AdminMonthlyPaymentsSlice.reducer
+    AdminMonthlyPaymentsSlice:AdminMonthlyPaymentsSlice.reducer,
+    AdminRankSlice: AdminRankSlice.reducer
   },
 });
 

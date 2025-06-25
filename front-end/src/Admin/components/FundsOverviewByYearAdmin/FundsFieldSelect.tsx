@@ -10,7 +10,7 @@ interface Props {
 }
 
 const FundsFieldSelect= ({ selectedFields, onChange}: Props)=> {
-  const {selectedUser}=useSelector((state: RootState) => state.adminUsers);
+  const {selectedUser}=useSelector((state: RootState) => state.AdminUsers);
     const isMobile = useMediaQuery("(max-width:600px)");
   const handleChange = (event: any) => {
     const { value } = event.target;

@@ -18,7 +18,7 @@ import MoneyOutlinedIcon from '@mui/icons-material/MoneyOutlined';
 const FundsOverview: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { fundsOverview, status, error } = useSelector(
-    (s: RootState) => s.adminFundsOverviewReducer
+    (s: RootState) => s.AdminFundsOverviewReducer
   );
 
   const [displayMode, setDisplayMode] = React.useState<"gauge" | "default">(

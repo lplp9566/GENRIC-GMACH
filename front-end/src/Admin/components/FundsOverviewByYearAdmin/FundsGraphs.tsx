@@ -16,7 +16,7 @@ import { RootState } from "../../../store/store";
     pieData: any[];
   }
   const FundsGraphs =({ type, data, selectedFields, pieData }: Props)=> {
-    const {selectedUser} = useSelector((state: RootState) => state.adminUsers);
+    const {selectedUser} = useSelector((state: RootState) => state.AdminUsers);
       const COLORS = !selectedUser ? AdminYearlyFinancialItems.map(f => f.color) : UserAdminFinancialItems.map(f => f.color);
     if (type === 0)
       return (

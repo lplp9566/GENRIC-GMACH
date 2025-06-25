@@ -9,7 +9,7 @@ interface BarChartGraphProps {
   COLORS: string[];
 }
 const BarChartGraph : React.FC<BarChartGraphProps> = ({data, selectedFields, COLORS}) => {
-const {selectedUser} = useSelector((state: RootState) => state.adminUsers);
+const {selectedUser} = useSelector((state: RootState) => state.AdminUsers);
   return (
     <ResponsiveContainer width="100%" height={350}>
               <BarChart data={data}>

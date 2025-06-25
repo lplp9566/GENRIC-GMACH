@@ -27,7 +27,7 @@ const SelectAllUsers: React.FC<Props> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const allUsers = useSelector(
-    (state: RootState) => state.adminUsers.allUsers
+    (state: RootState) => state.AdminUsers.allUsers
   );
 
   useEffect(() => {

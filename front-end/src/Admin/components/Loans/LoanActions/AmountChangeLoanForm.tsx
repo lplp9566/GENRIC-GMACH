@@ -19,7 +19,7 @@ interface Props {
 
 const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
     const loanDetails = useSelector(
-      (s: RootState) => s.adminLoansSlice.loanDetails
+      (s: RootState) => s.AdminLoansSlice.loanDetails
     );
   const dispatch = useDispatch<AppDispatch>();
   const [newAmount, setNewAmount] = useState<number | "">("");
@@ -29,7 +29,7 @@ const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
     (state: RootState) => state.mapModeSlice
   );
   const Loan = useSelector((state: RootState) =>
-    state.adminLoansSlice.allLoans.find((loan) => loan.id === loanId)
+    state.AdminLoansSlice.allLoans.find((loan) => loan.id === loanId)
   );
 
   if (!Loan) return null;
