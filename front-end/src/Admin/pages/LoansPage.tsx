@@ -72,15 +72,15 @@ export const LoansPage: React.FC = () => {
                 alignItems: "center",
               }}
             >
-              <Typography variant="h5" align="center" fontWeight={600}>
-                ניהול הלוואות
-              </Typography>
               <img
                 width="48"
                 height="48"
                 src="https://img.icons8.com/color/48/loan.png"
                 alt="loan"
               />
+              <Typography variant="h5" align="center" fontWeight={600}>
+                ניהול הלוואות
+              </Typography>
             </Box>
             <Box
               sx={{

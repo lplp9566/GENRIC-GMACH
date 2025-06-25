@@ -26,7 +26,7 @@ export class MonthlyDepositsService {
 
   async getAllDeposits(): Promise<MonthlyDepositsEntity[]> {
     try {
-      const allDeposits = this.monthlyDepositsRepository.find({order: {year: 'ASC', month: 'ASC'},relations:["user"]});
+      const allDeposits = this.monthlyDepositsRepository.find({order: {deposit_date: 'ASC'},relations:["user"]});
       if (!allDeposits) {
         throw new Error('no dMonthlyDeposits fund');
       }

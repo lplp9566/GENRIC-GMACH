@@ -23,6 +23,7 @@ import { createMonthlyPayment } from "../../../../store/features/admin/adminMont
 import { payment_method } from "../../Users/UsersDto";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { RtlProvider } from "../../../../Theme/rtl";
 
 export const AddPaymentModal: React.FC = () => {
   const open = useSelector(
@@ -81,11 +82,14 @@ export const AddPaymentModal: React.FC = () => {
   };
 
   return (
+      <RtlProvider>
+
     <Dialog
       open={!!open}
       onClose={handleClose}
       fullWidth
       maxWidth="sm"
+      dir="rtl"
       PaperProps={{
         sx: {
           borderRadius: 3,
@@ -132,7 +136,7 @@ export const AddPaymentModal: React.FC = () => {
 
           <TextField
             label="סכום (₪)*"
-            size="small"
+            size="medium"
             color="success"
             fullWidth
             value={newPayment.amount}
@@ -147,7 +151,7 @@ export const AddPaymentModal: React.FC = () => {
           <TextField
             label="תאריך*"
             type="date"
-            size="small"
+            size="medium"
             fullWidth
             color="success"
             InputLabelProps={{ shrink: true }}
@@ -171,6 +175,7 @@ export const AddPaymentModal: React.FC = () => {
               אמצעי תשלום
             </InputLabel>
             <Select
+            size="medium"
               labelId="method-label"
               value={newPayment.method}
               label="אמצעי תשלום*"
@@ -183,7 +188,8 @@ export const AddPaymentModal: React.FC = () => {
               }
             >
               {paymentMethod.map((pm) => (
-                <MenuItem key={pm.value} value={pm.value}>
+                <MenuItem key={pm.value} value={pm.value} dir="rtl">
+
                   {pm.label}
                 </MenuItem>
               ))}
@@ -216,7 +222,6 @@ export const AddPaymentModal: React.FC = () => {
           justifyContent: "space-between",
         }}
       >
-        <Button onClick={handleClose}>ביטול</Button>
         <Button
           variant="contained"
           onClick={handleSubmit}
@@ -236,7 +241,10 @@ export const AddPaymentModal: React.FC = () => {
         >
           הוסף הוראת קבע
         </Button>
+          <Button onClick={handleClose}>ביטול</Button>
       </DialogActions>
     </Dialog>
+      </RtlProvider>
+
   );
 };

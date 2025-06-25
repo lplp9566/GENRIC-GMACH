@@ -62,7 +62,7 @@ const SelectAllUsers: React.FC<Props> = ({
       >
         {allUsers.map((user) => (
           // כאן חשוב שה-value של כל MenuItem יתאים ל-type של value ומחרוזת
-          <MenuItem key={user.id} value={user.id.toString()}>
+          <MenuItem key={user.id} value={user.id.toString()} dir="rtl">
             {user.first_name} {user.last_name}
           </MenuItem>
         ))}

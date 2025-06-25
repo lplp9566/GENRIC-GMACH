@@ -8,7 +8,6 @@ const MonthlyPaymentHeader = () => {
 
 
   return (
-    <div>
           <Paper
           elevation={3}
           sx={{
@@ -76,8 +75,6 @@ const MonthlyPaymentHeader = () => {
             </Box>
           </Stack>
         </Paper>
-
-    </div>
   )
 }
 
