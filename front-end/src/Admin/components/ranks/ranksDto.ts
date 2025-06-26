@@ -14,6 +14,18 @@ export interface  IMembershipRank {
     role :IMembershipRank;
     effective_from: string;
   }
+
+  export interface IMembershipRankDetails {
+    id: number;
+    name: string;
+    monthlyRates: {
+      id: number;
+      amount: number;
+      effective_from: string;
+    }[];
+    };
+
+  
 export interface ICreateMonthlyRank {
   role: number;
   amount: number;

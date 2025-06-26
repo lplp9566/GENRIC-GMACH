@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { ICreateMembershipRank, IMembershipRank, IMonthlyRank } from "../../../Admin/components/ranks/ranksDto";
+import { ICreateMembershipRank, IMembershipRank, IMembershipRankDetails, IMonthlyRank } from "../../../Admin/components/ranks/ranksDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
 import axios from "axios";
 
 interface AdminRankState {
   memberShipRanks: IMembershipRank[] | [];
-  monthlyRanks: IMonthlyRank[] | [];
+  monthlyRanks: IMembershipRankDetails[] | [];
   status:Status;
   error: string | null;
 }
@@ -17,10 +17,10 @@ const initialState: AdminRankState = {
   error: null,
 };
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-const getAllMonthlyRanks = createAsyncThunk(
+ export const getAllMonthlyRanks = createAsyncThunk(
   "admin/getAllMonthlyRanks",
   async () => {
-      const response = await axios.get(`${BASE_URL}/monthly-ranks`);
+      const response = await axios.get(`${BASE_URL}/membership-roles/with-rates`);
       return response.data;
   }
 );

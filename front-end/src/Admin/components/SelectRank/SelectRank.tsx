@@ -10,11 +10,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { getAllMembershipRanks } from "../../../store/features/admin/adminRankSlice";
-import { RtlProvider } from "../../../Theme/rtl";
 
 interface SelectRankProps {
   value: number;
-  onChange: (rankId: number) => void; 
+  onChange: (rankId: number) => void;
   label?: string;
   color?: "primary" | "secondary" | "error" | "info" | "success" | "warning";
 }
@@ -31,14 +30,12 @@ const SelectRank: React.FC<SelectRankProps> = ({
   );
 
   useEffect(() => {
-    if (allRanks.length === 0) { 
-      dispatch(getAllMembershipRanks());
-    }
-  }, [dispatch, allRanks.length]); 
+    dispatch(getAllMembershipRanks());
+  }, [dispatch, allRanks.length]);
 
   const handleChange = (e: SelectChangeEvent<string>) => {
     const selectedId = Number(e.target.value);
-    onChange(selectedId); 
+    onChange(selectedId);
   };
 
   return (
@@ -47,12 +44,12 @@ const SelectRank: React.FC<SelectRankProps> = ({
       <Select
         labelId="select-rank-label"
         label={label}
-        value={value != null ? value.toString() : ""} 
+        value={value != null ? value.toString() : ""}
         onChange={handleChange}
         sx={{ height: 55, minHeight: 55 }}
         inputProps={{ sx: { borderRadius: 2 } }}
         renderValue={(selected) => {
-                   if (!selected) {
+          if (!selected) {
             return <em>{label}</em>;
           }
           const rank = allRanks.find((r) => r.id === Number(selected));

@@ -1,14 +1,11 @@
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 import React from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 interface RankHeaderProps {
   handleAddOpen: () => void;
   handleManageOpen: () => void;
 }
 const RankHeader: React.FC<RankHeaderProps> = ({ handleAddOpen, handleManageOpen }) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+
   return (
     <Paper
       elevation={3}

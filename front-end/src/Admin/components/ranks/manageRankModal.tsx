@@ -14,13 +14,16 @@ import { ICreateMonthlyRank } from "./ranksDto";
 import CloseIcon from "@mui/icons-material/Close";
 import { AppDispatch } from "../../../store/store";
 import { useDispatch } from "react-redux";
-import { createMonthlyRank } from "../../../store/features/admin/adminRankSlice";
+import { createMonthlyRank, getAllMonthlyRanks } from "../../../store/features/admin/adminRankSlice";
 import { toast } from "react-toastify";
 interface IManageRankModalProps {
   openManage: boolean;
   onClose: () => void;
 }
-const manageRankModal: React.FC<IManageRankModalProps> = ({ openManage, onClose }: IManageRankModalProps) => {
+const manageRankModal: React.FC<IManageRankModalProps> = ({
+  openManage,
+  onClose,
+}: IManageRankModalProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const [manageRank, setManageRank] = useState<ICreateMonthlyRank>({
@@ -29,9 +32,7 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({ openManage, onClose 
     role: 1,
   });
   const handleSubmit = () => {
-    const promise = dispatch(
-      createMonthlyRank(manageRank)
-    ).unwrap();
+    const promise = dispatch(createMonthlyRank(manageRank)).unwrap();
     toast.promise(promise, {
       pending: "ממתין...",
       success: "הדרגה נשמרה בהצלחה!",
@@ -40,6 +41,7 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({ openManage, onClose 
     promise.then(() => {
       setManageRank({ amount: 0, effective_from: "", role: 1 });
       onClose();
+      dispatch(getAllMonthlyRanks());
     });
   };
 
@@ -133,7 +135,7 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({ openManage, onClose 
         </Button>
         <Button
           onClick={() => {
-            handleSubmit ();
+            handleSubmit();
           }}
           variant="contained"
           disabled={

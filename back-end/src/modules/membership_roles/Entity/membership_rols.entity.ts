@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { RoleMonthlyRateEntity } from "src/modules/role_monthly_rates/Entity/role_monthly_rates.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('membership_roles')
 export class MembershipRoleEntity {
@@ -7,4 +8,10 @@ export class MembershipRoleEntity {
 
   @Column({ type: 'text', unique: true })
   name: string;
+
+    @OneToMany(() => RoleMonthlyRateEntity, rate => rate.role, {
+    cascade: ['insert', 'update'], 
+    eager: false, 
+  })
+  monthlyRates: RoleMonthlyRateEntity[];
 }

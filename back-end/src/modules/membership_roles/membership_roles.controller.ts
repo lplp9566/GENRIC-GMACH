@@ -14,6 +14,10 @@ export class MembershipRolesController {
     async getAllMemberShip() {
         return await this.membershipRolesService.getAllMemberShip();
     }
+    @Get('/with-rates')
+    async getAllMemberShipWithRates() {
+        return await this.membershipRolesService.getAllMemberShipWithRates();
+    }
     @Post()
     async createMemberShip(@Body() dto:IMembershipRole ) {
         return await this.membershipRolesService.createMemberShip(dto.name);
