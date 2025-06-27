@@ -39,7 +39,12 @@ const SelectRank: React.FC<SelectRankProps> = ({
   };
 
   return (
-    <FormControl fullWidth size="small" color={color}>
+    <FormControl
+      fullWidth
+      size="small"
+      color={color}
+      sx={{ marginTop: 5, marginBottom: 4 }}
+    >
       <InputLabel id="select-rank-label">{label}</InputLabel>
       <Select
         labelId="select-rank-label"

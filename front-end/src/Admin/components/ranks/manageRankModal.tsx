@@ -7,6 +7,7 @@ import {
   IconButton,
   Paper,
   TextField,
+  Typography,
 } from "@mui/material";
 import { useState } from "react";
 import SelectRank from "../SelectRank/SelectRank";
@@ -14,8 +15,13 @@ import { ICreateMonthlyRank } from "./ranksDto";
 import CloseIcon from "@mui/icons-material/Close";
 import { AppDispatch } from "../../../store/store";
 import { useDispatch } from "react-redux";
-import { createMonthlyRank, getAllMonthlyRanks } from "../../../store/features/admin/adminRankSlice";
+import {
+  createMonthlyRank,
+  getAllMonthlyRanks,
+} from "../../../store/features/admin/adminRankSlice";
 import { toast } from "react-toastify";
+import { RtlProvider } from "../../../Theme/rtl";
+import { inputProps } from "../../../common/styles/inpotstels";
 interface IManageRankModalProps {
   openManage: boolean;
   onClose: () => void;
@@ -46,107 +52,108 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
   };
 
   return (
-    <Dialog
-      open={openManage}
-      onClose={() => {
-        onClose;
-      }}
-      dir="rtl"
-      fullWidth
-      maxWidth="sm"
-      PaperComponent={(props) => <Paper {...props} sx={{ borderRadius: 4 }} />}
-    >
-      <DialogTitle
-        sx={{
-          bgcolor: "#2a8c82",
-          color: "#fff",
-          py: 2,
-          textAlign: "center",
-          position: "relative",
+    <RtlProvider>
+      <Dialog
+        open={openManage}
+        onClose={() => {
+          onClose;
+        }}
+        dir="rtl"
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          component: Paper,
+          sx: {
+            borderRadius: 3,
+            bgcolor: "#e6f9ec",
+          },
         }}
       >
-        ניהול דרגה
-        <IconButton
-          sx={{ position: "absolute", top: 8, left: 8, color: "#fff" }}
-          onClick={() => {
-            onClose();
+        <DialogTitle
+          sx={{
+            bgcolor: "#2a8c82",
+            color: "#fff",
+            textAlign: "center",
+            py: 2,
+            // position: "relative",
           }}
         >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      <DialogContent sx={{ bgcolor: "#e6f9ec", py: 4, px: 4 }}>
-        <SelectRank
-          onChange={(selectedRankId) =>
-            setManageRank({ ...manageRank, role: selectedRankId })
-          }
-          label="דרגה *"
-          value={manageRank.role}
-        />
-        <TextField
-          fullWidth
-          type="number"
-          label="סכום (₪) *"
-          value={manageRank.amount}
-          onChange={(e) =>
-            setManageRank({ ...manageRank, amount: Number(e.target.value) })
-          }
-          InputLabelProps={{
-            sx: {
-              textAlign: "right",
-              right: 0,
-              left: "auto",
-              transformOrigin: "top right",
-            },
-          }}
-          InputProps={{ sx: { "& input": { textAlign: "right" } } }}
-          sx={{ mb: 3 }}
-        />
-        <TextField
-          fullWidth
-          type="date"
-          label="תאריך *"
-          name="effective_from"
-          value={manageRank.effective_from}
-          onChange={(e) =>
-            setManageRank({ ...manageRank, effective_from: e.target.value })
-          }
-          InputLabelProps={{
-            shrink: true,
-            sx: {
-              textAlign: "right",
-              right: 0,
-              left: "auto",
-              transformOrigin: "top right",
-            },
-          }}
-          InputProps={{ sx: { "& input": { textAlign: "right" } } }}
-          sx={{ mb: 3 }}
-        />
-      </DialogContent>
-      <DialogActions sx={{ px: 4, py: 2, bgcolor: "#fff" }}>
-        <Button
-          onClick={() => {
-            onClose();
-          }}
-          sx={{ color: "#2a8c82" }}
-        >
-          ביטול
-        </Button>
-        <Button
-          onClick={() => {
-            handleSubmit();
-          }}
-          variant="contained"
-          disabled={
-            !manageRank.amount || !manageRank.effective_from || !manageRank.role
-          }
-          sx={{ bgcolor: "#2a8c82" }}
-        >
-          שמירה
-        </Button>
-      </DialogActions>
-    </Dialog>
+          <Typography variant="h6" sx={{ m: 0, fontWeight: 700 }}>
+            ניהול דרגה{" "}
+          </Typography>
+          <IconButton
+            sx={{ position: "absolute", top: 8, left: 8, color: "#fff" }}
+            onClick={() => {
+              onClose();
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ py: 4, px: 4 }}>
+          <SelectRank
+            onChange={(selectedRankId) =>
+              setManageRank({ ...manageRank, role: selectedRankId })
+            }
+            label="דרגה *"
+            value={manageRank.role}
+          />
+          <TextField
+            fullWidth
+            label="סכום (₪) "
+            dir="rtl"
+            size="medium"
+            value={manageRank.amount}
+            InputProps={inputProps}
+            onChange={(e) =>
+              setManageRank({ ...manageRank, amount: Number(e.target.value) })
+            }
+          />
+          <TextField
+            sx={{ marginTop: 4 }}
+            fullWidth
+            type="date"
+            label="תאריך *"
+            name="effective_from"
+            variant="outlined"
+            value={manageRank.effective_from}
+            InputProps={inputProps}
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
+            }}
+            onChange={(e) =>
+              setManageRank({ ...manageRank, effective_from: e.target.value })
+            }
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 4, py: 2 }}>
+          <Button
+            onClick={() => {
+              onClose();
+            }}
+            sx={{ color: "#2a8c82" }}
+          >
+            ביטול
+          </Button>
+          <Button
+            onClick={() => {
+              handleSubmit();
+            }}
+            variant="contained"
+            disabled={
+              !manageRank.amount ||
+              !manageRank.effective_from ||
+              !manageRank.role
+            }
+            sx={{ bgcolor: "#2a8c82" }}
+          >
+            שמירה
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </RtlProvider>
   );
 };
 

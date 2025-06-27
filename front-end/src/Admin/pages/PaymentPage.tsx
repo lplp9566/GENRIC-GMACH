@@ -41,7 +41,6 @@ const paymentModal = useSelector(
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth() + 1;
 
-  // שנים קיימות בדאטה
   const years = useMemo(
     () =>
       Array.from(new Set(payments.map((p) => p.year))).sort((a, b) => b - a),
@@ -51,13 +50,11 @@ const paymentModal = useSelector(
     years.includes(currentYear) ? currentYear : years[0] ?? currentYear
   );
 
-  // תשלומים לשנה נבחרת
   const paymentsThisYear = useMemo(
     () => payments.filter((p) => p.year === selectedYear),
     [payments, selectedYear]
   );
 
-  // חודשים קיימים בשנה זו
   const months = useMemo(
     () =>
       Array.from(new Set(paymentsThisYear.map((p) => p.month))).sort(
@@ -65,12 +62,10 @@ const paymentModal = useSelector(
       ),
     [paymentsThisYear]
   );
-  // selectedMonth === 0 פירושו “כל החודשים”
   const [selectedMonth, setSelectedMonth] = useState<number>(
     months.includes(currentMonth) ? currentMonth : 0
   );
 
-  // אם שנה משתנה ולא קיים החודש הנבחר, נסמן 0
   useEffect(() => {
     if (selectedMonth !== 0 && !months.includes(selectedMonth)) {
       setSelectedMonth(0);
@@ -86,10 +81,6 @@ const paymentModal = useSelector(
   );
   const sumMonth = paymentsThisMonth.reduce((sum, p) => sum + p.amount, 0);
   const countMonth = paymentsThisMonth.length;
-
-  // const sumYear = paymentsThisYear.reduce((sum, p) => sum + p.amount, 0);
-  // const countYear = paymentsThisYear.length;
-
 
   return (
     

@@ -17,6 +17,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store/store";
 import { createMembershipRank, getAllMonthlyRanks } from "../../../store/features/admin/adminRankSlice";
 import { toast } from "react-toastify";
+import { inputProps } from "../../../common/styles/inpotstels";
 
 interface AddRankModalProps {
   open: boolean;
@@ -85,14 +86,6 @@ const AddRankModal: React.FC<AddRankModalProps> = ({ open, onClose }) => {
         </DialogTitle>
 
         <DialogContent sx={{ px: 4, pt: 3, pb: 2 }} dir="rtl">
-          {/* <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ textAlign: "center", mb: 3 }}
-          >
-            אנא מלא/י את כל השדות המסומנים בכוכבית *
-          </Typography> */}
-
           <Box
             component="form"
             noValidate
@@ -112,20 +105,7 @@ const AddRankModal: React.FC<AddRankModalProps> = ({ open, onClose }) => {
               dir="rtl"
               variant="outlined"
               size="medium"
-              InputProps={{
-                sx: {
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#81c784",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#4caf50",
-                  },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#2a8c82",
-                  },
-                  input: { direction: "rtl", textAlign: "right" },
-                },
-              }}
+              InputProps={inputProps}
             />
           </Box>
         </DialogContent>
