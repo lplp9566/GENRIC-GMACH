@@ -54,7 +54,7 @@ describe('LoansService', () => {
     id_number: '123456789',
     deposits: [],
     phone_number: '0501234567',
-    current_role:{id : 1,name:"hh"},
+    current_role:{id : 1,name:"hh",monthlyRates:[]},
     is_admin: false,
     roleHistory: [],
     payment_details: {

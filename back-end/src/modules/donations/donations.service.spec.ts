@@ -42,7 +42,7 @@ describe('DonationsService', () => {
     cashHoldings: [],
     orderReturns: [],
     deposits: [],
-    current_role: { id: 1, name: 'Member' },
+    current_role: { id: 1, name: 'Member',monthlyRates:[] },
     roleHistory: [],
   };
 

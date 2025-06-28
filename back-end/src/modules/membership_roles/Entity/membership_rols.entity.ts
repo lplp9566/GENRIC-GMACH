@@ -1,4 +1,4 @@
-import { RoleMonthlyRateEntity } from "src/modules/role_monthly_rates/Entity/role_monthly_rates.entity";
+import { RoleMonthlyRateEntity } from "../../role_monthly_rates/Entity/role_monthly_rates.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('membership_roles')
