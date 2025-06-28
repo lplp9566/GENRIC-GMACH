@@ -1,10 +1,15 @@
-import { Box, Button, Paper, Stack, Typography } from "@mui/material";
+import { Box, Button, Paper, Stack, Typography, useTheme } from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import React from "react";
+
 interface RankHeaderProps {
   handleAddOpen: () => void;
   handleManageOpen: () => void;
 }
+
 const RankHeader: React.FC<RankHeaderProps> = ({ handleAddOpen, handleManageOpen }) => {
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <Paper
@@ -14,62 +19,74 @@ const RankHeader: React.FC<RankHeaderProps> = ({ handleAddOpen, handleManageOpen
         mb: 4,
         borderRadius: 2,
         bgcolor: "#FFFFFF",
-        width: "40%",
-        mx: "auto",
+        // רוחב גמיש לפי מסך
+        width: {
+          xs: "100%",   // מובייל: תופס את כל הרוחב
+          sm: "80%",    // טאבלט קטן: 80%
+          md: "60%",    // טאבלט/דסקטופ קטן: 60%
+          lg: "40%",    // דסקטופ רגיל ומעלה: 40%
+        },
+        mx: "auto", // מרכז אופקית
         dir: "rtl",
       }}
     >
-      <Stack spacing={2}>
+      <Stack spacing={3}>
+        {/* שורת הכותרת */}
         <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+          component={Stack}
+          direction="row"
+          spacing={1}
+          justifyContent="center"
+          alignItems="center"
         >
-          <Typography variant="h5" align="center" fontWeight={600}>
-            ניהול דרגות במערכת{" "}
+          <Typography variant="h5" fontWeight={600} textAlign="center">
+            ניהול דרגות במערכת
           </Typography>
-          <img
-            width="48"
-            height="48"
+          <Box
+            component="img"
             src="https://img.icons8.com/color/48/rank.png"
-            alt="loan"
+            alt="rank icon"
+            sx={{ width: 48, height: 48 }}
           />
         </Box>
+
+        {/* שורת הכפתורים */}
         <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
+          component={Stack}
+          direction={isXs ? "column" : "row"}
+          spacing={2}
+          justifyContent= {isXs? "center" : "space-between"}
+          alignItems="center"
         >
           <Button
             variant="contained"
-            onClick={() => handleAddOpen()}
+            onClick={handleAddOpen}
             sx={{
-              backgroundColor: "green",
-              color: "#ffffff",
+              bgcolor: "#2a8c82",
+              color: "#fff",
+              width: { xs: "100%", sm: "auto" }, // מלא במובייל
               "&:hover": {
-                backgroundColor: "rgb(26, 29, 27)",
+                bgcolor: "#1f645f",
               },
             }}
           >
             הוסף דרגה
           </Button>
+
           <Button
             variant="outlined"
-            onClick={() => handleManageOpen()}
+            onClick={handleManageOpen}
             sx={{
               borderColor: "#2a8c82",
               color: "#2a8c82",
+              width: { xs: "100%", sm: "auto" }, // מלא במובייל
               "&:hover": {
-                borderColor: "#1b5e20",
-                color: "#1b5e20",
+                borderColor: "#1f645f",
+                color: "#1f645f",
               },
             }}
           >
-            ניהול דרגה
+            ניהול דרגות
           </Button>
         </Box>
       </Stack>

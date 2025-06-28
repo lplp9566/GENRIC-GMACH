@@ -118,9 +118,7 @@ const AddRankModal: React.FC<AddRankModalProps> = ({ open, onClose }) => {
             justifyContent: "space-between",
           }}
         >
-          <Button onClick={onClose} sx={{ color: "#2a8c82" }}>
-            ביטול
-          </Button>
+
           <Button
             onClick={onSubmit}
             variant="contained"
@@ -133,6 +131,9 @@ const AddRankModal: React.FC<AddRankModalProps> = ({ open, onClose }) => {
             }}
           >
             הוסף דרגה
+          </Button>
+                    <Button onClick={onClose} sx={{ color: "#2a8c82" }}>
+            ביטול
           </Button>
         </DialogActions>
       </Dialog>

@@ -128,15 +128,15 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
             }
           />
         </DialogContent>
-        <DialogActions sx={{ px: 4, py: 2 }}>
-          <Button
-            onClick={() => {
-              onClose();
-            }}
-            sx={{ color: "#2a8c82" }}
-          >
-            ביטול
-          </Button>
+        <DialogActions       sx={{
+            px: 4,
+            py: 2,
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+
+  
           <Button
             onClick={() => {
               handleSubmit();
@@ -151,6 +151,15 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
           >
             שמירה
           </Button>
+                    <Button
+            onClick={() => {
+              onClose();
+            }}
+            sx={{ color: "#2a8c82" }}
+          >
+            ביטול
+          </Button>
+
         </DialogActions>
       </Dialog>
     </RtlProvider>

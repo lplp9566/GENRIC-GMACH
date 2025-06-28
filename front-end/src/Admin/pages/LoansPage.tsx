@@ -12,33 +12,35 @@ import {
   SelectChangeEvent,
   Button,
   Stack,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
 import { getAllLoans, setPage } from "../../store/features/admin/adminLoanSlice";
 import Loans from "../components/Loans/LoansDashboard/LoansDashboard";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
-
 import { useNavigate } from "react-router-dom";
 import { LoanStatus } from "../../common/indexTypes";
 
 export const LoansPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const theme = useTheme();
+
+  // נקודת שבירה למובייל
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+
   const [filter, setFilter] = useState<LoanStatus>(LoanStatus.ACTIVE);
   const { allLoans, page, pageCount, status, total } = useSelector(
     (s: RootState) => s.AdminLoansSlice
   );
-  const selectedUser = useSelector(
-    (state: RootState) => state.AdminUsers.selectedUser
-  );
+  const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
   const limit = 20;
 
   useEffect(() => {
     if (selectedUser?.id) {
-      dispatch(
-        getAllLoans({ page, limit, status: filter, userId: selectedUser.id })
-      );
+      dispatch(getAllLoans({ page, limit, status: filter, userId: selectedUser.id }));
     } else {
       dispatch(getAllLoans({ page, limit, status: filter }));
     }
@@ -48,9 +50,11 @@ export const LoansPage: React.FC = () => {
     setFilter(e.target.value as LoanStatus);
     dispatch(setPage(1));
   };
+
   return (
-    <Box sx={{ backgroundColor: "#F8F8F8"}}>
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
+    <Box sx={{ bgcolor: "#F8F8F8", minHeight: "100vh", py: 4 }}>
+      <Container maxWidth="lg">
+        {/* HEADER */}
         <Paper
           elevation={3}
           sx={{
@@ -58,93 +62,93 @@ export const LoansPage: React.FC = () => {
             mb: 4,
             borderRadius: 2,
             bgcolor: "#FFFFFF",
-            width: "40%",
+            width: {
+              xs: "100%",  
+              sm: "90%",
+              md: "60%",
+              lg: "40%",
+            },
             mx: "auto",
             dir: "rtl",
           }}
         >
           <Stack spacing={2}>
-            {/* Row 1: Title */}
+            {/* כותרת ואייקון */}
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                gap: 1,
               }}
             >
               <img
-                width="48"
-                height="48"
+                width={48}
+                height={48}
                 src="https://img.icons8.com/color/48/loan.png"
                 alt="loan"
               />
-              <Typography variant="h5" align="center" fontWeight={600}>
+              <Typography variant="h5" fontWeight={600} textAlign="center">
                 ניהול הלוואות
               </Typography>
             </Box>
+
+            {/* כפתור + פילטר */}
             <Box
               sx={{
                 display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
                 justifyContent: "space-between",
-                alignItems: "center",
+                alignItems: { xs: "stretch", sm: "center" },
+                gap: 2,
               }}
             >
               <Button
                 variant="contained"
                 onClick={() => navigate("/loans/new")}
+                fullWidth={isSm}
                 sx={{
-                  backgroundColor: "green", // טורקיז כצבע ראשי לכפתור
-                  color: "#ffffff",
-                  "&:hover": {
-                    backgroundColor: "rgb(26, 29, 27)", // טורקיז כהה יותר במעבר עכבר
-                  },
+                  bgcolor: "#2a8c82",
+                  color: "#fff",
+                  "&:hover": { bgcolor: "#1f645f" },
                 }}
               >
                 הוסף הלוואה
               </Button>
 
-              {/* Right: Filter Select */}
-              <FormControl size="small" sx={{ minWidth: 160 }}>
+              <FormControl
+                size="small"
+                fullWidth={isSm}
+                sx={{
+                  minWidth: { xs: "auto", sm: 160 },
+                }}
+              >
                 <InputLabel
                   id="filter-status-label"
                   sx={{
-                    color: "#424242", // אפור כהה ורך יותר לכיתוב
+                    color: "#424242",
                     fontWeight: 500,
-                    // כשה־Select בפוקוס, שיהיה בצבע טורקיז:
-                    "&.Mui-focused": {
-                      color: "#2a8c82",
-                    },
+                    "&.Mui-focused": { color: "#2a8c82" },
                   }}
                 >
                   מצב הלוואה
                 </InputLabel>
-
                 <Select
                   labelId="filter-status-label"
                   value={filter}
                   label="מצב הלוואה"
                   onChange={handleFilterChange}
                   sx={{
-                    bgcolor: "transparent",
-                    color: "#424242", // אפור כהה ורך יותר לטקסט בתוך ה־Select
                     borderRadius: 1,
-                    // נוסיף גבול קונטינואס בכל המצבים:
                     "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#B0B0B0", // אפור נייטרלי עדין לגבול ברירת מחדל
-                      borderWidth: 1,
+                      borderColor: "#B0B0B0",
                     },
-                    // כשכפתור ה־Select נמצא במצב hover:
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#2a8c82", // טורקיז במעבר עכבר
+                      borderColor: "#2a8c82",
                     },
-                    // וכשה־Select בפוקוס:
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#2a8c82", // טורקיז בפוקוס
+                      borderColor: "#2a8c82",
                       borderWidth: 1.5,
-                    },
-                    // כדי שה־dropdown עצמו יקבל מעט מרווח פנימי:
-                    "& .MuiSelect-select": {
-                      padding: "6px 12px",
                     },
                   }}
                 >
@@ -157,15 +161,24 @@ export const LoansPage: React.FC = () => {
           </Stack>
         </Paper>
 
+        {/* LOADING */}
         {status === "pending" && <LoadingIndicator />}
 
-        {/* LOANS TABLE */}
-        {status === "fulfilled" &&
-                <Paper elevation={1} sx={{ p: 2, borderRadius: 2, bgcolor: "#FFFFFF" /* לבן נקי לטבלת ההלוואות */ }}>
-          <Loans loansData={allLoans} total={total} />
-        </Paper>
-          }
-
+        {/* טבלה עם גלילה אופקית */}
+        {status === "fulfilled" && (
+          <Box
+            component={Paper}
+            elevation={1}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              bgcolor: "#FFFFFF",
+              overflowX: "auto",
+            }}
+          >
+            <Loans loansData={allLoans} total={total} />
+          </Box>
+        )}
 
         {/* PAGINATION */}
         {pageCount > 1 && (
@@ -176,21 +189,17 @@ export const LoansPage: React.FC = () => {
               onChange={(_, v) => dispatch(setPage(v))}
               sx={{
                 "& .MuiPaginationItem-root": {
-                  color: "#424242", // צבע טקסט ברירת מחדל לכפתורי פאגינציה
+                  color: "#424242",
                   "&.Mui-selected": {
-                    backgroundColor: "#2a8c82", // רקע טורקיז לעמוד הנבחר
-                    color: "#FFFFFF", // טקסט לבן לעמוד הנבחר
-                    "&:hover": {
-                      backgroundColor: "#1e7b72", // טורקיז כהה יותר במעבר עכבר על עמוד נבחר
-                    },
+                    bgcolor: "#2a8c82",
+                    color: "#ffffff",
+                    "&:hover": { bgcolor: "#1f645f" },
                   },
                   "&:hover:not(.Mui-selected)": {
-                    backgroundColor: "#E0E0E0", // אפור בהיר במעבר עכבר על עמודים לא נבחרים
+                    bgcolor: "#E0E0E0",
                   },
                 },
-                "& .MuiPaginationItem-icon": {
-                  color: "#2a8c82", // צבע טורקיז לאייקוני החיצים
-                },
+                "& .MuiPaginationItem-icon": { color: "#2a8c82" },
               }}
               showFirstButton
               showLastButton
@@ -203,5 +212,6 @@ export const LoansPage: React.FC = () => {
     </Box>
   );
 };
+
 
 export default LoansPage;
