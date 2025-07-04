@@ -29,7 +29,8 @@ const StepperNavigation: React.FC<StepperNavigationProps> = ({
     alternativeLabel
     activeStep={activeStep}
     connector={<CustomConnector />}
-    sx={{ mb: 4 }}
+    sx={{ mb: 4 ,direction: "ltr"}}
+    
   >
     {steps.map((label, idx) => (
       <Step key={idx}>

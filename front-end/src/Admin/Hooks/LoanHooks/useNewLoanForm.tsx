@@ -99,12 +99,12 @@ export function useNewLoanForm() {
       newLoan.monthly_payment <= 0 ||
       !newLoan.loan_date ||
       !newLoan.purpose ||
-      newLoan.payment_date < 1 ||
-      newLoan.payment_date > 28
+      newLoan.payment_date < 1 
     ) {
       toast.warn(
         "נא למלא את כל הפריטים החובה ולוודא יום תשלום תקין"
       );
+      if(newLoan.payment_date < 1 || newLoan.payment_date > 31) toast.warn("תאריך תשלום לא תקין");
       return;
     }
     setOpenModal(true);

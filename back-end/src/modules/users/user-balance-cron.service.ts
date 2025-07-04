@@ -31,7 +31,7 @@ export class UserBalanceCronService {
     for (const user of users!) {
 
    const net =   await this.usersService.updateUserMonthlyBalance(user);
-      this.logger.debug(`Loan ${user.id}: payment  balance updated to ${net}`);
+      this.logger.debug(`user ${user.id}: payment  balance updated to ${net}`);
     }
     this.logger.log('✅ All user balances updated successfully.');
   }

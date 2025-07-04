@@ -30,8 +30,10 @@ export class UserEntity {
 
   @Column({ type: 'text' })
   last_name: string;
+
   @Column({ type: 'text' })
   id_number: string;
+  
   @Column({
     type: 'date',
     transformer: {

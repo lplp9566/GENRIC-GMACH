@@ -1,16 +1,19 @@
-import { Box, Button, Paper, Stack, Typography, useTheme } from "@mui/material";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import React from "react";
+import {
+  Box,
+  Button,
+  Paper,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-interface RankHeaderProps {
-  handleAddOpen: () => void;
-  handleManageOpen: () => void;
-}
-
-const RankHeader: React.FC<RankHeaderProps> = ({ handleAddOpen, handleManageOpen }) => {
+const UsersHeader = () => {
+      const navigate = useNavigate();
+    
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down("sm"));
-
   return (
     <Paper
       elevation={3}
@@ -20,12 +23,12 @@ const RankHeader: React.FC<RankHeaderProps> = ({ handleAddOpen, handleManageOpen
         borderRadius: 2,
         bgcolor: "#FFFFFF",
         width: {
-          xs: "100%",   
-          sm: "80%",   
-          md: "60%",   
-          lg: "40%",    
+          xs: "100%",
+          sm: "80%",
+          md: "60%",
+          lg: "40%",
         },
-        mx: "auto", 
+        mx: "auto",
         dir: "rtl",
       }}
     >
@@ -38,12 +41,12 @@ const RankHeader: React.FC<RankHeaderProps> = ({ handleAddOpen, handleManageOpen
           alignItems="center"
         >
           <Typography variant="h5" fontWeight={600} textAlign="center">
-            ניהול דרגות במערכת
+            ניהול משתמשים
           </Typography>
           <Box
             component="img"
-            src="https://img.icons8.com/color/48/rank.png"
-            alt="rank icon"
+            src="https://img.icons8.com/?size=100&id=103933&format=png&color=000000"
+            alt="users icon"
             sx={{ width: 48, height: 48 }}
           />
         </Box>
@@ -52,25 +55,25 @@ const RankHeader: React.FC<RankHeaderProps> = ({ handleAddOpen, handleManageOpen
           component={Stack}
           direction={isXs ? "column" : "row"}
           spacing={2}
-          justifyContent= {isXs? "center" : "space-between"}
+          justifyContent={isXs ? "center" : "space-between"}
           alignItems="center"
         >
           <Button
             variant="contained"
-            onClick={handleAddOpen}
+             onClick={() => navigate("/users/new")}
             sx={{
               bgcolor: "#2a8c82",
               color: "#fff",
-              width: { xs: "100%", sm: "auto" }, 
+              width: { xs: "100%", sm: "auto" },
               "&:hover": {
                 bgcolor: "#1f645f",
               },
             }}
           >
-            הוסף דרגה
+            הוסף משתמש
           </Button>
 
-          <Button
+          {/* <Button
             variant="outlined"
             onClick={handleManageOpen}
             sx={{
@@ -83,12 +86,12 @@ const RankHeader: React.FC<RankHeaderProps> = ({ handleAddOpen, handleManageOpen
               },
             }}
           >
-            ניהול דרגות
-          </Button>
+            ניהול דרגת משתמש
+          </Button> */}
         </Box>
       </Stack>
     </Paper>
   );
 };
 
-export default RankHeader;
+export default UsersHeader;

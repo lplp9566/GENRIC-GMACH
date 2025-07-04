@@ -7,12 +7,10 @@ export interface IUser {
   password: string;
   phone_number: string;
   email: string;
-  role: UserRole;
   iS_admin: boolean;
   payment_details: IPaymentDetails;
 }
 export interface IPaymentDetails {
-  id: number;
   bank_number: number;
   bank_branch: number;
   bank_account_number: number;
@@ -29,39 +27,33 @@ export enum payment_method {
   other = 'other',
 }
 
-export enum UserRole {
-  president = "president",
-  committeeMember = "committeeMember",
-  member = "member",
-  admin = "admin",
-}
 export interface IUsers{
     users : IUser[]
 }
 export type Status = "idle" | "pending" | "fulfilled" | "rejected";
 
-export interface IFormUserData {
+
+
+export interface ICreateUser {
     first_name: string;
     last_name: string;
     id_number: string;
-    join_date: Date;
+    join_date: string;
     password: string;
-    confirmPassword: string;
+    email_address: string;
     phone_number: string;
-    email: string;
-    role: UserRole;
-    iS_admin: boolean;
- 
+    is_admin: boolean;
+    current_role: number;
 }
-
-  export interface IFormPaymentData {
+export interface ICreatePaymentDetails {
     bank_number: number;
     bank_branch: number;
     bank_account_number: number;
     charge_date: string;
     payment_method: payment_method;
-  }
+}
+
   export interface IAddUserFormData {
-    userData: IFormUserData;
-    paymentData: IFormPaymentData;
+    userData: ICreateUser;
+    paymentData: ICreatePaymentDetails;
   }

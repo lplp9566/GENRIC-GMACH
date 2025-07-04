@@ -69,7 +69,6 @@ export class UsersService {
       const newUser = this.usersRepository.create(userData);
       const paymentDetails = this.paymentDetailsRepository.create(paymentData);
       const savedUser = await this.usersRepository.save(newUser);
-      console.log(savedUser.current_role)
       newUser.payment_details = paymentDetails;
       await this.userRoleHistoryService.createUserRoleHistory({
         from_date: newUser.join_date,

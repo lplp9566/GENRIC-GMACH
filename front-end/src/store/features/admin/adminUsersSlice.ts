@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IUser, Status } from "../../../Admin/components/Users/UsersDto";
+import { IAddUserFormData, IUser, Status } from "../../../Admin/components/Users/UsersDto";
 
 axios.defaults.withCredentials = true;
 
@@ -9,6 +9,7 @@ interface AdminUsersType {
   allUsers: IUser[] | [];
   selectedUser: IUser | null;
   status: Status;
+  createUserStatus: Status;
   error: string | null;
 }
 const initialState: AdminUsersType = {
@@ -16,15 +17,22 @@ const initialState: AdminUsersType = {
   selectedUser: null,
   status: "idle",
   error: null,
+  createUserStatus: "idle",
 };
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const getAllUsers = createAsyncThunk("admin/getAllUsers", async () => {
   const response = await axios.get(
     `${BASE_URL}/users`
   );
-  console.log(response);
   return response.data;
 });
+export const createUser = createAsyncThunk(
+  "admin/createUser",
+  async (user: IAddUserFormData) => {
+    const response = await axios.post<IUser>(`${BASE_URL}/users`, user);
+    return response.data;
+  }
+)
 
 export const AdminUsersSlice = createSlice({
   name: "adminUsers",
@@ -33,7 +41,6 @@ export const AdminUsersSlice = createSlice({
     setSelectedUser(state, action: PayloadAction<IUser | null>) {
       state.selectedUser = action.payload;
     },
-    // אופציונלי: פעולה לאיפוס הבחירה
     clearSelectedUser(state) {
       state.selectedUser = null;
     },
@@ -52,6 +59,16 @@ export const AdminUsersSlice = createSlice({
         (state.status = "rejected"),
           (state.error = action.error.message || null),
           (state.allUsers = []);
+      })
+      .addCase(createUser.pending, (state) => {
+        state.createUserStatus = "pending";
+      })
+      .addCase(createUser.fulfilled, (state) => {
+        state.createUserStatus = "fulfilled";
+      })
+      .addCase(createUser.rejected, (state, action) => {
+        state.createUserStatus = "rejected";
+        state.error = action.error.message || null;
       });
   },
 });

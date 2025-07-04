@@ -1,19 +1,9 @@
-import { UserRole } from "../Users/UsersDto";
-export interface ILoanUser {
-    id: number;
-    first_name: string;
-    last_name: string;
-    id_number: string;
-    join_date: Date;
-    password: string;
-    email_address: string;
-    phone_number: string;
-    role: UserRole;
-    is_admin: boolean;
-}
+import { IUser } from "../Users/UsersDto";
+
+
 export interface ILoanWithUser {
   id: number;
-  user: ILoanUser;
+  user: IUser;
   initial_loan_amount: number;
   loan_amount: number;
   loan_date: string;

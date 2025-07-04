@@ -25,7 +25,6 @@ const StepBasicDetails: React.FC<StepBasicDetailsProps> = ({
   onUserChange,
 }) => {
   const today = new Date().toISOString().split("T")[0];
-
   return (
     <Stack spacing={2}>
       <SelectAllUsers
@@ -39,6 +38,7 @@ const StepBasicDetails: React.FC<StepBasicDetailsProps> = ({
         value={newLoan.loan_amount}
         onChange={onFieldChange}
         fullWidth
+        dir="rtl"
       />
       <TextField
         label="מטרה"
@@ -46,6 +46,7 @@ const StepBasicDetails: React.FC<StepBasicDetailsProps> = ({
         value={newLoan.purpose}
         onChange={onFieldChange}
         fullWidth
+        dir="rtl"
       />
       <TextField
         label="תאריך הלוואה"
@@ -55,6 +56,7 @@ const StepBasicDetails: React.FC<StepBasicDetailsProps> = ({
         onChange={onFieldChange}
         InputLabelProps={{ shrink: true }}
         fullWidth
+        dir="rtl"
       />
       <TextField
         label="תשלום חודשי"
@@ -62,15 +64,16 @@ const StepBasicDetails: React.FC<StepBasicDetailsProps> = ({
         value={newLoan.monthly_payment}
         onChange={onFieldChange}
         fullWidth
+        dir="rtl"
       />
       <TextField
-        label="יום תשלום (1–28)"
+        label="יום תשלום"
         name="payment_date"
-        type="number"
         inputProps={{ min: 1, max: 28 }}
         value={newLoan.payment_date}
         onChange={onFieldChange}
         fullWidth
+        dir="rtl"
       />
     </Stack>
   );

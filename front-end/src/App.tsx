@@ -4,12 +4,13 @@ import NewLoan from './Admin/components/Loans/NewLoan/NewLoanForm';
 import Navbar from './Admin/components/NavBar/NavBar';
 import LoansPage from './Admin/pages/LoansPage';
 import HomePage from './Admin/components/HomePage/HomePage';
-import UsersPage from './Admin/components/Users/UsersComponets';
 import PaymentsPage from './Admin/pages/PaymentPage';
 import FundsOverviewByYearPage from './Admin/pages/FundsOverviewByYearPage';
 import LoanDetailsPage from './Admin/components/Loans/LoanDetails/LoanDetailsPage';
 import FundsOverviewDashboard from './Admin/pages/FundsOverviewDashboard';
 import RankPage from './Admin/pages/RankPage';
+import AddNewUser from './Admin/components/Users/AddNewUser/AddNewUser';
+import UsersPage from './Admin/pages/UsersPage';
 
 
 
@@ -30,6 +31,7 @@ function App() {
           <Route path="/users" element={<UsersPage/>} />
           <Route path='paymentsPage' element=  {<PaymentsPage/>}/>
           <Route path='/rankPage' element={<RankPage/>} />
+          <Route path='/users/new' element={<AddNewUser />} />
         </Routes>
       </Box>
     </BrowserRouter>

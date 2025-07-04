@@ -44,6 +44,8 @@ const SelectAllUsers: React.FC<Props> = ({
       <Select
         labelId="select-user-label"
         label={label}
+                        dir="rtl"
+
         color={color ?? "primary"} // אם לא הועבר צבע, נשתמש בצבע ברירת מחדל
         // אם קיבלנו value, נהפוך אותו למחרוזת, אחרת נעביר מחרוזת ריקה
         value={value != null ? value.toString() : ""}
