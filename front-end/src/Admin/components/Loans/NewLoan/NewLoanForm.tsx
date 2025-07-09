@@ -4,7 +4,7 @@ import { Box, Card, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import CheckLoanModal from "../CheckLoanModal";
 
-import StepperNavigation from "./StepperNavigation";
+import StepperNavigation from "../../StepperNavigation/StepperNavigation";
 import StepBasicDetails from "./StepBasicDetails";
 import StepGuarantors from "./StepGuarantors";
 import StepSummary from "./StepSummary";
@@ -114,7 +114,6 @@ const NewLoanForm: React.FC = () => {
                 mt: 3,
               }}
             >
-
               <Button
                 variant="contained"
                 type="submit"
@@ -128,7 +127,7 @@ const NewLoanForm: React.FC = () => {
                   ? "צור הלוואה"
                   : "המשך"}
               </Button>
-                            <Button
+              <Button
                 type="button"
                 onClick={() =>
                   activeStep === 0 ? navigate("/loans") : handleBack()

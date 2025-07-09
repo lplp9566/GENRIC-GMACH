@@ -43,10 +43,10 @@ const SelectRank: React.FC<SelectRankProps> = ({
       fullWidth
       size="small"
       color={color}
-      sx={{ marginTop: 5, marginBottom: 4 }}
     >
       <InputLabel id="select-rank-label">{label}</InputLabel>
       <Select
+              dir="rtl"
         labelId="select-rank-label"
         label={label}
         value={value != null ? value.toString() : ""}

@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -75,7 +76,6 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
             color: "#fff",
             textAlign: "center",
             py: 2,
-            // position: "relative",
           }}
         >
           <Typography variant="h6" sx={{ m: 0, fontWeight: 700 }}>
@@ -91,13 +91,16 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
           </IconButton>
         </DialogTitle>
         <DialogContent sx={{ py: 4, px: 4 }}>
-          <SelectRank
-            onChange={(selectedRankId) =>
-              setManageRank({ ...manageRank, role: selectedRankId })
-            }
-            label="דרגה *"
-            value={manageRank.role}
-          />
+          <Box sx={{ marginTop: 5, marginBottom: 4 }}>
+            <SelectRank
+              onChange={(selectedRankId) =>
+                setManageRank({ ...manageRank, role: selectedRankId })
+              }
+              label="דרגה *"
+              value={manageRank.role}
+            />
+          </Box>
+
           <TextField
             fullWidth
             label="סכום (₪) "
@@ -128,15 +131,14 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
             }
           />
         </DialogContent>
-        <DialogActions       sx={{
+        <DialogActions
+          sx={{
             px: 4,
             py: 2,
             display: "flex",
             justifyContent: "space-between",
           }}
         >
-
-  
           <Button
             onClick={() => {
               handleSubmit();
@@ -151,7 +153,7 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
           >
             שמירה
           </Button>
-                    <Button
+          <Button
             onClick={() => {
               onClose();
             }}
@@ -159,7 +161,6 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
           >
             ביטול
           </Button>
-
         </DialogActions>
       </Dialog>
     </RtlProvider>
