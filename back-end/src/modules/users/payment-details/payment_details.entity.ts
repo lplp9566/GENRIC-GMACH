@@ -28,8 +28,8 @@ export class PaymentDetailsEntity {
   @Column({type: 'int'})
   bank_account_number: number;
 
-  @Column({type: 'text', default: '5'})
-  charge_date: string;
+  @Column({type: 'int'})
+  charge_date: number;
 
   @Column({type: 'enum', enum: payment_method})
   payment_method: payment_method;

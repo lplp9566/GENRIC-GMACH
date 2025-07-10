@@ -14,7 +14,7 @@ export interface IPaymentDetails {
   bank_number: number;
   bank_branch: number;
   bank_account_number: number;
-  charge_date: string;
+  charge_date: number;
   payment_method: payment_method;
   monthly_balance: number;
   loan_balances: { loanId: number; balance: number }[];
@@ -49,7 +49,7 @@ export interface ICreatePaymentDetails {
     bank_number: number;
     bank_branch: number;
     bank_account_number: number;
-    charge_date: string;
+    charge_date: number | null;
     payment_method: payment_method;
 }
 

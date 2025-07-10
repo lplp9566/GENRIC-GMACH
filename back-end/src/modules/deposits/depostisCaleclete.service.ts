@@ -48,8 +48,7 @@ async calculateTotalInflows(
 
     for (const user of users) {
       // 3. Determine the charge day of month
-      const rawCharge = user.payment_details?.charge_date;
-      const chargeDay = parseInt(rawCharge as string, 10);
+      const chargeDay = user.payment_details?.charge_date;
       if (!chargeDay || chargeDay < 1 || chargeDay > 31) {
         // skip users without a valid charge day
         continue;

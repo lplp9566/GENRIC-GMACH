@@ -53,10 +53,9 @@ async calculateTotalInflows(
     // console.log(`\n--- User ID=${user.id} (${user.first_name} ${user.last_name}) ---`);
 
     // 3. Determine the charge day
-    const rawCharge = user.payment_details?.charge_date;
+    const chargeDate = user.payment_details?.charge_date;
     // console.log(`🗓 Raw charge day: ${rawCharge}`);
-    const chargeDay = parseInt(rawCharge as string, 10);
-    if (!chargeDay || chargeDay < 1 || chargeDay > 31) {
+    if (!chargeDate || chargeDate < 1 || chargeDate > 31) {
       // console.log(`⚠️ Skipping: invalid charge day`);
       continue;
     }
@@ -84,7 +83,7 @@ async calculateTotalInflows(
       // console.log(`\n  🔍 Processing month: ${year}-${(month+1).toString().padStart(2,'0')}`);
 
       // 6a. Compute billing date
-      const billingDate = new Date(year, month, chargeDay);
+      const billingDate = new Date(year, month, chargeDate);
       if (billingDate < startDate || billingDate > endDate) {
         // console.log(`    ⚠️ Skipping: billing date ${billingDate.toISOString().slice(0,10)} out of range`);
         continue;

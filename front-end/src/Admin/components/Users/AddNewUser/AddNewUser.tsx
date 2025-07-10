@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { RtlProvider } from "../../../../Theme/rtl";
 import StepBankDetails from "./StepBankDetails";
 import StepSummary from "./StepSummary";
-import useNewUserForm from "../../../Hooks/LoanHooks/UsersHooks/NewUserForm";
+import useNewUserForm from "../../../Hooks/UsersHooks/NewUserForm";
 import PaymentMethodStep from "./PaymentMethodStep";
 import StepUserDetails from "./StepUserDetails";
 import StepperNavigation from "../../StepperNavigation/StepperNavigation";

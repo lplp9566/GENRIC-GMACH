@@ -3,10 +3,10 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { AppDispatch } from "../../../../store/store";
-import { IAddUserFormData, payment_method } from "../../../components/Users/UsersDto";
-import { createUser } from "../../../../store/features/admin/adminUsersSlice";
-import { NEW_USER_STEPS } from "../../../components/Users/AddNewUser/AddNewUser";
+import { AppDispatch } from "../../../store/store";
+import { IAddUserFormData, payment_method } from "../../components/Users/UsersDto";
+import { createUser } from "../../../store/features/admin/adminUsersSlice";
+import { NEW_USER_STEPS } from "../../components/Users/AddNewUser/AddNewUser";
 
 export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -30,7 +30,7 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
       bank_number: 0,
       bank_branch: 0,
       bank_account_number: 0,
-      charge_date: "",
+      charge_date: null,
       payment_method: payment_method.direct_debit,
     },
   });
@@ -58,14 +58,11 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
 
  const handleSubmit = (e: React.FormEvent) => {
   e.preventDefault();
-
-  // מעבר שלבים
   if (activeStep < NEW_USER_STEPS.length - 1) {
     setActiveStep((prev) => prev + 1);
     return;
   }
 
-  // ולידציה רק בשלב האחרון
   const requiredUserFields = [
     "first_name",
     "last_name",
@@ -100,6 +97,14 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
     toast.warn("נא למלא את פרטי הבנק באופן תקין");
     return;
   }
+  if (
+    data.paymentData.charge_date === null ||
+    data.paymentData.charge_date > 31 ||
+    data.paymentData.charge_date < 1
+  ) {
+    toast.warn("נא למלא את תאריך החיוב באופן תקין");
+    return;
+  }
 
   // רק אחרי שכל הבדיקות עברו, מבצע יצירה
   const promise = dispatch(createUser(data));
@@ -129,7 +134,7 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
         bank_number: 0,
         bank_branch: 0,
         bank_account_number: 0,
-        charge_date: "",
+        charge_date: null,
         payment_method: payment_method.direct_debit,
       },
     });

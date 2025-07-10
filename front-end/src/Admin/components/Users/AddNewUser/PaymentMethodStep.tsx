@@ -7,14 +7,22 @@ import { PaymentStepProps } from "./AddUserStepsProps";
 
 const PaymentMethodStep: React.FC<PaymentStepProps> = ({ data, onPaymentChange }) => (
   <Box display="grid" gap={2} mb={2}>
-    <TextField
-    dir="rtl"
-      label="תאריך חיוב"
-      InputLabelProps={{ shrink: true }}
-      value={data.paymentData.charge_date}
-      onChange={onPaymentChange("charge_date")}
-      fullWidth
-    />
+<FormControl fullWidth dir="rtl">
+  <InputLabel id="charge-date-label">תאריך חיוב</InputLabel>
+  <Select
+    labelId="charge-date-label"
+    label="תאריך חיוב"
+value={data.paymentData.charge_date ?? ""}
+onChange={() => onPaymentChange("charge_date")}
+  >
+    {Array.from({ length: 28 }, (_, i) => (
+      <MenuItem key={i + 1} value={String(i + 1)}>
+        {i + 1}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
     <FormControl fullWidth>
       <InputLabel>אופן תשלום</InputLabel>
       <Select
