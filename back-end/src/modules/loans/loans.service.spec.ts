@@ -63,7 +63,7 @@ describe('LoansService', () => {
       bank_number: 10,
       bank_branch: 123,
       bank_account_number: 456789,
-      charge_date: '15',
+      charge_date: 15,
       payment_method: payment_method.bank_transfer,
       monthly_balance: 0,
       loan_balances: [],
