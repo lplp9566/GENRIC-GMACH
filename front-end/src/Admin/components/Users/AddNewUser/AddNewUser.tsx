@@ -24,13 +24,12 @@ const NewUserForm: React.FC = () => {
     activeStep,
     data,
     handleUserChange,
-    handlePaymentChange,
+    handleBankFieldChange,
     handleSubmit,
     handleBack,
     setData,
-    
+    handlePaymentFieldChange,
   } = useNewUserForm(navigate);
-
 
   return (
     <RtlProvider>
@@ -76,13 +75,13 @@ const NewUserForm: React.FC = () => {
           {activeStep === 1 && (
             <StepBankDetails
               data={data}
-              onPaymentChange={handlePaymentChange}
+              onFieldChange={handleBankFieldChange}
             />
           )}
           {activeStep === 2 && (
             <PaymentMethodStep
               data={data}
-              onPaymentChange={handlePaymentChange}
+              onFieldChange={handlePaymentFieldChange}
             />
           )}
           {activeStep === 3 && <StepSummary data={data} />}
@@ -94,19 +93,16 @@ const NewUserForm: React.FC = () => {
               mt: 3,
             }}
           >
-
-
             <Button
-            type="submit"
-            sx={{
-              
-              bgcolor: GREEN_MAIN,}}
+              type="submit"
+              sx={{
+                bgcolor: GREEN_MAIN,
+              }}
               variant="contained"
-
             >
               {activeStep === NEW_USER_STEPS.length - 1 ? "צור משתמש" : "המשך"}
             </Button>
-                        <Button
+            <Button
               type="button"
               onClick={() =>
                 activeStep === 0 ? navigate("/users") : handleBack()

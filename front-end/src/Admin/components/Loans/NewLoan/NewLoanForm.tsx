@@ -37,7 +37,6 @@ const NewLoanForm: React.FC = () => {
     handleSubmit,
     closeModal,
     handleBack,
-
     borrowerName,
     modalLoan,
   } = useNewLoanForm();

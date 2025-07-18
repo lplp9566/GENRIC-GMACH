@@ -1,5 +1,13 @@
+// StepSummary.tsx
 import React from "react";
-import { Box, Paper, Typography } from "@mui/material";
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Divider,
+  Box,
+} from "@mui/material";
 import { IAddUserFormData } from "../UsersDto";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../store/store";
@@ -10,26 +18,58 @@ interface Props {
 }
 
 const StepSummary: React.FC<Props> = ({ data }) => {
+  const allRanks = useSelector(
+    (state: RootState) => state.AdminRankSlice.memberShipRanks
+  );
+  const rankName = allRanks.find((r) => r.id === data.userData.current_role)
+    ?.name;
 
-const allRanks = useSelector((state: RootState) => state.AdminRankSlice.memberShipRanks);
-  return(
+  return (
+    <Box mb={2}>
+      <Typography variant="h5" align="center" gutterBottom>
+        סיכום ואישור
+      </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <Card variant="outlined">
+            <CardContent>
+              <Typography variant="h6" textAlign={"center"} gutterBottom>
+                פרטי תשלום
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Typography align="center"><strong>בנק:</strong> {data.paymentData.bank_number}</Typography>
+              <Typography align={"center"}><strong>סניף:</strong> {data.paymentData.bank_branch}</Typography>
+              <Typography align={"center"}><strong>חשבון:</strong> {data.paymentData.bank_account_number}</Typography>
+              <Typography align={"center"}>
+                <strong>תאריך חיוב:</strong> {data.paymentData.charge_date}
+              </Typography>
+              <Typography align={"center"}>
+                <strong>אופן תשלום:</strong>{" "}
+                {revertPaymentMethod(data.paymentData.payment_method)}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+         <Grid item xs={12} sm={6}>
+          <Card variant="outlined">
+            <CardContent>
+              <Typography align={"center"} variant="h6" gutterBottom>
+                פרטים אישיים
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Typography align={"center"}  ><strong>שם מלא:</strong> {data.userData.first_name} {data.userData.last_name}</Typography>
+              <Typography align={"center"}><strong>ת"ז:</strong> {data.userData.id_number}</Typography>
+              <Typography align={"center"}><strong>דוא"ל:</strong> {data.userData.email_address}</Typography>
+              <Typography align={"center"}><strong>טלפון:</strong> {data.userData.phone_number}</Typography>
+              <Typography align={"center"}><strong>מנהל:</strong> {data.userData.is_admin ? "כן" : "לא"}</Typography>
+              <Typography align={"center"}><strong>דרגה:</strong> {rankName}</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
 
-  
-  <Paper variant="outlined" sx={{ p: 3, backgroundColor: "#e9f5e9", mb: 2,  textAlign: "center"  }}>
-    <Typography variant="h6" gutterBottom>סיכום ואישור</Typography>
-    <Typography>שם: {data.userData.first_name} {data.userData.last_name}</Typography>
-    <Typography>תז: {data.userData.id_number}</Typography>
-    <Typography>דוא"ל: {data.userData.email_address}</Typography>
-    <Typography>טלפון: {data.userData.phone_number}</Typography>
-    <Typography>מנהל: {data.userData.is_admin ? "כן" : "לא"}</Typography>
-    <Typography>דרגה: {allRanks.find((rank) => rank.id === data.userData.current_role)?.name}</Typography>
-    <Box mt={2} />
-    <Typography>בנק: {data.paymentData.bank_number}</Typography>
-    <Typography>סניף: {data.paymentData.bank_branch}</Typography>
-    <Typography>חשבון: {data.paymentData.bank_account_number}</Typography>
-    <Typography>תאריך חיוב: {data.paymentData.charge_date}</Typography>
-    <Typography>אופן תשלום: {revertPaymentMethod(data.paymentData.payment_method)}</Typography>
-  </Paper>)
-}
+      </Grid>
+    </Box>
+  );
+};
 
 export default StepSummary;

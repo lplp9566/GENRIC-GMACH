@@ -46,9 +46,9 @@ export interface ICreateUser {
     current_role: number;
 }
 export interface ICreatePaymentDetails {
-    bank_number: number;
-    bank_branch: number;
-    bank_account_number: number;
+    bank_number: number | null;
+    bank_branch: number   | null;
+    bank_account_number: number | null;
     charge_date: number | null;
     payment_method: payment_method;
 }

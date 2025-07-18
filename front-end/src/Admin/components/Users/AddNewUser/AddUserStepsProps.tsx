@@ -1,5 +1,6 @@
 // AddUserStepProps.ts
 
+import { SelectChangeEvent } from "@mui/material";
 import { IAddUserFormData } from "../UsersDto";
 
 export interface UserDetailsStepProps {
@@ -8,7 +9,11 @@ export interface UserDetailsStepProps {
   setData: React.Dispatch<React.SetStateAction<IAddUserFormData>>;
 }
 
-export interface PaymentStepProps {
+export interface StepBankDetailsProps {
   data: IAddUserFormData;
-  onPaymentChange: (key: keyof IAddUserFormData["paymentData"]) => (e: React.ChangeEvent<any>) => void;
+  onFieldChange: React.ChangeEventHandler<HTMLInputElement>;
 }
+export interface PaymentMethodStepProps {
+  data: IAddUserFormData;
+  onFieldChange: (e: SelectChangeEvent<string>) => void}
+

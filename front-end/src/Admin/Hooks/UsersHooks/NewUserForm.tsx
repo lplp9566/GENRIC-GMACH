@@ -7,6 +7,7 @@ import { AppDispatch } from "../../../store/store";
 import { IAddUserFormData, payment_method } from "../../components/Users/UsersDto";
 import { createUser } from "../../../store/features/admin/adminUsersSlice";
 import { NEW_USER_STEPS } from "../../components/Users/AddNewUser/AddNewUser";
+import { SelectChangeEvent } from "@mui/material";
 
 export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -27,9 +28,9 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
       current_role: 1,
     },
     paymentData: {
-      bank_number: 0,
-      bank_branch: 0,
-      bank_account_number: 0,
+      bank_number: null,
+      bank_branch: null,
+      bank_account_number: null,
       charge_date: null,
       payment_method: payment_method.direct_debit,
     },
@@ -46,13 +47,43 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
       userData: { ...prev.userData, [key]: e.target.value },
     }));
   };
-
-  const handlePaymentChange = (key: keyof IAddUserFormData["paymentData"]) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }>
-  ) => {
+  const handleOuter = (name:string ,value:any)=>{
+    console.log(name,value);
+    
     setData((prev) => ({
       ...prev,
-      paymentData: { ...prev.paymentData, [key]: e.target.value },
+      paymentData: { ...prev.paymentData, [name]: value },
+    }))
+
+  }
+  
+  const handleBankFieldChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  const { name, value } = e.target;
+  setData(prev => ({
+    ...prev,
+    paymentData: {
+      ...prev.paymentData,
+      [name]: Number(value),
+    },
+  }));
+};
+
+  const handlePaymentFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>
+  ) => {
+    const { name, value } = e.target as { name: string; value: unknown };
+    console.log(name, value);
+    let parsed: unknown = value;
+    // ממיר למספר את השדות הרצויים
+    if (["bank_number", "bank_branch", "bank_account_number", "charge_date"].includes(name)) {
+      parsed = Number(value);
+    }
+    setData(prev => ({
+      ...prev,
+      paymentData: {
+        ...prev.paymentData,
+        [name]: parsed,
+      },
     }));
   };
 
@@ -90,9 +121,9 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
   }
 
   if (
-    data.paymentData.bank_number <= 0 ||
-    data.paymentData.bank_branch <= 0 ||
-    data.paymentData.bank_account_number <= 0
+    data.paymentData.bank_number != null && data.paymentData.bank_number <= 0 ||
+    data.paymentData.bank_branch != null && data.paymentData.bank_branch  <= 0 ||
+    data.paymentData.bank_account_number != null && data.paymentData.bank_account_number <= 0
   ) {
     toast.warn("נא למלא את פרטי הבנק באופן תקין");
     return;
@@ -148,10 +179,12 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
     data,
     setData,
     handleUserChange,
-    handlePaymentChange,
+    handleBankFieldChange,
     handleSubmit,
     handleNext,
     handleBack,
+    handleOuter,
+    handlePaymentFieldChange
   };
 };
 
