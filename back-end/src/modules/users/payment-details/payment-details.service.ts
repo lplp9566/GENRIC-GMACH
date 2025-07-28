@@ -9,4 +9,5 @@ export class PaymentDetailsService {
     @InjectRepository(PaymentDetailsEntity)
     private readonly paymentDetailsRepository: Repository<PaymentDetailsEntity>,
   ) {}
+  // async deleteLoanBalances(loan:string): Promise<void> {
 }

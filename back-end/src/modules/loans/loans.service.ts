@@ -13,6 +13,8 @@ import { FundsFlowService } from './calcelete.service';
 import { LoanEntity } from './Entity/loans.entity';
 import { FindLoansOpts, LoanStatus, PaginatedResult } from '../../common/index';
 import { log } from 'console';
+import { b } from 'vite/dist/node/moduleRunnerTransport.d-CXw_Ws6P';
+import { FundsOverviewEntity } from '../funds-overview/entity/funds-overview.entity';
 // cSpell:ignore Financials
 
 @Injectable()
@@ -32,8 +34,33 @@ export class LoansService {
  
   async checkLoan(
     loanData: Partial<LoanEntity>
-  ): Promise<{ ok: boolean; error: string }> {
+  ): Promise<{ ok: boolean; error: string,butten:boolean }> {
     try {
+                const fund_details = await this.fundsOverviewService.getFundDetails();
+      if (fund_details.available_funds < loanData.loan_amount!) {
+        return {
+          butten: false,
+          ok: false,
+          error:
+            'לא ניתן להוציא הלוואה על ' +
+            loanData.loan_amount! +
+            ' ש"ח, במערכת יש כרגע ' +
+            fund_details.available_funds +
+            ' ש"ח',
+        };
+      }
+      const activeLoans = await this.loansRepository.find({
+        where: { user: { id: loanData.user?.id }, isActive: true },
+      });
+      for (const loan of activeLoans) {
+        if (loan.purpose === loanData.purpose) {
+          return {
+            ok: false,
+            error: `משתמש זה כבר לקח הלוואה למטרה זו, לא ניתן להוציא הלוואה נוספת`,
+            butten: false,
+          };
+        }
+          }
       const fromDate = new Date(loanData.loan_date!);
       const success = await this.fundsFlowService.getCashFlowTotals(
         fromDate,
@@ -41,13 +68,13 @@ export class LoansService {
       );
      
       if (!success) {
-        return { ok: false, error: 'לא מספיק כסף במערכת' };
+        return { ok: false, error: 'לא מספיק כסף במערכת', butten: false };
       }
-      return { ok: true , error: '' };
+      return { ok: true , error: '', butten: true };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       // console.log(message)
-      return { ok: false, error: message };
+      return { ok: false, error: message, butten: true };
     }
   }
 async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {

@@ -38,6 +38,7 @@ const initialState: AdminLoanType = {
   checkLoanResponse: {
     ok: false,
     error: "",
+    butten: false, 
   },
 };
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -148,7 +149,7 @@ export const AdminLoansSlice = createSlice({
       })
       .addCase(checkLoan.pending, (state) => {
         state.checkLoanStatus = "pending";
-        state.checkLoanResponse = { ok: false, error: "" };
+        state.checkLoanResponse = { ok: false, error: "", butten: false };
       })
       .addCase(checkLoan.fulfilled, (state, action) => {
         state.checkLoanResponse = action.payload;
@@ -156,7 +157,7 @@ export const AdminLoansSlice = createSlice({
       })
       .addCase(checkLoan.rejected, (state, action) => {
         state.checkLoanStatus = "rejected";
-        state.checkLoanResponse = { ok: false, error: action.error.message || "" };
+        state.checkLoanResponse = { ok: false, error: action.error.message || "", butten: false };
       })
       .addCase(createLoan.pending, (state) => {
         state.createLoanStatus = "pending";

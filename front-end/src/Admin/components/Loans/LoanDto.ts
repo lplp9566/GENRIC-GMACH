@@ -45,6 +45,7 @@ export interface ICreateLoan {
 export interface ILoanCheckResponse {
   ok: boolean;
   error: string;
+  butten: boolean; // Indicates if the button should be enabled or not
 }
 export enum LoanPaymentActionType {
   PAYMENT = "PAYMENT",

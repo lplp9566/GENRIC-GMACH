@@ -24,6 +24,8 @@ export const getAllUsers = createAsyncThunk("admin/getAllUsers", async () => {
   const response = await axios.get(
     `${BASE_URL}/users`
   );
+  console.log("Fetched users:", response.data);
+  
   return response.data;
 });
 export const createUser = createAsyncThunk(

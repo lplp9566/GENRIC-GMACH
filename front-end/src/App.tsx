@@ -11,6 +11,8 @@ import FundsOverviewDashboard from './Admin/pages/FundsOverviewDashboard';
 import RankPage from './Admin/pages/RankPage';
 import AddNewUser from './Admin/components/Users/AddNewUser/AddNewUser';
 import UsersPage from './Admin/pages/UsersPage';
+import DonationsPage from './Admin/pages/DonationsPage';
+import ExpensesPage from './Admin/pages/ExpensesPage';
 
 
 
@@ -32,6 +34,9 @@ function App() {
           <Route path='paymentsPage' element=  {<PaymentsPage/>}/>
           <Route path='/rankPage' element={<RankPage/>} />
           <Route path='/users/new' element={<AddNewUser />} />
+          <Route path='/donations' element={<DonationsPage/>} />
+          <Route path='/expenses' element={<ExpensesPage/>} />
+          
         </Routes>
       </Box>
     </BrowserRouter>

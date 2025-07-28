@@ -197,7 +197,8 @@ const CheckLoanModal: React.FC<Props> = ({
           }}
         >
           <Button onClick={onClose}>ביטול</Button>
-          <Button
+          {checkLoanResponse.butten == true && (
+                      <Button
             variant="contained"
             color={checkLoanResponse.ok ? "success" : "warning"}
             onClick={handleCreateLoan}
@@ -207,6 +208,8 @@ const CheckLoanModal: React.FC<Props> = ({
               ? "אשר הלוואה"
               : "אשר בכל זאת"}
           </Button>
+          )}
+
         </Box>
       </Box>
     </Box>

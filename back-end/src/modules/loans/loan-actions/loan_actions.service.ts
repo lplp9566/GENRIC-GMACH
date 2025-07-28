@@ -74,6 +74,9 @@ export class LoanActionsService {
       if (!loan.isActive) {
         throw new BadRequestException('Cannot operate on a closed loan');
       }
+      if(dto.value> loan.remaining_balance) {
+        throw new BadRequestException('Payment exceeds remaining balance');
+      }
       const newPayment = this.paymentsRepo.create({
         loan: loan,
         date: dto.date,
@@ -88,9 +91,11 @@ export class LoanActionsService {
       loan.remaining_balance -= dto.value;
       loan.total_remaining_payments +=1
       if (loan.remaining_balance < 0) loan.remaining_balance = 0;
+
       loan.total_installments = loan.remaining_balance / loan.monthly_payment;
             if (loan.remaining_balance === 0) {
         loan.isActive = false;
+        
       }
       await this.loansRepo.save(loan);
 
