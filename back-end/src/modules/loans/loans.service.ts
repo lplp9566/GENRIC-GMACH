@@ -15,6 +15,7 @@ import { FindLoansOpts, LoanStatus, PaginatedResult } from '../../common/index';
 import { log } from 'console';
 import { b } from 'vite/dist/node/moduleRunnerTransport.d-CXw_Ws6P';
 import { FundsOverviewEntity } from '../funds-overview/entity/funds-overview.entity';
+import { PaymentDetailsService } from '../users/payment-details/payment-details.service';
 // cSpell:ignore Financials
 
 @Injectable()
@@ -29,14 +30,14 @@ export class LoansService {
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly usersService: UsersService,
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
-    private readonly fundsFlowService:FundsFlowService
+    private readonly fundsFlowService: FundsFlowService,
   ) {}
- 
+
   async checkLoan(
-    loanData: Partial<LoanEntity>
-  ): Promise<{ ok: boolean; error: string,butten:boolean }> {
+    loanData: Partial<LoanEntity>,
+  ): Promise<{ ok: boolean; error: string; butten: boolean }> {
     try {
-                const fund_details = await this.fundsOverviewService.getFundDetails();
+      const fund_details = await this.fundsOverviewService.getFundDetails();
       if (fund_details.available_funds < loanData.loan_amount!) {
         return {
           butten: false,
@@ -60,84 +61,89 @@ export class LoansService {
             butten: false,
           };
         }
-          }
+      }
       const fromDate = new Date(loanData.loan_date!);
       const success = await this.fundsFlowService.getCashFlowTotals(
         fromDate,
-        loanData
+        loanData,
       );
-     
+
       if (!success) {
         return { ok: false, error: 'לא מספיק כסף במערכת', butten: false };
       }
-      return { ok: true , error: '', butten: true };
+      return { ok: true, error: '', butten: true };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       // console.log(message)
       return { ok: false, error: message, butten: true };
     }
   }
-async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
-  const page  = opts.page  > 0 ? opts.page  : 1;
-  const limit = opts.limit > 0 ? Math.min(opts.limit, 100) : 50;
+  async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
+    const page = opts.page > 0 ? opts.page : 1;
+    const limit = opts.limit > 0 ? Math.min(opts.limit, 100) : 50;
 
-  // בניית ה־where הדינמי
-  const where: any = {};
+    // בניית ה־where הדינמי
+    const where: any = {};
 
-  // סינון לפי סטטוס
-  if (opts.status === LoanStatus.ACTIVE) {
-    where.isActive = true;
-  } else if (opts.status === LoanStatus.INACTIVE) {
-    where.isActive = false;
+    // סינון לפי סטטוס
+    if (opts.status === LoanStatus.ACTIVE) {
+      where.isActive = true;
+    } else if (opts.status === LoanStatus.INACTIVE) {
+      where.isActive = false;
+    }
 
-  } 
+    if (opts.userId) {
+      where.user = { id: opts.userId };
+    }
 
-  if (opts.userId ) {
-    where.user = { id: opts.userId };
+    try {
+      const [data, total] = await this.loansRepository.findAndCount({
+        where,
+        relations: ['user'],
+        skip: (page - 1) * limit,
+        take: limit,
+        order: { loan_date: 'DESC' },
+      });
+
+      const pageCount = Math.ceil(total / limit);
+      return { data, total, page, pageCount };
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
-
-  try {
-    const [data, total] = await this.loansRepository.findAndCount({
-      where,
-      relations: ['user'],
-      skip: (page - 1) * limit,
-      take: limit,
-      order: { loan_date: 'DESC' },
-    });
-
-    const pageCount = Math.ceil(total / limit);
-    return { data, total, page, pageCount };
-  } catch (err) {
-    throw new BadRequestException(err.message);
-  }
-}
 
   async createLoan(loanData: Partial<LoanEntity>) {
     try {
-          const fund_details = await this.fundsOverviewService.getFundDetails();
-    if(fund_details.available_funds<loanData?.loan_amount!){
-      throw new BadRequestException('אתה לא יכול להוציא הלוואה על  ' + (loanData.loan_amount) + ' ש"ח, במערכת יש כרגע ' + fund_details.available_funds + ' ש"ח');
-
-    }
+      const fund_details = await this.fundsOverviewService.getFundDetails();
+      if (fund_details.available_funds < loanData?.loan_amount!) {
+        throw new BadRequestException(
+          'אתה לא יכול להוציא הלוואה על  ' +
+            loanData.loan_amount +
+            ' ש"ח, במערכת יש כרגע ' +
+            fund_details.available_funds +
+            ' ש"ח',
+        );
+      }
       const loanRecord = this.loansRepository.create(loanData);
       loanRecord.remaining_balance = loanRecord.loan_amount;
-      loanRecord.total_installments = loanRecord.loan_amount / loanRecord.monthly_payment;
+      loanRecord.total_installments =
+        loanRecord.loan_amount / loanRecord.monthly_payment;
       const year = getYearFromDate(loanRecord.loan_date);
       const user = await this.usersService.getUserById(Number(loanRecord.user));
       if (!user) {
         throw new Error('User not found');
       }
       loanRecord.initial_monthly_payment = loanData.monthly_payment!;
-      loanRecord.initial_loan_amount = loanData.loan_amount!
-      loanRecord.total_remaining_payments = 0
-      if(loanData.guarantor1){
-        loanRecord.guarantor1 = loanData.guarantor1
+      loanRecord.initial_loan_amount = loanData.loan_amount!;
+      loanRecord.total_remaining_payments = 0;
+      if (loanData.guarantor1) {
+        loanRecord.guarantor1 = loanData.guarantor1;
       }
-      if(loanData.guarantor2){
-        loanRecord.guarantor2 = loanData.guarantor2
+      if (loanData.guarantor2) {
+        loanRecord.guarantor2 = loanData.guarantor2;
       }
       this.loansRepository.save(loanRecord);
-       await this.userFinancialsService.recordLoanTaken(
+      await this.userFinancialsService.recordLoanTaken(
         user,
         loanRecord.loan_amount,
       );
@@ -157,7 +163,7 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
     }
   }
 
-  async getLoanById(id: number): Promise<LoanEntity | null> {   
+  async getLoanById(id: number): Promise<LoanEntity | null> {
     try {
       return this.loansRepository.findOne({
         where: { id },
@@ -177,7 +183,6 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
   }
   async changeLoanAmount(dto: LoanActionDto): Promise<LoanActionEntity> {
     try {
-      
       const loan = await this.loansRepository.findOne({
         where: { id: dto.loanId },
         relations: ['user'],
@@ -189,8 +194,8 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
       const diff = dto.value;
       loan.loan_amount += dto.value;
       loan.remaining_balance += dto.value;
-      loan.total_installments = loan.remaining_balance / loan.monthly_payment,
-      await this.loansRepository.save(loan);
+      (loan.total_installments = loan.remaining_balance / loan.monthly_payment),
+        await this.loansRepository.save(loan);
       const year = getYearFromDate(dto.date);
       await Promise.all([
         this.userFinancialsByYearService.recordLoanTaken(loan.user, year, diff),
@@ -220,8 +225,8 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
     }
     try {
       loan.monthly_payment = dto.value;
-      loan.total_installments = loan.remaining_balance / loan.monthly_payment,
-      await this.loansRepository.save(loan);
+      (loan.total_installments = loan.remaining_balance / loan.monthly_payment),
+        await this.loansRepository.save(loan);
       return await this.paymentsRepository.save({
         loan,
         date: dto.date,
@@ -259,17 +264,16 @@ async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
       throw new Error(error.message);
     }
   }
-  async recordLoanBalance(loanId: number, balance:number){
+  async recordLoanBalance(loanId: number, balance: number) {
     try {
-          const loan = await this.loansRepository.findOne({
-      where: { id: loanId },
-    })
-    if (!loan) throw new BadRequestException('Loan not found');
-    loan.balance = balance
-    await this.loansRepository.save(loan)
+      const loan = await this.loansRepository.findOne({
+        where: { id: loanId },
+      });
+      if (!loan) throw new BadRequestException('Loan not found');
+      loan.balance = balance;
+      await this.loansRepository.save(loan);
     } catch (error) {
       throw new Error(error.message);
     }
-
   }
 }

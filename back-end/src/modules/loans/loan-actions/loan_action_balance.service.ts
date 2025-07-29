@@ -98,15 +98,15 @@ export class LoanActionBalanceService {
       where: { user: { id: loan.user.id } },
     });
     if (!pd) throw new Error("Payment details not found for user");
-
-    pd.loan_balances = [
+    if(loan.isActive){
+  pd.loan_balances = [
       ...pd.loan_balances.filter((x) => x.loanId !== loan.id),
       { loanId: loan.id, balance: netBalance },
     ];
-
+       await this.paymentDetailsRepo.save(pd);
+    }
     // 9. רישום לוג ושמירה סופית
     await this.loansService.recordLoanBalance(loan.id, netBalance);
-    await this.paymentDetailsRepo.save(pd);
     console.log(expectedPaid)
     return netBalance;
   }

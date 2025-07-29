@@ -21,7 +21,8 @@ export class FundsFlowService {
     @InjectRepository(UserEntity)
     private readonly usersRepo: Repository<UserEntity>,
     private readonly depositsService: DepositsService,
-    private readonly fundsOverviewService: FundsOverviewService
+    private readonly fundsOverviewService: FundsOverviewService,
+
   ) {}
 
 async calculateTotalInflows(

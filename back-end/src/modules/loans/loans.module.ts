@@ -13,6 +13,7 @@ import { FundsFlowService } from './calcelete.service';
 import { MonthlyDepositsModule } from '../monthly_deposits/monthly_deposits.module';
 import { DepositsModule } from '../deposits/deposits.module';
 import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates.module';
+import { PaymentDetailsModule } from '../users/payment-details/payment-details.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates
     MonthlyDepositsModule,
     DepositsModule,
     RoleMonthlyRatesModule,
+    PaymentDetailsModule,
     forwardRef(() => UsersModule),
   ],
   providers: [LoansService,FundsFlowService, ],

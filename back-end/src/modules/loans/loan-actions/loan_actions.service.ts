@@ -17,6 +17,7 @@ import { UserFinancialService } from '../../users/user-financials/user-financial
 import { UsersService } from '../../users/users.service';
 import { FundsOverviewByYearService } from '../../funds-overview-by-year/funds-overview-by-year.service';
 import { LoanActionBalanceService } from './loan_action_balance.service';
+import { PaymentDetailsService } from 'src/modules/users/payment-details/payment-details.service';
 
 // cSpell:ignore Financials
 
@@ -28,13 +29,14 @@ export class LoanActionsService {
     @InjectRepository(LoanActionEntity)
     private readonly paymentsRepo: Repository<LoanActionEntity>,
     @InjectRepository(PaymentDetailsEntity)
-    private readonly paymentDetailsRepo: Repository<PaymentDetailsEntity>,
     private readonly loansService: LoansService,
     private readonly userFinByYear: UserFinancialByYearService,
     private readonly userFin: UserFinancialService,
     private readonly fundsOverview: FundsOverviewService,
     private readonly usersService: UsersService,
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
+    private readonly paymentDetailsService: PaymentDetailsService,
+
     @Inject(forwardRef(() => LoanActionBalanceService))
     private readonly LoanActionBalanceService:LoanActionBalanceService
   ) {}
@@ -91,16 +93,17 @@ export class LoanActionsService {
       loan.remaining_balance -= dto.value;
       loan.total_remaining_payments +=1
       if (loan.remaining_balance < 0) loan.remaining_balance = 0;
+    
 
       loan.total_installments = loan.remaining_balance / loan.monthly_payment;
             if (loan.remaining_balance === 0) {
         loan.isActive = false;
-        
+        await this.paymentDetailsService.deleteLoanBalance(loan.id, loan.user.id);
+
       }
       await this.loansRepo.save(loan);
 
       const year = getYearFromDate(dto.date);
-
       await Promise.all([
         this.userFinByYear.recordLoanRepaid(loan.user, year, dto.value),
         this.userFin.recordLoanRepaid(loan.user, dto.value),
