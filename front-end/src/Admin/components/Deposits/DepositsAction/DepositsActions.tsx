@@ -1,22 +1,39 @@
-import  { FC, useState } from 'react'
-import { DepositActionsType } from '../depositsDto';
-import { Box, FormControl, InputLabel, MenuItem, Paper, Select, SelectChangeEvent, Typography } from '@mui/material';
-import DepositAmountChange from './DepositAmountChange';
+import { FC, useState } from "react";
+import { DepositActionsType } from "../depositsDto";
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  SelectChangeEvent,
+  Typography,
+} from "@mui/material";
+import DepositAmountChange from "./DepositAmountChange";
+import DepositDateChange from "./DepositDateChange";
 interface IDepositsActionsProps {
-    depositId: number;
-    max:number
+  depositId: number;
+  max: number;
 }
-const DepositsActions:FC<IDepositsActionsProps> = ({ depositId, max }) => {
-    const [mode ,setMode ] =useState<DepositActionsType>(DepositActionsType.AddToDeposit)
-    const handleModeChange = (e: SelectChangeEvent) => {
-        setMode(e.target.value as DepositActionsType);
-    };
-console.log(max);
+const DepositsActions: FC<IDepositsActionsProps> = ({ depositId, max }) => {
+  const [mode, setMode] = useState<DepositActionsType>(
+    DepositActionsType.AddToDeposit
+  );
+  const handleModeChange = (e: SelectChangeEvent) => {
+    setMode(e.target.value as DepositActionsType);
+  };
+  console.log(max);
 
   return (
-  <Box dir="rtl">
-      <Paper elevation={2} sx={{ p: 2, borderRadius: 2, backgroundColor: "#FEFEFE"}}>
-        <Typography variant="h6" sx={{textAlign:"center", paddingBottom:2}}>פעולות להלוואה</Typography>
+    <Box dir="rtl">
+      <Paper
+        elevation={2}
+        sx={{ p: 2, borderRadius: 2, backgroundColor: "#FEFEFE" }}
+      >
+        <Typography variant="h6" sx={{ textAlign: "center", paddingBottom: 2 }}>
+          פעולות להלוואה
+        </Typography>
         <FormControl fullWidth size="small">
           <InputLabel id="action-select-label">בחר פעולה</InputLabel>
           <Select
@@ -26,9 +43,11 @@ console.log(max);
             onChange={handleModeChange}
             sx={{ backgroundColor: "#FFF", borderRadius: 1 }}
           >
-            <MenuItem value={DepositActionsType.AddToDeposit}>הוספה  להפקדה </MenuItem>
+            <MenuItem value={DepositActionsType.AddToDeposit}>
+              הוספה להפקדה{" "}
+            </MenuItem>
             <MenuItem value={DepositActionsType.ChangeReturnDate}>
-              שינוי סכום הפקדה
+              שינוי תאריך החזרת ההפקדה{" "}
             </MenuItem>
             <MenuItem value={DepositActionsType.RemoveFromDeposit}>
               הסרה מהפקדה
@@ -37,17 +56,17 @@ console.log(max);
         </FormControl>
 
         {mode === DepositActionsType.AddToDeposit && (
-<DepositAmountChange depositId={depositId}/>
+          <DepositAmountChange depositId={depositId} />
         )}
-        {/* {mode === LoanPaymentActionType.AMOUNT_CHANGE && (
-          <AmountChangeLoanForm loanId={loanId} onSubmit={handleSubmit} />
+        {mode === DepositActionsType.ChangeReturnDate && (
+          <DepositDateChange depositId={depositId} />
         )}
-        {mode === LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE && (
+        {/* {mode === LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE && (
           <MonthlyPaymentChangeLoanForm loanId={loanId} onSubmit={handleSubmit} />
         )} */}
-      
       </Paper>
-    </Box>  )
-}
+    </Box>
+  );
+};
 
-export default DepositsActions
+export default DepositsActions;
