@@ -11,7 +11,7 @@ import { LoanActionDto, LoanPaymentActionType } from './loan-dto/loanTypes';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { FundsFlowService } from './calcelete.service';
 import { LoanEntity } from './Entity/loans.entity';
-import { FindLoansOpts, LoanStatus, PaginatedResult } from '../../common/index';
+import { FindOpts, LoanStatus, PaginatedResult } from '../../common/index';
 import { log } from 'console';
 import { b } from 'vite/dist/node/moduleRunnerTransport.d-CXw_Ws6P';
 import { FundsOverviewEntity } from '../funds-overview/entity/funds-overview.entity';
@@ -53,15 +53,7 @@ export class LoansService {
       const activeLoans = await this.loansRepository.find({
         where: { user: { id: loanData.user?.id }, isActive: true },
       });
-      for (const loan of activeLoans) {
-        if (loan.purpose === loanData.purpose) {
-          return {
-            ok: false,
-            error: `משתמש זה כבר לקח הלוואה למטרה זו, לא ניתן להוציא הלוואה נוספת`,
-            butten: false,
-          };
-        }
-      }
+
       const fromDate = new Date(loanData.loan_date!);
       const success = await this.fundsFlowService.getCashFlowTotals(
         fromDate,
@@ -78,7 +70,7 @@ export class LoansService {
       return { ok: false, error: message, butten: true };
     }
   }
-  async getLoans(opts: FindLoansOpts): Promise<PaginatedResult<LoanEntity>> {
+  async getLoans(opts: FindOpts): Promise<PaginatedResult<LoanEntity>> {
     const page = opts.page > 0 ? opts.page : 1;
     const limit = opts.limit > 0 ? Math.min(opts.limit, 100) : 50;
 

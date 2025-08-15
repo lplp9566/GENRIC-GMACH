@@ -5,14 +5,14 @@ export interface PaginatedResult<T> {
   pageCount: number;
   
 }
-export interface FindLoansOpts {
-  status: LoanStatus;
+export interface FindOptionsGeneric {
+  status: StatusGeneric;
   page?: number;
   limit?: number;
   userId?: number | undefined;
 }
 
-export enum LoanStatus {
+export enum StatusGeneric {
   ALL      = 'all',
   ACTIVE   = 'active',
   INACTIVE = 'inactive',

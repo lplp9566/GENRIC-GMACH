@@ -17,7 +17,7 @@ import { UserFinancialService } from '../../users/user-financials/user-financial
 import { UsersService } from '../../users/users.service';
 import { FundsOverviewByYearService } from '../../funds-overview-by-year/funds-overview-by-year.service';
 import { LoanActionBalanceService } from './loan_action_balance.service';
-import { PaymentDetailsService } from 'src/modules/users/payment-details/payment-details.service';
+import { PaymentDetailsService } from '../../users/payment-details/payment-details.service';
 
 // cSpell:ignore Financials
 

@@ -13,6 +13,8 @@ import AddNewUser from './Admin/components/Users/AddNewUser/AddNewUser';
 import UsersPage from './Admin/pages/UsersPage';
 import DonationsPage from './Admin/pages/DonationsPage';
 import ExpensesPage from './Admin/pages/ExpensesPage';
+import DepositsPage from './Admin/pages/DepositsPage';
+import DepositDetailsPage from './Admin/components/Deposits/DepositsDetails/DepositDetailsPage';
 
 
 
@@ -36,7 +38,9 @@ function App() {
           <Route path='/users/new' element={<AddNewUser />} />
           <Route path='/donations' element={<DonationsPage/>} />
           <Route path='/expenses' element={<ExpensesPage/>} />
-          
+          <Route path='/deposits' element={<DepositsPage/>} />
+          <Route path='/deposit/:id' element={<DepositDetailsPage />} />
+
         </Routes>
       </Box>
     </BrowserRouter>

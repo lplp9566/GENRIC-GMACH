@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, DefaultValuePipe, Get, ParseEnumPipe, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { DepositsService } from './deposits.service';
 import { DepositsEntity } from './Entity/deposits.entity';
+import { LoanStatus as StatusCordi } from 'src/common';
 
 
 @Controller('deposits')
@@ -9,8 +10,34 @@ export class DepositsController {
  private readonly depositsService: DepositsService
     ) {}
     @Get()
-    async getDeposits() {
-        return await this.depositsService.getDeposits();
+    async getDeposits(
+ @Query('page', new DefaultValuePipe(1), ParseIntPipe)
+    page: number,
+    @Query('limit', new DefaultValuePipe(50), ParseIntPipe)
+    limit: number,  
+     @Query(
+           'status',
+           new DefaultValuePipe(StatusCordi.ALL),
+           new ParseEnumPipe(StatusCordi, {
+             exceptionFactory: () =>
+               new BadRequestException(
+                 `status חייב להיות אחד מהערכים: ${Object.values(StatusCordi).join(
+                   ', ',
+                 )}`,
+               ),
+           }),
+         )
+         status: StatusCordi,
+         @Query('userId') userIdRaw?: number,
+   ) {
+    const opts: { page: number; limit: number; status?: StatusCordi; userId?: number } = { page, limit };
+    if (status !== StatusCordi.ALL) {
+      opts.status = status;
+    }
+    if (userIdRaw !== undefined) {
+      opts.userId = parseInt(userIdRaw as any, 10);
+    }
+        return await this.depositsService.getDeposits(opts);
       }
       @Get('active')
       async getDepositsActive() {

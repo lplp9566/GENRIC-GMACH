@@ -12,9 +12,7 @@ import {
 
 import UsersHeader from "../components/Users/UsersHeader";
 import UserCard from "../components/Users/UserCard";
-// styled רכיב הכרטיס
 
-// styled כפתור הסיבוב
 
 
 export default function UsersPage() {

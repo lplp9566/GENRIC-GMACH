@@ -42,36 +42,19 @@ const LoansDashboard: React.FC<LoanProps> = ({ loansData, total }) => {
           }}
         >
           {/* Summary Section */}
-          <Grid
-            container
-            spacing={2}
-            justifyContent="center"
-            mb={4}
-          >
-            <Grid item xs={12} sm={isSm? 6:3}>
-              <SummaryCard
-                label="מספר הלוואות"
-                value={total}
-              />
+          <Grid container spacing={2} justifyContent="center" mb={4}>
+            <Grid item xs={12} sm={isSm ? 6 : 3}>
+              <SummaryCard label="מספר הלוואות" value={total} />
             </Grid>
-            <Grid item xs={12} sm={isSm? 6:3}>
-                            <SummaryCard
-                label="סה״כ הלוואות"
-                value={`₪${totalAmount}`}
-              />
+            <Grid item xs={12} sm={isSm ? 6 : 3}>
+              <SummaryCard label="סה״כ הלוואות" value={`₪${totalAmount}`} />
             </Grid>
           </Grid>
 
           {/* Loans Grid */}
           <Grid container spacing={4}>
             {loansData.map((loan) => (
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                md={4}
-                key={loan.id}
-              >
+              <Grid item xs={12} sm={6} md={4} key={loan.id}>
                 <LoanCard
                   loan={loan}
                   onClick={() => navigate(`/loans/${loan.id}`)}

@@ -1,56 +1,57 @@
-import React, { useEffect, useState } from "react";
+import React, { FC } from "react";
+import { AppDispatch, RootState } from "../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import useTheme from "@mui/material/styles/useTheme";
 import {
-  Container,
-  Paper,
-  Typography,
-  Pagination,
   Box,
+  Button,
+  Container,
   FormControl,
   InputLabel,
-  Select,
   MenuItem,
+  Pagination,
+  Paper,
+  Select,
   SelectChangeEvent,
-  Button,
   Stack,
-  useTheme,
+  Typography,
   useMediaQuery,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../store/store";
-import { getAllLoans, setPage } from "../../store/features/admin/adminLoanSlice";
-import Loans from "../components/Loans/LoansDashboard/LoansDashboard";
-import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
-import { useNavigate } from "react-router-dom";
 import { StatusGeneric } from "../../common/indexTypes";
+import {
+  getAllDeposits,
+  setPage,
+} from "../../store/features/admin/adminDepositsSlice";
+import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
+import DepositsDashboard from "../components/Deposits/DepositsDashboard/DepositsDashboard";
 
-export const LoansPage: React.FC = () => {
+const DepositsPage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const theme = useTheme();
 
-  // נקודת שבירה למובייל
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const [filter, setFilter] = useState<StatusGeneric>(StatusGeneric.ACTIVE);
-  const { allLoans, page, pageCount, status, total } = useSelector(
-    (s: RootState) => s.AdminLoansSlice
+  const [filter, setFilter] = React.useState<StatusGeneric>(
+    StatusGeneric.ACTIVE
   );
+  const { allDeposits, page, pageCount, total } =
+    useSelector((s: RootState) => s.AdminDepositsSlice);
   const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
   const limit = 20;
-
-  useEffect(() => {
+  React.useEffect(() => {
     if (selectedUser?.id) {
-      dispatch(getAllLoans({ page, limit, status: filter, userId: selectedUser.id }));
+      dispatch(
+        getAllDeposits({ page, limit, status: filter, userId: selectedUser.id })
+      );
     } else {
-      dispatch(getAllLoans({ page, limit, status: filter }));
+      dispatch(getAllDeposits({ page, limit, status: filter }));
     }
   }, [dispatch, page, filter, selectedUser]);
-
   const handleFilterChange = (e: SelectChangeEvent) => {
     setFilter(e.target.value as StatusGeneric);
     dispatch(setPage(1));
   };
-
   return (
     <Box sx={{ bgcolor: "#F8F8F8", minHeight: "100vh", py: 4 }}>
       <Container maxWidth="lg">
@@ -63,7 +64,7 @@ export const LoansPage: React.FC = () => {
             borderRadius: 2,
             bgcolor: "#FFFFFF",
             width: {
-              xs: "100%",  
+              xs: "100%",
               sm: "90%",
               md: "60%",
               lg: "40%",
@@ -85,11 +86,11 @@ export const LoansPage: React.FC = () => {
               <img
                 width={48}
                 height={48}
-                src="https://img.icons8.com/color/48/loan.png"
+                src="https://img.icons8.com/office/40/safe-in.png"
                 alt="loan"
               />
               <Typography variant="h5" fontWeight={600} textAlign="center">
-                ניהול הלוואות
+                ניהול הפקדות
               </Typography>
             </Box>
 
@@ -105,7 +106,7 @@ export const LoansPage: React.FC = () => {
             >
               <Button
                 variant="contained"
-                onClick={() => navigate("/loans/new")}
+                // onClick={() => navigate("/loans/new")}
                 fullWidth={isSm}
                 sx={{
                   bgcolor: "#2a8c82",
@@ -113,7 +114,7 @@ export const LoansPage: React.FC = () => {
                   "&:hover": { bgcolor: "#1f645f" },
                 }}
               >
-                הוסף הלוואה
+                הוסף הפקדה
               </Button>
 
               <FormControl
@@ -131,13 +132,13 @@ export const LoansPage: React.FC = () => {
                     "&.Mui-focused": { color: "#2a8c82" },
                   }}
                 >
-                  מצב הלוואה
+                  מצב הפקדות
                 </InputLabel>
                 <Select
                   labelId="filter-status-label"
                   value={filter}
                   label="מצב הלוואה"
-                  onChange={handleFilterChange}
+                    onChange={handleFilterChange}
                   sx={{
                     borderRadius: 1,
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -175,9 +176,7 @@ export const LoansPage: React.FC = () => {
               bgcolor: "#FFFFFF",
               overflowX: "auto",
             }}
-          >
-            <Loans loansData={allLoans} total={total} />
-          </Box>
+          ></Box>
         )}
 
         {/* PAGINATION */}
@@ -209,9 +208,9 @@ export const LoansPage: React.FC = () => {
           </Box>
         )}
       </Container>
+      <DepositsDashboard depositsData={allDeposits} total={total} />
     </Box>
   );
 };
 
-
-export default LoansPage;
+export default DepositsPage;

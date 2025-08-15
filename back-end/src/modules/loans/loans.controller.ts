@@ -3,7 +3,7 @@ import { LoansService } from './loans.service';
 import { LoanEntity } from './Entity/loans.entity';
 import { LoanActionEntity } from './loan-actions/Entity/loan_actions.entity';
 import { log } from 'console';
-import { FindLoansOpts } from 'src/common';
+import { FindOpts } from 'src/common';
 export enum LoanStatus {
   ALL = 'all',
   ACTIVE = 'active',
@@ -52,7 +52,7 @@ export class LoansController {
     //     throw new BadRequestException('userId חייב להיות מספר תקין');
     //   }
     // }
-    const opts: FindLoansOpts = { page, limit };
+    const opts: FindOpts = { page, limit };
     if (status !== LoanStatus.ALL) {
       opts.status = status;
     }

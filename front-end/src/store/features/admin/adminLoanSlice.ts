@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
-import { FindLoansOpts, PaginatedResult } from "../../../common/indexTypes";
+import { FindOptionsGeneric, PaginatedResult } from "../../../common/indexTypes";
 import { ICreateLoan, ICreateLoanAction, ILoanAction, ILoanCheckResponse, ILoanWithPayment, ILoanWithUser } from "../../../Admin/components/Loans/LoanDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
 
@@ -45,7 +45,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const getAllLoans = createAsyncThunk<
   PaginatedResult<ILoanWithUser>,
-  FindLoansOpts
+  FindOptionsGeneric
 >("admin/getAllLoans", async (opts) => {
 
   const response = await axios.get<PaginatedResult<ILoanWithUser>>(

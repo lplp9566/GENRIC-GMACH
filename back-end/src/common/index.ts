@@ -1,4 +1,4 @@
-export  interface FindLoansOpts {
+export  interface FindOpts {
   page: number;
   limit: number;
   status?:LoanStatus;

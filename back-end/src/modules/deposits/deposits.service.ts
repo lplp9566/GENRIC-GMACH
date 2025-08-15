@@ -8,6 +8,7 @@ import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { getYearFromDate } from '../../services/services';
 import { DepositsEntity } from './Entity/deposits.entity';
+import { FindOpts, LoanStatus, PaginatedResult } from '../../common/index';
 
 
 @Injectable()
@@ -21,8 +22,38 @@ export class DepositsService {
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly fundsOverviewServiceByYear: FundsOverviewByYearService,
   ) {}
-  async getDeposits() {
-    return await this.depositsRepo.find();
+  async getDeposits(opts:FindOpts):Promise<PaginatedResult<DepositsEntity>> {
+    const page = opts.page > 0 ? opts.page : 1;
+    const limit = opts.limit > 0 ? Math.min(opts.limit, 100) : 50;
+
+    // בניית ה־where הדינמי
+    const where: any = {};
+
+    // סינון לפי סטטוס
+    if (opts.status === LoanStatus.ACTIVE) {
+      where.isActive = true;
+    } else if (opts.status === LoanStatus.INACTIVE) {
+      where.isActive = false;
+    }
+
+    if (opts.userId) {
+      where.user = { id: opts.userId };
+    }
+
+    try {
+      const [data, total] = await this.depositsRepo.findAndCount({
+        where,
+        relations: ['user'],
+        skip: (page - 1) * limit,
+        take: limit,
+        order: { start_date: 'DESC' },
+      });
+
+      const pageCount = Math.ceil(total / limit);
+      return { data, total, page, pageCount };
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
   async getDepositsActive() {
     return await this.depositsRepo.find({ where: { isActive: true } });

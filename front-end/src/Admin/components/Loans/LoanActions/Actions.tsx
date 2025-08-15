@@ -22,17 +22,12 @@ interface ActionsProps {
   max : number
 }
 
-type ActionMode =
-  | LoanPaymentActionType.PAYMENT
-  | LoanPaymentActionType.AMOUNT_CHANGE
-  | LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE
-  | LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE;
 
 export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit,max}) => {
-  const [mode, setMode] = useState<ActionMode>(LoanPaymentActionType.PAYMENT);
+  const [mode, setMode] = useState<LoanPaymentActionType>(LoanPaymentActionType.PAYMENT);
 
   const handleModeChange = (e: SelectChangeEvent) =>
-    setMode(e.target.value as ActionMode);
+    setMode(e.target.value as LoanPaymentActionType);
   return (
     <Box dir="rtl">
       <Paper elevation={2} sx={{ p: 2, borderRadius: 2, backgroundColor: "#FEFEFE"}}>
