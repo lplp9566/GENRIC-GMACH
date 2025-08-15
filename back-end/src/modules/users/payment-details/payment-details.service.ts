@@ -2,8 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PaymentDetailsEntity } from './payment_details.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { log } from 'console';
-import { c } from 'vite/dist/node/moduleRunnerTransport.d-CXw_Ws6P';
 
 @Injectable()
 export class PaymentDetailsService {
