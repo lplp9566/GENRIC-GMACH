@@ -43,7 +43,7 @@ const DepositAmountChange:FC<IDepositAmountChangeProps> = ({depositId}) => {
           type="date"
           value={date}
           onChange={(e) => {
-            if (new Date(e.target.value) < new Date()) {
+            if (new Date(e.target.value) < ne()) {
                toast.error("נא להזין תאריך עתידי");
               return;
             }

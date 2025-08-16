@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 import DepositAmountChange from "./DepositAmountChange";
 import DepositDateChange from "./DepositDateChange";
+import DepositAmountRemove from "./DepositAmountRemove";
+import { RtlProvider } from "../../../../Theme/rtl";
 interface IDepositsActionsProps {
   depositId: number;
   max: number;
@@ -23,16 +25,17 @@ const DepositsActions: FC<IDepositsActionsProps> = ({ depositId, max }) => {
   const handleModeChange = (e: SelectChangeEvent) => {
     setMode(e.target.value as DepositActionsType);
   };
-  console.log(max);
 
   return (
     <Box dir="rtl">
+            <RtlProvider>
+      
       <Paper
         elevation={2}
         sx={{ p: 2, borderRadius: 2, backgroundColor: "#FEFEFE" }}
       >
         <Typography variant="h6" sx={{ textAlign: "center", paddingBottom: 2 }}>
-          פעולות להלוואה
+          פעולות על הפקדה
         </Typography>
         <FormControl fullWidth size="small">
           <InputLabel id="action-select-label">בחר פעולה</InputLabel>
@@ -61,10 +64,11 @@ const DepositsActions: FC<IDepositsActionsProps> = ({ depositId, max }) => {
         {mode === DepositActionsType.ChangeReturnDate && (
           <DepositDateChange depositId={depositId} />
         )}
-        {/* {mode === LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE && (
-          <MonthlyPaymentChangeLoanForm loanId={loanId} onSubmit={handleSubmit} />
-        )} */}
+        {mode === DepositActionsType.RemoveFromDeposit && (
+          <DepositAmountRemove depositId={depositId} max={max} />
+        )}
       </Paper>
+    </RtlProvider>
     </Box>
   );
 };

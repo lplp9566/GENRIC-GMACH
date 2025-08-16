@@ -7,6 +7,7 @@ import DepositActionTable from "./DepositActionTable";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { getDepositActions } from "../../../../store/features/admin/adminDepositsSlice";
 import DepositsActions from "../DepositsAction/DepositsActions";
+import DepositDetailsInfoCard from "./DepositDetailsInfoCard";
 
 const DepositDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -64,9 +65,9 @@ const DepositDetailsPage = () => {
         alignItems="flex-start"
         sx={{ mt: 3 }}
       >
-        {/* <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "40%" } }}>
-          <GeneralLoanInfoCard loan={loanDetails} />
-        </Grid> */}
+        <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "40%" } }}>
+          <DepositDetailsInfoCard deposit={deposit!} />
+        </Grid>
 
           <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "20%" } }}>
             <DepositsActions
