@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { DepositActionsType } from "../depositsDto";
+import { DepositActionsType, IDepositActionCreate } from "../depositsDto";
 import {
   Box,
   FormControl,
@@ -17,8 +17,9 @@ import { RtlProvider } from "../../../../Theme/rtl";
 interface IDepositsActionsProps {
   depositId: number;
   max: number;
+  handleSubmit?: (dto: IDepositActionCreate) => Promise<void>;
 }
-const DepositsActions: FC<IDepositsActionsProps> = ({ depositId, max }) => {
+const DepositsActions: FC<IDepositsActionsProps> = ({ depositId, max, handleSubmit }) => {
   const [mode, setMode] = useState<DepositActionsType>(
     DepositActionsType.AddToDeposit
   );
@@ -59,13 +60,13 @@ const DepositsActions: FC<IDepositsActionsProps> = ({ depositId, max }) => {
         </FormControl>
 
         {mode === DepositActionsType.AddToDeposit && (
-          <DepositAmountChange depositId={depositId} />
+          <DepositAmountChange depositId={depositId}  handleSubmit={handleSubmit} />
         )}
         {mode === DepositActionsType.ChangeReturnDate && (
-          <DepositDateChange depositId={depositId} />
+          <DepositDateChange depositId={depositId} handleSubmit={handleSubmit} />
         )}
         {mode === DepositActionsType.RemoveFromDeposit && (
-          <DepositAmountRemove depositId={depositId} max={max} />
+          <DepositAmountRemove depositId={depositId} max={max} handleSubmit={handleSubmit}  />
         )}
       </Paper>
     </RtlProvider>

@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, DefaultValuePipe, Get, ParseEnumPipe, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, DefaultValuePipe, Get, Param, ParseEnumPipe, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { DepositsService } from './deposits.service';
 import { DepositsEntity } from './Entity/deposits.entity';
 import { LoanStatus as StatusCordi } from 'src/common';
@@ -44,7 +44,7 @@ export class DepositsController {
         return await this.depositsService.getDepositsActive();
       }
       @Get(':id')
-      async getDepositById(id: number) {
+      async getDepositById(@Param('id', ParseIntPipe) id: number) {
         return await this.depositsService.getDepositById(id);
       }
       @Post()

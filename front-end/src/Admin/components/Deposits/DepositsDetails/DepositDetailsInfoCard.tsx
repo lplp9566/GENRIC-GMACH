@@ -5,6 +5,8 @@ interface DepositDetailsInfoCardProps {
     deposit :IDeposit
 }
 const DepositDetailsInfoCard: React.FC<DepositDetailsInfoCardProps> = ({ deposit }) => {
+  console.log("DepositDetailsInfoCard", deposit);
+  
     const items =[
         {
       label: "סכום הפקדה ראשוני",

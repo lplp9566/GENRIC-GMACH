@@ -258,4 +258,16 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
+  async increaseUserDepositsTotal(amount: number) {
+    try {
+      const fund = await this.getFundsOverviewRecord();
+      fund.own_equity += amount;
+      fund.available_funds += amount;
+      fund.total_user_deposits += amount;
+      await this.fundsOverviewRepository.save(fund);
+      return fund;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
 }

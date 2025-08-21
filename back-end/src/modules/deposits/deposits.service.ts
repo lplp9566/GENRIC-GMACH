@@ -118,4 +118,19 @@ export class DepositsService {
       throw new BadRequestException(error.message);
     }
   } 
+  async addToDeposit(deposit: DepositsEntity, amount: number, date: Date) {
+    try {
+      deposit.current_balance += amount;
+      await this.fundsOverviewService.increaseUserDepositsTotal(amount);
+      const year = getYearFromDate(date);
+      const user = deposit.user;
+      await this.fundsOverviewServiceByYear.recordFixedDepositAdded(year,amount);
+      await this.userFinancialByYearService.recordFixedDepositAdded(user, year, amount);
+      await this.userFinancialService.recordFixedDepositAdded(user, amount);
+       await this.depositsRepo.save(deposit);
+       return this.getDepositsActive();
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
 }

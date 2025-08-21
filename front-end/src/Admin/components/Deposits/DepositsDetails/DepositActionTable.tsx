@@ -1,6 +1,6 @@
-import  { FC, useMemo, useState } from 'react';
-import { Chip, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import { DepositActionsType, IDepositAction } from '../depositsDto';
+import React, { FC, useMemo, useState } from "react";
+import { Chip, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { DepositActionsType, IDepositAction } from "../depositsDto";
 
 type SortField = "date" | "action_type" | "result";
 type SortDirection = "asc" | "desc";
@@ -27,7 +27,7 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
 
   const handleHeaderClick = (field: SortField) => {
     if (field === currentSortField) {
-      setCurrentSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+      setCurrentSortDirection((dir) => (dir === "asc" ? "desc" : "asc"));
     } else {
       setCurrentSortField(field);
       setCurrentSortDirection("asc");
@@ -40,7 +40,6 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
     const copy = [...actions];
 
     copy.sort((a, b) => {
-      // תמיכה גם במקרה שיש לך camelCase במודל פרונט
       const typeA = (a as any).action_type ?? (a as any).actionType;
       const typeB = (b as any).action_type ?? (b as any).actionType;
 
@@ -50,7 +49,6 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
       } else if (currentSortField === "action_type") {
         cmp = (orderMap.get(typeA) ?? 0) - (orderMap.get(typeB) ?? 0);
       } else {
-        // "result" = לפי סכום
         cmp = (a.amount ?? 0) - (b.amount ?? 0);
       }
       return cmp * dir;
@@ -112,8 +110,13 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
                     />
                   </TableCell>
                   <TableCell align="left" sx={{ fontWeight: 600, color: "#007BFF" }}>
+                    {type === DepositActionsType.ChangeReturnDate
+                      && action.update_date
+                      ? `${new Date(action.update_date).toLocaleDateString("he-IL")}`
+                      : null
+                    }
                     {type !== DepositActionsType.ChangeReturnDate && "₪"}
-                    {action.amount.toLocaleString()}
+                    {action.amount}
                   </TableCell>
                 </TableRow>
               );

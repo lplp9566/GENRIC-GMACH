@@ -24,6 +24,7 @@ export class DepositsActionsService {
   }
   async createDepositAction(depositAction: IDepositAction) {
     try {
+      console.log(depositAction)
       if (!depositAction) {
         throw new Error('DepositAction not found');
       }  
@@ -46,7 +47,7 @@ export class DepositsActionsService {
             date:depositAction.date,
             update_date:depositAction.update_date
           });
-  
+          console.log(newAction,"new")
            await this.depositsActionsRepo.save(newAction);
            return this.depositsService.getDepositsActive();
            break
@@ -68,8 +69,26 @@ export class DepositsActionsService {
            await this.depositsActionsRepo.save(newAction2);
            return this.depositsService.getDepositsActive(); 
            break
+        case DepositActionsType.AddToDeposit:
+          if (!depositAction.amount) throw new Error('Amount not found');
+          await this.depositsService.addToDeposit(
+            deposit,
+            depositAction.amount,
+            depositAction.date,
+          );
+          const newAction3 = this.depositsActionsRepo.create({
+            deposit:deposit,
+            action_type:depositAction.action_type,
+            amount:depositAction.amount,
+            date:depositAction.date
+          });
+  
+           await this.depositsActionsRepo.save(newAction3);
+           return this.depositsService.getDepositsActive(); 
+           break  
           
       }
+
     } catch (error) {
       throw new BadRequestException(error.message);
     }

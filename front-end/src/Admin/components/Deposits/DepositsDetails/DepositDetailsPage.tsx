@@ -1,29 +1,46 @@
 import { Box, Button, Divider, Grid } from "@mui/material";
-import  { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { AppDispatch, RootState } from "../../../../store/store";
-import DepositActionTable from "./DepositActionTable";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { getDepositActions } from "../../../../store/features/admin/adminDepositsSlice";
+import { AppDispatch, RootState } from "../../../../store/store";
+import {
+  createDepositAction,
+  getDepositActions,
+  getDepositDetails,
+} from "../../../../store/features/admin/adminDepositsSlice";
+import DepositActionTable from "./DepositActionTable";
 import DepositsActions from "../DepositsAction/DepositsActions";
 import DepositDetailsInfoCard from "./DepositDetailsInfoCard";
+import { IDepositActionCreate } from "../depositsDto";
 
 const DepositDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
+  const depositId = Number(id);
+  console.log(depositId, "DepositDetailsPage");
+
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-    const depositId = Number(id);
-    const deposit = useSelector((s: RootState) =>
-      s.AdminDepositsSlice.allDeposits?.find((d) => d.id === depositId)
-    );
-    const depositDetails = useSelector(
-      (s: RootState) => s.AdminDepositsSlice.depositActions
-    );
-    useEffect(() => {
-      if (depositId) dispatch(getDepositActions(depositId));
-    }, [dispatch, depositId]);
-    console.log(depositId);
+
+  const actions = useSelector((s: RootState) => s.AdminDepositsSlice.depositActions);
+  const deposit = useSelector((s: RootState) => s.AdminDepositsSlice.currentDeposit);
+
+  // טעינה ראשונית
+  useEffect(() => {
+    if (!Number.isNaN(depositId)) {
+      dispatch(getDepositActions(depositId));
+      dispatch(getDepositDetails(depositId));
+    }
+  }, [dispatch, depositId]);
+
+  // שליחת פעולה ורענון (ה-thunk כבר עושה refetch לשניהם)
+  const handleSubmit = useCallback(
+    async (dto: IDepositActionCreate) => {
+      await dispatch(createDepositAction(dto)).unwrap();
+    },
+    [dispatch]
+  );
+
   return (
     <Box
       sx={{
@@ -46,17 +63,11 @@ const DepositDetailsPage = () => {
           "&:hover": { backgroundColor: "rgba(0,0,0,.04)" },
         }}
       >
-        חזור לדף הלוואות
+        חזור לדף ההפקדות
       </Button>
-      {/* <LoanHeader
-        firstName={loan.user.first_name}
-        lastName={loan.user.last_name}
-        principal={principal}
-        remaining={remaining}
-        balance={balance}
-        purpose={loan.purpose}
-      /> */}
+
       <Divider />
+
       <Grid
         container
         spacing={4}
@@ -66,19 +77,19 @@ const DepositDetailsPage = () => {
         sx={{ mt: 3 }}
       >
         <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "40%" } }}>
-          <DepositDetailsInfoCard deposit={deposit!} />
+          {deposit && <DepositDetailsInfoCard deposit={deposit} />}
         </Grid>
 
-          <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "20%" } }}>
-            <DepositsActions
-          depositId={depositId}
-          max={deposit?.current_balance ?? 0}
-            />
-          </Grid>
-        
+        <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "20%" } }}>
+          <DepositsActions
+            depositId={depositId}
+            max={deposit?.current_balance ?? 0}
+            handleSubmit={handleSubmit}
+          />
+        </Grid>
 
         <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "30%" } }}>
-          <DepositActionTable actions={depositDetails ?? []} />
+          <DepositActionTable actions={actions ?? []} />
         </Grid>
       </Grid>
     </Box>

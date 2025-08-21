@@ -29,7 +29,7 @@ export interface IDepositAction {
 }
 export interface IDepositActionCreate {
     deposit: number;
-    actionType: DepositActionsType;
+    action_type: DepositActionsType;
     amount?: number;
     date: string;
     update_date?: string | null;

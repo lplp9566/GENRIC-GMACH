@@ -1,19 +1,36 @@
 import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
+import { DepositActionsType, IDepositActionCreate } from "../depositsDto";
+import { toast } from "react-toastify";
 
 interface DepositDateChangeProps {
-  depositId?: number;
+  depositId: number;
+  handleSubmit?: (dto: IDepositActionCreate) => Promise<void>;
 }
-const DepositDateChange: React.FC<DepositDateChangeProps> = ({ depositId }) => {
+const DepositDateChange: React.FC<DepositDateChangeProps> = ({
+  depositId,
+  handleSubmit,
+}) => {
   const [date, setDate] = useState<string>("");
   const [updateDate, setUpdateDate] = useState<string>("");
   const isValid = date !== "" && updateDate !== "";
-  const handle = () => {
+  const handle = async () => {
     if (!isValid) return;
+    const dto: IDepositActionCreate = {
+      deposit: depositId,
+      action_type: DepositActionsType.ChangeReturnDate,
+      date,
+      update_date: updateDate,
+    };
+    try {
+      await handleSubmit?.(dto);
+      toast.success("הפעולה נשמרה בהצלחה");
+      setDate("");
+      setUpdateDate("");
+    } catch (err: any) {
+      toast.error(err?.message ?? "אירעה שגיאה בשמירת הפעולה");
+    }
     // Here you would typically dispatch an action or call an API to update the deposit date
-    console.log("Updating deposit date:", { depositId, date, updateDate });
-    setDate("");
-    setUpdateDate("");
   };
   return (
     <Box
@@ -51,8 +68,7 @@ const DepositDateChange: React.FC<DepositDateChangeProps> = ({ depositId }) => {
         InputLabelProps={{ shrink: true }}
         onChange={(e) => {
           setUpdateDate(e.target.value);
-          }
-        }
+        }}
         size="small"
         // sx={{ minWidth: 120 }}
       />
