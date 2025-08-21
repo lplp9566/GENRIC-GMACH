@@ -10,6 +10,8 @@ import { FundsOverviewModule } from '../funds-overview/funds-overview.module';
 import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overview-by-year.module';
 import { DepositsEntity } from './Entity/deposits.entity';
 import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates.module';
+import { DepositsFlowService } from './DepositsFlow.service';
+import { LoansModule } from '../loans/loans.module';
 
 
 
@@ -17,6 +19,7 @@ import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates
   imports: [
     TypeOrmModule.forFeature([DepositsEntity,DepositsActionsEntity]),
     forwardRef(() => UsersModule),
+    forwardRef(() => LoansModule),
     UserFinancialByYearModule,
     UserFinancialsModule,
     FundsOverviewModule,
@@ -24,7 +27,7 @@ import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates
     RoleMonthlyRatesModule
   ],
   controllers: [DepositsController],
-  providers: [DepositsService],
-  exports: [DepositsService],
+  providers: [DepositsService, DepositsFlowService],
+  exports: [DepositsService, DepositsFlowService],
 })
 export class DepositsModule {}

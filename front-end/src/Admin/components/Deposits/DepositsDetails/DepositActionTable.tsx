@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from "react";
+import  { FC, useMemo, useState } from "react";
 import { Chip, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { DepositActionsType, IDepositAction } from "../depositsDto";
 

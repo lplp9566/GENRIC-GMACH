@@ -2,12 +2,16 @@ import { BadRequestException, Body, Controller, DefaultValuePipe, Get, Param, Pa
 import { DepositsService } from './deposits.service';
 import { DepositsEntity } from './Entity/deposits.entity';
 import { LoanStatus as StatusCordi } from 'src/common';
+import { DepositsFlowService } from './DepositsFlow.service';
 
-
+export interface BringForwardDto {
+  newReturnDate: string; 
+}
 @Controller('deposits')
 export class DepositsController {
     constructor(
- private readonly depositsService: DepositsService
+ private readonly depositsService: DepositsService,
+ private readonly depositsFlowService: DepositsFlowService,
     ) {}
     @Get()
     async getDeposits(
@@ -51,4 +55,15 @@ export class DepositsController {
       async createDeposit(@Body() deposit: DepositsEntity) {
         return await this.depositsService.createDeposit(deposit);
       }
+     @Post(':id/bring-forward/check')
+  async bringForwardCheck(
+    @Param('id') id: number,
+    @Body() dto: BringForwardDto,
+  ) {
+    const date = new Date(dto.newReturnDate);
+    if (Number.isNaN(date.getTime())) {
+      throw new BadRequestException('תאריך לא תקין');
+    }
+    return this.depositsFlowService.canBringDepositForwardFull(id, date);
+  }
 }
