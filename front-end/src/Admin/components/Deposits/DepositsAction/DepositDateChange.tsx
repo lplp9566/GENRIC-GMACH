@@ -2,6 +2,9 @@ import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
 import { DepositActionsType, IDepositActionCreate } from "../depositsDto";
 import { toast } from "react-toastify";
+import BringForwardModal from "./DepositCheckModal";
+import { RootState } from "../../../../store/store";
+import { useSelector } from "react-redux";
 
 interface DepositDateChangeProps {
   depositId: number;
@@ -12,9 +15,22 @@ const DepositDateChange: React.FC<DepositDateChangeProps> = ({
   handleSubmit,
 }) => {
   const [date, setDate] = useState<string>("");
+  const [isModalOpen ,setIsModalOpen]= useState<boolean>(false)
   const [updateDate, setUpdateDate] = useState<string>("");
   const isValid = date !== "" && updateDate !== "";
-  const handle = async () => {
+    const deposit = useSelector((s: RootState) => s.AdminDepositsSlice.currentDeposit);
+
+  const handle = async()=>{
+    if(!isValid) return;
+    if(new Date(updateDate)> new Date(deposit?.end_date ||"") ){
+    
+    approve()
+    return  
+
+    }
+    setIsModalOpen(true)
+  }
+  const approve = async () => {
     if (!isValid) return;
     const dto: IDepositActionCreate = {
       deposit: depositId,
@@ -23,16 +39,26 @@ const DepositDateChange: React.FC<DepositDateChangeProps> = ({
       update_date: updateDate,
     };
     try {
-      await handleSubmit?.(dto);
-      toast.success("הפעולה נשמרה בהצלחה");
-      setDate("");
-      setUpdateDate("");
+      if (!handleSubmit) throw new Error("לא הוגדרה פונקציית שליחה");
+      await toast.promise(
+        handleSubmit(dto),
+        {
+          pending: "שולח...",
+          success: `התאריך עודכן בהצלחה ל ${new Date(updateDate).toLocaleDateString("he-IL")}`,
+          error: "אירעה שגיאה בשמירת הפעולה",
+        }
+      )
+      setDate("")
+      setUpdateDate("")
     } catch (err: any) {
       toast.error(err?.message ?? "אירעה שגיאה בשמירת הפעולה");
     }
     // Here you would typically dispatch an action or call an API to update the deposit date
   };
   return (
+<Box>
+  {isModalOpen&& <BringForwardModal depositId={depositId} handleSubmit={approve} newReturnDate={updateDate} onClose={()=>setIsModalOpen(false)} open/> }
+
     <Box
       component="form"
       noValidate
@@ -61,7 +87,7 @@ const DepositDateChange: React.FC<DepositDateChangeProps> = ({
         InputLabelProps={{ shrink: true }}
       />
       <TextField
-        label="יום החיוב בחודש "
+        label="התאריך החדש"
         value={updateDate}
         fullWidth
         type="date"
@@ -81,6 +107,7 @@ const DepositDateChange: React.FC<DepositDateChangeProps> = ({
       >
         שלח
       </Button>
+    </Box>
     </Box>
   );
 };

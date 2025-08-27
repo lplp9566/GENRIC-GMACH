@@ -8,7 +8,10 @@ interface IDepositAmountChangeProps {
   handleSubmit?: (dto: IDepositActionCreate) => Promise<void>;
 }
 
-const DepositAmountChange: FC<IDepositAmountChangeProps> = ({ depositId, handleSubmit }) => {
+const DepositAmountChange: FC<IDepositAmountChangeProps> = ({
+  depositId,
+  handleSubmit,
+}) => {
   const [amountStr, setAmountStr] = useState<string>("");
   const [date, setDate] = useState<string>("");
 
@@ -27,10 +30,14 @@ const DepositAmountChange: FC<IDepositAmountChangeProps> = ({ depositId, handleS
     };
 
     try {
-      await handleSubmit?.(dto);
-      toast.success("הפעולה נשמרה בהצלחה");
+      if (!handleSubmit) throw new Error("לא הוגדרה פונקציית שליחה");
       setAmountStr("");
       setDate("");
+      await toast.promise(handleSubmit(dto), {
+        pending: "שולח...",
+        success: `הסכום ${amountNum} ש"ח נוסף בהצלחה להפקדה`,
+        error: "אירעה שגיאה בשמירת הפעולה",
+      });
     } catch (err: any) {
       toast.error(err?.message ?? "אירעה שגיאה בשמירת הפעולה");
     }
@@ -41,7 +48,13 @@ const DepositAmountChange: FC<IDepositAmountChangeProps> = ({ depositId, handleS
       component="form"
       noValidate
       autoComplete="off"
-      sx={{ mt: 2, display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap" }}
+      sx={{
+        mt: 2,
+        display: "flex",
+        gap: 2,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit();
@@ -63,7 +76,6 @@ const DepositAmountChange: FC<IDepositAmountChangeProps> = ({ depositId, handleS
 
       <TextField
         label="סכום"
-        type="number"
         inputMode="numeric"
         value={amountStr}
         onChange={(e) => setAmountStr(e.target.value)}
@@ -72,7 +84,12 @@ const DepositAmountChange: FC<IDepositAmountChangeProps> = ({ depositId, handleS
         inputProps={{ min: 1 }}
       />
 
-      <Button type="submit" variant="contained" disabled={!isValid} sx={{ bgcolor: isValid ? "green" : "grey.500" }}>
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={!isValid}
+        sx={{ bgcolor: isValid ? "green" : "grey.500" }}
+      >
         עדכן
       </Button>
     </Box>

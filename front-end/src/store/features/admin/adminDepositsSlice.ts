@@ -15,6 +15,12 @@ interface AdminDepositType {
   currentDeposit: IDeposit | null;        // ← נשמר כאן הפיקדון הנוכחי
   depositActions: IDepositAction[];
   allDepositsStatus: Status;
+  depositCheckStatus: Status; 
+  depositCheck:{
+    ok: boolean;
+    error?: string;
+  }
+  // ← סטטוס לבדוק אם הפיקדון פעיל
   createDepositStatus: Status;
   depositActionsStatus: Status;
   createDepositActionStatus: Status;
@@ -28,10 +34,15 @@ const initialState: AdminDepositType = {
   allDeposits: [],
   currentDeposit: null,
   depositActions: [],
+  depositCheckStatus: "idle",
   allDepositsStatus: "idle",
   createDepositStatus: "idle",
   depositActionsStatus: "idle",
   createDepositActionStatus: "idle",
+  depositCheck: {
+    ok: false,
+    error: undefined,
+  },
   error: null,
   pageCount: 1,
   page: 1,
@@ -79,6 +90,21 @@ export const createDeposit = createAsyncThunk(
   async (deposit: ICreateDeposits) => {
     const { data } = await axios.post<IDeposit>(`${BASE_URL}/deposits`, deposit);
     return data;
+  }
+);
+
+export const bringForwardCheck = createAsyncThunk(
+  "admin/bringForwardCheck",
+  async (dto: { depositId: number; newReturnDate: string }, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.post<{ ok: boolean; error?: string }>(
+        `${BASE_URL}/deposits/${dto.depositId}/bring-forward/check`,
+        { newReturnDate: dto.newReturnDate }
+      );
+      return data;
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data ?? err?.message ?? "Request failed");
+    }
   }
 );
 
@@ -142,6 +168,17 @@ export const AdminDepositsSlice = createSlice({
       .addCase(createDeposit.rejected, (state, action) => {
         state.createDepositStatus = "rejected";
         state.error = action.error.message || "Failed to create deposit";
+      })
+      .addCase(bringForwardCheck.pending, (state) => {
+        state.depositCheckStatus = "pending";
+      })
+      .addCase(bringForwardCheck.fulfilled, (state, action) => {    
+        state.depositCheckStatus = "fulfilled";
+        state.depositCheck = action.payload;
+      })
+      .addCase(bringForwardCheck.rejected, (state, action) => {
+        state.depositCheckStatus = "rejected";
+        state.error = action.error.message || "Failed to check deposit";
       })
 
       // actions

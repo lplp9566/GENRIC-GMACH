@@ -8,12 +8,15 @@ import {
   Chip,
 } from "@mui/material";
 import { ILoanWithPayment } from "../LoanDto";
+import { fmtDate } from "../../../../common/genricFunction";
 
 interface Props {
   loan: ILoanWithPayment;
 }
 
 export const GeneralLoanInfoCard: React.FC<Props> = ({ loan }) => {
+
+
   const items = [
     {
       label: "סכום הלוואה ראשוני",
@@ -25,7 +28,7 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan }) => {
       value: `₪${loan.loan_amount.toLocaleString()}`,
       color: "#007BFF",
     },
-    { label: "תאריך הלוואה", value: loan.loan_date, color: "text.primary" },
+    { label: "תאריך הלוואה", value: fmtDate(loan.loan_date), color: "text.primary" },
     { label: "מטרה", value: loan.purpose, color: "text.primary" },
     {
       label: "תשלום חודשי",

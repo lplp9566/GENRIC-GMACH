@@ -1,6 +1,7 @@
 // src/components/Loans/StepSummary.tsx
 import React from "react";
 import { Card, Typography, Stack } from "@mui/material";
+import { fmtDate } from "../../../../common/genricFunction";
 
 interface StepSummaryProps {
   newLoan: {
@@ -44,7 +45,7 @@ const StepSummary: React.FC<StepSummaryProps> = ({
         <strong>מטרה:</strong> {newLoan.purpose}
       </Typography>
       <Typography>
-        <strong>תאריך:</strong> {newLoan.loan_date}
+        <strong>תאריך:</strong> {fmtDate(newLoan.loan_date)}
       </Typography>
       <Typography>
         <strong>תשלום חודשי:</strong> ₪{newLoan.monthly_payment}

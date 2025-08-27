@@ -2,6 +2,8 @@ import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { DepositActionsType, IDepositActionCreate } from "../depositsDto";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../store/store";
 
 interface DepositAmountRemoveProps {
   depositId: number;
@@ -15,6 +17,7 @@ const DepositAmountRemove: React.FC<DepositAmountRemoveProps> = ({
 }) => {
   const [amountToRemove, setAmountToRemove] = useState<number | "">("");
   const [date, setDate] = useState<string>("");
+  const  amont = useSelector((s: RootState) => s.AdminFundsOverviewReducer.fundsOverview?.available_funds)
   const isValid = amountToRemove !== "" && date !== "";
   const handle = async () => {
     if (!isValid) return;
@@ -22,6 +25,11 @@ const DepositAmountRemove: React.FC<DepositAmountRemoveProps> = ({
       toast.error("הסכום להחזרה לא יכול להיות גדול מהסכום הכולל של ההפקדה");
       return;
     }
+    if (amountToRemove > amont!) {
+      toast.error(`אתה מבקש להוציא ${amountToRemove} ש"ח, בעוד שבקרן יש ${amont} ש"ח בלבד`);
+      return;
+    }
+    
     const dto: IDepositActionCreate = {
       deposit: depositId,
       action_type: DepositActionsType.RemoveFromDeposit,
@@ -30,10 +38,18 @@ const DepositAmountRemove: React.FC<DepositAmountRemoveProps> = ({
       update_date: null,
     };
     try {
-      await handleSubmit?.(dto);
-      setAmountToRemove("");
+            if (!handleSubmit) throw new Error("לא הוגדרה פונקציית שליחה");
+                  setAmountToRemove("");
       setDate("");
-      toast.success("הפעולה נשמרה בהצלחה");
+          await toast.promise(
+        handleSubmit(dto),
+        {
+          pending: "שולח...",
+          success: `הסכום ${amountToRemove} ש"ח הוחזר בהצלחה`,
+          error: "אירעה שגיאה בשמירת הפעולה",
+        }
+      )
+
     } catch (err: any) {
       toast.error(err?.message ?? "אירעה שגיאה בשמירת הפעולה");
     }

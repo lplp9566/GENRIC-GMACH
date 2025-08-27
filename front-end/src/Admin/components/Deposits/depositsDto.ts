@@ -12,8 +12,8 @@ export interface IDeposit {
 export interface ICreateDeposits{
     user: number;
     initialDeposit: number;
-    startDate: string;
-    endDate: string;
+    start_date: string;
+    end_date: string;
 }
 export enum DepositActionsType{
     AddToDeposit = 'AddToDeposit',

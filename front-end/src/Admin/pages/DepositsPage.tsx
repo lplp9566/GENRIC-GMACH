@@ -24,6 +24,8 @@ import {
 } from "../../store/features/admin/adminDepositsSlice";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
 import DepositsDashboard from "../components/Deposits/DepositsDashboard/DepositsDashboard";
+import { setAddDepositModal } from "../../store/features/Main/AppMode";
+import NewDepositModal from "../components/Deposits/newDeposit/newDeposit";
 
 const DepositsPage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -52,8 +54,13 @@ const DepositsPage: FC = () => {
     setFilter(e.target.value as StatusGeneric);
     dispatch(setPage(1));
   };
+    const depositModal = useSelector(
+      (state: RootState) => state.mapModeSlice.AddDepositModal
+    );
   return (
     <Box sx={{ bgcolor: "#F8F8F8", minHeight: "100vh", py: 4 }}>
+                {depositModal && <NewDepositModal />}
+
       <Container maxWidth="lg">
         {/* HEADER */}
         <Paper
@@ -106,6 +113,7 @@ const DepositsPage: FC = () => {
             >
               <Button
                 variant="contained"
+                onClick={() => dispatch(setAddDepositModal(true))}
                 // onClick={() => navigate("/loans/new")}
                 fullWidth={isSm}
                 sx={{
@@ -137,7 +145,7 @@ const DepositsPage: FC = () => {
                 <Select
                   labelId="filter-status-label"
                   value={filter}
-                  label="מצב הלוואה"
+                  label="מצב הפקדה"
                     onChange={handleFilterChange}
                   sx={{
                     borderRadius: 1,

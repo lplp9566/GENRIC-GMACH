@@ -1,5 +1,6 @@
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { IMonthlyPayment, paymentMethod } from '../MonthlyPaymentsDto'
+import { fmtDate } from '../../../../common/genricFunction'
 interface MonthlyPaymentProps {
     paymentsThisMonth: IMonthlyPayment[]
 } 
@@ -26,7 +27,7 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({ paymentsThisMonth 
                   <TableCell align="right" sx={{ color: 'success.main', fontWeight: 600 }}>
                     ₪{p.amount.toLocaleString()}
                   </TableCell>
-                  <TableCell align="right">{p.deposit_date}</TableCell>
+                  <TableCell align="right">{fmtDate(p.deposit_date)}</TableCell>
                   <TableCell align="right">{ paymentMethod.find(pm => pm.value == p.payment_method)?.label}</TableCell>
                   <TableCell align="right">{p.description}</TableCell>
                 </TableRow>

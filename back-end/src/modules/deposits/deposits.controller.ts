@@ -61,6 +61,7 @@ export class DepositsController {
     @Body() dto: BringForwardDto,
   ) {
     const date = new Date(dto.newReturnDate);
+    console.log(date, "date");
     if (Number.isNaN(date.getTime())) {
       throw new BadRequestException('תאריך לא תקין');
     }

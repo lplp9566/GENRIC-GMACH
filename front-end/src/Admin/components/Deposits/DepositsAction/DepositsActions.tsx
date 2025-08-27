@@ -19,7 +19,11 @@ interface IDepositsActionsProps {
   max: number;
   handleSubmit?: (dto: IDepositActionCreate) => Promise<void>;
 }
-const DepositsActions: FC<IDepositsActionsProps> = ({ depositId, max, handleSubmit }) => {
+const DepositsActions: FC<IDepositsActionsProps> = ({
+  depositId,
+  max,
+  handleSubmit,
+}) => {
   const [mode, setMode] = useState<DepositActionsType>(
     DepositActionsType.AddToDeposit
   );
@@ -29,47 +33,59 @@ const DepositsActions: FC<IDepositsActionsProps> = ({ depositId, max, handleSubm
 
   return (
     <Box dir="rtl">
-            <RtlProvider>
-      
-      <Paper
-        elevation={2}
-        sx={{ p: 2, borderRadius: 2, backgroundColor: "#FEFEFE" }}
-      >
-        <Typography variant="h6" sx={{ textAlign: "center", paddingBottom: 2 }}>
-          פעולות על הפקדה
-        </Typography>
-        <FormControl fullWidth size="small">
-          <InputLabel id="action-select-label">בחר פעולה</InputLabel>
-          <Select
-            labelId="action-select-label"
-            value={mode}
-            label="בחר פעולה"
-            onChange={handleModeChange}
-            sx={{ backgroundColor: "#FFF", borderRadius: 1 }}
+      <RtlProvider>
+        <Paper
+          elevation={2}
+          sx={{ p: 2, borderRadius: 2, backgroundColor: "#FEFEFE" }}
+        >
+          <Typography
+            variant="h6"
+            sx={{ textAlign: "center", paddingBottom: 2 }}
           >
-            <MenuItem value={DepositActionsType.AddToDeposit}>
-              הוספה להפקדה{" "}
-            </MenuItem>
-            <MenuItem value={DepositActionsType.ChangeReturnDate}>
-              שינוי תאריך החזרת ההפקדה{" "}
-            </MenuItem>
-            <MenuItem value={DepositActionsType.RemoveFromDeposit}>
-              הסרה מהפקדה
-            </MenuItem>
-          </Select>
-        </FormControl>
+            פעולות על הפקדה
+          </Typography>
+          <FormControl fullWidth size="small">
+            <InputLabel id="action-select-label">בחר פעולה</InputLabel>
+            <Select
+              labelId="action-select-label"
+              value={mode}
+              label="בחר פעולה"
+              onChange={handleModeChange}
+              sx={{ backgroundColor: "#FFF", borderRadius: 1 }}
+            >
+              <MenuItem value={DepositActionsType.AddToDeposit}>
+                הוספה להפקדה{" "}
+              </MenuItem>
+              <MenuItem value={DepositActionsType.ChangeReturnDate}>
+                שינוי תאריך החזרת ההפקדה{" "}
+              </MenuItem>
+              <MenuItem value={DepositActionsType.RemoveFromDeposit}>
+                הסרה מהפקדה
+              </MenuItem>
+            </Select>
+          </FormControl>
 
-        {mode === DepositActionsType.AddToDeposit && (
-          <DepositAmountChange depositId={depositId}  handleSubmit={handleSubmit} />
-        )}
-        {mode === DepositActionsType.ChangeReturnDate && (
-          <DepositDateChange depositId={depositId} handleSubmit={handleSubmit} />
-        )}
-        {mode === DepositActionsType.RemoveFromDeposit && (
-          <DepositAmountRemove depositId={depositId} max={max} handleSubmit={handleSubmit}  />
-        )}
-      </Paper>
-    </RtlProvider>
+          {mode === DepositActionsType.AddToDeposit && (
+            <DepositAmountChange
+              depositId={depositId}
+              handleSubmit={handleSubmit}
+            />
+          )}
+          {mode === DepositActionsType.ChangeReturnDate && (
+            <DepositDateChange
+              depositId={depositId}
+              handleSubmit={handleSubmit}
+            />
+          )}
+          {mode === DepositActionsType.RemoveFromDeposit && (
+            <DepositAmountRemove
+              depositId={depositId}
+              max={max}
+              handleSubmit={handleSubmit}
+            />
+          )}
+        </Paper>
+      </RtlProvider>
     </Box>
   );
 };

@@ -7,7 +7,7 @@ import {
   VolunteerActivism,
   AccountBalanceWallet,
 } from "@mui/icons-material";
-import { useDispatch , useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../store/store";
 import { getFundsOverview } from "../../../store/features/admin/adminFundsOverviewSlice";
 import { RootState } from "../../../store/store";
@@ -15,19 +15,25 @@ import LoadingIndicator from "../StatusComponents/LoadingIndicator";
 import GemachRegulationsModal from "./GemachRegulationsModal";
 import { AddPaymentModal } from "../MonthlyPayments/AddMonthlyPayment/AddMonthlyPayment";
 import { setMonthlyPaymentModalMode } from "../../../store/features/Main/AppMode";
+import NewDepositModal from "../Deposits/newDeposit/newDeposit";
 const HomePage: React.FC = () => {
-    const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     dispatch(getFundsOverview());
   }, [dispatch]);
-const paymentModal = useSelector(
+  const paymentModal = useSelector(
     (state: RootState) => state.mapModeSlice.MonthlyPaymentModalMode
+  );
+  const depositModal = useSelector(
+    (state: RootState) => state.mapModeSlice.AddDepositModal
   );
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const { fundsOverview, status } = useSelector(
     (s: RootState) => s.AdminFundsOverviewReducer
-  );  const quickActions = [
+  );
+  
+  const quickActions = [
     {
       label: "תשלום דמי חבר",
       description: "רישום תשלום דמי חבר",
@@ -56,7 +62,12 @@ const paymentModal = useSelector(
     },
   ];
   const stats = [
-    { label: "סכום זמין", value: fundsOverview?.available_funds, icon: <Group />, bgColor: "#a44fe4" },
+    {
+      label: "סכום זמין",
+      value: fundsOverview?.available_funds,
+      icon: <Group />,
+      bgColor: "#a44fe4",
+    },
     {
       label: "קרן הגמח ",
       value: fundsOverview?.fund_principal,
@@ -85,7 +96,12 @@ const paymentModal = useSelector(
             bgcolor="linear-gradient(to right, #2563eb, #1db954)"
             color="#fff"
           >
-            <Typography variant="h3" fontWeight={700} gutterBottom color="black">
+            <Typography
+              variant="h3"
+              fontWeight={700}
+              gutterBottom
+              color="black"
+            >
               מערכת ניהול גמ"ח אהבת חסד של משפחת פסיקוב
             </Typography>
           </Box>
@@ -114,9 +130,8 @@ const paymentModal = useSelector(
               </Grid>
             ))}
           </Grid>
-     {paymentModal && (
-        <AddPaymentModal/>
-      )}
+          {paymentModal && <AddPaymentModal />}
+          {depositModal && <NewDepositModal />}
           <Box mt={10}>
             <Typography variant="h5" fontWeight={700} mb={2} textAlign="center">
               פעולות מהירות
@@ -155,13 +170,17 @@ const paymentModal = useSelector(
             <Typography variant="body1" color="text.secondary">
               קרא את תקנון הגמ"ח המלא כדי להכיר את כל הכללים והתנאים
             </Typography>
-            <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => setOpen(true)} >
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ mt: 2 }}
+              onClick={() => setOpen(true)}
+            >
               צפיה בתקנון
             </Button>
           </Box>
         </>
       )}
-      
     </Box>
   );
 };

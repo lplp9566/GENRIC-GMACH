@@ -65,7 +65,7 @@ export const AddPaymentModal: React.FC = () => {
       promise,
       {
         pending: "מוסיף תשלום חדש…",
-        success: "התשלום נוסף בהצלחה! 👌",
+        success: `הוספת תשלום של ${newPayment.amount} ש"ח בוצעה בהצלחה`,
         error: "שגיאה בהוספת התשלום 💥",
       },
       { autoClose: 3000 }
@@ -77,8 +77,8 @@ export const AddPaymentModal: React.FC = () => {
         navigate("/paymentsPage");
       })
       .catch(() => {
-        // שגיאה כבר הודגמה ב-toast
-      });
+        
+        });
   };
 
   return (
