@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { UsersService } from './users.service';
 import { LoanActionsService } from '../loans/loan-actions/loan_actions.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -56,5 +56,16 @@ export class UserBalanceCronService {
     }
 
     this.logger.log('✅ Daily loan balances update complete.');
+  }
+    // רץ כל 5 דקות
+  @Cron(CronExpression.EVERY_5_MINUTES, { timeZone: 'Asia/Jerusalem' })
+  async fiveMinuteJob() {
+    this.logger.log('⏱️ fiveMinuteJob running (every 5 minutes)...');
+
+    // דוגמה לפעולה — שנה למה שאתה צריך
+    const users = await this.usersService.getAllUsers();
+    this.logger.debug(`Checked ${users?.length ?? 0} users in 5-min job`);
+
+    // TODO: הכנס כאן את הלוגיקה הרצויה
   }
 }
