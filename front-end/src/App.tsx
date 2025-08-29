@@ -15,17 +15,20 @@ import DonationsPage from './Admin/pages/DonationsPage';
 import ExpensesPage from './Admin/pages/ExpensesPage';
 import DepositsPage from './Admin/pages/DepositsPage';
 import DepositDetailsPage from './Admin/components/Deposits/DepositsDetails/DepositDetailsPage';
+import LoginPage from './Admin/pages/LoginPage';
 
 
 
 function App() {
   return (
     <BrowserRouter >
+    
       <Navbar />
       <Box 
       sx={{ mt: 10, px: 2 }}
       >
         <Routes>
+          <Route path="/" element={<LoginPage />} />
           <Route path="/loans" element={<LoansPage />} />
           <Route path="/Home" element={<HomePage />} />
           <Route path="/loans/new" element={<NewLoan  />} />

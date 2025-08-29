@@ -17,7 +17,6 @@ export class DonationsController {
 
   @Post('/window')
   indowDonations(@Body() donations: DonationsEntity) {
-    process.stdout.write('createWindowDonations function called!\n');
     return this.donationsService.withdrawSpecialFund(donations);
   }
 }

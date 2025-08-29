@@ -43,4 +43,14 @@ export class AuthController {
   adminRoute(@Req() req: Request) {
     return { message: 'You are admin', user: req.user };
   }
+  @Post('logout')
+logout(@Res({ passthrough: true }) res: Response) {
+  res.clearCookie('Authentication', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+  });
+  return { message: 'Logged out' };
+}
+
 }
