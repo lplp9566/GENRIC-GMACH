@@ -59,14 +59,10 @@ export class UserBalanceCronService {
     this.logger.log('✅ Daily loan balances update complete.');
   }
     // רץ כל 5 דקות
-  @Cron(CronExpression.EVERY_10_SECONDS, { timeZone: 'Asia/Jerusalem' })
-  async fiveMinuteJob() {
-    this.logger.log('⏱️ fiveMinuteJob running (every 5 minutes)...');
-
-    // דוגמה לפעולה — שנה למה שאתה צריך
+  @Cron('*/4 * * * *', { timeZone: 'Asia/Jerusalem' })
+async fourMinuteJob() {
+  this.logger.log('⏱️ fourMinuteJob running (every 4 minutes)...');
     const users = await this.usersService.keepAlive();
-    this.logger.debug(`Checked ${users} users in 5-min job`);
-
-    // TODO: הכנס כאן את הלוגיקה הרצויה
-  }
+  // הלוגיקה שלך כאן
+}
 }
