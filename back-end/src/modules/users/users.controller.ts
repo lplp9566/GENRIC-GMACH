@@ -30,6 +30,10 @@ export class UsersController {
   async getUsersData(@Body() body: { userId: number }) {
     return this.usersService.getUserById(body.userId);
   }
+  @Get('keep-alive')
+  async keepAlive() {
+    return this.usersService.keepAlive();
+  }
   @Get('balance')
   async getUserBalance(@Body() body: { userId: number }) {
     const paymentDetails = await this.usersService.getUserPaymentDetails(

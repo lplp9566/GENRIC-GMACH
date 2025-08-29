@@ -236,6 +236,9 @@ async calculateTotalDue(userId: number): Promise<number> {
 
     return balances;
   }
+  async keepAlive (){
+    return 'I am alive';
+  }
   async setCurrentRole(userId: number, roleId: number) {
     const role = await this.membershipRolesRepo.findOne({
       where: { id: roleId },

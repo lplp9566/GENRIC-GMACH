@@ -22,6 +22,7 @@ export class UserBalanceCronService {
 
     @InjectRepository(PaymentDetailsEntity)
     private readonly paymentDetailsRepo: Repository<PaymentDetailsEntity>,
+    
   ) {}
 
   @Cron('00 00 * * *', { timeZone: 'Asia/Jerusalem' })
@@ -58,13 +59,13 @@ export class UserBalanceCronService {
     this.logger.log('✅ Daily loan balances update complete.');
   }
     // רץ כל 5 דקות
-  @Cron(CronExpression.EVERY_5_MINUTES, { timeZone: 'Asia/Jerusalem' })
+  @Cron(CronExpression.EVERY_10_SECONDS, { timeZone: 'Asia/Jerusalem' })
   async fiveMinuteJob() {
     this.logger.log('⏱️ fiveMinuteJob running (every 5 minutes)...');
 
     // דוגמה לפעולה — שנה למה שאתה צריך
-    const users = await this.usersService.getAllUsers();
-    this.logger.debug(`Checked ${users?.length ?? 0} users in 5-min job`);
+    const users = await this.usersService.keepAlive();
+    this.logger.debug(`Checked ${users} users in 5-min job`);
 
     // TODO: הכנס כאן את הלוגיקה הרצויה
   }
