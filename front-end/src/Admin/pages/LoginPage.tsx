@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardContent, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import type { AppDispatch } from "../../store/store";
 import { login, selectAuth, validate } from "../../store/features/auth/authSlice";
 
@@ -11,11 +11,11 @@ const auth = useSelector(selectAuth);
   const status = auth?.status ?? "idle";
 const error = auth?.error ?? null;
   const navigate = useNavigate();
-  const location = useLocation() as any;
+  // const location = useLocation() as any;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const from = location.state?.from?.pathname ?? "/";
+  // const from = location.state?.from?.pathname ?? "/";
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
