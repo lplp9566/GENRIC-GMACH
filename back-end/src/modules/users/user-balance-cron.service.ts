@@ -59,7 +59,7 @@ export class UserBalanceCronService {
     this.logger.log('✅ Daily loan balances update complete.');
   }
     // רץ כל 5 דקות
-  @Cron(CronExpression.EVERY_10_SECONDS, { timeZone: 'Asia/Jerusalem' })
+  @Cron(CronExpression.EVERY_5_MINUTES, { timeZone: 'Asia/Jerusalem' })
   async fiveMinuteJob() {
     this.logger.log('⏱️ fiveMinuteJob running (every 5 minutes)...');
 
