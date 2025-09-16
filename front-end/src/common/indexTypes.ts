@@ -3,10 +3,9 @@ export interface PaginatedResult<T> {
   total: number;
   page: number;
   pageCount: number;
-  
 }
 export interface FindOptionsGeneric {
-  status: StatusGeneric;
+  status?: StatusGeneric;
   page?: number;
   limit?: number;
   userId?: number | undefined;

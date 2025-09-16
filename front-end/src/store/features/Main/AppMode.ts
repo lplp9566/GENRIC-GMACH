@@ -7,13 +7,15 @@ interface AppModeType {
     LoanModalMode: boolean
     MonthlyPaymentModalMode?: boolean
     AddDepositModal?: boolean
+    AddDonationModal?: boolean
 }
 
 const initialState:AppModeType = {
     LoanModalMode:false,
     mode:'admin',
     MonthlyPaymentModalMode:false,
-    AddDepositModal:false
+    AddDepositModal:false,
+    AddDonationModal:false
 }
 export const AppModeSlice = createSlice({
     name:'AppMode',
@@ -32,8 +34,14 @@ export const AppModeSlice = createSlice({
             console.log("Setting AddDepositModal to", action.payload);
             
             state.AddDepositModal = action.payload
-        }
+        },
+        setAddDonationModal(state, action) {
+            console.log("Setting AddDonationModal to", action.payload);
+            
+            state.AddDonationModal = action.payload
+        },
+        
     }
 })
-export const {setAppMode,setLoanModalMode,setMonthlyPaymentModalMode,setAddDepositModal} = AppModeSlice.actions
+export const {setAppMode,setLoanModalMode,setMonthlyPaymentModalMode,setAddDepositModal,setAddDonationModal} = AppModeSlice.actions
 export default AppModeSlice.reducer

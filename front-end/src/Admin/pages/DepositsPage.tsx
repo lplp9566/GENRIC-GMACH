@@ -37,8 +37,9 @@ const DepositsPage: FC = () => {
   const [filter, setFilter] = React.useState<StatusGeneric>(
     StatusGeneric.ACTIVE
   );
-  const { allDeposits, page, pageCount, total } =
-    useSelector((s: RootState) => s.AdminDepositsSlice);
+  const { allDeposits, page, pageCount, total } = useSelector(
+    (s: RootState) => s.AdminDepositsSlice
+  );
   const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
   const limit = 20;
   React.useEffect(() => {
@@ -54,12 +55,12 @@ const DepositsPage: FC = () => {
     setFilter(e.target.value as StatusGeneric);
     dispatch(setPage(1));
   };
-    const depositModal = useSelector(
-      (state: RootState) => state.mapModeSlice.AddDepositModal
-    );
+  const depositModal = useSelector(
+    (state: RootState) => state.mapModeSlice.AddDepositModal
+  );
   return (
     <Box sx={{ bgcolor: "#F8F8F8", minHeight: "100vh", py: 4 }}>
-                {depositModal && <NewDepositModal />}
+      {depositModal && <NewDepositModal />}
 
       <Container maxWidth="lg">
         {/* HEADER */}
@@ -146,7 +147,7 @@ const DepositsPage: FC = () => {
                   labelId="filter-status-label"
                   value={filter}
                   label="מצב הפקדה"
-                    onChange={handleFilterChange}
+                  onChange={handleFilterChange}
                   sx={{
                     borderRadius: 1,
                     "& .MuiOutlinedInput-notchedOutline": {

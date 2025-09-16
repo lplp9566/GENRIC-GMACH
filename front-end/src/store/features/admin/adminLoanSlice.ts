@@ -79,7 +79,6 @@ export const createLoanAction = createAsyncThunk(
       `${BASE_URL}/loan-actions`,
       loanAction
     );
-    console.log(response);
     return response.data;
   }
 )

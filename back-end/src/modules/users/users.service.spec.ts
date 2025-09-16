@@ -1,102 +1,184 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 import { UsersService } from './users.service';
 import { UserEntity } from './user.entity';
 import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
-
-import { MonthlyDepositsService } from '../monthly_deposits/monthly_deposits.service';
 import { UserRoleHistoryEntity } from '../user_role_history/Entity/user_role_history.entity';
 import { MembershipRoleEntity } from '../membership_roles/Entity/membership_rols.entity';
 import { RoleMonthlyRateEntity } from '../role_monthly_rates/Entity/role_monthly_rates.entity';
+import { MonthlyDepositsService } from '../monthly_deposits/monthly_deposits.service';
 import { UserRoleHistoryService } from '../user_role_history/user_role_history.service';
 
-// --- Mock factories ---
+// --------- Repos Mocks for constructor-injected repositories ----------
 const mockUserRepo = () => ({
   findOne: jest.fn(),
   find: jest.fn(),
   create: jest.fn(),
   save: jest.fn(),
+  update: jest.fn(),
 });
-
-const mockMembershipRoleRepo = () => ({
+const mockPaymentRepo = () => ({
   findOne: jest.fn(),
   find: jest.fn(),
-});
-
-const mockPaymentDetailsRepo = () => ({
-  findOne: jest.fn(),
   create: jest.fn(),
   save: jest.fn(),
+  merge: jest.fn(),
 });
+const mockMembershipRoleRepo = () => ({ findOne: jest.fn(), find: jest.fn() });
+const mockUserRoleHistoryRepo = () => ({ find: jest.fn() });
+const mockRatesRepo = () => ({ find: jest.fn() });
 
-const mockUserRoleHistoryRepo = () => ({
-  find: jest.fn(),
-});
-
-const mockRoleMonthlyRateRepo = () => ({
-  find: jest.fn(),
-});
-
+// --------- Other services ----------
 const mockMonthlyDepositsService = () => ({
   getUserTotalDeposits: jest.fn(),
 });
-
 const mockUserRoleHistoryService = () => ({
-  // הוסיפו כאן מתודות לפי הצורך
+  createUserRoleHistory: jest.fn(),
 });
+
+// --------- DataSource mock tailored to updateUserAndPaymentInfo ----------
+function buildDataSourceMockForTx(
+  repoMap: Map<any, any>
+) {
+  return {
+    // מריץ את הקולבק עם "manager" שמכיל getRepository
+    transaction: jest.fn(async (cb: any) =>
+      cb({
+        getRepository: (entity: any) => {
+          const repo = repoMap.get(entity);
+          if (!repo) {
+            throw new Error(`Repo not mocked for entity: ${entity?.name}`);
+          }
+          return repo;
+        },
+      })
+    ),
+  } as unknown as DataSource;
+}
 
 describe('UsersService', () => {
   let service: UsersService;
+
+  // constructor-injected repos (שאינם טרנזקציוניים)
   let userRepo: jest.Mocked<Repository<UserEntity>>;
   let paymentRepo: jest.Mocked<Repository<PaymentDetailsEntity>>;
+  let roleHistoryRepo: jest.Mocked<Repository<UserRoleHistoryEntity>>;
+  let membershipRoleRepo: jest.Mocked<Repository<MembershipRoleEntity>>;
+  let ratesRepo: jest.Mocked<Repository<RoleMonthlyRateEntity>>;
+
+  // repos שיעבדו בתוך הטרנזקציה (manager.getRepository)
+  let usersRepoTx: any;
+  let paymentRepoTx: any;
+
+  // DataSource mock
+  let dataSourceMock: DataSource;
 
   beforeEach(async () => {
+    // טרנזקציה: ריפוזיטוריז בגרסת "Tx"
+    usersRepoTx = {
+      findOne: jest.fn(),
+      save: jest.fn(),
+      merge: jest.fn(),
+    };
+    paymentRepoTx = {
+      findOne: jest.fn(),
+      save: jest.fn(),
+      create: jest.fn(),
+      merge: jest.fn(),
+    };
+
+    const txRepoMap = new Map<any, any>([
+      [UserEntity, usersRepoTx],
+      [PaymentDetailsEntity, paymentRepoTx],
+    ]);
+
+    dataSourceMock = buildDataSourceMockForTx(txRepoMap);
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
 
-        // repositories
+        // repos שנכנסים דרך ה-constructor
         { provide: getRepositoryToken(UserEntity), useFactory: mockUserRepo },
-        { provide: getRepositoryToken(MembershipRoleEntity), useFactory: mockMembershipRoleRepo },
-        { provide: getRepositoryToken(PaymentDetailsEntity), useFactory: mockPaymentDetailsRepo },
+        { provide: getRepositoryToken(PaymentDetailsEntity), useFactory: mockPaymentRepo },
         { provide: getRepositoryToken(UserRoleHistoryEntity), useFactory: mockUserRoleHistoryRepo },
-        { provide: getRepositoryToken(RoleMonthlyRateEntity), useFactory: mockRoleMonthlyRateRepo },
+        { provide: getRepositoryToken(MembershipRoleEntity), useFactory: mockMembershipRoleRepo },
+        { provide: getRepositoryToken(RoleMonthlyRateEntity), useFactory: mockRatesRepo },
 
-        // services
+        // services נוספים
         { provide: MonthlyDepositsService, useFactory: mockMonthlyDepositsService },
         { provide: UserRoleHistoryService, useFactory: mockUserRoleHistoryService },
+
+        // הכי חשוב: DataSource
+        { provide: DataSource, useValue: dataSourceMock },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
     userRepo = module.get(getRepositoryToken(UserEntity));
     paymentRepo = module.get(getRepositoryToken(PaymentDetailsEntity));
+    roleHistoryRepo = module.get(getRepositoryToken(UserRoleHistoryEntity));
+    membershipRoleRepo = module.get(getRepositoryToken(MembershipRoleEntity));
+    ratesRepo = module.get(getRepositoryToken(RoleMonthlyRateEntity));
   });
 
   describe('getUserById', () => {
-    it('should return a user if found', async () => {
+    it('מחזיר יוזר כשנמצא', async () => {
       const mockUser = { id: 1 } as any;
       userRepo.findOne.mockResolvedValue(mockUser);
 
-      const result = await service.getUserById(1);
-      expect(result).toEqual(mockUser);
+      const res = await service.getUserById(1);
+      expect(res).toEqual(mockUser);
+      expect(userRepo.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+        relations: ['payment_details'],
+      });
     });
 
-    it('should throw NotFoundException if user not found', async () => {
+    it('זורק שגיאה כשלא נמצא', async () => {
       userRepo.findOne.mockResolvedValue(null);
       await expect(service.getUserById(999)).rejects.toThrow('User not found');
     });
   });
 
-  describe('getAllUsers', () => {
-    it('should return an array of users', async () => {
-      const mockUsers = [{ id: 1 }, { id: 2 }] as any[];
-      userRepo.find.mockResolvedValue(mockUsers);
+  describe('updateUserAndPaymentInfo', () => {
+    it('מעדכן חלקית את המשתמש ויוצר/מעדכן פרטי תשלום בתוך טרנזקציה', async () => {
+      // מצב התחלתי: יש משתמש בלי payment_details
+      const existingUser = { id: 10, first_name: 'Eli', payment_details: null } as any;
 
-      const result = await service.getAllUsers();
-      expect(result).toEqual(mockUsers);
+      usersRepoTx.findOne.mockResolvedValueOnce(existingUser); // שלב הטעינה בתחילת הטרנזקציה
+      usersRepoTx.merge.mockImplementation((target: any, patch: any) => Object.assign(target, patch));
+      usersRepoTx.save.mockImplementation(async (u: any) => u);
+
+      const createdPayment = { id: 100, iban: 'IL00', user: existingUser } as any;
+      paymentRepoTx.create.mockImplementation((dto: any) => dto);
+      paymentRepoTx.save.mockResolvedValue(createdPayment);
+
+      // אחרי השמירות, השירות טוען מחדש את המשתמש
+      const userAfter = { ...existingUser, payment_details: createdPayment } as any;
+      usersRepoTx.findOne.mockResolvedValueOnce(userAfter);
+
+      const result = await service.updateUserAndPaymentInfo(
+        10,
+        { first_name: 'Eli' },
+        { iban: 'IL00' } as any
+      );
+
+      expect(result.first_name).toBe('Eli');
+      expect(result.payment_details).toEqual(createdPayment);
+
+      // ווידוא שהתבצעה טרנזקציה
+      expect((dataSourceMock as any).transaction).toHaveBeenCalledTimes(1);
+
+      // ווידוא שהריפוזיטוריז הטרנזקציוניים נקראו
+      expect(usersRepoTx.findOne).toHaveBeenCalledTimes(2);
+      expect(usersRepoTx.merge).toHaveBeenCalled();
+      expect(usersRepoTx.save).toHaveBeenCalled();
+
+      expect(paymentRepoTx.create).toHaveBeenCalledWith({ iban: 'IL00', user: existingUser });
+      expect(paymentRepoTx.save).toHaveBeenCalled();
     });
   });
 });

@@ -164,10 +164,10 @@ export class FundsOverviewService {
         fund.fund_details = {};
       }
       if (!fund.fund_details[fundName]) {
-        throw new Error('no mony in this fund');
+        throw new Error('לא קיים כסף בקרן הזה');
       }
       if (fund.fund_details[fundName] < amount) {
-        throw new Error('not enough funds in this fund');
+        throw new Error('אין מספיק כסף בקרן הזו');
       }
       fund.fund_details[fundName] -= amount;
       fund.special_funds -= amount;

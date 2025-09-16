@@ -1,3 +1,6 @@
+import { IsObject, IsOptional } from "class-validator"
+import { UserEntity } from "./user.entity"
+import { PaymentDetailsEntity } from "./payment-details/payment_details.entity"
 
 
 export enum payment_method {
@@ -30,4 +33,14 @@ bank_branch: number
 bank_account_number: number
 charge_date: string
 payment_method: payment_method
+}
+
+export class UpdateUserWithPaymentDto {
+  @IsOptional()
+  @IsObject()
+  userData?: Partial<UserEntity>;
+
+  @IsOptional()
+  @IsObject()
+  paymentData?: Partial<PaymentDetailsEntity>;
 }

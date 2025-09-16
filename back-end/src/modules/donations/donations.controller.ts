@@ -7,11 +7,11 @@ export class DonationsController {
   constructor(private readonly donationsService: DonationsService) {}
   @Post()
   async createDonation(@Body() donation: DonationsEntity) {
-    process.stdout.write('createDonation function called!\n');
     return this.donationsService.createDonation(donation);
   }
   @Get()
-  async getDonations() {
+  async getDonations(
+  ) {
     return this.donationsService.getDonations();
   }
 

@@ -1,105 +1,291 @@
-import  { useEffect, useState } from 'react';
-import { Box, Container, Card, CardContent, Typography, Grid, Collapse, IconButton } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import axios from 'axios';
+// src/pages/DonationsHomePage.tsx
+import  { FC, useEffect, useMemo, useState } from "react";
+import {
+  Box, Container, Grid, Alert
+} from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store/store";
+import { getAllDonations } from "../../store/features/admin/adminDonationsSlice";
+import { getFundsOverview } from "../../store/features/admin/adminFundsOverviewSlice";
+import DonationsTable, { DonationRow, SortBy, SortDir } from "../components/Donations/DonationsTable";
+import FundsPanel, { FundCardData } from "../components/Donations/FundPanel";
+import FiltersBar from "../components/Donations/FiltersBar";
+import Frame from "../components/Donations/Frame";
+import KpiRow from "../components/Donations/KpiRow";
+import DonationHeader from "../components/Donations/DonationHeader";
+import NewDonation from "../components/Donations/NewDonation";
 
-interface Donation {
-  id: number;
-  donor_name: string;
-  amount: number;
-  date: string;
-  comment?: string;
-  user_id?: number;
+
+type ViewMode = "split" | "left" | "right";
+
+const MONTHS = [
+  "ינואר","פברואר","מרץ","אפריל","מאי","יוני",
+  "יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר",
+];
+
+
+// --- Utils (נשארים בעמוד בשביל פשטות) ---
+const normalizeKey = (s: any) => String(s ?? "").trim().toLowerCase();
+
+function getDonationDate(d: any): Date | null {
+  const raw = d?.date;
+  if (!raw) return null;
+  const t = new Date(raw);
+  return isNaN(t.getTime()) ? null : t;
 }
 
-const DonationsPage = () => {
-  const [donations, setDonations] = useState<Donation[]>([]);
-  const [loading, setLoading] = useState(true);
+function getDonationCategory(d: any): { kind: "regular" | "fund"; key: string; label: string } {
+  const reasonRaw = String(d?.donation_reason ?? "").trim();
+  const rlow = reasonRaw.toLowerCase();
+  const isRegular = !reasonRaw || rlow === "equity" || rlow === "equality";
+  if (isRegular) return { kind: "regular", key: "__regular__", label: "תרומות רגילות" };
+  return { kind: "fund", key: normalizeKey(reasonRaw), label: reasonRaw };
+}
 
+const DonationsHomePage:FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const AddDonationModal = useSelector((s: RootState) => s.mapModeSlice.AddDonationModal);
+  // Redux state
+  const { allDonations, status, error } = useSelector((s: RootState) => s.AdminDonationsSlice);
+  const fundsOverview = useSelector((s: RootState) => s.AdminFundsOverviewReducer.fundsOverview);
+  const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
+
+  // fetch base data
   useEffect(() => {
-    // TODO: Replace with your actual API endpoint
-    axios.get('http://localhost:3000/donations')
-      .then(res => {
-        console.log(res.data);
-        setDonations(res.data);
-      })
-      .catch(() => setDonations([]))
-      .finally(() => setLoading(false));
-  }, []);
+    if (status === "idle") {
+      dispatch(getAllDonations({} as any));
+      dispatch(getFundsOverview());
+    }
+  }, [dispatch, status]);
+
+  const donationsSafe = Array.isArray(allDonations) ? allDonations : [];
+
+  // אם נבחר משתמש — מסננים רק לתרומות שלו
+  const donationsBase = useMemo(() => {
+    if (!selectedUser) return donationsSafe;
+    const uid = selectedUser?.id ?? selectedUser?.id ?? selectedUser?.id;
+    return donationsSafe.filter((d) => {
+      const donorId = d?.user?.id ?? d?.user.id ?? d?.id;
+      return donorId === uid;
+    });
+  }, [donationsSafe, selectedUser]);
+
+  // מצבים (UI)
+  const [view, setView] = useState<ViewMode>("split");
+  const [monthFilter, setMonthFilter] = useState<number | "all">("all");
+  const [yearFilter, setYearFilter] = useState<number | "all">("all");
+  const [sortBy, setSortBy] = useState<SortBy>("date");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [activeKey, setActiveKey] = useState<string | null>(null);
+
+  // שנים וחודשים זמינים אחרי סינונים קיימים
+  const yearOptions = useMemo(() => {
+    const set = new Set<number>();
+    donationsBase.forEach((d) => {
+      const dt = getDonationDate(d);
+      if (dt) set.add(dt.getFullYear());
+    });
+    return Array.from(set).sort((a, b) => b - a);
+  }, [donationsBase]);
+
+  const monthOptions = useMemo(() => {
+    const set = new Set<number>();
+    donationsBase.forEach((d) => {
+      const dt = getDonationDate(d);
+      if (!dt) return;
+      if (yearFilter !== "all" && dt.getFullYear() !== yearFilter) return;
+
+      if (activeKey) {
+        const cat = getDonationCategory(d);
+        if (activeKey === "__regular__" && cat.kind !== "regular") return;
+        if (activeKey !== "__regular__" && (cat.kind !== "fund" || cat.key !== activeKey)) return;
+      }
+      set.add(dt.getMonth());
+    });
+    return Array.from(set).sort((a, b) => a - b);
+  }, [donationsBase, yearFilter, activeKey]);
+
+  // ודא ש-monthFilter חוקי
+  useEffect(() => {
+    if (monthFilter !== "all" && !monthOptions.includes(monthFilter)) {
+      setMonthFilter("all");
+    }
+  }, [monthOptions, monthFilter]);
+
+  // סינון ראשי
+  const filtered = useMemo(() => {
+    return donationsBase.filter((d) => {
+      const dt = getDonationDate(d);
+      if (!dt) return false;
+
+      const okYear = yearFilter === "all" ? true : dt.getFullYear() === yearFilter;
+      const okMonth = monthFilter === "all" ? true : dt.getMonth() === monthFilter;
+      if (!okYear || !okMonth) return false;
+
+      if (!activeKey) return true;
+      const cat = getDonationCategory(d);
+      if (activeKey === "__regular__") return cat.kind === "regular";
+      if (cat.kind === "fund") return cat.key === activeKey;
+      return false;
+    });
+  }, [donationsBase, monthFilter, yearFilter, activeKey]);
+
+  // מיון
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    arr.sort((a, b) => {
+      if (sortBy === "date") {
+        const ta = getDonationDate(a)?.getTime() ?? 0;
+        const tb = getDonationDate(b)?.getTime() ?? 0;
+        return sortDir === "asc" ? ta - tb : tb - ta;
+      }
+      const aa = Number(a?.amount) || 0;
+      const bb = Number(b?.amount) || 0;
+      return sortDir === "asc" ? aa - bb : bb - aa;
+    });
+    return arr;
+  }, [filtered, sortBy, sortDir]);
+
+  // שורות לטבלה
+  const rows: DonationRow[] = useMemo(() => {
+    return sorted.map((d) => {
+      const userName = [d?.user?.first_name, d?.user?.last_name]
+        .filter(Boolean)
+        .join(" ")
+        .trim() || "—";
+      const dt = getDonationDate(d);
+      return {
+        id: d?.id ?? "—",
+        userName,
+        amount: Number(d?.amount) || 0,
+        date: dt ? dt.toLocaleDateString("he-IL") : "—",
+        action: d?.action ?? d?.action ?? "—",
+        donation_reason: d?.donation_reason ?? d?.donation_reason ?? "—",
+      };
+    });
+  }, [sorted]);
+
+  const isLoading = status === "pending";
+  const isError = status === "rejected";
+
+  // KPI מבוסס סינון
+  const kpiTotal = useMemo(() => rows.reduce((s, r) => s + (r.amount || 0), 0), [rows]);
+  const kpiCount = rows.length;
+
+  // פריסה: שמאל=טבלה, ימין=קרנות
+  const leftCols = view === "left" ? 12 : view === "split" ? 6 : 0;
+  const rightCols = view === "right" ? 12 : view === "split" ? 6 : 0;
+
+  const handleSortClick = (key: SortBy) => {
+    if (sortBy === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else {
+      setSortBy(key);
+      setSortDir("desc");
+    }
+  };
+
+  // כרטיסיות הקרנות — לפי משתמש אם יש, אחרת Overview
+  const userSideTotals = useMemo(() => {
+    if (!selectedUser) return null;
+    let regular = 0;
+    const fundMap = new Map<string, number>();
+
+    donationsBase.forEach((d) => {
+      const amt = Number(d?.amount) || 0;
+      const cat = getDonationCategory(d);
+      if (cat.kind === "regular") regular += amt;
+      else fundMap.set(cat.key, (fundMap.get(cat.key) ?? 0) + amt);
+    });
+
+    const fundCards: FundCardData[] = Array.from(fundMap.entries()).map(([label, total]) => ({
+      key: label,
+      label,
+      total,
+    }));
+
+    return { regularTotal: regular, fundCards };
+  }, [donationsBase, selectedUser]);
+
+  const fundDetails: Record<string, number> = fundsOverview?.fund_details ?? {};
+  const overviewFundCards: FundCardData[] = useMemo(
+    () =>
+      Object.entries(fundDetails).map(([label, total]) => ({
+        key: normalizeKey(label),
+        label,
+        total: Number(total || 0),
+      })),
+    [fundDetails]
+  );
+
+  const regularTotalFromOverview = Number(fundsOverview?.total_equity_donations ?? 0);
+  const rightPanelRegularTotal = userSideTotals ? userSideTotals.regularTotal : regularTotalFromOverview;
+  const rightPanelFundCards = userSideTotals ? userSideTotals.fundCards : overviewFundCards;
 
   return (
     <Container
       sx={{
         py: 4,
-        direction: 'rtl',
-        bgcolor: '#F9FBFC',
-        fontFamily: 'Heebo, Arial, sans-serif',
+        direction: "rtl",
+        bgcolor: "#F9FBFC",
+        fontFamily: "Heebo, Arial, sans-serif",
+        minHeight: "100vh",
       }}
     >
-      <Typography variant="h4" fontWeight={700} mb={4} align="center">רשימת תרומות</Typography>
-      <Box
-        sx={{
-          backgroundColor: '#FFFFFF',
-          minHeight: '100vh',
-          pt: 4,
-          direction: 'rtl',
-          borderRadius: 3,
-          boxShadow: '0 8px 25px rgba(0,0,0,0.08)',
-          mt: 4,
-        }}
-      >
-        <Box
-          sx={{
-            bgcolor: '#FBFDFE',
-            padding: { xs: 2, md: 3 },
-            borderRadius: 2,
-            mb: 4,
-          }}
-        >
-          <Grid container spacing={3}>
-            {loading ? (
-              <Grid item xs={12}><Typography align="center">טוען תרומות...</Typography></Grid>
-            ) : donations.length > 0 ? (
-              donations.map((donation) => (
-                <DonationCard key={donation.id} donation={donation} />
-              ))
-            ) : (
-              <Grid item xs={12}><Typography align="center">לא נמצאו תרומות</Typography></Grid>
-            )}
+      {AddDonationModal && <NewDonation />}
+      <DonationHeader />
+
+      <Box mt={4}>
+        {isError && <Alert severity="error">{error || "אירעה שגיאה בטעינת תרומות"}</Alert>}
+
+        <Grid container spacing={3}>
+          {/* שמאל – טבלת תרומות (עם KPI+סלקטים) */}
+          <Grid item xs={12} md={leftCols} sx={{ display: leftCols ? "block" : "none" }}>
+            <Frame
+              title="טבלת תרומות"
+              expanded={view === "left"}
+              onToggle={() => setView((v) => (v === "left" ? "split" : "left"))}
+            >
+              <KpiRow totalAmount={kpiTotal} totalDonations={kpiCount} view={view} />
+
+              <FiltersBar
+                yearFilter={yearFilter}
+                monthFilter={monthFilter}
+                yearOptions={yearOptions}
+                monthOptions={monthOptions}
+                monthsLabels={MONTHS}
+                onChangeYear={setYearFilter}
+                onChangeMonth={setMonthFilter}
+              />
+
+              <DonationsTable
+                isLoading={isLoading}
+                rows={rows}
+                sortBy={sortBy}
+                sortDir={sortDir}
+                onSortClick={handleSortClick}
+              />
+            </Frame>
           </Grid>
-        </Box>
+
+          {/* ימין – קרנות */}
+          <Grid item xs={12} md={rightCols} sx={{ display: rightCols ? "block" : "none" }}>
+            <Frame
+              title={selectedUser ? "קרנות (למשתמש הנבחר)" : "קרנות מיוחדות"}
+              expanded={view === "right"}
+              onToggle={() => setView((v) => (v === "right" ? "split" : "right"))}
+            >
+              <FundsPanel
+                regularTotal={rightPanelRegularTotal}
+                fundCards={rightPanelFundCards}
+                activeKey={activeKey}
+                onToggleKey={(k) => setActiveKey((prev) => (prev === k ? null : k))}
+              />
+            </Frame>
+          </Grid>
+        </Grid>
       </Box>
     </Container>
   );
 };
 
-function DonationCard({ donation }: { donation: Donation }) {
-  const [expanded, setExpanded] = useState(false);
-  return (
-    <Grid item xs={12} sm={6} md={4} lg={3}>
-      <Card sx={{ borderRadius: 3, boxShadow: 2, transition: '0.2s', cursor: 'pointer', '&:hover': { boxShadow: 6 } }}>
-        <CardContent onClick={() => setExpanded((prev) => !prev)}>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Box>
-              <Typography variant="h6" fontWeight={600}>{donation.donor_name}</Typography>
-              <Typography variant="body2" color="text.secondary">{new Date(donation.date).toLocaleDateString()}</Typography>
-            </Box>
-            <IconButton onClick={e => { e.stopPropagation(); setExpanded((prev) => !prev); }}>
-              <ExpandMoreIcon sx={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.2s' }} />
-            </IconButton>
-          </Box>
-          <Typography variant="body2" color="text.secondary">סכום: {donation.amount.toLocaleString()} ₪</Typography>
-        </CardContent>
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <CardContent sx={{ bgcolor: '#f5f7fa', borderTop: '1px solid #eee' }}>
-            <Typography variant="subtitle2">הערה: {donation.comment || '-'}</Typography>
-            <Typography variant="subtitle2">מזהה תרומה: {donation.id}</Typography>
-            {donation.user_id && <Typography variant="subtitle2">מזהה משתמש: {donation.user_id}</Typography>}
-          </CardContent>
-        </Collapse>
-      </Card>
-    </Grid>
-  );
-}
-
-export default DonationsPage; 
+export default DonationsHomePage;

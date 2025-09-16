@@ -14,6 +14,7 @@ import { UserFinancialService } from '../users/user-financials/user-financials.s
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { DonationActionType, IWindowDonations } from './donations_dto';
 import { DonationsEntity } from './Entity/donations.entity';
+import { log } from 'console';
 
 @Injectable()
 export class DonationsService {
@@ -28,7 +29,9 @@ export class DonationsService {
   ) {}
 
   async getDonations() {
-    return this.donationsRepository.find();
+
+
+    return await this.donationsRepository.find({ relations: ['user'] });
   }
 
   async createEquityDonation(donation: DonationsEntity) {
@@ -50,8 +53,8 @@ export class DonationsService {
       year,
       donation.amount,
     );
-    this.donationsRepository.save(donation);
-    return donation;
+  const donationRecord = await this.donationsRepository.save(donation);  
+    return donationRecord;
   }
 
   async createFundDonation(donation: DonationsEntity) {
@@ -76,14 +79,19 @@ export class DonationsService {
       donation.donation_reason,
       donation.amount,
     );
-    this.donationsRepository.save(donation);
-    return donation;
+    return await this.donationsRepository.save(donation);
   }
 
-  async createDonation(donation: DonationsEntity) {
+  async createDonation(donation: DonationsEntity) {  
     if (!donation) {
       throw new BadRequestException('Donation is required');
     }
+    // if (!donation.user) {
+    //   throw new BadRequestException('User is required');
+    // }
+    // if (donation.action) {
+    //   throw new BadRequestException('Amount must be greater than zero');
+    // }
     if (donation.action == DonationActionType.donation) {
       if (donation.donation_reason === 'Equity') {
         return await this.createEquityDonation(donation);
@@ -108,7 +116,8 @@ export class DonationsService {
         donation.donation_reason,
         donation.amount,
       );
-      return donation;
+      const donationRecord = await this.donationsRepository.save(donation);
+      return donationRecord;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
