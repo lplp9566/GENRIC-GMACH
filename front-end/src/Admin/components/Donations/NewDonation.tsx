@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { setAddDonationModal } from "../../../store/features/Main/AppMode";
 import { createDonation } from "../../../store/features/admin/adminDonationsSlice";
 import { DonationActionType, ICreateDonation } from "./DonationDto";
+import { getFundsOverview } from "../../../store/features/admin/adminFundsOverviewSlice";
 
 type DonationKind = "regular" | "fund";
 
@@ -63,6 +64,7 @@ const AddDonationModal: React.FC = () => {
       donation_reason: kind === "regular" ? "Equity" : fundName.trim(),
     };
     dispatch(createDonation(payload));
+    // dispatch(getFundsOverview())
     navigate("/donations");
     handleClose();
   };

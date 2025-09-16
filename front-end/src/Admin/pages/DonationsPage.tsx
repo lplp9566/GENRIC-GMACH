@@ -46,17 +46,24 @@ const DonationsHomePage:FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const AddDonationModal = useSelector((s: RootState) => s.mapModeSlice.AddDonationModal);
   // Redux state
-  const { allDonations, status, error } = useSelector((s: RootState) => s.AdminDonationsSlice);
-  const fundsOverview = useSelector((s: RootState) => s.AdminFundsOverviewReducer.fundsOverview);
+  const { allDonations, status: adminDonationStatus, error } = useSelector((s: RootState) => s.AdminDonationsSlice);
+  const { status: fundsOverviewStatus, fundsOverview } = useSelector((s: RootState) => s.AdminFundsOverviewReducer);
   const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
 
   // fetch base data
   useEffect(() => {
-    if (status === "idle") {
+    if (adminDonationStatus === "idle") {
+      
       dispatch(getAllDonations({} as any));
+      // dispatch(getFundsOverview());
+    }
+    if (fundsOverviewStatus === "idle") {
+      console.log("Fetching funds overview...");
+      
       dispatch(getFundsOverview());
     }
-  }, [dispatch, status]);
+
+  }, [dispatch, adminDonationStatus, fundsOverviewStatus]);
 
   const donationsSafe = Array.isArray(allDonations) ? allDonations : [];
 
@@ -165,8 +172,8 @@ const DonationsHomePage:FC = () => {
     });
   }, [sorted]);
 
-  const isLoading = status === "pending";
-  const isError = status === "rejected";
+  const isLoading = adminDonationStatus === "pending";
+  const isError = adminDonationStatus === "rejected";
 
   // KPI מבוסס סינון
   const kpiTotal = useMemo(() => rows.reduce((s, r) => s + (r.amount || 0), 0), [rows]);

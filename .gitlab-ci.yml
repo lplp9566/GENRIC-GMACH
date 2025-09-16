@@ -1,62 +1,73 @@
+image: node:18
+
 stages:
-  - install
   - test
   - build
 
-variables:
-  NODE_ENV: development
-
+# Cache עוזר, אבל לא מחליף npm ci
 cache:
+  key:
+    files:
+      - back-end/package-lock.json
+      - front-end/package-lock.json
   paths:
     - back-end/node_modules/
     - front-end/node_modules/
 
-install_backend:
-  stage: install
-  image: node:18
-  script:
-    - cd back-end
-    - npm ci
-
-install_frontend:
-  stage: install
-  image: node:18
-  script:
-    - cd front-end
-    - npm ci
-
+# ---------- TEST ----------
 test_backend:
   stage: test
-  image: node:18
-  script:
+  before_script:
     - cd back-end
-    - npm run test
+    - npm ci            # מתקין חבילות (כולל jest)
+  script:
+    - npm run test -- --runInBand
+  artifacts:
+    when: always
+    paths:
+      - back-end/coverage/
+    expire_in: 1 week
 
+# אם תרצה גם טסטים לפרונט, בטל הערות ותוודא שיש script "test" בפרונט
 # test_frontend:
 #   stage: test
-#   image: node:18
-#   script:
+#   before_script:
 #     - cd front-end
+#     - npm ci
+#   script:
 #     - npm run test
+#   artifacts:
+#     when: always
+#     paths:
+#       - front-end/coverage/
+#     expire_in: 1 week
 
+# ---------- BUILD ----------
 build_backend:
   stage: build
-  image: node:18
-  script:
+  needs: ["test_backend"]     # בונה רק אחרי שהטסטים עברו
+  before_script:
     - cd back-end
+    - npm ci
+  script:
     - npm run build
   artifacts:
     paths:
       - back-end/dist/
+    expire_in: 1 week
 
 build_frontend:
   stage: build
-  image: node:18
-  script:
+  # אם אין תלות הדדית, אין צורך ב-needs. אם יש – הוסף needs בהתאם.
+  before_script:
     - cd front-end
     - npm ci
-    - npx tsc -b      # ✅ מריץ TypeScript דרך npx
-    - npm run build   # או npx vite build אם אתה לא משתמש ב-script
+  script:
+    # אם יש לך script build ב-package.json זה עדיף:
+    - npm run build
+    # אם בכל זאת חייבים tsc, ודא שיש tsconfig מתאים:
+    # - npx tsc --noEmit
   artifacts:
     paths:
-      - front-end/dist/ # או front-end/build תלוי ב־vite/react
+      - front-end/dist/
+    expire_in: 1 week
