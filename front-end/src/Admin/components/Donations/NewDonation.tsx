@@ -21,7 +21,6 @@ import { useNavigate } from "react-router-dom";
 import { setAddDonationModal } from "../../../store/features/Main/AppMode";
 import { createDonation } from "../../../store/features/admin/adminDonationsSlice";
 import { DonationActionType, ICreateDonation } from "./DonationDto";
-import { getFundsOverview } from "../../../store/features/admin/adminFundsOverviewSlice";
 
 type DonationKind = "regular" | "fund";
 
