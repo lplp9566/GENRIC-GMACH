@@ -31,8 +31,8 @@ export class DepositsFlowService {
     const deposits = await this.depositsService.getDepositsActive();
     const target = deposits.find(d => d.id == depositId);
     
-    console.log(deposits, "deposits")
-    console.log(target, "target")
+    // console.log(deposits, "deposits")
+    // console.log(target, "target")
     if (!target) return { ok: false, error: 'הפיקדון לא נמצא' };
 
     // 3) בניית מפה: תאריך -> סכום שצריך להחזיר בתאריך הזה

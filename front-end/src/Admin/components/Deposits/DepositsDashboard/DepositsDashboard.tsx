@@ -14,7 +14,7 @@ const navigate = useNavigate();
 const theme = useTheme();
 const isSm = useMediaQuery(theme.breakpoints.down('sm'));  
 
-const totalAmount = depositsData
+const totalAmount = depositsData!
   .reduce((sum, deposit) => sum + (deposit.isActive ? deposit.current_balance : 0), 0)
 
   return (
