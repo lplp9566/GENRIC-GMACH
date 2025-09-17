@@ -245,10 +245,10 @@ const DonationsHomePage: FC = () => {
   const rows: DonationRow[] = useMemo(() => {
     return sorted.map((d: any) => {
       const dt = parseDate(d?.date);
-      const userName = getDonorFullName(d, selectedUser, usersById);
+      // const userName = getDonorFullName(d, selectedUser, usersById);
       return {
         id: d?.id ?? "—",
-        userName, // ← שם מלא; אם user=3 נקבל מה־store או selectedUser
+        userName : `${d.user?.first_name ?? ""} ${d.user?.last_name ?? ""}`.trim() ,
         amount: Number(d?.amount) || 0,
         date: formatDate(dt),
         action: d?.action ?? "—",

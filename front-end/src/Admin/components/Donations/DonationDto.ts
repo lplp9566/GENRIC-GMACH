@@ -14,7 +14,7 @@ export interface IDonation{
 }
 export interface ICreateDonation {
     user:number
-    date:Date
+    date:string
     amount:number
     action:DonationActionType
     donation_reason:string

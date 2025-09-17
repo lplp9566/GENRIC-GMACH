@@ -38,12 +38,14 @@ export type NewDonationPayload = {
 //   onSubmit: (payload: NewDonationPayload) => void; // dispatch ל-API אצלך
 //   defaultUserId?: number;
 // };
+const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
 
 const AddDonationModal: React.FC = () => {
   const [userId, setUserId] = useState<number>();
   const [kind, setKind] = useState<DonationKind>("regular");
   const [fundName, setFundName] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
+  const [date, setDate] = useState<string>(today);
   const open = useSelector((s: RootState) => s.mapModeSlice.AddDonationModal);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -58,7 +60,7 @@ const AddDonationModal: React.FC = () => {
     const payload: ICreateDonation = {
       user: userId!,
       amount,
-      date: new Date(),
+      date: date!,
       action: DonationActionType.donation,
       donation_reason: kind === "regular" ? "Equity" : fundName.trim(),
     };
@@ -160,6 +162,16 @@ const AddDonationModal: React.FC = () => {
                 onChange={(e) => setFundName(e.target.value)}
               />
             )}
+            <TextField
+              label="תאריך*"
+              type="date"
+              size="medium"
+              color="success"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
 
             {/* סכום */}
             <TextField
