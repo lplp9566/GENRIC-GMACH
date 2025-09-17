@@ -13,7 +13,7 @@ export interface IDonation{
     donation_reason: string
 }
 export interface ICreateDonation {
-    user:number
+    user?:number
     date:string
     amount:number
     action:DonationActionType

@@ -17,6 +17,7 @@ export class UsersController {
       userData: Partial<UserEntity>;
       paymentData: Partial<PaymentDetailsEntity>;
     },
+
   ) {
     const { userData, paymentData } = body;
     return this.usersService.createUserAndPaymentInfo(userData, paymentData);

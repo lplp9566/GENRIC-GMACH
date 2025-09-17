@@ -59,10 +59,10 @@ export class UserBalanceCronService {
     this.logger.log('✅ Daily loan balances update complete.');
   }
     // רץ כל 5 דקות
-  @Cron('*/4 * * * *', { timeZone: 'Asia/Jerusalem' })
-async fourMinuteJob() {
-  this.logger.log('⏱️ fourMinuteJob running (every 4 minutes)...');
-    const users = await this.usersService.keepAlive();
-  // הלוגיקה שלך כאן
-}
+//   @Cron('*/4 * * * *', { timeZone: 'Asia/Jerusalem' })
+// async fourMinuteJob() {
+//   this.logger.log('⏱️ fourMinuteJob running (every 4 minutes)...');
+//     const users = await this.usersService.keepAlive();
+//   // הלוגיקה שלך כאן
+// }
 }

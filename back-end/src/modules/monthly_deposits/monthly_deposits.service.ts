@@ -2,14 +2,12 @@ import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/com
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MonthlyDepositsEntity } from "./monthly_deposits.entity";
-import { UserEntity } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { getMonthFromDate, getYearFromDate } from '../../services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
-// cSpell:ignore Financials
 
 @Injectable()
 export class MonthlyDepositsService {

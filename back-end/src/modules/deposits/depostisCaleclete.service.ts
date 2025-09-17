@@ -41,6 +41,7 @@ async calculateTotalInflows(
 
     // 2. Load all users with their payment details and full role history
     const users = await this.usersRepo.find({
+      where: { is_admin: false },
       relations: ['payment_details', 'roleHistory', 'roleHistory.role'],
     });
 

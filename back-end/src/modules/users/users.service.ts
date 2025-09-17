@@ -15,6 +15,8 @@ import { UserRoleHistoryEntity } from '../user_role_history/Entity/user_role_his
 import { UserRoleHistoryService } from '../user_role_history/user_role_history.service';
 import { MembershipRoleEntity } from '../membership_roles/Entity/membership_rols.entity';
 import { RoleMonthlyRateEntity } from '../role_monthly_rates/Entity/role_monthly_rates.entity';
+import { ConfigService } from '@nestjs/config';
+import { payment_method } from './userTypes';
 
 @Injectable()
 export class UsersService {
@@ -37,22 +39,65 @@ export class UsersService {
     @Inject(forwardRef(() => UserRoleHistoryService))
     private readonly userRoleHistoryService: UserRoleHistoryService,
     private readonly dataSource: DataSource,
+    private readonly config: ConfigService, 
   ) {}
-
+ 
   async getUserPaymentDetails(
     userId: number,
   ): Promise<PaymentDetailsEntity | null> {
     return this.paymentDetailsRepository.findOne({
-      where: { user: { id: userId } },
+      where: { user: { id: userId, is_admin: false } },
     });
   }
+async onApplicationBootstrap() {
+    if (this.config.get('SEED_ADMIN') !== 'true') return;
 
+    const count = await this.usersRepository.count();
+    if (count > 0) return;
+
+    // const email = this.config.get<string>('ADMIN_EMAIL');
+    // const password = this.config.get<string>('ADMIN_PASSWORD');
+    // if (!email || !password) return;
+
+    // תפקיד ברירת מחדל אם נדרש ע"י הסכמה
+    const defaultRole = await this.membershipRolesRepo.findOne({ where: { name: 'Member' } });
+
+    // הכנה: האש לסיסמה (כי הפונקציה שלך מצפה לסיסמה גולמית ומבצעת האש בתוכה;
+    // אם היא כבר מבצעת האש – תן לה את הגולמית, אחרת האש כאן)
+    // const hashed = await bcrypt.hash(password, 12);
+
+    // userData + paymentData "ריקים" (כדי לא להישבר בוולידציה)
+    await this.createUserAndPaymentInfo(
+      {
+        first_name: 'מנהל',
+        last_name: 'מערכת',
+        email_address: "chesedgmach@gmail.com",
+        password: "1234",         
+        is_admin: true,
+        id_number: '123456789',
+         phone_number: '0501234567',
+        current_role: null as any,
+        join_date: new Date(),
+      },
+      {
+        payment_method: payment_method.bank_transfer,     
+        charge_date: 1,
+        bank_number: 1,
+        bank_branch: 1,
+        bank_account_number: 1,
+       
+      },
+    );
+
+    // this.logger.log(`Admin user seeded: ${email}`);
+  }
   async createUserAndPaymentInfo(
     userData: Partial<UserEntity>,
     paymentData: Partial<PaymentDetailsEntity>,
     // roleData: Partial<UserRoleHistoryEntity>,
   ): Promise<UserEntity> {
     try {
+    
       if (
         paymentData.payment_method === undefined ||
         !Object.values(paymentData).includes(paymentData.payment_method)
@@ -70,13 +115,17 @@ export class UsersService {
       const newUser = this.usersRepository.create(userData);
       const paymentDetails = this.paymentDetailsRepository.create(paymentData);
       const savedUser = await this.usersRepository.save(newUser);
+      const userWithCurrentRole = await this.usersRepository.findOne({where:{id:savedUser.id},relations:["current_role"]});
       newUser.payment_details = paymentDetails;
-      await this.userRoleHistoryService.createUserRoleHistory({
-        from_date: newUser.join_date,
-        userId: savedUser.id,
-        roleId: savedUser.current_role.id,
-      });
-      return this.usersRepository.save(newUser);
+      if (userData.current_role) {
+        await this.userRoleHistoryService.createUserRoleHistory({
+          from_date: newUser.join_date,
+          userId: savedUser.id,
+          roleId: userWithCurrentRole?.current_role.id!,
+        });
+      }
+
+      return await this.usersRepository.save(newUser);;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -92,7 +141,7 @@ export class UsersService {
   async getUserById(id: number) {
     try {
       const user = await this.usersRepository.findOne({
-        where: { id },
+        where: { id, is_admin: false },
         relations: ['payment_details'],
       });
       if (!user) throw new Error('User not found');
@@ -103,11 +152,12 @@ export class UsersService {
   }
 
   async getUserByIdNumber(id_number: string): Promise<UserEntity | null> {
-    return this.usersRepository.findOne({ where: { id: Number(id_number) } });
+    return this.usersRepository.findOne({ where: { id: Number(id_number), is_admin: false } });
   }
 
   async getAllUsers(): Promise<UserEntity[]> {
     return this.usersRepository.find({
+      where: { is_admin: false },
       relations: ['payment_details', 'current_role'],
     });
   }
@@ -115,7 +165,7 @@ export class UsersService {
   async calculateTotalDue(userId: number): Promise<number> {
     // 1. שליפת המשתמש ובדיקות
     const user = await this.usersRepository.findOne({
-      where: { id: userId },
+      where: { id: userId, is_admin: false },
       relations: ['payment_details'],
     });
     if (!user) throw new BadRequestException('User not found');
@@ -211,7 +261,7 @@ export class UsersService {
 
   async updateUserMonthlyBalance(user: UserEntity) {
     const paymentDetails = await this.paymentDetailsRepository.findOne({
-      where: { user: { id: user.id } },
+      where: { user: { id: user.id, is_admin: false } },
       relations: ['user'],
     });
     if (!paymentDetails) {
@@ -227,7 +277,9 @@ export class UsersService {
   async getAllUsersBalances(): Promise<
     { user: string; total_due: number; total_paid: number; balance: number }[]
   > {
-    const users = await this.usersRepository.find();
+    const users = await this.usersRepository.find({
+      where: { is_admin: false },
+    });
     const balances = await Promise.all(
       users.map(async (user) => {
         const balanceData = await this.calculateUserMonthlyBalance(user);
@@ -251,20 +303,21 @@ export class UsersService {
 
     await this.usersRepository.update({ id: userId }, { current_role: role });
   }
-    async updateUserAndPaymentInfo(
+  async updateUserAndPaymentInfo(
     userId: number,
     userPatch?: Partial<UserEntity>,
     paymentPatch?: Partial<PaymentDetailsEntity>,
   ) {
     // 1) ולידציה בסיסית: אם לא נשלח שום דבר לעדכן – זורקים שגיאה 400
-    if ((!userPatch || Object.keys(userPatch).length === 0) &&
-        (!paymentPatch || Object.keys(paymentPatch).length === 0)) {
+    if (
+      (!userPatch || Object.keys(userPatch).length === 0) &&
+      (!paymentPatch || Object.keys(paymentPatch).length === 0)
+    ) {
       throw new BadRequestException('No fields provided to update');
     }
 
     // 2) מתחילים טרנזקציה: כל מה שבבלוק הפנימי ירוץ עם אותו Transaction Manager
     return this.dataSource.transaction(async (manager) => {
-
       // 3) שואבים Repositories "קשורים" לטרנזקציה (לא את ה-Repos הרגילים מה-constructor)
       const usersRepo = manager.getRepository(UserEntity);
       const paymentRepo = manager.getRepository(PaymentDetailsEntity);

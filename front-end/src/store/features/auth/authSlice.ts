@@ -73,16 +73,16 @@ export const logoutServer = createAsyncThunk<void, void, { rejectValue: string }
       state.error = null;
     },
   },
-  extraReducers: (b) => {
-    b.addCase(login.pending, (s) => { s.status = "pending"; s.error = null; });
-    b.addCase(login.fulfilled, (s) => { s.status = "fulfilled"; });
-    b.addCase(login.rejected, (s, a) => { s.status = "rejected"; s.error = a.payload ?? "Login failed"; });
+  extraReducers: (builder) => {
+    builder.addCase(login.pending, (s) => { s.status = "pending"; s.error = null; });
+    builder.addCase(login.fulfilled, (s) => { s.status = "fulfilled"; });
+    builder.addCase(login.rejected, (s, a) => { s.status = "rejected"; s.error = a.payload ?? "Login failed"; });
 
-    b.addCase(validate.pending, (s) => { s.status = "pending"; });
-    b.addCase(validate.fulfilled, (s, a) => { s.status = "fulfilled"; s.user = a.payload; });
-    b.addCase(validate.rejected, (s) => { s.status = "rejected"; s.user = null; });
+    builder.addCase(validate.pending, (s) => { s.status = "pending"; });
+    builder.addCase(validate.fulfilled, (s, a) => { s.status = "fulfilled"; s.user = a.payload; });
+    builder.addCase(validate.rejected, (s) => { s.status = "rejected"; s.user = null; });
 
-    b.addCase(logoutServer.fulfilled, (s) => { s.user = null; s.status = "idle"; s.error = null; });
+    builder.addCase(logoutServer.fulfilled, (s) => { s.user = null; s.status = "idle"; s.error = null; });
   },
 });
 

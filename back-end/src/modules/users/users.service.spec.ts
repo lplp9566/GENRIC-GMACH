@@ -10,6 +10,7 @@ import { MembershipRoleEntity } from '../membership_roles/Entity/membership_rols
 import { RoleMonthlyRateEntity } from '../role_monthly_rates/Entity/role_monthly_rates.entity';
 import { MonthlyDepositsService } from '../monthly_deposits/monthly_deposits.service';
 import { UserRoleHistoryService } from '../user_role_history/user_role_history.service';
+import { ConfigService } from '@nestjs/config';
 
 // --------- Repos Mocks for constructor-injected repositories ----------
 const mockUserRepo = () => ({
@@ -38,12 +39,19 @@ const mockUserRoleHistoryService = () => ({
   createUserRoleHistory: jest.fn(),
 });
 
+// --------- ConfigService mock ----------
+const mockConfigService: Partial<ConfigService> = {
+  get: jest.fn((key: string) => {
+    // החזר כאן ערכים אם ה־UsersService מצפה למפתחות מסוימים
+    // דוגמה:
+    // if (key === 'FEATURE_FLAGS.enableSomething') return true;
+    return undefined;
+  }),
+};
+
 // --------- DataSource mock tailored to updateUserAndPaymentInfo ----------
-function buildDataSourceMockForTx(
-  repoMap: Map<any, any>
-) {
+function buildDataSourceMockForTx(repoMap: Map<any, any>) {
   return {
-    // מריץ את הקולבק עם "manager" שמכיל getRepository
     transaction: jest.fn(async (cb: any) =>
       cb({
         getRepository: (entity: any) => {
@@ -111,8 +119,11 @@ describe('UsersService', () => {
         { provide: MonthlyDepositsService, useFactory: mockMonthlyDepositsService },
         { provide: UserRoleHistoryService, useFactory: mockUserRoleHistoryService },
 
-        // הכי חשוב: DataSource
+        // DataSource
         { provide: DataSource, useValue: dataSourceMock },
+
+        // ConfigService
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
@@ -132,13 +143,13 @@ describe('UsersService', () => {
       const res = await service.getUserById(1);
       expect(res).toEqual(mockUser);
       expect(userRepo.findOne).toHaveBeenCalledWith({
-        where: { id: 1 },
+        where: { id: 1, is_admin: false },
         relations: ['payment_details'],
       });
     });
 
     it('זורק שגיאה כשלא נמצא', async () => {
-      userRepo.findOne.mockResolvedValue(null);
+      userRepo.findOne.mockResolvedValue(null as any);
       await expect(service.getUserById(999)).rejects.toThrow('User not found');
     });
   });
@@ -148,7 +159,8 @@ describe('UsersService', () => {
       // מצב התחלתי: יש משתמש בלי payment_details
       const existingUser = { id: 10, first_name: 'Eli', payment_details: null } as any;
 
-      usersRepoTx.findOne.mockResolvedValueOnce(existingUser); // שלב הטעינה בתחילת הטרנזקציה
+      // שלב הטעינה בתחילת הטרנזקציה
+      usersRepoTx.findOne.mockResolvedValueOnce(existingUser);
       usersRepoTx.merge.mockImplementation((target: any, patch: any) => Object.assign(target, patch));
       usersRepoTx.save.mockImplementation(async (u: any) => u);
 

@@ -24,8 +24,9 @@ export class UserRoleHistoryService {
     private readonly membershipRolesService: MembershipRolesService,
   ) {}
     async createUserRoleHistory(dto: CreateUserRoleHistoryDto) {
+      if(dto.roleId == null) return
     // 1. טעינת המשתמש
-    const user = await this.userRepo.findOne({ where: { id: dto.userId } });
+    const user = await this.userRepo.findOne({ where: { id: dto.userId} });
     if (!user) throw new BadRequestException('User not found');
 
     // 2. טעינת הדרגה

@@ -14,6 +14,7 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
 
   // נתוני סיכום
   const mb = user.payment_details.monthly_balance;
+  if (mb === null) return ;
   const loans = user.payment_details.loan_balances;
   const anyLoanNeg = loans.some((l) => l.balance < 0);
   const today = new Date().getDate();

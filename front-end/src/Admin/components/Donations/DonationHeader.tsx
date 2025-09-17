@@ -1,11 +1,14 @@
 import { Paper, Stack, Box, Typography, Button } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store/store";
-import { setAddDonationModal } from "../../../store/features/Main/AppMode";
+import {
+  setAddDonationModal,
+  setWithdrawDonationModal,
+} from "../../../store/features/Main/AppMode";
 
 const DonationHeader = () => {
-      const dispatch = useDispatch<AppDispatch>();
-    
+  const dispatch = useDispatch<AppDispatch>();
+
   return (
     <Paper
       elevation={3}
@@ -58,6 +61,7 @@ const DonationHeader = () => {
             הוסף תרומה
           </Button>
           <Button
+            onClick={() => dispatch(setWithdrawDonationModal(true))}
             variant="outlined"
             sx={{
               borderColor: "#2a8c82",

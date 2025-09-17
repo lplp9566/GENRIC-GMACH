@@ -25,7 +25,7 @@ export interface IUserCreate {
   email_address: string
   phone_number: string
   is_admin: boolean
-  currentRole :number
+  current_role: number
 }
 export interface IPaymentDetails{
 bank_number: number

@@ -7,7 +7,7 @@ export class DonationsEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.donations)
+  @ManyToOne(() => UserEntity, (user) => user.donations ,{nullable:true})
   user: UserEntity;
 
   @Column({ type: 'date' })

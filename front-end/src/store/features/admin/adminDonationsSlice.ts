@@ -37,10 +37,10 @@ export const createDonation = createAsyncThunk<IDonation, ICreateDonation>(
     return data; 
   }
 );
-export const withdrawDonation = createAsyncThunk<IDonation, IDonation>(
+export const withdrawDonation = createAsyncThunk<IDonation, ICreateDonation>(
   "admin/withdrawDonation",
   async (donation) => {
-    const { data } = await axios.post<IDonation>(`${BASE_URL}/donations/withdraw`, donation);
+    const { data } = await axios.post<IDonation>(`${BASE_URL}/donations`, donation);
     return data; // <-- payload הוא IDonation
   }
 );
