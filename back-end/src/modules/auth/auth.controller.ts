@@ -25,8 +25,8 @@ export class AuthController {
     const token = await this.authService.login(email, password);
     res.cookie('Authentication', token, {
       httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production'? true : false,
+      secure: true,          // חובה כי Netlify הוא HTTPS
+  sameSite: 'none',
       maxAge: 1000 * 60 * 60 * 24,
     });
     return { message: 'Token issued successfully' };
