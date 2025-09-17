@@ -115,7 +115,6 @@ const DonationsHomePage: FC = () => {
   const { allDonations, status: donationsStatus, error } = useSelector((s: RootState) => s.AdminDonationsSlice);
   const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
 
-  // רשימת משתמשים ל־id->user (לוקחים מכל וריאציה נפוצה של ה-slice)
   const usersList = useSelector((s: RootState) => {
     const any = s as any;
     const arr: any[] = [];

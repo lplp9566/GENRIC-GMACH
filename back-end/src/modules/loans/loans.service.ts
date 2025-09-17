@@ -12,7 +12,6 @@ import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-over
 import { FundsFlowService } from './calcelete.service';
 import { LoanEntity } from './Entity/loans.entity';
 import { FindOpts, LoanStatus, PaginatedResult } from '../../common/index';
-// cSpell:ignore Financials
 
 @Injectable()
 export class LoansService {

@@ -3,7 +3,6 @@ import { addDays } from 'date-fns';
 import { DepositsService } from '../deposits/deposits.service';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsFlowService } from '../loans/calcelete.service';
-import { log } from 'console';
 
 @Injectable()
 export class DepositsFlowService {

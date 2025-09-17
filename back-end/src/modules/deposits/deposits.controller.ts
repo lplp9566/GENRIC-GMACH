@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, DefaultValuePipe, Get, Param, ParseEnumPipe, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { DepositsService } from './deposits.service';
 import { DepositsEntity } from './Entity/deposits.entity';
-import { LoanStatus as StatusCordi } from 'src/common';
+import { LoanStatus as StatusCordi } from '../../common';
 import { DepositsFlowService } from './DepositsFlow.service';
 
 export interface BringForwardDto {

@@ -13,7 +13,6 @@ import { LoanActionsModule } from '../loans/loan-actions/loan-actions.module';
 import { UserRoleHistoryModule } from '../user_role_history/user_role_history.module';
 import { MembershipRolesModule } from '../membership_roles/membership_roles.module';
 import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates.module';
-import { AppModule } from 'src/app.module';
 
 @Module({
   imports: [

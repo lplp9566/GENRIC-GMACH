@@ -1,15 +1,10 @@
-// cSpell:ignore Financials
 
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './modules/users/users.module';
 import { FundsOverviewModule } from './modules/funds-overview/funds-overview.module';
-import { FundsOverviewService } from './modules/funds-overview/funds-overview.service';
-import { FundsOverviewController } from './modules/funds-overview/funds-overview.controller';
 import { LoanActionsModule } from './modules/loans/loan-actions/loan-actions.module';
-import { LoansController } from './modules/loans/loans.controller';
-import { LoansService } from './modules/loans/loans.service';
 import { LoansModule } from './modules/loans/loans.module';
 import { UserFinancialByYearModule } from './modules/users/user-financials-by-year/user-financial-by-year.module';
 import { ExpensesService } from './modules/expenses/expenses.service';
@@ -22,7 +17,6 @@ import { MailModule } from './modules/mail/mail.module';
 import { UserFinancialsModule } from './modules/users/user-financials/user-financials.module';
 import { InvestmentsModule } from './modules/investments/investments.module';
 import { InvestmentTransactionsModule } from './modules/investments/investment-transactions/investment-transactions.module';
-import { config } from 'dotenv';
 import { RequestsModule } from './modules/requests/requests.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { DepositsModule } from './modules/deposits/deposits.module';

@@ -29,8 +29,6 @@ export class DonationsService {
   ) {}
 
   async getDonations() {
-
-
     return await this.donationsRepository.find({ relations: ['user'] });
   }
 
