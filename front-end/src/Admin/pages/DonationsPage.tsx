@@ -61,34 +61,34 @@ function getDonorId(d: any): string | null {
 }
 
 // מחלץ שם מלא – קודם מאובייקט התרומה, אח"כ selectedUser, אח"כ מהמפה ב־Redux
-function getDonorFullName(d: any, selectedUser: any, usersById: Map<string, any>): string {
-  // 1) יש user עם שם פרטי/משפחה בתוך התרומה?
-  const first = d?.user?.first_name ?? d?.user?.firstName ?? "";
-  const last  = d?.user?.last_name  ?? d?.user?.lastName  ?? "";
-  const byNested = `${first} ${last}`.trim();
-  if (byNested) return byNested;
+// function getDonorFullName(d: any, selectedUser: any, usersById: Map<string, any>): string {
+//   // 1) יש user עם שם פרטי/משפחה בתוך התרומה?
+//   const first = d?.user?.first_name ?? d?.user?.firstName ?? "";
+//   const last  = d?.user?.last_name  ?? d?.user?.lastName  ?? "";
+//   const byNested = `${first} ${last}`.trim();
+//   if (byNested) return byNested;
 
-  // 2) אם מסונן לפי משתמש וה־id תואם – קח מה-selectedUser
-  const donorId = getDonorId(d);
-  if (donorId && selectedUser?.id != null && String(selectedUser.id) === donorId) {
-    const selFirst = selectedUser?.first_name ?? selectedUser?.firstName ?? "";
-    const selLast  = selectedUser?.last_name  ?? selectedUser?.lastName  ?? "";
-    const bySelected = `${selFirst} ${selLast}`.trim();
-    if (bySelected) return bySelected;
-  }
+//   // 2) אם מסונן לפי משתמש וה־id תואם – קח מה-selectedUser
+//   const donorId = getDonorId(d);
+//   if (donorId && selectedUser?.id != null && String(selectedUser.id) === donorId) {
+//     const selFirst = selectedUser?.first_name ?? selectedUser?.firstName ?? "";
+//     const selLast  = selectedUser?.last_name  ?? selectedUser?.lastName  ?? "";
+//     const bySelected = `${selFirst} ${selLast}`.trim();
+//     if (bySelected) return bySelected;
+//   }
 
-  // 3) מהמפה ב־Redux (AdminUsers)
-  if (donorId && usersById.has(donorId)) {
-    const u = usersById.get(donorId);
-    const uFirst = u?.first_name ?? u?.firstName ?? "";
-    const uLast  = u?.last_name  ?? u?.lastName  ?? "";
-    const byMap = `${uFirst} ${uLast}`.trim();
-    if (byMap) return byMap;
-  }
+//   // 3) מהמפה ב־Redux (AdminUsers)
+//   if (donorId && usersById.has(donorId)) {
+//     const u = usersById.get(donorId);
+//     const uFirst = u?.first_name ?? u?.firstName ?? "";
+//     const uLast  = u?.last_name  ?? u?.lastName  ?? "";
+//     const byMap = `${uFirst} ${uLast}`.trim();
+//     if (byMap) return byMap;
+//   }
 
-  // 4) אין – מציגים מקף (כדי שלא יהיה #id)
-  return "—";
-}
+//   // 4) אין – מציגים מקף (כדי שלא יהיה #id)
+//   return "—";
+// }
 
 // מחשב קרנות “און דה פליי” מכל התרומות (מתעדכן מיד אחרי הוספה)
 function computeOverviewFromDonations(donations: any[]): { regularTotal: number; fundCards: FundCardData[] } {
