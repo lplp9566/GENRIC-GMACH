@@ -4,11 +4,9 @@ import { Box, Container, Grid, Alert } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
 
-// Thunks (אם יש לכם בבאק)
 import { getAllDonations } from "../../store/features/admin/adminDonationsSlice";
 import { getFundsOverview } from "../../store/features/admin/adminFundsOverviewSlice";
 
-// רכיבים קיימים אצלך
 import DonationsTable, { DonationRow, SortBy, SortDir } from "../components/Donations/DonationsTable";
 import FundsPanel, { FundCardData } from "../components/Donations/FundPanel";
 import FiltersBar from "../components/Donations/FiltersBar";
@@ -17,12 +15,18 @@ import KpiRow from "../components/Donations/KpiRow";
 import DonationHeader from "../components/Donations/DonationHeader";
 import NewDonation from "../components/Donations/NewDonation";
 
-// --- קבועי UI קטנים ---
-const MONTHS = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+// --------------------------------------------------
+// UI consts
+// --------------------------------------------------
 type ViewMode = "split" | "left" | "right";
+const MONTHS = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
 
-// --- פונקציות עזר קטנות, פשוטות ---
-function normalizeKey(s: any) { return String(s ?? "").trim().toLowerCase(); }
+// --------------------------------------------------
+// Helpers (פשוטים וברורים)
+// --------------------------------------------------
+function normalizeKey(s: any) {
+  return String(s ?? "").trim().toLowerCase();
+}
 
 function parseDate(raw: any): Date | null {
   if (!raw) return null;
@@ -32,7 +36,6 @@ function parseDate(raw: any): Date | null {
 
 function formatDate(d: Date | null) {
   if (!d) return "—";
-  // תאריך אחיד וקריא
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
@@ -47,24 +50,25 @@ function getDonationCategory(d: any): { kind: "regular" | "fund"; key: string; l
   return { kind: "fund", key: normalizeKey(reasonRaw), label: reasonRaw };
 }
 
-// מחלץ מזהה תורם מתוך תרומה – תומך גם user.id וגם userId/user_id
+// מחלץ מזהה תורם גם כש- d.user הוא **מספר** (כמו בדוגמה שלך)
 function getDonorId(d: any): string | null {
-  const id = d?.user?.id ?? d?.userId ?? d?.user_id;
-  if (id == null) return null;
-  const key = String(id).trim();
+  const raw =
+    (typeof d?.user === "object" && d?.user !== null ? (d.user.id ?? d.userId ?? d.user_id) : d?.user) ??
+    d?.userId ?? d?.user_id;
+  if (raw == null) return null;
+  const key = String(raw).trim();
   return key || null;
 }
 
-// מחלץ שם מלא – קודם מהאובייקט עצמו, אח"כ selectedUser, אח"כ מהמפה ב־Redux
+// מחלץ שם מלא – קודם מאובייקט התרומה, אח"כ selectedUser, אח"כ מהמפה ב־Redux
 function getDonorFullName(d: any, selectedUser: any, usersById: Map<string, any>): string {
-  
-  // 1) אם יש user עם שם פרטי/משפחה בתוך התרומה
+  // 1) יש user עם שם פרטי/משפחה בתוך התרומה?
   const first = d?.user?.first_name ?? d?.user?.firstName ?? "";
   const last  = d?.user?.last_name  ?? d?.user?.lastName  ?? "";
   const byNested = `${first} ${last}`.trim();
   if (byNested) return byNested;
 
-  // 2) אם מסונן לפי משתמש וה־id תואם – קח את השם משם
+  // 2) אם מסונן לפי משתמש וה־id תואם – קח מה-selectedUser
   const donorId = getDonorId(d);
   if (donorId && selectedUser?.id != null && String(selectedUser.id) === donorId) {
     const selFirst = selectedUser?.first_name ?? selectedUser?.firstName ?? "";
@@ -82,11 +86,11 @@ function getDonorFullName(d: any, selectedUser: any, usersById: Map<string, any>
     if (byMap) return byMap;
   }
 
-  // 4) אם אין – הצג מקף (לא #id)
+  // 4) אין – מציגים מקף (כדי שלא יהיה #id)
   return "—";
 }
 
-// מחשב קרנות “און דה פליי” מכל התרומות (לא תלוי בשרת)
+// מחשב קרנות “און דה פליי” מכל התרומות (מתעדכן מיד אחרי הוספה)
 function computeOverviewFromDonations(donations: any[]): { regularTotal: number; fundCards: FundCardData[] } {
   let regular = 0;
   const fundMap = new Map<string, number>();
@@ -100,19 +104,27 @@ function computeOverviewFromDonations(donations: any[]): { regularTotal: number;
   return { regularTotal: regular, fundCards };
 }
 
-// --- העמוד עצמו: פשוט, פונקציות + return ברור ---
+// --------------------------------------------------
+// Component
+// --------------------------------------------------
 const DonationsHomePage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // Redux
+  // Redux state
   const addDonationModal = useSelector((s: RootState) => s.mapModeSlice.AddDonationModal);
   const { allDonations, status: donationsStatus, error } = useSelector((s: RootState) => s.AdminDonationsSlice);
   const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
 
-  // רשימת משתמשים לבניית מפת id->user (פשוט)
-  const usersList = useSelector((s: RootState) =>
-    (s as any)?.AdminUsers?.users ?? (s as any)?.AdminUsers?.list ?? []
-  );
+  // רשימת משתמשים ל־id->user (לוקחים מכל וריאציה נפוצה של ה-slice)
+  const usersList = useSelector((s: RootState) => {
+    const any = s as any;
+    const arr: any[] = [];
+    if (any?.AdminUsers?.entities) arr.push(...Object.values(any.AdminUsers.entities));
+    if (Array.isArray(any?.AdminUsers?.users)) arr.push(...any.AdminUsers.users);
+    if (Array.isArray(any?.AdminUsers?.list)) arr.push(...any.AdminUsers.list);
+    return arr;
+  });
+
   const usersById = useMemo(() => {
     const m = new Map<string, any>();
     (Array.isArray(usersList) ? usersList : []).forEach((u: any) => {
@@ -122,16 +134,17 @@ const DonationsHomePage: FC = () => {
     return m;
   }, [usersList]);
 
-  // טעינה ראשונית + כשסטטוס חוזר ל-idle
+  // טעינה ראשונית
   useEffect(() => {
     if (donationsStatus === "idle") {
       dispatch(getAllDonations({} as any));
-      dispatch(getFundsOverview()); // לא מזיק גם אם לא משתמשים
+      dispatch(getFundsOverview()); // לא חובה, אבל לא מזיק
     }
   }, [dispatch, donationsStatus]);
 
-  // אחרי שסוגרים מודאל הוספה – ריענון וחזרה ל-split
+  // אחרי שסוגרים מודאל הוספה – ריענון רשימות וחזרה ל-split
   const wasOpen = useRef(addDonationModal);
+  const [view, setView] = useState<ViewMode>("split");
   useEffect(() => {
     if (wasOpen.current && !addDonationModal) {
       dispatch(getAllDonations({} as any));
@@ -141,21 +154,17 @@ const DonationsHomePage: FC = () => {
     wasOpen.current = addDonationModal;
   }, [addDonationModal, dispatch]);
 
-  // בסיס נתונים
+  // דאטה בסיסית
   const donations = Array.isArray(allDonations) ? allDonations : [];
-
-  // סינון לפי משתמש נבחר (אם יש)
   const selectedUserId = selectedUser?.id != null ? String(selectedUser.id) : null;
+
+  // תרומות בסיס בהתאם למשתמש נבחר (אם יש)
   const donationsBase = useMemo(() => {
     if (!selectedUserId) return donations;
-    return donations.filter((d: any) => {
-      const donorId = getDonorId(d);
-      return donorId === selectedUserId;
-    });
+    return donations.filter((d: any) => getDonorId(d) === selectedUserId);
   }, [donations, selectedUserId]);
 
   // מצבי UI
-  const [view, setView] = useState<ViewMode>("split");
   const [monthFilter, setMonthFilter] = useState<number | "all">("all");
   const [yearFilter, setYearFilter] = useState<number | "all">("all");
   const [sortBy, setSortBy] = useState<SortBy>("date");
@@ -163,8 +172,8 @@ const DonationsHomePage: FC = () => {
   const [activeKey, setActiveKey] = useState<string | null>(null);
 
   // פריסה
-  const leftCols  = view === "left"  ? 12 : view === "split" ? 6 : 0;
-  const rightCols = view === "right" ? 12 : view === "split" ? 6 : 0;
+  // const leftCols  = view === "left"  ? 12 : view === "split" ? 6 : 0;
+  // const rightCols = view === "right" ? 12 : view === "split" ? 6 : 0;
 
   // אופציות שנה/חודש
   const yearOptions = useMemo(() => {
@@ -193,7 +202,6 @@ const DonationsHomePage: FC = () => {
     return Array.from(set).sort((a, b) => a - b);
   }, [donationsBase, yearFilter, activeKey]);
 
-  // ודא שהחודש חוקי
   useEffect(() => {
     if (monthFilter !== "all" && !monthOptions.includes(monthFilter)) {
       setMonthFilter("all");
@@ -233,14 +241,14 @@ const DonationsHomePage: FC = () => {
     return arr;
   }, [filtered, sortBy, sortDir]);
 
-  // שורות לטבלה – פה קורה הקסם של שם מלא
+  // טבלת שורות – עם שם מלא אמיתי
   const rows: DonationRow[] = useMemo(() => {
     return sorted.map((d: any) => {
       const dt = parseDate(d?.date);
       const userName = getDonorFullName(d, selectedUser, usersById);
       return {
         id: d?.id ?? "—",
-        userName,                             // ← שם מלא של התורם (אם קיים במפה/selectedUser/האובייקט)
+        userName, // ← שם מלא; אם user=3 נקבל מה־store או selectedUser
         amount: Number(d?.amount) || 0,
         date: formatDate(dt),
         action: d?.action ?? "—",
@@ -255,19 +263,21 @@ const DonationsHomePage: FC = () => {
   const kpiTotal  = useMemo(() => rows.reduce((s, r) => s + (r.amount || 0), 0), [rows]);
   const kpiCount  = rows.length;
 
-  // נתוני קרנות: תמיד מחושב מהתרומות (fresh). אם יש selectedUser – מסכם רק שלו.
+  // קרנות – מחושב מקומית; אם יש selectedUser – לפי התרומות שלו
   const overviewAll   = useMemo(() => computeOverviewFromDonations(donations),     [donations]);
   const overviewUser  = useMemo(() => computeOverviewFromDonations(donationsBase), [donationsBase]);
   const rightPanelRegularTotal = selectedUserId ? overviewUser.regularTotal : overviewAll.regularTotal;
   const rightPanelFundCards    = selectedUserId ? overviewUser.fundCards    : overviewAll.fundCards;
 
-  // האנדלר של מיון
+  // מיון
   function handleSortClick(key: SortBy) {
     if (sortBy === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortBy(key); setSortDir("desc"); }
   }
 
-  // --- וחוזרים לרנדר פשוט ---
+  // --------------------------------------------------
+  // Render
+  // --------------------------------------------------
   return (
     <Container sx={{ py: 4, direction: "rtl", bgcolor: "#F9FBFC", fontFamily: "Heebo, Arial, sans-serif", minHeight: "100vh" }}>
       {addDonationModal && <NewDonation />}
@@ -277,8 +287,8 @@ const DonationsHomePage: FC = () => {
         {isError && <Alert severity="error">{error || "אירעה שגיאה בטעינת תרומות"}</Alert>}
 
         <Grid container spacing={3}>
-          {/* שמאל – טבלה */}
-          <Grid item xs={12} md={leftCols} sx={{ display: leftCols ? "block" : "none" }}>
+          {/* שמאל – טבלת תרומות */}
+          <Grid item xs={12} md={view === "left" ? 12 : view === "split" ? 6 : 0} sx={{ display: view === "right" ? "none" : "block" }}>
             <Frame title="טבלת תרומות" expanded={view === "left"} onToggle={() => setView(view === "left" ? "split" : "left")}>
               <KpiRow totalAmount={kpiTotal} totalDonations={kpiCount} view={view} />
 
@@ -303,7 +313,7 @@ const DonationsHomePage: FC = () => {
           </Grid>
 
           {/* ימין – קרנות */}
-          <Grid item xs={12} md={rightCols} sx={{ display: rightCols ? "block" : "none" }}>
+          <Grid item xs={12} md={view === "right" ? 12 : view === "split" ? 6 : 0} sx={{ display: view === "left" ? "none" : "block" }}>
             <Frame
               title={selectedUserId ? "קרנות (למשתמש הנבחר)" : "קרנות מיוחדות"}
               expanded={view === "right"}

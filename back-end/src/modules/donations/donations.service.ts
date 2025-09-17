@@ -53,8 +53,13 @@ export class DonationsService {
       year,
       donation.amount,
     );
-  const donationRecord = await this.donationsRepository.save(donation);  
-    return donationRecord;
+    const saved = await this.donationsRepository.save(donation);
+  const withUser = await this.donationsRepository.findOne({
+    where: { id: saved.id },
+    relations: { user: true },
+  });
+
+    return withUser;
   }
 
   async createFundDonation(donation: DonationsEntity) {
@@ -79,7 +84,26 @@ export class DonationsService {
       donation.donation_reason,
       donation.amount,
     );
-    return await this.donationsRepository.save(donation);
+    await this.userFinancialsService.recordSpecialFundDonation(
+      user,
+      donation.amount,
+    );
+    await this.fundsOverviewService.addSpecialFund(
+      donation.donation_reason,
+      donation.amount,
+    );
+    await this.fundsOvirewviewServiceByYear.recordSpecialFundDonationByName(
+      year,
+      donation.donation_reason,
+      donation.amount,
+    );
+    const saved = await this.donationsRepository.save(donation);
+  const withUser = await this.donationsRepository.findOne({
+    where: { id: saved.id },
+    relations: { user: true },
+  });
+
+    return withUser;
   }
 
   async createDonation(donation: DonationsEntity) {  
@@ -117,7 +141,11 @@ export class DonationsService {
         donation.amount,
       );
       const donationRecord = await this.donationsRepository.save(donation);
-      return donationRecord;
+      const withUser = await this.donationsRepository.findOne({
+        where: { id: donationRecord.id },
+        relations: { user: true },
+      });
+      return withUser;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

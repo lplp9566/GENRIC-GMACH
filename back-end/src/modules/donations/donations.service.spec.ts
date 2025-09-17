@@ -16,8 +16,8 @@ import { DonationsEntity } from './Entity/donations.entity';
 const mockDonationRepo = () => ({
   find: jest.fn(),
   save: jest.fn(),
+  findOne: jest.fn(),
 });
-
 describe('DonationsService', () => {
   let service: DonationsService;
   let donationRepo: jest.Mocked<Repository<DonationsEntity>>;
@@ -104,49 +104,69 @@ describe('DonationsService', () => {
     expect(result).toEqual(donations);
   });
 
-  it('should create equity donation flow', async () => {
-    const donation: DonationsEntity = {
-      id: 1,
-      user: mockUser,
-      date: new Date(),
-      amount: 100,
-      donation_reason: 'Equity',
-      action: DonationActionType.donation,
-    };
-    donationRepo.save.mockResolvedValue(donation);
-    const result = await service.createDonation(donation);
-    expect(donationRepo.save).toHaveBeenCalledWith(donation);
-    expect(result).toEqual(donation);
+ it('should create equity donation flow', async () => {
+  const donation: DonationsEntity = {
+    id: 1,
+    user: mockUser as any,
+    date: new Date(),
+    amount: 100,
+    donation_reason: 'Equity',
+    action: DonationActionType.donation,
+  };
+
+  donationRepo.save.mockResolvedValue(donation);
+  donationRepo.findOne.mockResolvedValue({ ...donation, user: mockUser }); // ← החזרת הרשומה עם user
+
+  const result = await service.createDonation(donation);
+
+  expect(donationRepo.save).toHaveBeenCalledWith(donation);
+  expect(donationRepo.findOne).toHaveBeenCalledWith({
+    where: { id: donation.id },
+    relations: { user: true },
   });
+  expect(result).toEqual({ ...donation, user: mockUser });
+});
 
   it('should create fund donation flow', async () => {
-    const donation: DonationsEntity = {
-      id: 1,
-      user: mockUser,
-      date: new Date(),
-      amount: 150,
-      donation_reason: 'SpecialFund',
-      action: DonationActionType.donation,
-    };
-    donationRepo.save.mockResolvedValue(donation);
-    const result = await service.createDonation(donation);
-    expect(donationRepo.save).toHaveBeenCalledWith(donation);
-    expect(result).toEqual(donation);
-  });
+  const donation: DonationsEntity = {
+    id: 1,
+    user: mockUser as any,
+    date: new Date(),
+    amount: 150,
+    donation_reason: 'SpecialFund',
+    action: DonationActionType.donation,
+  };
 
-  it('should handle fund withdrawal flow', async () => {
-    const donation: DonationsEntity = {
-      id: 1,
-      user: mockUser,
-      date: new Date(),
-      amount: 200,
-      donation_reason: 'CampFund',
-      action: DonationActionType.withdraw,
-    };
-    donationRepo.save.mockResolvedValue(donation);
-    const result = await service.createDonation(donation);
-    expect(result).toEqual(donation);
-  });
+  donationRepo.save.mockResolvedValue(donation);
+  donationRepo.findOne.mockResolvedValue({ ...donation, user: mockUser });
+
+  const result = await service.createDonation(donation);
+
+  expect(donationRepo.save).toHaveBeenCalledWith(donation);
+  expect(donationRepo.findOne).toHaveBeenCalled();
+  expect(result).toEqual({ ...donation, user: mockUser });
+});
+
+it('should handle fund withdrawal flow', async () => {
+  const donation: DonationsEntity = {
+    id: 1,
+    user: mockUser as any,
+    date: new Date(),
+    amount: 200,
+    donation_reason: 'CampFund',
+    action: DonationActionType.withdraw,
+  };
+
+  donationRepo.save.mockResolvedValue(donation);
+  donationRepo.findOne.mockResolvedValue({ ...donation, user: mockUser });
+
+  const result = await service.createDonation(donation);
+
+  expect(donationRepo.save).toHaveBeenCalledWith(donation);
+  expect(donationRepo.findOne).toHaveBeenCalled();
+  expect(result).toEqual({ ...donation, user: mockUser });
+});
+
 
   it('should throw if user not found', async () => {
     const module: TestingModule = await Test.createTestingModule({

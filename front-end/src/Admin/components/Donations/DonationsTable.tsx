@@ -18,7 +18,6 @@ interface DonationsTableProps {
   onSortClick: (key: SortBy) => void;
 }
 const DonationsTable: FC<DonationsTableProps> = ({ isLoading, rows, sortBy, sortDir, onSortClick }) => {
-  console.log({ isLoading, rows, sortBy, sortDir });
   
       if (isLoading) {
     return (

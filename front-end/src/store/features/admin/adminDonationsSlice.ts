@@ -33,6 +33,7 @@ export const createDonation = createAsyncThunk<IDonation, ICreateDonation>(
   "admin/createDonation",
   async (donation) => {
     const { data } = await axios.post<IDonation>(`${BASE_URL}/donations`, donation);
+    console.log(data.user.last_name)
     return data; 
   }
 );
