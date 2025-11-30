@@ -27,6 +27,7 @@ const error = auth?.error ?? null;
   return (
     <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center", p: 2 }}>
       <Card sx={{ width: "100%", maxWidth: 420 }}>
+        <Typography variant="h4" fontWeight={700} textAlign="center">ברוכים הבאים לגמח אהבת חסד </Typography>
         <CardContent sx={{ p: 4 }}>
           <Typography variant="h5" fontWeight={700} textAlign="center" mb={3}>התחברות</Typography>
           <Box component="form" onSubmit={onSubmit} sx={{ display: "grid", gap: 2 }}>

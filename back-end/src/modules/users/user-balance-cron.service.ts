@@ -25,7 +25,7 @@ export class UserBalanceCronService {
     
   ) {}
 
-  @Cron('00 00 * * *', { timeZone: 'Asia/Jerusalem' })
+  @Cron('06 19 * * *', { timeZone: 'Asia/Jerusalem' })
   async updateAllUsersBalances() {
     this.logger.log('🔄 Updating all users balances...');
     const users = await this.usersService.getAllUsers();

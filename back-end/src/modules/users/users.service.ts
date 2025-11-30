@@ -124,7 +124,7 @@ async onApplicationBootstrap() {
           roleId: userWithCurrentRole?.current_role.id!,
         });
       }
-
+    
       return await this.usersRepository.save(newUser);;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -204,7 +204,9 @@ async onApplicationBootstrap() {
 
     // 6. לולאה חודש־חודש מ־iter ועד לרגע end (כולל יוני)
     while (iter.getTime() <= end.getTime()) {
-      // console.log('⏳ Month:', iter.toISOString().slice(0,7));
+      console.log(user.first_name);
+      
+      console.log('⏳ Month:', iter.toISOString().slice(0,7));
 
       // א. בחר את הדרגה שהייתה פעילה באותו חודש
       const active = history
@@ -212,9 +214,9 @@ async onApplicationBootstrap() {
         .sort((a, b) => +new Date(b.from_date) - +new Date(a.from_date))[0];
 
       if (!active) {
-        // console.log('  ✖ No active role, skipping');
+        console.log('  ✖ No active role, skipping');
       } else {
-        // console.log('  ✔ Active role id:', active.role.id);
+        console.log('  ✔ Active role id:', active.role.id);
 
         // ב. מצא את התעריף האחרון שהחל עד אותו חודש
         const rate = allRates
@@ -228,10 +230,10 @@ async onApplicationBootstrap() {
           )[0];
 
         if (rate) {
-          // console.log('  💰 Using rate:', rate.amount);
+          console.log('  💰 Using rate:', rate.amount);
           totalDue += rate.amount;
         } else {
-          // console.log('  ✖ No rate found, skipping');
+          console.log('  ✖ No rate found, skipping');
         }
       }
 
@@ -253,6 +255,7 @@ async onApplicationBootstrap() {
     user: UserEntity,
   ): Promise<{ total_due: number; total_paid: number; balance: number }> {
     const totalDue = await this.calculateTotalDue(user.id);
+    console.log(totalDue,"totalDue");
     const totalPaid = await this.getUserTotalDeposits(user.id);
     const balance = totalPaid - totalDue;
     // console.log(totalDue,"totalDue",totalPaid,"totalPaid",balance,"balance");
@@ -293,6 +296,8 @@ async onApplicationBootstrap() {
     return balances;
   }
   async keepAlive() {
+    console.log('I am alive');
+    
     return 'I am alive';
   }
   async setCurrentRole(userId: number, roleId: number) {

@@ -89,10 +89,11 @@ export class MonthlyDepositsService {
         this.userFinancialByYearService.recordMonthlyDeposit(user, year, payment_details.amount),
         this.userFinancialsService.recordMonthlyDeposit(user, payment_details.amount),
         this.fundsOverviewService.addMonthlyDeposit(payment_details.amount),
-        this.usersService.updateUserMonthlyBalance(user),
+
         this.fundsOverviewByYearService.recordMonthlyDeposit(year, payment_details.amount),
       ]);
-  
+      await this.usersService.updateUserMonthlyBalance(user);
+
       return { message: `Deposit recorded successfully.` };
   
     } catch (error) {

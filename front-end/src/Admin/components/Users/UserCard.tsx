@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { IUser } from "./UsersDto";
 import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, Chip, Collapse, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, Stack, styled, Typography } from "@mui/material";
 import { revertPaymentMethod } from "../../../common/revertTypes/PaymentMethed";
@@ -8,13 +7,15 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import SavingsIcon from "@mui/icons-material/Savings";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import EditUser from "./editUser";
+
 const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
   const [expanded, setExpanded] = useState(false);
-  const navigate = useNavigate();
+  const [editModal, seteditModal] = useState(false);
 
   // נתוני סיכום
-  const mb = user.payment_details.monthly_balance;
-  if (mb === null) return ;
+  const mb = user.payment_details.monthly_balance!;
+  if (mb === null) return null ;
   const loans = user.payment_details.loan_balances;
   const anyLoanNeg = loans.some((l) => l.balance < 0);
   const today = new Date().getDate();
@@ -27,7 +28,8 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
   };
   const onEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate(`/users/${user.id}/edit`);
+    seteditModal(true);
+    // navigate(`/users/${user.id}/edit`);
   };
 const StyledCard = styled(Card)(({ theme }) => ({
   borderRadius: theme.spacing(2),
@@ -52,6 +54,7 @@ const ExpandMore = styled((props: any) => {
   }),
 }));
   return (
+    <>
     <StyledCard onClick={() => toggleExpand()}>
       <CardHeader
         avatar={
@@ -175,6 +178,10 @@ const ExpandMore = styled((props: any) => {
             {user.payment_details.bank_account_number}
           </Typography>
           <Typography variant="body2">
+            <strong>תאריך חיוב:</strong>{" "}
+            {user.payment_details.charge_date}
+          </Typography>
+          <Typography variant="body2">
             <strong>שיטת תשלום:</strong>{" "}
             {revertPaymentMethod(user.payment_details.payment_method)}
           </Typography>
@@ -186,7 +193,10 @@ const ExpandMore = styled((props: any) => {
           </Box>
         </CardContent>
       </Collapse>
+
     </StyledCard>
+         {editModal && <EditUser open={editModal} user={user} onClose={() => seteditModal(false)} />}
+    </>
   );
 };
 export default UserCard;

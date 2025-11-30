@@ -1,7 +1,11 @@
 import axios from "axios";
 
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IAddUserFormData, IUser, Status } from "../../../Admin/components/Users/UsersDto";
+import {
+  IAddUserFormData,
+  IUser,
+  Status,
+} from "../../../Admin/components/Users/UsersDto";
 
 axios.defaults.withCredentials = true;
 
@@ -21,11 +25,9 @@ const initialState: AdminUsersType = {
 };
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const getAllUsers = createAsyncThunk("admin/getAllUsers", async () => {
-  const response = await axios.get(
-    `${BASE_URL}/users`
-  );
+  const response = await axios.get(`${BASE_URL}/users`);
   console.log("Fetched users:", response.data);
-  
+
   return response.data;
 });
 export const createUser = createAsyncThunk(
@@ -34,7 +36,34 @@ export const createUser = createAsyncThunk(
     const response = await axios.post<IUser>(`${BASE_URL}/users`, user);
     return response.data;
   }
-)
+);
+export const editUser = createAsyncThunk(
+  "admin/editUser",
+  async (data: { userId: number; userData: Partial<IUser> }) => {
+    const payload = {
+      userData: {
+        id: data.userId,
+        first_name: data.userData.first_name,
+        last_name: data.userData.last_name,
+        id_number: data.userData.id_number,
+        phone_number: data.userData.phone_number,
+        email_address: data.userData.email_address,
+      },
+      paymentData: {
+        bank_number: data.userData.payment_details?.bank_number,
+        bank_branch: data.userData.payment_details?.bank_branch,
+        bank_account_number: data.userData.payment_details?.bank_account_number,
+        charge_date: data.userData.payment_details?.charge_date,
+        payment_method: data.userData.payment_details?.payment_method,
+      },
+    };
+    const response = await axios.patch<IUser>(
+      `${BASE_URL}/users/${data.userId}`,
+      payload
+    );
+    return response.data;
+  }
+);
 
 export const AdminUsersSlice = createSlice({
   name: "adminUsers",
@@ -69,6 +98,16 @@ export const AdminUsersSlice = createSlice({
         state.createUserStatus = "fulfilled";
       })
       .addCase(createUser.rejected, (state, action) => {
+        state.createUserStatus = "rejected";
+        state.error = action.error.message || null;
+      })
+      .addCase(editUser.pending, (state) => {
+        state.createUserStatus = "pending";
+      })
+      .addCase(editUser.fulfilled, (state) => {
+        state.createUserStatus = "fulfilled";
+      })
+      .addCase(editUser.rejected, (state, action) => {
         state.createUserStatus = "rejected";
         state.error = action.error.message || null;
       });
