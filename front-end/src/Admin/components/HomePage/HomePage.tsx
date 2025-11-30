@@ -46,6 +46,7 @@ const HomePage: React.FC = () => {
       description: "הוספת משתמש חדש",
       icon: <Group />,
       color: "linear-gradient(to right, #00b4db, #0083b0)",
+      onclick: () => navigate("/users/new"),
     },
     {
       label: "תרומה",
