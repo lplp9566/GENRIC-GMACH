@@ -14,12 +14,12 @@ import {
 interface Props {
   onChange: (userId: number) => void;
   label?: string;
-  // מגדירים כאן גם אפשרות להעביר ערך נבחר
   value?: number;
   color?: "primary" | "secondary" | "error" | "info" | "success" | "warning";
 }
 
 const SelectAllUsers: React.FC<Props> = ({
+
   onChange,
   label = "בחר משתמש",
   value,
@@ -29,7 +29,8 @@ const SelectAllUsers: React.FC<Props> = ({
   const allUsers = useSelector(
     (state: RootState) => state.AdminUsers.allUsers
   );
-
+  console.log(value);
+  
   useEffect(() => {
     dispatch(getAllUsers());
   }, [dispatch]);

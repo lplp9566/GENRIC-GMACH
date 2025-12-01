@@ -77,7 +77,7 @@ const HomePage: React.FC = () => {
     },
     {
       label: "הון עצמי ",
-      value: fundsOverview?.own_equity,
+      value: `${fundsOverview?.own_equity}` ,
       icon: <MonetizationOn />,
       bgColor: "#2563eb",
     },

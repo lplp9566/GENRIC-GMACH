@@ -22,6 +22,7 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan }) => {
       label: "סכום הלוואה ראשוני",
       value: `₪${loan.initial_loan_amount.toLocaleString()}`,
       color: "#006CF0",
+      condition:loan.initial_loan_amount !== loan.loan_amount
     },
     {
       label: "סכום הלוואה נוכחי",
@@ -39,6 +40,7 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan }) => {
       label: "תשלום חודשי התחלתי",
       value: `₪${loan.initial_monthly_payment.toLocaleString()}`,
       color: "#28A960",
+      condition: loan.initial_monthly_payment !== loan.monthly_payment,
     },
     { label: "יום תשלום בחודש", value: loan.payment_date, color: "#FD7E14" },
     {
@@ -82,7 +84,7 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan }) => {
       color: "text.primary",
     },
   ];
-
+  const itemsToRender = items.filter((it) => it.condition !== false);
   return (
     <Card sx={{ borderRadius: 2, boxShadow: 3, p: 3 }}>
       <CardContent>
@@ -91,7 +93,7 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan }) => {
         </Typography>
 
         <Grid container spacing={3}>
-          {items.map((it, idx) => (
+          {itemsToRender.map((it, idx) => (
             <Grid item xs={12} sm={6} key={idx}>
               <Box
                 sx={{

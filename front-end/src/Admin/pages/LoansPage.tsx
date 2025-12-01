@@ -22,13 +22,13 @@ import Loans from "../components/Loans/LoansDashboard/LoansDashboard";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
 import { useNavigate } from "react-router-dom";
 import { StatusGeneric } from "../../common/indexTypes";
+import { RtlProvider } from "../../Theme/rtl";
 
 export const LoansPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const theme = useTheme();
 
-  // נקודת שבירה למובייל
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [filter, setFilter] = useState<StatusGeneric>(StatusGeneric.ACTIVE);
@@ -52,6 +52,7 @@ export const LoansPage: React.FC = () => {
   };
 
   return (
+    <>
     <Box sx={{ bgcolor: "#F8F8F8", minHeight: "100vh", py: 4 }}>
       <Container maxWidth="lg">
         {/* HEADER */}
@@ -115,6 +116,7 @@ export const LoansPage: React.FC = () => {
               >
                 הוסף הלוואה
               </Button>
+<RtlProvider>
 
               <FormControl
                 size="small"
@@ -157,6 +159,8 @@ export const LoansPage: React.FC = () => {
                   <MenuItem value={StatusGeneric.INACTIVE}>לא פעילות</MenuItem>
                 </Select>
               </FormControl>
+              </RtlProvider>
+
             </Box>
           </Stack>
         </Paper>
@@ -210,6 +214,8 @@ export const LoansPage: React.FC = () => {
         )}
       </Container>
     </Box>
+        </>
+
   );
 };
 

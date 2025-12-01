@@ -2,6 +2,8 @@
 import React from "react";
 import { Stack, TextField } from "@mui/material";
 import SelectAllUsers from "../../SelectUsers/SelectAllUsers";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../store/store";
 
 interface StepBasicDetailsProps {
   newLoan: {
@@ -24,12 +26,15 @@ const StepBasicDetails: React.FC<StepBasicDetailsProps> = ({
   onFieldChange,
   onUserChange,
 }) => {
+  const userselected = useSelector((state: RootState) => state.AdminUsers.selectedUser);  
+  console.log(userselected,"jkjk");
+  
   const today = new Date().toISOString().split("T")[0];
   return (
     <Stack spacing={2}>
       <SelectAllUsers
         label="בחר משתמש"
-        value={selectedUserId || newLoan.user}
+        value={userselected?.id}
         onChange={onUserChange}
       />
       <TextField
