@@ -30,7 +30,7 @@ export class UserBalanceCronService {
   ) {}
 
   // עדכון יתרות חודשיות
-  @Cron('21 25 * * *', { timeZone: 'Asia/Jerusalem' })
+  @Cron('25 21 * * *', { timeZone: 'Asia/Jerusalem' })
   async updateAllUsersBalances() {
     this.logger.log('🔄 Updating all users balances...');
     const users = await this.usersService.getAllUsers();
@@ -67,7 +67,7 @@ export class UserBalanceCronService {
   }
 
   // ⭐⭐ --- שליחת תזכורת אוטומטית על הלוואות --- ⭐⭐
-  @Cron('00 09 * * *', { timeZone: 'Asia/Jerusalem' })
+  @Cron('25 21 * * *', { timeZone: 'Asia/Jerusalem' })
   async sendDailyLoanReminders() {
     const today = new Date().getDate();
 
