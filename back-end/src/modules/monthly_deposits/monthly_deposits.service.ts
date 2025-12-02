@@ -101,4 +101,56 @@ export class MonthlyDepositsService {
       throw new BadRequestException(error.message);
     }
   }
+  // async editMonthlyDeposit(depositId: number, updatedDetails: Partial<MonthlyDepositsEntity>) {
+  //   try {
+  //     const existingDeposit = await this.monthlyDepositsRepository.findOne({
+  //       where: { id: depositId },
+  //       relations: ['user'],
+  //     });
+  //     if (!existingDeposit) {
+  //       throw new Error('Deposit not found');
+  //     }   
+  //     const oldAmount = existingDeposit.amount;
+  //     const oldYear = existingDeposit.year;
+  //     const newAmount = updatedDetails.amount ?? existingDeposit.amount;
+  //     const newDepositDate = updatedDetails.deposit_date ?? existingDeposit.deposit_date;
+  //     const newYear = getYearFromDate(newDepositDate);
+  //     Object.assign(existingDeposit, updatedDetails, {
+  //       year: newYear,
+  //       month: getMonthFromDate(newDepositDate),
+  //     }); 
+  //     await this.monthlyDepositsRepository.save(existingDeposit);
+
+  //     const amountDifference = newAmount - oldAmount;
+
+  //     if (amountDifference !== 0 || oldYear !== newYear) {
+  //       await Promise.all([
+  //         this.userFinancialByYearService.updateMonthlyDeposit(
+  //           existingDeposit.user,
+  //           oldYear,
+  //           newYear,
+  //           amountDifference,
+
+  //         ),
+  //         this.userFinancialsService.updateMonthlyDeposit(
+  //           existingDeposit.user,
+  //           amountDifference,
+  //         ),
+  //         this.fundsOverviewService.updateMonthlyDeposit(
+  //           amountDifference, 
+  //         ),
+  //         this.fundsOverviewByYearService.updateMonthlyDeposit(
+  //           oldYear,  
+  //           newYear,
+  //           amountDifference,
+  //         ),
+  //       ]);
+  //     }
+  //     await this.usersService.updateUserMonthlyBalance(existingDeposit.user);
+  //     return { message: `Deposit updated successfully.` };
+  //   } catch (error) {
+  //     console.error('❌ Error updating deposit:', error.message);
+  //     throw new BadRequestException(error.message);
+  //   }
+  // }
 }  

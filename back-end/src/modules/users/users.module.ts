@@ -13,6 +13,7 @@ import { LoanActionsModule } from '../loans/loan-actions/loan-actions.module';
 import { UserRoleHistoryModule } from '../user_role_history/user_role_history.module';
 import { MembershipRolesModule } from '../membership_roles/membership_roles.module';
 import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates.module';
+import { WhatsappModule } from '../whatsapp/whatsapp.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates
     forwardRef(() => RequestsModule),
     forwardRef(() => UserRoleHistoryModule),
     forwardRef(() => MembershipRolesModule),
+    forwardRef(() => WhatsappModule),
     PaymentDetailsModule,
     // cSpell:ignore Financials
     UserFinancialsModule,

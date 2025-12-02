@@ -1,7 +1,8 @@
+import InvestmentsHeader from "../components/Investments/InvestmentsHeader"
 
 const Investments = () => {
   return (
-    <div>הדף בבניה </div>
+    <div><InvestmentsHeader/></div>
   )
 }
 

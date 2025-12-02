@@ -82,6 +82,19 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
+  // async removeMonthlyDeposit(amount: number) {
+  //   try {
+  //     const fund = await this.getFundsOverviewRecord();
+  //     fund.own_equity -= amount;
+  //     fund.fund_principal -= amount;
+  //     fund.available_funds -= amount;
+  //     fund.monthly_deposits -= amount;
+  //     await this.fundsOverviewRepository.save(fund);
+  //     return fund;
+  //   } catch (error) {
+  //     throw new BadRequestException(error.message);
+  //   }
+  // }
   async addDonation(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
@@ -96,6 +109,21 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
+  // async removeDonation(amount: number) {
+  //   try {
+  //     const fund = await this.getFundsOverviewRecord(); 
+  //     fund.own_equity -= amount;
+  //     fund.fund_principal -= amount;
+  //     fund.available_funds -= amount;
+  //     fund.total_donations -= amount;
+  //     fund.total_equity_donations -= amount;
+  //     await this.fundsOverviewRepository.save(fund);
+  //     return fund;
+  //   } catch (error) {
+  //     throw new BadRequestException(error.message);
+  //   } 
+  // }
+
   async addInvestment(amount: number) {
     const fund = await this.getFundsOverviewRecord();
     if (amount > fund.available_funds) {
