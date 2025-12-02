@@ -375,4 +375,17 @@ async onApplicationBootstrap() {
       return updated!;
     }); // סוף הטרנזקציה (commit אם הכול עבר, אחרת rollback)
   }
+    async searchUsers(query: string, limit = 5): Promise<UserEntity[]> {
+    const q = `%${query}%`;
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .where(
+        'user.first_name LIKE :q OR user.last_name LIKE :q OR user.phone LIKE :q',
+        { q },
+      )
+      .orderBy('user.first_name', 'ASC')
+      .limit(limit)
+      .getMany();
+  }
+
 }
