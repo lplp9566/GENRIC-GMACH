@@ -43,6 +43,7 @@ export class UserBalanceCronService {
 
   // עדכון יתרות הלוואות
   @Cron('00 00 * * *', { timeZone: 'Asia/Jerusalem' })
+  
   async updateDailyLoanBalances() {
     const today = new Date().getDate(); // 1–31
     this.logger.log(`🔄 Checking loans with payment_date = ${today}`);
