@@ -380,7 +380,7 @@ async onApplicationBootstrap() {
     return this.usersRepository
       .createQueryBuilder('user')
       .where(
-        'user.first_name LIKE :q OR user.last_name LIKE :q OR user.phone LIKE :q',
+        'user.first_name LIKE :q OR user.last_name LIKE :q OR user.phone_number LIKE :q',
         { q },
       )
       .orderBy('user.first_name', 'ASC')
