@@ -52,6 +52,7 @@ export class WhatsappController {
       return res.sendStatus(200);
     } catch (err: any) {
       console.error('Error in webhook:', err.message);
+          console.error(err.stack);
       return res.sendStatus(500);
     }
   }
