@@ -38,7 +38,7 @@ export class WhatsappController {
         body.entry?.[0]?.changes?.[0]?.value?.messages?.[0]
       ) {
         const message = body.entry[0].changes[0].value.messages[0];
-        const from = message.from; // מספר הוואטסאפ
+        const from = message.from; // 
         const text: string =
           message.text && message.text.body ? message.text.body.trim() : '';
 

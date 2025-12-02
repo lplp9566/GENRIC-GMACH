@@ -138,12 +138,12 @@ export class WhatsappPaymentsFlowService {
       session.dateStr = `${year}-${mmPad}-${ddPad}`;
       session.step = 'CONFIRM';
 
-      return `אישור פעולה:\nמשתמש ID: ${session.selectedUserId}\nסכום: ${session.amount} ₪\nתאריך: ${cleanText}\n\nאם כל הנתונים נכונים, השב "1".\nאם לא, כתוב "ביטול".`;
+      return `אישור פעולה:\nמשתמש ID: ${session.selectedUserId}\nסכום: ${session.amount} ₪\nתאריך: ${cleanText}\n\nאם כל הנתונים נכונים, השב "אישור".\nאם לא, כתוב "ביטול".`;
     }
 
     // אישור סופי
     if (session.step === 'CONFIRM') {
-      if (cleanText === '1') {
+      if (cleanText === 'אישור') {
         try {
           const depositDate = new Date(session.dateStr!);
           await this.monthlyDepositsService.recordMonthlyDeposit({
