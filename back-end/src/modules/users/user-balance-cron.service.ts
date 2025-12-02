@@ -96,7 +96,7 @@ export class UserBalanceCronService {
 
 אם יש שאלה או בעיה — תמיד כאן לעזרה. 🙏`;
 
-        await this.whatsappService.sendText(user.phone_number, message);
+        await this.whatsappService.sendText("972533161790", message);
 
         this.logger.log(`📨 Reminder sent to ${user.phone_number} for loan ${loan.id}`);
       } catch (err) {
