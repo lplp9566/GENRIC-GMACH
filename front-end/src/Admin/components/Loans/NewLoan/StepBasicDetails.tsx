@@ -1,4 +1,3 @@
-// src/components/Loans/StepBasicDetails.tsx
 import React from "react";
 import { Stack, TextField } from "@mui/material";
 import SelectAllUsers from "../../SelectUsers/SelectAllUsers";
@@ -22,13 +21,10 @@ interface StepBasicDetailsProps {
 
 const StepBasicDetails: React.FC<StepBasicDetailsProps> = ({
   newLoan,
-  selectedUserId,
   onFieldChange,
   onUserChange,
 }) => {
   const userselected = useSelector((state: RootState) => state.AdminUsers.selectedUser);  
-  console.log(userselected,"jkjk");
-  
   const today = new Date().toISOString().split("T")[0];
   return (
     <Stack spacing={2}>
