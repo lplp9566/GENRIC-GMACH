@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllInvestments } from "../../store/features/admin/adminInvestmentsSlice";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
 import InvestmentsHeader from "../components/Investments/InvestmentsHeader";
+import InvestmentsDashboard from "../components/Investments/InvestmentsDashboard";
 
 const Investments = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -51,7 +52,7 @@ console.log(fixidInvestments);
               {/* <Loans loansData={allLoans} total={total} /> */}
             </Box>
           )}
-
+        <InvestmentsDashboard investmentsData={fixidInvestments} />
          
         </Container>
       </Box>

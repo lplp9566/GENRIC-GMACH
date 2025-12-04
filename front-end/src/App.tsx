@@ -19,7 +19,7 @@ import ExpensesPage from "./Admin/pages/ExpensesPage";
 import DepositsPage from "./Admin/pages/DepositsPage";
 import DepositDetailsPage from "./Admin/components/Deposits/DepositsDetails/DepositDetailsPage";
 import ProtectedRoute from "./Auth/ProtectedRoute";
-import Investments from "./Admin/pages/Investments";
+import Investments from "./Admin/pages/InvestmentsPage";
 
 export default function App() {
   return (
@@ -48,6 +48,7 @@ export default function App() {
             <Route path="/deposits" element={<DepositsPage />} />
             <Route path="/deposit/:id" element={<DepositDetailsPage />} />
             <Route path="/investments" element={<Investments />} />
+            < Route path="/investments/:id" element={<Investments />} />
           </Route>
         </Route>
 
