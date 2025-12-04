@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { InvestmentDto } from './InvestmentDto';
+import { InvestmentDto } from '../InvestmentDto';
 import { Box, Container, Grid, Paper, useMediaQuery, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import InvestmentCard from './InvestmentCard';

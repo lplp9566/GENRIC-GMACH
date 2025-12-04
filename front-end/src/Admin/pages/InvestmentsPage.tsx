@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllInvestments } from "../../store/features/admin/adminInvestmentsSlice";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
 import InvestmentsHeader from "../components/Investments/InvestmentsHeader";
-import InvestmentsDashboard from "../components/Investments/InvestmentsDashboard";
+import InvestmentsDashboard from "../components/Investments/InvestmentDashboard/InvestmentsDashboard";
 
 const Investments = () => {
   const dispatch = useDispatch<AppDispatch>();

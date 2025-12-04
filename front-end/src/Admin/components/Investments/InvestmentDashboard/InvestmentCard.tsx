@@ -15,7 +15,7 @@ import {
   Business as BusinessIcon,
   AccountBalanceWallet as WalletIcon,
 } from "@mui/icons-material";
-import { InvestmentDto } from "./InvestmentDto";
+import { InvestmentDto } from "../InvestmentDto";
 
 interface InvestmentCardProps {
   investment: InvestmentDto;
