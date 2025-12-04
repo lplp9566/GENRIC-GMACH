@@ -9,6 +9,7 @@ import { AdminRankSlice } from "./features/admin/adminRankSlice";
 import { AdminDepositsSlice } from "./features/admin/adminDepositsSlice";
 import { Authslice } from "./features/auth/authSlice";
 import { AdminDonationsSlice } from "./features/admin/adminDonationsSlice";
+import { AdminInvestmentsSlice } from "./features/admin/adminInvestmentsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     AdminDepositsSlice: AdminDepositsSlice.reducer,
     authslice: Authslice.reducer,
     AdminDonationsSlice: AdminDonationsSlice.reducer,
+    AdminInvestmentsSlice: AdminInvestmentsSlice.reducer,
   },
 });
 

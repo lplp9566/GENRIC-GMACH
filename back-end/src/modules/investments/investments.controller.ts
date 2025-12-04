@@ -14,7 +14,7 @@ export class InvestmentsController {
   }
 
   // ✅ הוספת קרן להשקעה קיימת
-  @Post('add-investment')
+  @Post('add-to-investment')
   async addInvestment(@Body() body: {
     id: number;
     amount: number;
