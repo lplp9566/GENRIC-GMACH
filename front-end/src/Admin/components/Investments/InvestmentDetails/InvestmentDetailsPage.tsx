@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { getTransactionsByInvestmentId } from '../../../../store/features/admin/adminInvestmentsSlice';
 import LoadingIndicator from '../../StatusComponents/LoadingIndicator';
 import GeneralInvestmentInfoCard from './GeneralInvestmentInfoCard';
+import InvestmentAction from './InvestmentAction';
 
 const InvestmentDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -45,7 +46,7 @@ const InvestmentDetailsPage = () => {
           "&:hover": { backgroundColor: "rgba(0,0,0,.04)" },
         }}
       >
-        חזור לדף הלוואות
+        חזור לדף ההשקעות
       </Button>
       {/* <LoanHeader
         firstName={loan.user.first_name}
@@ -68,15 +69,13 @@ const InvestmentDetailsPage = () => {
           <GeneralInvestmentInfoCard investment={investment} />
         </Grid>
 
-        {/* {loanDetails.isActive && (
+        {investment.is_active && (
           <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "20%" } }}>
-            <Actions
-              loanId={loanId}
-              handleSubmit={handleSubmit}
-              max={loanDetails.remaining_balance}
+            <InvestmentAction
+              investmentId={investmentId}
             />
           </Grid>
-        )} */}
+        )}
 
         {/* <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "30%" } }}>
           <ActionsTable actions={loanDetails.actions ?? []} />

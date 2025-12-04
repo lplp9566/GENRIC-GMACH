@@ -72,7 +72,7 @@ export const createInitialInvestment = createAsyncThunk(
   async (investmentData: createInvestment) => {    
     const response = await axios.post<InvestmentDto>(    
       `${BASE_URL}/investments`,    
-      {investmentData}
+      investmentData
     );
     return response.data;
   }
@@ -92,7 +92,7 @@ export const updateInvestmentValue = createAsyncThunk(
   async (data: { id: number; new_value: number; date: Date }) => {  
     const response = await axios.post<InvestmentDto>(
         `${BASE_URL}/investments/update-value`,
-        {data}
+        data
     );
     return response.data;
   }
@@ -102,7 +102,7 @@ export const withdrawFromInvestment = createAsyncThunk(
   async (data: { id: number; amount: number; date: Date }) => { 
     const response = await axios.post<InvestmentDto>(
         `${BASE_URL}/investments/withdraw`,
-        {data}
+        data
     );
     return response.data;
   }
@@ -112,7 +112,7 @@ export const applyManagementFee = createAsyncThunk(
   async (data: { id: number; feeAmount: number; date: Date }) => {
     const response = await axios.post<InvestmentDto>(
         `${BASE_URL}/investments/management-fee`,
-        {data}    
+        data  
     );
     return response.data;
   }

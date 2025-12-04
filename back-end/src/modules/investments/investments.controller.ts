@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { InvestmentsService } from './investments.service';
 import { InvestmentInit } from './investments_dto';
+import { log } from 'console';
 
 @Controller('investments')
 export class InvestmentsController {
@@ -10,6 +11,8 @@ export class InvestmentsController {
   @Post()
   async createInitialInvestment(@Body() body: InvestmentInit
 ) {
+  console.log(body);
+  
     return this.investmentsService.createInitialInvestment(body);
   }
 

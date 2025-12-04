@@ -48,6 +48,8 @@ const NewInvestment = ({ open, onClose }: NewInvestmentProps) => {
       toast.error(`הסכום שהוזן גבוה מהקרן הזמינה להשקעה: ${availableInvestment} ש"ח`);
       return;
     }
+    console.log(newInvestment.start_date);
+    
     onClose();
     toast.promise(
       dispatch(createInitialInvestment({ ...newInvestment, start_date: new Date(newInvestment.start_date) })),
