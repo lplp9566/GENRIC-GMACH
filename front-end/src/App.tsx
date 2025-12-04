@@ -20,6 +20,7 @@ import DepositsPage from "./Admin/pages/DepositsPage";
 import DepositDetailsPage from "./Admin/components/Deposits/DepositsDetails/DepositDetailsPage";
 import ProtectedRoute from "./Auth/ProtectedRoute";
 import Investments from "./Admin/pages/InvestmentsPage";
+import InvestmentDetailsPage from "./Admin/components/Investments/InvestmentDetails/InvestmentDetailsPage";
 
 export default function App() {
   return (
@@ -48,11 +49,9 @@ export default function App() {
             <Route path="/deposits" element={<DepositsPage />} />
             <Route path="/deposit/:id" element={<DepositDetailsPage />} />
             <Route path="/investments" element={<Investments />} />
-            < Route path="/investments/:id" element={<Investments />} />
+            < Route path="/investments/:id" element={<InvestmentDetailsPage />} />
           </Route>
         </Route>
-
-        {/* ברירת מחדל */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
