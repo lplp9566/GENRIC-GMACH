@@ -6,6 +6,7 @@ import { AppDispatch, RootState } from '../../../../store/store';
 import { useEffect } from 'react';
 import { getTransactionsByInvestmentId } from '../../../../store/features/admin/adminInvestmentsSlice';
 import LoadingIndicator from '../../StatusComponents/LoadingIndicator';
+import GeneralInvestmentInfoCard from './GeneralInvestmentInfoCard';
 
 const InvestmentDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -13,13 +14,15 @@ const InvestmentDetailsPage = () => {
       const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const investment = useSelector((s:RootState)=> s.AdminInvestmentsSlice.allInvestments?.find((inv)=> inv.id === investmentId));
-  const investmensDedails = useSelector((s:RootState)=> s.AdminInvestmentsSlice.investmentDetails)
+  const investment = useSelector((s:RootState)=> s.AdminInvestmentsSlice.allInvestments.find((inv)=> inv.id === investmentId));
+  const investmentTransactionDetails = useSelector((s:RootState)=> s.AdminInvestmentsSlice.investmentTransactions);
   useEffect(() => {
     if (investmentId) dispatch(getTransactionsByInvestmentId(investmentId));
 
   }, [dispatch, investmentId]);
-   if (!investment || !investmensDedails) return <LoadingIndicator />;
+   if (!investment || !investmentTransactionDetails) return <LoadingIndicator />;
+   console.log(investmentTransactionDetails);
+   
   return (
   <Box
       sx={{
@@ -61,9 +64,9 @@ const InvestmentDetailsPage = () => {
         alignItems="flex-start"
         sx={{ mt: 3 }}
       >
-        {/* <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "40%" } }}>
-          <GeneralLoanInfoCard loan={loanDetails} />
-        </Grid> */}
+        <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "40%" } }}>
+          <GeneralInvestmentInfoCard investment={investment} />
+        </Grid>
 
         {/* {loanDetails.isActive && (
           <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "20%" } }}>

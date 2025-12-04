@@ -39,13 +39,16 @@ export class InvestmentTransactionService {
   }
 
   async getTransactionsByInvestmentId(investmentId: number) {
+    console.log(investmentId);
+    
     const investment = await this.investmentRepo.findOne({ where: { id: investmentId } });
     if (!investment) {
       throw new NotFoundException('השקעה לא קיימת');
     }
+console.log(investment);
 
     return this.transactionRepo.find({
-      where: { investment: { id: investmentId } },
+      where: { investment },
       order: { transaction_date: 'DESC' },
     });
   }
