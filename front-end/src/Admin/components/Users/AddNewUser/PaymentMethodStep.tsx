@@ -6,7 +6,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { payment_method } from "../UsersDto";
+import { payment_method_enum } from "../UsersDto";
 import { PaymentMethodStepProps } from "./AddUserStepsProps";
 const PaymentMethodStep:FC<PaymentMethodStepProps> = ({data,onFieldChange}) => {
   return (
@@ -38,19 +38,19 @@ const PaymentMethodStep:FC<PaymentMethodStepProps> = ({data,onFieldChange}) => {
           label="אופן תשלום"
           onChange={onFieldChange}
         >
-          <MenuItem dir="rtl" value={payment_method.direct_debit}>
+          <MenuItem dir="rtl" value={payment_method_enum.direct_debit}>
             הוראת קבע
           </MenuItem>
-          <MenuItem dir="rtl" value={payment_method.cash}>
+          <MenuItem dir="rtl" value={payment_method_enum.cash}>
             מזומן
           </MenuItem>
-          <MenuItem dir="rtl" value={payment_method.credit_card}>
+          <MenuItem dir="rtl" value={payment_method_enum.credit_card}>
             אשראי
           </MenuItem>
-          <MenuItem dir="rtl" value={payment_method.bank_transfer}>
+          <MenuItem dir="rtl" value={payment_method_enum.bank_transfer}>
             העברה בנקאית
           </MenuItem>
-          <MenuItem dir="rtl" value={payment_method.other}>
+          <MenuItem dir="rtl" value={payment_method_enum.other}>
             אחר
           </MenuItem>
         </Select>

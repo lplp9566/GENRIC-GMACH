@@ -20,7 +20,7 @@ import { setMonthlyPaymentModalMode } from "../../../../store/features/Main/AppM
 import { paymentMethod } from "../MonthlyPaymentsDto";
 import SelectAllUsers from "../../SelectUsers/SelectAllUsers";
 import { createMonthlyPayment } from "../../../../store/features/admin/adminMonthlyPayments";
-import { payment_method } from "../../Users/UsersDto";
+import { payment_method_enum } from "../../Users/UsersDto";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { RtlProvider } from "../../../../Theme/rtl";
@@ -37,13 +37,13 @@ export const AddPaymentModal: React.FC = () => {
     userId: number;
     amount: number;
     depositDate: string;
-    method: payment_method;
+    method: payment_method_enum;
     description: string;
   }>({
     userId: 0,
     amount: 0,
     depositDate: today,
-    method: paymentMethod[0].value as payment_method,
+    method: paymentMethod[0].value as payment_method_enum,
     description: "",
   });
 
@@ -183,7 +183,7 @@ export const AddPaymentModal: React.FC = () => {
               onChange={(e) =>
                 setNewPayment((p) => ({
                   ...p,
-                  method: e.target.value as payment_method,
+                  method: e.target.value as payment_method_enum,
                 }))
               }
             >

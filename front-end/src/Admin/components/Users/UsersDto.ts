@@ -20,11 +20,11 @@ export interface IPaymentDetails {
   bank_branch: number;
   bank_account_number: number;
   charge_date: number;
-  payment_method: payment_method;
+  payment_method: payment_method_enum;
   monthly_balance: number;
   loan_balances: { loanId: number; balance: number }[];
 }
-export enum payment_method {
+export enum payment_method_enum {
   direct_debit = "direct_debit",
   credit_card = "credit_card",
   bank_transfer = "bank_transfer",
@@ -53,7 +53,7 @@ export interface ICreatePaymentDetails {
   bank_branch: number | null;
   bank_account_number: number | null;
   charge_date: number | null;
-  payment_method: payment_method;
+  payment_method: payment_method_enum;
 }
 
 export interface IAddUserFormData {

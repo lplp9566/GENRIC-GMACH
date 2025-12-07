@@ -1,6 +1,6 @@
-import { payment_method } from "../../Admin/components/Users/UsersDto";
+import { payment_method_enum } from "../../Admin/components/Users/UsersDto";
 
-export const revertPaymentMethod = (paymentMethod:payment_method) => {
+export const revertPaymentMethod = (paymentMethod:payment_method_enum) => {
     switch (paymentMethod) {
         case "cash":
             return "מזומן";

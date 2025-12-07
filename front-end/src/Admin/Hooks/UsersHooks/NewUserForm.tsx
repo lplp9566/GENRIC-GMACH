@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AppDispatch } from "../../../store/store";
-import { IAddUserFormData, payment_method } from "../../components/Users/UsersDto";
+import { IAddUserFormData, payment_method_enum } from "../../components/Users/UsersDto";
 import { createUser } from "../../../store/features/admin/adminUsersSlice";
 import { NEW_USER_STEPS } from "../../components/Users/AddNewUser/AddNewUser";
 import { SelectChangeEvent } from "@mui/material";
@@ -32,7 +32,7 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
       bank_branch: null,
       bank_account_number: null,
       charge_date: null,
-      payment_method: payment_method.direct_debit,
+      payment_method: payment_method_enum.direct_debit,
     },
   });
 
@@ -166,7 +166,7 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
         bank_branch: 0,
         bank_account_number: 0,
         charge_date: null,
-        payment_method: payment_method.direct_debit,
+        payment_method: payment_method_enum.direct_debit,
       },
     });
     setActiveStep(0);

@@ -9,12 +9,14 @@ interface AdminMonthlyPaymentsType {
   GetPaymentsStatus: Status;
   AddMonthlyPaymentStatus: Status;
   error: string | null;
+  updateMonthlyPaymentStatus: Status
 }
 const initialState: AdminMonthlyPaymentsType = {
   allPayments: [],
   error: null,
   GetPaymentsStatus: "idle",
     AddMonthlyPaymentStatus: "idle",
+    updateMonthlyPaymentStatus: "idle",
 };
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const gatAllMonthlyPayments = createAsyncThunk(
@@ -36,6 +38,16 @@ export const getMonthlyPaymentsByUserId = createAsyncThunk(
     return response.data;
   }
 );
+export const updateMonthlyPayment = createAsyncThunk(
+  "/admin/updateMonthlyPayment",
+  async (monthlyPayment: IMonthlyPayment) => {
+    const response = await axios.patch<IMonthlyPayment>(
+      `${BASE_URL}/monthly-deposits/${monthlyPayment.id}`,
+      monthlyPayment
+    );
+    return response.data;
+  }
+)
 export const createMonthlyPayment = createAsyncThunk(
   "/admin/createMonthlyPayment",
   async (monthlyPayment: INewMonthlyPayment) => {
@@ -84,7 +96,23 @@ export const AdminMonthlyPaymentsSlice = createSlice({
         .addCase(createMonthlyPayment.rejected, (state, action) => {
             state.AddMonthlyPaymentStatus = "rejected";
             state.error = action.error.message || null;
-        });
+        })
+        .addCase(updateMonthlyPayment.pending, (state) => {
+            state.updateMonthlyPaymentStatus = "pending";
+        })
+        .addCase(updateMonthlyPayment.fulfilled, (state,action) => {
+            const update = action.payload
+            const index = state.allPayments.findIndex((payment) => payment.id === update.id);
+            if (index !== -1) {
+                state.allPayments[index] = update;
+            }
+            state.updateMonthlyPaymentStatus = "fulfilled";
+           
+        })
+        .addCase(updateMonthlyPayment.rejected, (state, action) => {
+            state.updateMonthlyPaymentStatus = "rejected";
+            state.error = action.error.message || null;
+        })
   },
 });
 export default AdminMonthlyPaymentsSlice.reducer;

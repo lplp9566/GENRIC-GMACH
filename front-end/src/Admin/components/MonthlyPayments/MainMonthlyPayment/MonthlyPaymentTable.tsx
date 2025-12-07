@@ -1,10 +1,14 @@
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { IMonthlyPayment, paymentMethod } from '../MonthlyPaymentsDto'
 import { fmtDate } from '../../../../common/genricFunction'
+import { useState } from 'react'
+import MonthlyPaymentEditModal from './MonthlyPaymentEditModal'
 interface MonthlyPaymentProps {
     paymentsThisMonth: IMonthlyPayment[]
 } 
 const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({ paymentsThisMonth }) => {
+  const [selectedPayment, setSelectedPayment] = useState<IMonthlyPayment | null>(null);
+  const [editMode, setEditMode] = useState<boolean>(false);
   return (
     <div>   <Paper sx={{ borderRadius: 2, overflow: 'auto',padding: 2, boxShadow: 1, }}>
         <Table size="small" sx={{ minWidth: 650 }}>
@@ -20,7 +24,7 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({ paymentsThisMonth 
           <TableBody>
             {paymentsThisMonth.length > 0 ? (
               paymentsThisMonth.map(p => (
-                <TableRow key={p.id} hover>
+                <TableRow key={p.id} hover onClick={() => { setSelectedPayment(p); setEditMode(true); }}>
                   <TableCell align="right">
                     {p.user.first_name} {p.user.last_name}
                   </TableCell>
@@ -39,6 +43,7 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({ paymentsThisMonth 
                 </TableCell>
               </TableRow>
             )}
+           {editMode && selectedPayment && <MonthlyPaymentEditModal editMode={editMode} onClose={() => setEditMode(false)} selectedPayment={selectedPayment!}/>}
           </TableBody>
         </Table>
       </Paper></div>

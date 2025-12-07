@@ -8,6 +8,7 @@ import { getMonthFromDate, getYearFromDate } from '../../services/services';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
+import { updateMonthlyDepositDto } from './monthly_deposits.controller';
 
 @Injectable()
 export class MonthlyDepositsService {
@@ -101,56 +102,68 @@ export class MonthlyDepositsService {
       throw new BadRequestException(error.message);
     }
   }
-  // async editMonthlyDeposit(depositId: number, updatedDetails: Partial<MonthlyDepositsEntity>) {
-  //   try {
-  //     const existingDeposit = await this.monthlyDepositsRepository.findOne({
-  //       where: { id: depositId },
-  //       relations: ['user'],
-  //     });
-  //     if (!existingDeposit) {
-  //       throw new Error('Deposit not found');
-  //     }   
-  //     const oldAmount = existingDeposit.amount;
-  //     const oldYear = existingDeposit.year;
-  //     const newAmount = updatedDetails.amount ?? existingDeposit.amount;
-  //     const newDepositDate = updatedDetails.deposit_date ?? existingDeposit.deposit_date;
-  //     const newYear = getYearFromDate(newDepositDate);
-  //     Object.assign(existingDeposit, updatedDetails, {
-  //       year: newYear,
-  //       month: getMonthFromDate(newDepositDate),
-  //     }); 
-  //     await this.monthlyDepositsRepository.save(existingDeposit);
+  async updateMonthlyDeposit(id: number, payment_details: updateMonthlyDepositDto) {
+  const {amount:newAmount,deposit_date:newDepositDate} = payment_details;
+  const newDate = new Date(newDepositDate);
+  if(newAmount <= 0){
+    throw new BadRequestException('Amount must be greater than zero');
+  }
+  return await this.monthlyDepositsRepository.manager.transaction(
+    async (manager) => {
+      // 1. מביאים את התרומה הקיימת
+      const existing = await manager.findOne(MonthlyDepositsEntity, {
+        where: { id },
+        relations: { user: true },
+      });
+  
+      if (!existing) {
+        throw new BadRequestException('Deposit not found');
+      }
+  
+      const oldAmount = existing.amount;
+      const oldDate = existing.deposit_date;
+      const oldYear = getYearFromDate(oldDate);
+      const newYear = getYearFromDate(newDate);
+      const deltaAmount = newAmount - oldAmount;
+      const user = existing.user;
+  
+      // 2. מעדכנים את רשומת התרומה עצמה
+      existing.amount = newAmount;
+      existing.deposit_date = newDate;
+      existing.year = newYear;
+      existing.month = getMonthFromDate(newDate);
+      existing.description = payment_details.description;
+      existing.payment_method = payment_details.payment_method;
+  
+      // 3. מעדכנים את רשומת המשתמש של התרומה
+      await this.userFinancialsService.recordMonthlyDeposit(user, deltaAmount);
+      await this.fundsOverviewService.addMonthlyDeposit(deltaAmount);
+      if(newYear == oldYear){
+        await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, deltaAmount);
+      await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, deltaAmount);
 
-  //     const amountDifference = newAmount - oldAmount;
+      }
+      else{
+        await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
+        await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
+        await this.userFinancialByYearService.recordMonthlyDeposit(user, newYear, newAmount);
+        await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, newAmount);
+      }
+            await this.usersService.updateUserMonthlyBalance(user);
 
-  //     if (amountDifference !== 0 || oldYear !== newYear) {
-  //       await Promise.all([
-  //         this.userFinancialByYearService.updateMonthlyDeposit(
-  //           existingDeposit.user,
-  //           oldYear,
-  //           newYear,
-  //           amountDifference,
-
-  //         ),
-  //         this.userFinancialsService.updateMonthlyDeposit(
-  //           existingDeposit.user,
-  //           amountDifference,
-  //         ),
-  //         this.fundsOverviewService.updateMonthlyDeposit(
-  //           amountDifference, 
-  //         ),
-  //         this.fundsOverviewByYearService.updateMonthlyDeposit(
-  //           oldYear,  
-  //           newYear,
-  //           amountDifference,
-  //         ),
-  //       ]);
-  //     }
-  //     await this.usersService.updateUserMonthlyBalance(existingDeposit.user);
-  //     return { message: `Deposit updated successfully.` };
-  //   } catch (error) {
-  //     console.error('❌ Error updating deposit:', error.message);
-  //     throw new BadRequestException(error.message);
-  //   }
-  // }
+      // 4. מוחקים את התרומה הקיימת
+      // await manager.remove(existing);
+  
+      // 5. מוסיפים את התרומה החדשה
+      await manager.save(existing);
+  
+      // 6. מביאים את התרומה החדשה
+      return await manager.findOne(MonthlyDepositsEntity, {
+        where: { id },
+        relations: { user: true },
+      });
+    }
+  )
+  }
+  
 }  

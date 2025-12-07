@@ -1,4 +1,4 @@
-import { IUser, payment_method } from "../Users/UsersDto"
+import { IUser, payment_method_enum } from "../Users/UsersDto"
 
 export  interface  IMonthlyPayment {
      id:number
@@ -8,14 +8,22 @@ export  interface  IMonthlyPayment {
      month:number
      year:number
      description?:string
-     payment_method:payment_method
+     payment_method:payment_method_enum
 }
 export interface INewMonthlyPayment {
     user:number
     amount:number
     deposit_date:string
     description?:string
-    payment_method:payment_method
+    payment_method:payment_method_enum
+}
+export interface IUpdateMonthlyPayment {
+    id:number
+    user:number
+    amount:number
+    deposit_date:string
+    description?:string
+    payment_method:payment_method_enum
 }
 export const paymentMethod = [
     {
@@ -34,6 +42,10 @@ export const paymentMethod = [
         label:'אחר',
         value : "other"
         
+    },
+    {
+        label:'הבערה בנקאית',
+        value : "bank_transfer"
     }
 ]
 
