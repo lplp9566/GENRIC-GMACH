@@ -1,17 +1,29 @@
-import { Controller, Get, Post } from '@nestjs/common';
-import { MailService } from '../mail/mail.service';
+import { Controller, Post, Body } from '@nestjs/common';
+import { MailService } from './mail.service';
 
 @Controller('mail')
 export class MailController {
   constructor(private readonly mailService: MailService) {}
 
-  @Post('send-mail')
-  async sendTestMail() {
-    const to = 'lplp9566@gmail.com';
-    const subject = 'Hello from NestJS!';
-    const text = 'This is a test email from NestJS.';
-    const html = '<h1style="color: blue;">Hello from NestJS!</h1><p>This is a test email.</p>/n <p style="color: red;">This is a test email.</p>';
+  @Post('donation-thank-you')
+  async sendDonationThankYou(
+    
+    @Body('to') to: string,
+    @Body('name') name: string,
+    @Body('amount') amount: number,
+  ) {
+    console.log("kkk"
+    );
+    
+    return this.mailService.sendDonationThankYou(to, name, amount);
+  }
 
-    return await this.mailService.sendMail(to, subject, text, html);
+  @Post('reminder')
+  async sendReminder(
+    @Body('to') to: string,
+    @Body('title') title: string,
+    @Body('message') message: string,
+  ) {
+    return this.mailService.sendReminder(to, title, message);
   }
 }

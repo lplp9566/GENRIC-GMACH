@@ -1,48 +1,76 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { Resend } from 'resend';
 
 @Injectable()
 export class MailService {
-  private transporter;
+  private transporter: nodemailer.Transporter;
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      service: 'gmail', // ניתן להשתמש גם ב-SMTP אחר
+      service: 'gmail',
       auth: {
-        user: process.env.EMAIL_ADDRESS, // כתובת האימייל שלך
-        pass: process.env.EMAIL_PASSWORD, // סיסמה או App Password
+        user: process.env.EMAIL_ADDRESS,
+        pass: process.env.EMAIL_PASSWORD,
       },
     });
   }
 
-  // async sendMail(to: string, subject: string, text: string, html?: string) {
-  //   try {
-  //     const mailOptions = {
-  //       from: process.env.EMAIL_USER,
-  //       to,
-  //       subject,
-  //       text,
-  //       html, 
-  //     };
+  // פונקציה כללית לשליחת מייל
+  async sendMail(
+    to: string,
+    subject: string,
+    html: string,
+    text?: string,
+  ) {
+    const mailOptions: nodemailer.SendMailOptions = {
+      from: process.env.EMAIL_ADDRESS,
+      to ,
+      subject,
+      html,
+      text,
+    };
 
-  //     const info = await this.transporter.sendMail(mailOptions);
-  //     console.log('📧 Email sent:', info.response);
-  //     return info;
-  //   } catch (error) {
-  //     console.error('❌ Error sending email:', error);
-  //     throw new Error('Failed to send email');
-  //   }
-  // }
-    async sendMail(to: string, subject: string, text: string, html?: string) {
-      const resend = new Resend('re_c2gs6w7P_JsMpMakenCDtPFeHrNTfbEWb');
-   return await resend.emails.send({
-        from: 'Eli Test <onboarding@resend.dev>',
-        to: to,
-        subject: subject,
-        text: text,
-        html: html
-      })
+    const info = await this.transporter.sendMail(mailOptions);
+    console.log('📧 Email sent:', info.messageId);
+    return info;
+  }
 
+  // 📩 מייל "תודה על תרומה"
+  async sendDonationThankYou(to: string, name: string, amount: number) {
+    const subject = 'תודה על התרומה שלך 🙏';
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; direction: rtl; text-align: right; background:#f7f7f7; padding:20px;">
+        <div style="max-width:600px; margin:0 auto; background:#ffffff; padding:20px; border-radius:8px;">
+          <h2 style="color:#2d7ff9; margin-top:0;">${name} היקר/ה, תודה רבה!</h2>
+          <p>ברצוננו להודות לך על תרומה בסך <strong>${amount} ₪</strong>.</p>
+          <p>בזכות אנשים כמוך אנחנו יכולים להמשיך בפעילות שלנו.</p>
+          <p>תודה רבה על האמון והתמיכה ❤️</p>
+          <hr style="margin:24px 0;" />
+          <p style="font-size:12px; color:#888;">
+            אם קיבלת את המייל הזה בטעות, אפשר להתעלם ממנו.
+          </p>
+        </div>
+      </div>
+    `;
+
+    return this.sendMail(to, subject, html);
+  }
+
+  // ⏰ מייל תזכורת
+  async sendReminder(to: string, title: string, message: string) {
+    const subject = `תזכורת: ${title}`;
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; direction: rtl; text-align: right; background:#f7f7f7; padding:20px;">
+        <div style="max-width:600px; margin:0 auto; background:#ffffff; padding:20px; border-radius:8px;">
+          <h2 style="color:#f39c12; margin-top:0;">תזכורת</h2>
+          <p style="margin-bottom:16px;">${message}</p>
+          <p style="font-size:13px; color:#555;">אם כבר טיפלת בזה, אפשר להתעלם מההודעה 🙂</p>
+        </div>
+      </div>
+    `;
+
+    return this.sendMail(to, subject, html);
   }
 }
