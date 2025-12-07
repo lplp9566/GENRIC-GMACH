@@ -64,7 +64,7 @@ describe('FundsOverviewByYearService', () => {
     const mockRecord = { total_equity_donations: 0, total_donations: 0 } as FundsOverviewByYearEntity;
     repo.findOne.mockResolvedValue(mockRecord);
     repo.save.mockResolvedValue({ total_equity_donations: 200, total_donations: 200 } as any);
-    const result = await service.recordEquityDonation(2025, 200);
+    const result = await service.adjustEquityDonation(2025, 200);
     expect(result.total_equity_donations).toBe(200);
   });
 
@@ -72,7 +72,7 @@ describe('FundsOverviewByYearService', () => {
     const mockRecord = { fund_details_donated: {}, special_fund_donations: 0 } as any;
     repo.findOne.mockResolvedValue(mockRecord);
     repo.save.mockResolvedValue({ fund_details_donated: { Shabbat: 300 } }as any );
-    const result = await service.recordSpecialFundDonationByName(2025, 'Shabbat', 300);
+    const result = await service.adjustSpecialFundDonationByName(2025, 'Shabbat', 300);
     expect(result.fund_details_donated['Shabbat']).toBe(300);
   });
 

@@ -94,7 +94,7 @@ describe('FundsOverviewService', () => {
       repo.findOne.mockResolvedValue(mockFund);
       repo.save.mockResolvedValue(updated);
 
-      const result = await service.addDonation(100);
+      const result = await service.adjustDonation(100);
       expect(result.total_donations).toBe(100);
       expect(repo.save).toHaveBeenCalled();
     });

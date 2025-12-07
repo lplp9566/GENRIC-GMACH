@@ -89,7 +89,7 @@ describe('UserFinancialByYearService', () => {
     jest.spyOn(service as any, 'getOrCreateFinancialRecord').mockResolvedValue(mockRecord);
     repo.save.mockResolvedValue({ ...mockRecord, total_equity_donations: 50 });
 
-    const result = await service.recordEquityDonation(mockUser, 2025, 50);
+    const result = await service.adjustEquityDonation(mockUser, 2025, 50);
     expect(result.total_equity_donations).toBe(50);
   });
 
@@ -98,7 +98,7 @@ describe('UserFinancialByYearService', () => {
     jest.spyOn(service as any, 'getOrCreateFinancialRecord').mockResolvedValue(mockRecord);
     repo.save.mockResolvedValue({ ...mockRecord, special_fund_donations: 75 });
 
-    const result = await service.recordSpecialFundDonation(mockUser, 2025, 75);
+    const result = await service.adjustSpecialFundDonation(mockUser, 2025, 75);
     expect(result.special_fund_donations).toBe(75);
   });
 });
