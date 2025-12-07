@@ -67,12 +67,12 @@ async getUserFinancialsByYear() {
     record.total_monthly_deposits += amount;
     return this.userFinancialsByYearRepository.save(record);
   }
-  async recordEquityDonation(user: UserEntity, year: number, amount: number) {
+  async adjustEquityDonation(user: UserEntity, year: number, amount: number) {
     const record = await this.getOrCreateFinancialRecord(user, year);
     record.total_equity_donations += amount;
     return this.userFinancialsByYearRepository.save(record);
   }
-  async recordSpecialFundDonation(
+  async adjustSpecialFundDonation(
     user: UserEntity,
     year: number,
     amount: number,

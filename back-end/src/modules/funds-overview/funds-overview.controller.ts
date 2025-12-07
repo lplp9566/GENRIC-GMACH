@@ -21,7 +21,7 @@ export class FundsOverviewController {
   }
   @Post('/donation')
   async addDonation(@Body() body: { amount: number }) {
-    return await this.fundsOverviewService.addDonation(body.amount);
+    return await this.fundsOverviewService.adjustDonation(body.amount);
   }
   @Post('/investment')
   async addInvestment(@Body() body: { amount: number }) {

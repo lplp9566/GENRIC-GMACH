@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   ICreateDonation,
   IDonation,
+  IUpdateDonation,
 } from "../../../Admin/components/Donations/DonationDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
 
@@ -13,6 +14,7 @@ interface AdminDonationType {
   error: string | null;
   CreateDonationStatus: Status;
   withdrawStatus: Status;
+  editDonationStatus: Status;
 }
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const initialState: AdminDonationType = {
@@ -21,6 +23,7 @@ const initialState: AdminDonationType = {
   status: "idle",
   CreateDonationStatus: "idle",
   withdrawStatus: "idle",
+  editDonationStatus: "idle",
 };
 export const getAllDonations = createAsyncThunk<IDonation[]
 >("admin/getAllDonations", async () => {
@@ -41,7 +44,14 @@ export const withdrawDonation = createAsyncThunk<IDonation, ICreateDonation>(
   "admin/withdrawDonation",
   async (donation) => {
     const { data } = await axios.post<IDonation>(`${BASE_URL}/donations`, donation);
-    return data; // <-- payload הוא IDonation
+    return data; 
+  }
+);
+export const updateDonationById = createAsyncThunk<IDonation, IUpdateDonation>(
+  "admin/editDonation",
+  async (donation) => {
+    const { data } = await axios.patch<IDonation>(`${BASE_URL}/donations/${donation.id}`, donation);
+    return data;
   }
 );
 export const AdminDonationsSlice = createSlice({
@@ -89,8 +99,21 @@ export const AdminDonationsSlice = createSlice({
       .addCase(withdrawDonation.rejected, (state, action) => {
         state.withdrawStatus = "rejected";
         state.error = action.error.message ?? "Failed to withdraw donation";
-      });
-  },
-});
+      })
+      .addCase(updateDonationById.pending, (state) => {
+        state.editDonationStatus = "pending";
+        state.error = null;
+      })  
+      .addCase(updateDonationById.fulfilled, (state, action) => {
+        state.editDonationStatus = "fulfilled";
+      const update =  action.payload;
+      const index = state.allDonations.findIndex((donation) => donation.id === update.id);
+      if (index !== -1) {
+        state.allDonations[index] = update;
+      }
+        });
+      }}
+    )
+      
 // export const { setPage } = AdminDonationsSlice.actions;
 export default AdminDonationsSlice.reducer;

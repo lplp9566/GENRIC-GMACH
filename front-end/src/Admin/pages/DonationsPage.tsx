@@ -137,7 +137,6 @@ const DonationsHomePage: FC = () => {
     // בכל שינוי בליסט/תוכן התרומות – למשוך Overview עדכני מהשרת
     dispatch(getFundsOverview());
   }, [dispatch, donationsSig]);
-  // *******************************************************
 
   const selectedUserId = selectedUser?.id != null ? String(selectedUser.id) : null;
 

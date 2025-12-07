@@ -20,3 +20,8 @@ export interface ICreateDonation {
     donation_reason:string
 }
 
+export interface IUpdateDonation {
+    id:number
+    date:string
+    amount:number
+}

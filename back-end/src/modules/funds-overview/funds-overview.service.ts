@@ -6,9 +6,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { FundsOverviewEntity } from './entity/funds-overview.entity';
 import { Repository } from 'typeorm';
-import { log } from 'console';
-import { ApiResponse } from '../../utils/response.utils';
-import { first } from 'rxjs';
 import { CashHoldingsTypesRecordType } from '../cash-holdings/cash-holdings-dto';
 
 @Injectable()
@@ -17,17 +14,19 @@ export class FundsOverviewService {
     @InjectRepository(FundsOverviewEntity)
     private readonly fundsOverviewRepository: Repository<FundsOverviewEntity>,
   ) {}
+
+  /**
+   * מחזיר את רשומת ה-FundsOverview היחידה במערכת.
+   * אם אין – יוצר אחת חדשה עם סכום התחלתי.
+   */
   async getFundsOverviewRecord(): Promise<FundsOverviewEntity> {
     try {
-      // נסה למצוא רשומה אחת (לפי סדר כלשהו, אבל כאן take: 1 מספיק כי אמורה להיות רק רשומה אחת)
-      let fund = await this.fundsOverviewRepository.findOne({ 
-        // אפשר לתת למשל where או כל תנאי. אם אין תנאים, findOne() יחזיר רשומה כלשהי
-        where: {}, 
-        order: { id: 'ASC' } 
+      let fund = await this.fundsOverviewRepository.findOne({
+        where: {},
+        order: { id: 'ASC' },
       });
 
       if (!fund) {
-        // אם לא נמצאה אף רשומה, צור אחת חדשה עם 0 כערך התחלתי
         fund = await this.initializeFundsOverview(0);
       }
 
@@ -37,9 +36,14 @@ export class FundsOverviewService {
     }
   }
 
+  /**
+   * יצירת רשומת FundsOverview ראשונית.
+   */
   async initializeFundsOverview(initialAmount: number) {
     try {
- const existingRecord = await this.fundsOverviewRepository.findOne({ where: {} });
+      const existingRecord = await this.fundsOverviewRepository.findOne({
+        where: {},
+      });
       if (existingRecord) {
         throw new Error('Funds overview already initialized');
       }
@@ -69,6 +73,9 @@ export class FundsOverviewService {
     }
   }
 
+  /**
+   * הפקדת הוראת קבע חודשית.
+   */
   async addMonthlyDeposit(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
@@ -82,48 +89,47 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
-  // async removeMonthlyDeposit(amount: number) {
-  //   try {
-  //     const fund = await this.getFundsOverviewRecord();
-  //     fund.own_equity -= amount;
-  //     fund.fund_principal -= amount;
-  //     fund.available_funds -= amount;
-  //     fund.monthly_deposits -= amount;
-  //     await this.fundsOverviewRepository.save(fund);
-  //     return fund;
-  //   } catch (error) {
-  //     throw new BadRequestException(error.message);
-  //   }
-  // }
-  async addDonation(amount: number) {
+
+  async adjustDonation(delta: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
-      fund.own_equity += amount;
-      fund.fund_principal += amount;
-      fund.available_funds += amount;
-      fund.total_donations += amount;
-      fund.total_equity_donations += amount;
+
+      fund.own_equity += delta;
+      fund.fund_principal += delta;
+      fund.available_funds += delta;
+      fund.total_donations += delta;
+      fund.total_equity_donations += delta;
+
       await this.fundsOverviewRepository.save(fund);
       return fund;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
-  // async removeDonation(amount: number) {
-  //   try {
-  //     const fund = await this.getFundsOverviewRecord(); 
-  //     fund.own_equity -= amount;
-  //     fund.fund_principal -= amount;
-  //     fund.available_funds -= amount;
-  //     fund.total_donations -= amount;
-  //     fund.total_equity_donations -= amount;
-  //     await this.fundsOverviewRepository.save(fund);
-  //     return fund;
-  //   } catch (error) {
-  //     throw new BadRequestException(error.message);
-  //   } 
-  // }
+async adjustSpecialFund(fundName: string, delta: number) {
+  try {
+    const fund = await this.getFundsOverviewRecord();
+    if (!fund.fund_details) {
+      fund.fund_details = {};
+    }
 
+    fund.fund_details[fundName] =
+      (fund.fund_details[fundName] || 0) + delta;
+
+    fund.special_funds += delta;
+    fund.own_equity += delta;
+    fund.total_donations += delta;
+    fund.available_funds += delta;
+
+    await this.fundsOverviewRepository.save(fund);
+    return fund;
+  } catch (error) {
+    throw new BadRequestException(error.message);
+  }
+}
+  /**
+   * השקעה מהקרן.
+   */
   async addInvestment(amount: number) {
     const fund = await this.getFundsOverviewRecord();
     if (amount > fund.available_funds) {
@@ -135,6 +141,9 @@ export class FundsOverviewService {
     return fund;
   }
 
+  /**
+   * רישום רווחי השקעה (החזרת קרן + רווח).
+   */
   async recordInvestmentEarnings(principal: number, profit: number) {
     const fund = await this.getFundsOverviewRecord();
     fund.available_funds += principal;
@@ -145,6 +154,10 @@ export class FundsOverviewService {
     await this.fundsOverviewRepository.save(fund);
     return fund;
   }
+
+  /**
+   * הוצאת הלוואה מהקרן.
+   */
   async addLoan(amount: number) {
     const fund = await this.getFundsOverviewRecord();
     if (amount > fund.available_funds) {
@@ -155,23 +168,34 @@ export class FundsOverviewService {
     await this.fundsOverviewRepository.save(fund);
     return fund;
   }
+
+  /**
+   * תרומת קרן מיוחדת (special fund).
+   */
   async addSpecialFund(fundName: string, amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
       if (!fund.fund_details) {
         fund.fund_details = {};
       }
-      fund.fund_details[fundName] = (fund.fund_details[fundName] || 0) + amount;
+      fund.fund_details[fundName] =
+        (fund.fund_details[fundName] || 0) + amount;
+
       fund.special_funds += amount;
       fund.own_equity += amount;
-      fund.total_donations += amount
+      fund.total_donations += amount;
       fund.available_funds += amount;
+
       await this.fundsOverviewRepository.save(fund);
       return fund;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
+
+  /**
+   * החזר הלוואה לקרן.
+   */
   async repayLoan(amount: number) {
     try {
       const fund = await this.fundsOverviewRepository.findOne({ where: {} });
@@ -185,6 +209,9 @@ export class FundsOverviewService {
     }
   }
 
+  /**
+   * משיכה מקרן מיוחדת קיימת.
+   */
   async reduceFundAmount(fundName: string, amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
@@ -207,6 +234,10 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
+
+  /**
+   * הוספת הוצאה כללית.
+   */
   async addExpense(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
@@ -220,6 +251,10 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
+
+  /**
+   * הוספת הפקדה כוללת של משתמשים (סך הכל).
+   */
   async addToDepositsTotal(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
@@ -232,6 +267,10 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
+
+  /**
+   * הפחתת סך הפקדונות של משתמשים (לדוגמה בעת החזר).
+   */
   async decreaseUserDepositsTotal(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
@@ -244,6 +283,10 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
+
+  /**
+   * רישום שינוי ביתרות מזומן פיזי (קופה).
+   */
   async recordCashHoldings(amount: number, type: CashHoldingsTypesRecordType) {
     try {
       const fund = await this.getFundsOverviewRecord();
@@ -260,17 +303,25 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
+
+  /**
+   * החזרת פרטי הקרן (לשימוש בדוחות / API).
+   */
   async getFundDetails(): Promise<FundsOverviewEntity> {
     try {
       const fund = await this.fundsOverviewRepository.findOne({ where: {} });
       if (!fund) {
         throw new NotFoundException('Fund details not found');
       }
-      return fund
+      return fund;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
+
+  /**
+   * רישום החזרי הוראות קבע.
+   */
   async addToStandingOrderReturn(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
@@ -286,6 +337,10 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
+
+  /**
+   * (נראה שכפול של addToDepositsTotal – השארתי כמו שהיה)
+   */
   async increaseUserDepositsTotal(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();

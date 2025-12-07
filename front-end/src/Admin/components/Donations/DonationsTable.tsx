@@ -1,5 +1,15 @@
-import { Box, CircularProgress, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel } from "@mui/material";
-import  { FC } from "react";
+import {
+  Box,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+} from "@mui/material";
+import { FC, useState } from "react";
+import EditDonationModal from "./EditDonationModal";
 export type DonationRow = {
   id: string | number;
   userName: string;
@@ -17,22 +27,42 @@ interface DonationsTableProps {
   sortDir: SortDir;
   onSortClick: (key: SortBy) => void;
 }
-const DonationsTable: FC<DonationsTableProps> = ({ isLoading, rows, sortBy, sortDir, onSortClick }) => {
-  
-      if (isLoading) {
+const DonationsTable: FC<DonationsTableProps> = ({
+  isLoading,
+  rows,
+  sortBy,
+  sortDir,
+  onSortClick,
+}) => {
+  if (isLoading) {
     return (
-      <Box display="flex" alignItems="center" justifyContent="center" height={300}>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        height={300}
+      >
         <CircularProgress />
       </Box>
     );
   }
-  return    <Box sx={{ overflow: "auto" }}>
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [selectedDonation, setSelectedDonation] = useState< DonationRow| null>(null);
+  const onClickEdit = (donation: DonationRow) => {
+    setSelectedDonation(donation);
+    setEditMode(true);
+  }
+  return (
+    <Box sx={{ overflow: "auto" }}>
       <Table size="small" stickyHeader>
         <TableHead>
           <TableRow>
             {/* לפי הדרישה: משתמש | סכום | תאריך | אמצעי תשלום | הערות */}
             <TableCell align="right">משתמש</TableCell>
-            <TableCell align="right" sortDirection={sortBy === "amount" ? sortDir : false as any}>
+            <TableCell
+              align="right"
+              sortDirection={sortBy === "amount" ? sortDir : (false as any)}
+            >
               <TableSortLabel
                 active={sortBy === "amount"}
                 direction={sortBy === "amount" ? sortDir : "asc"}
@@ -41,7 +71,10 @@ const DonationsTable: FC<DonationsTableProps> = ({ isLoading, rows, sortBy, sort
                 סכום
               </TableSortLabel>
             </TableCell>
-            <TableCell align="right" sortDirection={sortBy === "date" ? sortDir : false as any}>
+            <TableCell
+              align="right"
+              sortDirection={sortBy === "date" ? sortDir : (false as any)}
+            >
               <TableSortLabel
                 active={sortBy === "date"}
                 direction={sortBy === "date" ? sortDir : "asc"}
@@ -63,22 +96,43 @@ const DonationsTable: FC<DonationsTableProps> = ({ isLoading, rows, sortBy, sort
               </TableCell>
             </TableRow>
           ) : (
-            rows.map((r) => (
-              <TableRow key={r.id} hover>
-                <TableCell align="right">{r.userName}</TableCell>
-                <TableCell align="right" sx={{ color: "success.main", fontWeight: 700 }}>
-                  {r.amount.toLocaleString("he-IL", { style: "currency", currency: "ILS" })}
+            rows.map((donationRow) => (
+              <TableRow key={donationRow.id} hover onClick={() => onClickEdit(donationRow)} sx={{cursor: 'pointer'}}>
+                <TableCell align="right">{donationRow.userName}</TableCell>
+                <TableCell
+                  align="right"
+                  sx={{ color: "success.main", fontWeight: 700 }}
+                >
+                  {donationRow.amount.toLocaleString("he-IL", {
+                    style: "currency",
+                    currency: "ILS",
+                  })}
                 </TableCell>
-                <TableCell align="right">{r.date}</TableCell>
-                <TableCell align="right">{r.action == "donation" ? "תרומה" : "משיכה"}</TableCell>
-                <TableCell align="right">{r.donation_reason == "Equity" ? "תרומה רגילה" : ` קרן ${r.donation_reason}`}</TableCell>
+                <TableCell align="right">{donationRow.date}</TableCell>
+                <TableCell align="right">
+                  {donationRow.action == "donation" ? "תרומה" : "משיכה"}
+                </TableCell>
+                <TableCell align="right">
+                  {donationRow.donation_reason == "Equity"
+                    ? "תרומה רגילה"
+                    : ` קרן ${donationRow.donation_reason}`}
+                </TableCell>
               </TableRow>
             ))
           )}
+          {editMode && (
+            <EditDonationModal
+              open={editMode}
+              onClose={() => setEditMode(false)}
+              donation={selectedDonation!}
+            />
+          )}
+
         </TableBody>
       </Table>
+ 
     </Box>
+  );
 };
 
 export default DonationsTable;
-;

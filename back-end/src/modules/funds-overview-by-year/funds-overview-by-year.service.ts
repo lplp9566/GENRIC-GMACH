@@ -40,14 +40,14 @@ export class FundsOverviewByYearService {
     return this.fundsOverviewByYearRepo.save(record);
   }
 
-  async recordEquityDonation(year: number, amount: number) {
+  async adjustEquityDonation(year: number, amount: number) {
     const record = await this.getOrCreateOverview(year);
     record.total_equity_donations += amount;
     record.total_donations += amount;
     return this.fundsOverviewByYearRepo.save(record);
   }
 
-  async recordSpecialFundDonationByName(year: number, fundName: string, amount: number) {
+  async adjustSpecialFundDonationByName(year: number, fundName: string, amount: number) {
     const record = await this.getOrCreateOverview(year);
     if (!record["fund_details_donated"]) {
       record["fund_details_donated"] = {};

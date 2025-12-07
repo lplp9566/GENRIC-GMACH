@@ -13,7 +13,6 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createInitialInvestment } from "../../../store/features/admin/adminInvestmentsSlice";
-import { getFundsOverview } from "../../../store/features/admin/adminFundsOverviewSlice";
 interface NewInvestmentProps {
   open: boolean;
   onClose: () => void;
