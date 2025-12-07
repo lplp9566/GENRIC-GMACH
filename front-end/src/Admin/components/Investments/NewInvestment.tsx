@@ -22,37 +22,45 @@ const NewInvestment = ({ open, onClose }: NewInvestmentProps) => {
   // const GREEN_LIGHT = "#e8f5e9";
   const GREEN_DARK = "#094a20";
   const today = new Date().toISOString().split("T")[0];
-    const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [newInvestment, setNewInvestment] = useState({
     amount: 0,
-    investment_name: "",  
+    investment_name: "",
     start_date: today,
     company_name: "",
     investment_portfolio_number: "",
     investment_by: "",
   });
-  const availableInvestment = useSelector((s:RootState)=> s.AdminFundsOverviewReducer.fundsOverview?.available_funds)
+  const availableInvestment = useSelector(
+    (s: RootState) => s.AdminFundsOverviewReducer.fundsOverview?.available_funds
+  );
   const onFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewInvestment((prev) => ({ ...prev, [name]: value }));
   };
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); 
+    e.preventDefault();
     if (newInvestment.amount <= 0) {
       toast.error("אנא הזן סכום השקעה תקין.");
       return;
-
-    } 
-    if(newInvestment.amount > availableInvestment!){
-      toast.error(`הסכום שהוזן גבוה מהקרן הזמינה להשקעה: ${availableInvestment} ש"ח`);
+    }
+    if (newInvestment.amount > availableInvestment!) {
+      toast.error(
+        `הסכום שהוזן גבוה מהקרן הזמינה להשקעה: ${availableInvestment} ש"ח`
+      );
       return;
     }
     console.log(newInvestment.start_date);
-    
+
     onClose();
     toast.promise(
-      dispatch(createInitialInvestment({ ...newInvestment, start_date: new Date(newInvestment.start_date) })),
+      dispatch(
+        createInitialInvestment({
+          ...newInvestment,
+          start_date: new Date(newInvestment.start_date),
+        })
+      ),
       {
         pending: "מוסיף השקעה...",
         success: "השקעה נוצרה בהצלחה! 👌",
@@ -60,7 +68,7 @@ const NewInvestment = ({ open, onClose }: NewInvestmentProps) => {
       },
       { autoClose: 3000 }
     );
-  }
+  };
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -137,7 +145,7 @@ const NewInvestment = ({ open, onClose }: NewInvestmentProps) => {
                 fullWidth
                 dir="rtl"
               />
-                    <TextField
+              <TextField
                 label="הושקע דרך "
                 name="investment_by"
                 value={newInvestment.investment_by}
@@ -174,6 +182,5 @@ const NewInvestment = ({ open, onClose }: NewInvestmentProps) => {
     </Modal>
   );
 };
-
 
 export default NewInvestment;

@@ -59,3 +59,10 @@ export interface TransactionDto {
   transaction_date: Date;
   note?: string;
 }
+export enum InvestmentTransactionType {
+  INITIAL_INVESTMENT = "INITIAL_INVESTMENT",
+  VALUE_UPDATE = "VALUE_UPDATE",
+  ADDITIONAL_INVESTMENT = "ADDITIONAL_INVESTMENT",
+  WITHDRAWAL = "WITHDRAWAL",
+  MANAGEMENT_FEE = "MANAGEMENT_FEE",
+}

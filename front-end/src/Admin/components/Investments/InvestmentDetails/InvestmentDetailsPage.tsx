@@ -8,6 +8,7 @@ import { getTransactionsByInvestmentId } from '../../../../store/features/admin/
 import LoadingIndicator from '../../StatusComponents/LoadingIndicator';
 import GeneralInvestmentInfoCard from './GeneralInvestmentInfoCard';
 import InvestmentAction from './InvestmentAction';
+import InvestmentActionTable from './InvestmentActionTable';
 
 const InvestmentDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -22,7 +23,6 @@ const InvestmentDetailsPage = () => {
 
   }, [dispatch, investmentId]);
    if (!investment || !investmentTransactionDetails) return <LoadingIndicator />;
-   console.log(investmentTransactionDetails);
    
   return (
   <Box
@@ -77,9 +77,9 @@ const InvestmentDetailsPage = () => {
           </Grid>
         )}
 
-        {/* <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "30%" } }}>
-          <ActionsTable actions={loanDetails.actions ?? []} />
-        </Grid> */}
+        <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "30%" } }}>
+          <InvestmentActionTable actions={investmentTransactionDetails} />
+        </Grid>
       </Grid>
     </Box>
   )
