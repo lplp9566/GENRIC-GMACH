@@ -4,11 +4,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../../store/store';
 import { useEffect } from 'react';
-import { getTransactionsByInvestmentId } from '../../../../store/features/admin/adminInvestmentsSlice';
 import LoadingIndicator from '../../StatusComponents/LoadingIndicator';
 import GeneralInvestmentInfoCard from './GeneralInvestmentInfoCard';
 import InvestmentAction from './InvestmentAction';
 import InvestmentActionTable from './InvestmentActionTable';
+import { getTransactionsByInvestmentId, getAllInvestments } from
+  "../../../../store/features/admin/adminInvestmentsSlice";
 
 const InvestmentDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -23,7 +24,15 @@ const InvestmentDetailsPage = () => {
 
   }, [dispatch, investmentId]);
    if (!investment || !investmentTransactionDetails) return <LoadingIndicator />;
-   
+
+   const handleInvestmentChanged =  () => {
+    console.log("sdknskd");
+    
+    if (investmentId) {
+      dispatch(getTransactionsByInvestmentId(investmentId));
+      dispatch(getAllInvestments());
+    }
+  };
   return (
   <Box
       sx={{
@@ -73,6 +82,7 @@ const InvestmentDetailsPage = () => {
           <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "20%" } }}>
             <InvestmentAction
               investmentId={investmentId}
+              onChanged={handleInvestmentChanged}
             />
           </Grid>
         )}

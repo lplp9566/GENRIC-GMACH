@@ -15,10 +15,10 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../store/store";
 import { addToInvestment, applyManagementFee, updateInvestmentValue, withdrawFromInvestment } from "../../../../store/features/admin/adminInvestmentsSlice";
-import { getFundsOverview } from "../../../../store/features/admin/adminFundsOverviewSlice";
 
 interface InvestmentActionProps {
   investmentId: number;
+  onChanged: () => void;
 }
 type InvestmentActionMode =
   | "add-to-investment"
@@ -27,6 +27,7 @@ type InvestmentActionMode =
   | "management-fee";
 const InvestmentAction: React.FC<InvestmentActionProps> = ({
   investmentId,
+  onChanged,
 }) => {
   const availableInvestment = useSelector(
     (s: RootState) => s.AdminFundsOverviewReducer.fundsOverview?.available_funds
@@ -52,14 +53,14 @@ const InvestmentAction: React.FC<InvestmentActionProps> = ({
         );
         return;
       }
-      toast.promise(
+      await toast.promise(
         dispatch(
           addToInvestment({
             id: investmentId,
             amount: Number(amount),
             date: new Date(date),
           })
-        ),
+        ).unwrap(),
         {
           pending: "מוסיף להשקעה...",
           success: "הוספה להשקעה בוצעה בהצלחה! 👌",
@@ -71,8 +72,8 @@ const InvestmentAction: React.FC<InvestmentActionProps> = ({
         toast.error(`הסכום שהוזן גבוה מהערך הנוכחי של ההשקעה: ${investment?.current_value} ש"ח`);
         return;
       }
-      toast.promise(
-        dispatch(withdrawFromInvestment({id: investmentId, amount: Number(amount), date: new Date(date)})),
+    await toast.promise(
+        dispatch(withdrawFromInvestment({id: investmentId, amount: Number(amount), date: new Date(date)})).unwrap(),
         {
           pending: "מבצע משיכה מההשקעה...",
           success: "המשיכה מההשקעה בוצעה בהצלחה! 👌"
@@ -80,8 +81,8 @@ const InvestmentAction: React.FC<InvestmentActionProps> = ({
       );
     }
     if (mode === "update-value") {
-      toast.promise(
-        dispatch(updateInvestmentValue({id: investmentId, new_value: Number(amount), date: new Date(date)})),
+      await toast.promise(
+        dispatch(updateInvestmentValue({id: investmentId, new_value: Number(amount), date: new Date(date)})).unwrap(),
         {
           pending: "מעדכן ערך השקעה...",
           success: "עדכון ערך ההשקעה בוצע בהצלחה! 👌"
@@ -90,14 +91,15 @@ const InvestmentAction: React.FC<InvestmentActionProps> = ({
       )
     }
     if (mode === "management-fee") {
-      toast.promise(
-        dispatch(applyManagementFee({id: investmentId, feeAmount: Number(amount), date: new Date(date)})),
+      await toast.promise(
+        dispatch(applyManagementFee({id: investmentId, feeAmount: Number(amount), date: new Date(date)})).unwrap(),
         {
           pending: "מיישם דמי ניהול...",
           success: "דמי הניהול הוחלו בהצלחה! 👌"
           } ,
       )
     }
+ onChanged();
     setAmount(0);
     setDate(""
       )
