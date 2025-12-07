@@ -1,4 +1,3 @@
-// src/hooks/Loans/useNewLoanForm.ts
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
@@ -12,18 +11,13 @@ export const NEW_LOAN_STEPS = [
 ];
 
 export function useNewLoanForm() {
-  // ----- state מתוך ה-store -----
   const allUsers = useSelector(
     (s: RootState) => s.AdminUsers.allUsers ?? []
   );
   const selectedUser = useSelector(
     (s: RootState) => s.AdminUsers.selectedUser
   );
-
-  // ----- תאריכים ו-constants -----
   const today = new Date().toISOString().split("T")[0];
-
-  // ----- סטייט לוגי -----
   const [activeStep, setActiveStep] = useState(0);
   const [openModal, setOpenModal] = useState(false);
   const [newLoan, setNewLoan] = useState<
@@ -40,7 +34,6 @@ export function useNewLoanForm() {
     { id: number; firstName: string; lastName: string }[]
   >([]);
 
-  // ----- handlers -----
   const handleFieldChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -87,12 +80,10 @@ export function useNewLoanForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // עובר שלב עד האחרון
     if (activeStep < NEW_LOAN_STEPS.length - 1) {
       setActiveStep((s) => s + 1);
       return;
     }
-    // ולידציות סופיות
     if (
       !newLoan.user ||
       newLoan.loan_amount <= 0 ||
@@ -112,7 +103,6 @@ export function useNewLoanForm() {
 
   const closeModal = () => setOpenModal(false);
 
-  // ----- חישובים ל-UI -----
   const borrower = allUsers.find((u) => u.id === newLoan.user);
   const borrowerName = borrower
     ? `${borrower.first_name} ${borrower.last_name}`
@@ -136,14 +126,12 @@ export function useNewLoanForm() {
   };
 
   return {
-    // state
     activeStep,
     newLoan,
     guarantors,
     openModal,
     allUsers,
 
-    // handlers
     handleFieldChange,
     handleUserChange,
     addGuarantor,
@@ -151,8 +139,6 @@ export function useNewLoanForm() {
     handleSubmit,
     closeModal,
     handleBack,
-
-    // computed
     borrowerName,
     modalLoan,
   };

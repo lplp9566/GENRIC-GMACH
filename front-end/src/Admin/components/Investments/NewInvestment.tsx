@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createInitialInvestment } from "../../../store/features/admin/adminInvestmentsSlice";
+import { getFundsOverview } from "../../../store/features/admin/adminFundsOverviewSlice";
 interface NewInvestmentProps {
   open: boolean;
   onClose: () => void;
@@ -51,8 +52,6 @@ const NewInvestment = ({ open, onClose }: NewInvestmentProps) => {
       );
       return;
     }
-    console.log(newInvestment.start_date);
-
     onClose();
     toast.promise(
       dispatch(
@@ -68,6 +67,7 @@ const NewInvestment = ({ open, onClose }: NewInvestmentProps) => {
       },
       { autoClose: 3000 }
     );
+    // dispatch(getFundsOverview());
   };
   return (
     <Modal open={open} onClose={onClose}>

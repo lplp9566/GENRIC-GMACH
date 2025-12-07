@@ -22,7 +22,6 @@ const GREEN_DARK = "#094a20";
 const NewLoanForm: React.FC = () => {
   const navigate = useNavigate();
 
-  // שולפים מה-hook את כל ה-state וה handlers
   const {
     activeStep,
     newLoan,
