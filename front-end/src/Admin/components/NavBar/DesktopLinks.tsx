@@ -18,7 +18,7 @@ const navItems = [
   { label: "פקדונות", path: "/deposits" },
   { label: "נתונים כללים", path: "/funds" },
   { label: "סטטיסטיקה", path: "/FundsOverviewByYear" },
-  {label: "תשלומים חודשיים " , path:"/paymentsPage"},
+  {label: "דמי חבר" , path:"/paymentsPage"},
   {label:"הוצאות",path:"/expenses"}
 
 
