@@ -78,7 +78,6 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
     RoleMonthlyRatesModule,
     UserRoleHistoryModule,
     WhatsappModule,
-
   ],
   providers: [ExpensesService, UserRoleHistoryService],
   controllers: [UserRoleHistoryController,],
