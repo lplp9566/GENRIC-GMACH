@@ -1,5 +1,5 @@
 export const AdminYearlyFinancialItems = [
-  { key: "total_monthly_deposits", label: "הפקדות חודשיות", color: "#009688" }, // טורקיז כהה
+  { key: "total_monthly_deposits", label: "דמי חבר", color: "#009688" }, // טורקיז כהה
   { key: "total_loans_amount", label: "הלוואות שניתנו", color: "#f44336" }, // אדום
   { key: "total_loans_taken", label: "מספר הלוואות", color: "#ff9800" }, // כתום
   { key: "total_loan_repaid", label: "החזרי הלוואות", color: "#1976d2" }, // כחול קלאסי
@@ -35,7 +35,7 @@ export const AdminYearlyFinancialItems = [
   { key: "total_donations", label: "סך התרומות", color: "#ff5722" }, // כתום־אדום
 ];
 export const UserAdminFinancialItems = [
-  { key: "total_monthly_deposits", label: "הפקדות חודשיות", color: "#009688" },
+  { key: "total_monthly_deposits", label: "דמי חבר", color: "#009688" },
   { key: "total_loans_amount", label: "הלוואות שניתנו", color: "#f44336" },
   { key: "total_loan_repaid", label: "החזרי הלוואות", color: "#1976d2" }, // טורקיז כהה
   { key: "total_equity_donations", label: "תרומות הון", color: "#6d4c41" }, // חום כהה

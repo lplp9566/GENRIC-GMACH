@@ -30,7 +30,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const getFundsOverview = createAsyncThunk(
     '/admin/getFundsOverview',
     async()=>{
-        const response = await axios.get(`${BASE_URL}/funds-overview`|| "http://localhost:3000/funds-overview");
+        const response = await axios.get(`${BASE_URL}/funds-overview`);
         return response.data
     }
  )

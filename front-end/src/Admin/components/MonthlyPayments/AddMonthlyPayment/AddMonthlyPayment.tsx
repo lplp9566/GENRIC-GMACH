@@ -24,9 +24,8 @@ import { AppDispatch, RootState } from "../../../../store/store";
 import { setMonthlyPaymentModalMode } from "../../../../store/features/Main/AppMode";
 import { paymentMethod } from "../MonthlyPaymentsDto";
 import SelectAllUsers from "../../SelectUsers/SelectAllUsers";
-import { createMonthlyPayment } from "../../../../store/features/admin/adminMonthlyPayments";
+import { createMonthlyPayment, gatAllMonthlyPayments, getMonthlyPaymentsByUserId } from "../../../../store/features/admin/adminMonthlyPayments";
 import { payment_method_enum } from "../../Users/UsersDto";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { RtlProvider } from "../../../../Theme/rtl";
 
@@ -35,7 +34,6 @@ export const AddPaymentModal: React.FC = () => {
     (s: RootState) => s.mapModeSlice.MonthlyPaymentModalMode
   );
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
   const today = new Date().toISOString().slice(0, 10);
 
   const [isMultiUser, setIsMultiUser] = useState(false);
@@ -61,7 +59,9 @@ export const AddPaymentModal: React.FC = () => {
     const allUsers = useSelector(
       (state: RootState) => state.AdminUsers.allUsers
     );
-
+  const selectedUser = useSelector(
+    (state: RootState) => state.AdminUsers.selectedUser
+  );
   const handleAddMultiUser = () => {
     if (!tempMultiUserId || tempMultiUserId === 0) return;
     setSelectedUsers((prev) =>
@@ -113,7 +113,12 @@ export const AddPaymentModal: React.FC = () => {
 
     allPromises
       .then(() => {
-        navigate("/paymentsPage");
+    if (selectedUser) {
+          dispatch(getMonthlyPaymentsByUserId(selectedUser.id));
+        }
+        else{
+        dispatch(gatAllMonthlyPayments());
+        }
       })
       .catch(() => {
         toast.error("שגיאה בהוספת התשלום 💥", { autoClose: 3000 });
@@ -283,7 +288,6 @@ export const AddPaymentModal: React.FC = () => {
               size="medium"
               color="success"
               fullWidth
-              type="number"
               inputProps={{ min: 0 }}
               value={newPayment.amount}
               onChange={(e) =>

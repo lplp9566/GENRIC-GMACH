@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -43,5 +44,9 @@ export class MonthlyDepositsController {
   @Patch(':id')
   async updateMonthlyDeposit(@Param('id', ParseIntPipe) id: number, @Body() paymentData: updateMonthlyDepositDto) {
     return this.monthlyDepositsService.updateMonthlyDeposit(id, paymentData);
+  }
+  @Delete(':id')
+  async deleteMonthlyDeposit(@Param('id', ParseIntPipe) id: number) {
+    return this.monthlyDepositsService.deleteMonthlyDeposit(id);
   }
 }

@@ -1,34 +1,55 @@
-import { Dialog } from '@mui/material'
-import { FC } from 'react'
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from "@mui/material";
+import { FC } from "react";
+
 interface Props {
-    open: boolean
-    onClose: () => void
-    onSubmit: () => void
-    text:string
+  open: boolean;
+  onClose: () => void;
+  onSubmit: () => void;
+  text: string;
 }
-const ConfirmModal:FC<Props> = ({open,onClose,onSubmit,text}) => {
+
+const ConfirmModal: FC<Props> = ({ open, onClose, onSubmit, text }) => {
   return (
-<Dialog open={open} onClose={onClose}>
-    <div className="flex flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold mb-4">{text}</h1>
-        <div className="flex justify-center space-x-4">
-            <button
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-                onClick={onSubmit}
-            >
-                Yes
-            </button>
-            <button
-                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
-                onClick={onClose}
-            >
-                No
-            </button>
-        </div>
-    </div>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      fullWidth 
+      maxWidth="xs"
+      sx={{ direction: "rtl" }}
+    >
+      <DialogTitle>
+        <Typography variant="h6" fontWeight="bold" textAlign="center">
+          {text}
+        </Typography>
+      </DialogTitle>
 
-</Dialog>
-  )
-}
+      <DialogContent>
+        <Typography textAlign="center" color="text.secondary">
+          פעולה זו אינה הפיכה
+        </Typography>
+      </DialogContent>
 
-export default ConfirmModal
+      <DialogActions sx={{ justifyContent: "center", pb: 2,display: "flex", gap: 2 }}>
+        <Button 
+          variant="contained" 
+          color="error"
+          onClick={onSubmit}
+          sx={{ px: 4 }}
+        >
+          כן
+        </Button>
+
+        <Button 
+          variant="outlined" 
+          color="inherit"
+          onClick={onClose}
+          sx={{ px: 4 }}
+        >
+          ביטול
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+export default ConfirmModal;

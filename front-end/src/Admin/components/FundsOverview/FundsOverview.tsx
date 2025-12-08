@@ -45,7 +45,7 @@ const FundsOverview: React.FC = () => {
     { label: "בהשקעות", value: fundsOverview.total_invested ,  Icon : AccountBalanceIcon},
     { label: "רווחי השקעות", value: fundsOverview.Investment_profits ,  Icon : AttachMoneyIcon},
     { label: "קרנות מיוחדות", value: fundsOverview.special_funds ,  Icon : PriceChangeIcon},
-    { label: "הפקדות חודשיות", value: fundsOverview.monthly_deposits ,  Icon : SavingsIcon},
+    { label: "דמי חבר", value: fundsOverview.monthly_deposits ,  Icon : SavingsIcon},
     { label: "סך התרומות", value: fundsOverview.total_donations,  Icon : SavingsIcon},
     { label: "תרומות רגילות", value: fundsOverview.total_equity_donations ,  Icon : SavingsIcon},
     { label: "פיקדונות", value: fundsOverview.total_user_deposits,  Icon : SavingsIcon},

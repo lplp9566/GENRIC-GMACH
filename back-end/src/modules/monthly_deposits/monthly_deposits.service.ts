@@ -9,6 +9,7 @@ import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { updateMonthlyDepositDto } from './monthly_deposits.controller';
+import { log } from 'console';
 
 @Injectable()
 export class MonthlyDepositsService {
@@ -164,7 +165,30 @@ export class MonthlyDepositsService {
       });
     }
   )
-  
+
   }
-  
+async deleteMonthlyDeposit(id: number) {
+  // קודם כל נביא את ה-entity דרך ה-repository הרגיל
+  const existing = await this.monthlyDepositsRepository.findOne({
+    where: { id },
+    relations: { user: true },
+  });
+
+  if (!existing) {
+    throw new BadRequestException('Deposit not found');
+  }
+
+  const oldAmount = existing.amount;
+  const oldDate = existing.deposit_date;
+  const oldYear = getYearFromDate(oldDate);
+  const user = existing.user;
+
+  // כל ה-await-ים שלך, כמו שהם
+  await this.userFinancialsService.recordMonthlyDeposit(user, -oldAmount);
+  await this.fundsOverviewService.addMonthlyDeposit(-oldAmount);
+  await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
+  await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
+  return await this.monthlyDepositsRepository.delete(id);
+}
+
 }  

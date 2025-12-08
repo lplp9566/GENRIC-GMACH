@@ -13,7 +13,7 @@ export class UserFinancialByYearService {
   ) {}
   async getUserFinancialsByUser(user: number) {
     const  records = this.userFinancialsByYearRepository.find(
-      { where: { user: { id: user } } },
+      { where: { user: { id: user } }, order: { year: 'ASC' } },
     );
     return (await records).map((record) => ({
       // user : record.user.id,
@@ -31,7 +31,8 @@ export class UserFinancialByYearService {
     }));
   }
 async getUserFinancialsByYear() {
-    return this.userFinancialsByYearRepository.find();
+  
+    return this.userFinancialsByYearRepository.find({order: {year: 'ASC'}});
   }
 
   async getOrCreateFinancialRecord(

@@ -58,6 +58,13 @@ export const createMonthlyPayment = createAsyncThunk(
     return response.data;       
   }
 );
+export const deleteMonthlyPayment = createAsyncThunk(
+  "/admin/deleteMonthlyPayment",
+  async (id: number) => {
+  await axios.delete(`${BASE_URL}/monthly-deposits/${id}`);
+    return id; 
+  }
+)
 export const AdminMonthlyPaymentsSlice = createSlice({
   name: "adminMonthlyPayments",
   initialState,
@@ -113,6 +120,19 @@ export const AdminMonthlyPaymentsSlice = createSlice({
             state.updateMonthlyPaymentStatus = "rejected";
             state.error = action.error.message || null;
         })
+        .addCase(deleteMonthlyPayment.pending, (state) => {
+            state.updateMonthlyPaymentStatus = "pending";
+        })
+        .addCase(deleteMonthlyPayment.fulfilled, (state,action) => {
+            const id = action.payload
+            state.allPayments = state.allPayments.filter((payment) => payment.id !== id); 
+            state.updateMonthlyPaymentStatus = "fulfilled";
+           
+        })
+        .addCase(deleteMonthlyPayment.rejected, (state, action) => {
+            state.updateMonthlyPaymentStatus = "rejected";
+            state.error = action.error.message || null;
+        });
   },
 });
 export default AdminMonthlyPaymentsSlice.reducer;

@@ -73,9 +73,7 @@ export class FundsOverviewService {
     }
   }
 
-  /**
-   * הפקדת הוראת קבע חודשית.
-   */
+
   async addMonthlyDeposit(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
