@@ -29,7 +29,7 @@ const MonthlyPaymentHeader = () => {
               }}
             >
               <Typography variant="h5" align="center" fontWeight={600}>
-                ניהול הוראות קבע
+                ניהול  דמי חבר
               </Typography>
               <img
                 width="48"

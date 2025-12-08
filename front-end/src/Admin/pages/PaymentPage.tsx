@@ -49,11 +49,13 @@ const paymentModal = useSelector(
   const [selectedYear, setSelectedYear] = useState<number>(
     years.includes(currentYear) ? currentYear : years[0] ?? currentYear
   );
-
-  const paymentsThisYear = useMemo(
-    () => payments.filter((p) => p.year === selectedYear),
-    [payments, selectedYear]
-  );
+const paymentsThisYear = useMemo(
+  () =>
+    payments.filter(
+      (p) => selectedYear === 0 || p.year === selectedYear
+    ),
+  [payments, selectedYear]
+);
 
   const months = useMemo(
     () =>
