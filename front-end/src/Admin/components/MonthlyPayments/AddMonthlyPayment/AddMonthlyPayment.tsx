@@ -74,6 +74,7 @@ export const AddPaymentModal: React.FC = () => {
   };
 
   const handleSubmit = () => {
+            handleClose();
     const targetUserIds = isMultiUser
       ? selectedUsers
       : [newPayment.userId];
@@ -112,7 +113,6 @@ export const AddPaymentModal: React.FC = () => {
 
     allPromises
       .then(() => {
-        handleClose();
         navigate("/paymentsPage");
       })
       .catch(() => {

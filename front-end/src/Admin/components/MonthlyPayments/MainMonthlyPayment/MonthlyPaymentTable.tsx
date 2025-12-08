@@ -3,12 +3,14 @@ import { IMonthlyPayment, paymentMethod } from '../MonthlyPaymentsDto'
 import { fmtDate } from '../../../../common/genricFunction'
 import { useState } from 'react'
 import MonthlyPaymentEditModal from './MonthlyPaymentEditModal'
+import ConfirmModal from '../../genricComponents/confirmModal'
 interface MonthlyPaymentProps {
     paymentsThisMonth: IMonthlyPayment[]
 } 
 const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({ paymentsThisMonth }) => {
   const [selectedPayment, setSelectedPayment] = useState<IMonthlyPayment | null>(null);
   const [editMode, setEditMode] = useState<boolean>(false);
+  const [deleteMode, setDeleteMode] = useState<boolean>(false);
   return (
     <div>   <Paper sx={{ borderRadius: 2, overflow: 'auto',padding: 2, boxShadow: 1, }}>
         <Table size="small" sx={{ minWidth: 650 }}>
@@ -34,6 +36,9 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({ paymentsThisMonth 
                   <TableCell align="right">{fmtDate(p.deposit_date)}</TableCell>
                   <TableCell align="right">{ paymentMethod.find(pm => pm.value == p.payment_method)?.label}</TableCell>
                   <TableCell align="right">{p.description}</TableCell>
+                  <TableCell align="right" onClick={(e) => { e.stopPropagation(); setDeleteMode(true); }}>
+                    מחיקה
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -44,6 +49,7 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({ paymentsThisMonth 
               </TableRow>
             )}
            {editMode && selectedPayment && <MonthlyPaymentEditModal editMode={editMode} onClose={() => setEditMode(false)} selectedPayment={selectedPayment!}/>}
+            {deleteMode && <ConfirmModal onClose={()=>setDeleteMode(false) } open={deleteMode} onSubmit={() => {}} text={"האם ברצונך למחוק את התשלום?"  }/>}
           </TableBody>
         </Table>
       </Paper></div>
