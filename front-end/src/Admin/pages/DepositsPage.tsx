@@ -29,7 +29,6 @@ import NewDepositModal from "../components/Deposits/newDeposit/newDeposit";
 
 const DepositsPage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  // const navigate = useNavigate();
   const theme = useTheme();
 
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
