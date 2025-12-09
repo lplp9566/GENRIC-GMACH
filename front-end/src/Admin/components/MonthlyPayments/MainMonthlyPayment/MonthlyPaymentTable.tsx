@@ -18,6 +18,8 @@ import { deleteMonthlyPayment } from "../../../../store/features/admin/adminMont
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../store/store";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditIcon from "@mui/icons-material/Edit";
+
 interface MonthlyPaymentProps {
   paymentsThisMonth: IMonthlyPayment[];
 }
@@ -59,20 +61,13 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
               <TableCell align="right">תאריך</TableCell>
               <TableCell align="right">אמצעי תשלום</TableCell>
               <TableCell align="right">הערות</TableCell>
-              <TableCell align="right"></TableCell>
+              <TableCell align="right">פעולות</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {paymentsThisMonth.length > 0 ? (
               paymentsThisMonth.map((p) => (
-                <TableRow
-                  key={p.id}
-                  hover
-                  onClick={() => {
-                    setSelectedPayment(p);
-                    setEditMode(true);
-                  }}
-                >
+                <TableRow key={p.id} hover>
                   <TableCell align="right">
                     {p.user.first_name} {p.user.last_name}
                   </TableCell>
@@ -91,15 +86,40 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
                   </TableCell>
                   <TableCell align="right">{p.description}</TableCell>
                   <TableCell
-                    align="center"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedPayment(p);
-                      setDeleteMode(true);
-                    }}
+                    align="right"
+                    onClick={(e) => e.stopPropagation()
+                      
+                    }
                   >
+                    <Tooltip title="עריכת תשלום">
+                      <IconButton
+                        color="primary"
+                        size="small"
+                        onClick={() => {
+                          setSelectedPayment(p);
+                          setEditMode(true);
+                        }}
+                      >
+                        <EditIcon 
+                          sx={{ color: "primary.main" }}
+                          onClick={() => {
+                            setSelectedPayment(p);
+                            setEditMode(true);
+                          }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+
+                    {/* מחיקה */}
                     <Tooltip title="מחיקת תשלום">
-                      <IconButton color="error" size="small">
+                      <IconButton
+                        color="error"
+                        size="small"
+                        onClick={() => {
+                          setSelectedPayment(p);
+                          setDeleteMode(true);
+                        }}
+                      >
                         <DeleteOutlineIcon />
                       </IconButton>
                     </Tooltip>
