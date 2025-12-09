@@ -21,10 +21,12 @@ import DepositDetailsPage from "./Admin/components/Deposits/DepositsDetails/Depo
 import ProtectedRoute from "./Auth/ProtectedRoute";
 import Investments from "./Admin/pages/InvestmentsPage";
 import InvestmentDetailsPage from "./Admin/components/Investments/InvestmentDetails/InvestmentDetailsPage";
+import { MatomoTracker } from "./MatomoTracker";
 
 export default function App() {
   return (
     <BrowserRouter>
+          <MatomoTracker />
       <Routes>
         {/* Public */}
         <Route element={<PublicLayout />}>
@@ -32,9 +34,10 @@ export default function App() {
         </Route>
 
         {/* Private */}
+
         <Route element={<ProtectedRoute />}>
           <Route element={<PrivateLayout />}>
-            <Route path="/home" element={<HomePage />} />
+                      <Route path="/home" element={<HomePage />} />
             <Route path="/loans" element={<LoansPage />} />
             <Route path="/loans/new" element={<NewLoan />} />
             <Route path="/loans/:id" element={<LoanDetailsPage />} />
