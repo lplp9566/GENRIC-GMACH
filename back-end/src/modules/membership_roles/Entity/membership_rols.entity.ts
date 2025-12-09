@@ -10,7 +10,7 @@ export class MembershipRoleEntity {
   name: string;
 
     @OneToMany(() => RoleMonthlyRateEntity, rate => rate.role, {
-    cascade: ['insert', 'update'], 
+    cascade: ['insert', 'update' , 'remove'], 
     eager: false, 
   })
   monthlyRates: RoleMonthlyRateEntity[];
