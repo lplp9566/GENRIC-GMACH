@@ -67,8 +67,7 @@ export class UserBalanceCronService {
     this.logger.log('✅ Daily loan balances update complete.');
   }
 
-  // ⭐⭐ --- שליחת תזכורת אוטומטית על הלוואות --- ⭐⭐
-  @Cron('26 21 * * *', { timeZone: 'Asia/Jerusalem' })
+  @Cron('36 22 * * *', { timeZone: 'Asia/Jerusalem' })
   async sendDailyLoanReminders() {
     const today = new Date().getDate();
 
