@@ -17,6 +17,7 @@ import { MembershipRoleEntity } from '../membership_roles/Entity/membership_rols
 import { RoleMonthlyRateEntity } from '../role_monthly_rates/Entity/role_monthly_rates.entity';
 import { ConfigService } from '@nestjs/config';
 import { payment_method } from './userTypes';
+import { log } from 'console';
 
 @Injectable()
 export class UsersService {
@@ -205,9 +206,9 @@ async onApplicationBootstrap() {
 
     // 6. לולאה חודש־חודש מ־iter ועד לרגע end (כולל יוני)
     while (iter.getTime() <= end.getTime()) {
-      // console.log(user.first_name);
+      console.log(user.first_name);
       
-      // console.log('⏳ Month:', iter.toISOString().slice(0,7));
+      console.log('⏳ Month:', iter.toISOString().slice(0,7));
 
       // א. בחר את הדרגה שהייתה פעילה באותו חודש
       const active = history
@@ -215,9 +216,9 @@ async onApplicationBootstrap() {
         .sort((a, b) => +new Date(b.from_date) - +new Date(a.from_date))[0];
 
       if (!active) {
-        // console.log('  ✖ No active role, skipping');
+        console.log('  ✖ No active role, skipping');
       } else {
-        // console.log('  ✔ Active role id:', active.role.id);
+        console.log('  ✔ Active role id:', active.role.id);
 
         // ב. מצא את התעריף האחרון שהחל עד אותו חודש
         const rate = allRates
@@ -231,10 +232,12 @@ async onApplicationBootstrap() {
           )[0];
 
         if (rate) {
-          // console.log('  💰 Using rate:', rate.amount);
+          console.log('  💰 Using rate:', rate.amount);
           totalDue += rate.amount;
+          console.log(`totalDue`,totalDue);
+          
         } else {
-          // console.log('  ✖ No rate found, skipping');
+          console.log('  ✖ No rate found, skipping');
         }
       }
 
@@ -242,7 +245,7 @@ async onApplicationBootstrap() {
       iter.setMonth(iter.getMonth() + 1);
     }
 
-    // console.log('🏁 totalDue:', totalDue);
+    console.log('🏁 totalDue:', totalDue);
     return totalDue;
   }
 
@@ -256,10 +259,10 @@ async onApplicationBootstrap() {
     user: UserEntity,
   ): Promise<{ total_due: number; total_paid: number; balance: number }> {
     const totalDue = await this.calculateTotalDue(user.id);
-    // console.log(totalDue,"totalDue");
+    console.log(totalDue,"totalDue");
     const totalPaid = await this.getUserTotalDeposits(user.id);
     const balance = totalPaid - totalDue;
-    // console.log(totalDue,"totalDue",totalPaid,"totalPaid",balance,"balance");
+    console.log(totalDue,"totalDue",totalPaid,"totalPaid",balance,"balance");
     return { total_due: totalDue, total_paid: totalPaid, balance };
   }
 
