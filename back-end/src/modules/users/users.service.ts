@@ -164,90 +164,78 @@ async onApplicationBootstrap() {
     });
   }
 
-  async calculateTotalDue(userId: number): Promise<number> {
-    // 1. שליפת המשתמש ובדיקות
-    const user = await this.usersRepository.findOne({
-      where: { id: userId, is_admin: false },
-      relations: ['payment_details'],
-    });
-    if (!user) throw new BadRequestException('User not found');
-    if (!user.payment_details?.charge_date) {
-      throw new BadRequestException('Missing payment details');
-    }
-
-    // 2. היסטוריית הדרגות, ממוינת לפי תאריך עולה
-    const history = await this.roleHistoryRepo.find({
-      where: { user: { id: userId } },
-      relations: ['role'],
-      order: { from_date: 'ASC' },
-    });
-    if (history.length === 0) {
-      throw new BadRequestException('No role history for user');
-    }
-
-    // 3. תעריפים לכל הדרגות
-    const allRates = await this.ratesRepo.find({ relations: ['role'] });
-    if (allRates.length === 0) {
-      throw new BadRequestException('No monthly rates defined');
-    }
-
-    // 4. נקודת ההתחלה – ראש החודש הראשון
-    const firstFrom =
-      history[0].from_date instanceof Date
-        ? history[0].from_date
-        : new Date(history[0].from_date);
-    let iter = new Date(firstFrom.getFullYear(), firstFrom.getMonth(), 1);
-
-    // 5. נקודת הסיום – ראש החודש הנוכחי
-    const today = new Date();
-    const end = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-
-    let totalDue = 0;
-
-    // 6. לולאה חודש־חודש מ־iter ועד לרגע end (כולל יוני)
-    while (iter.getTime() <= end.getTime()) {
-      console.log(user.first_name);
-      
-      console.log('⏳ Month:', iter.toISOString().slice(0,7));
-
-      // א. בחר את הדרגה שהייתה פעילה באותו חודש
-      const active = history
-        .filter((h) => new Date(h.from_date).getTime() <= iter.getTime())
-        .sort((a, b) => +new Date(b.from_date) - +new Date(a.from_date))[0];
-
-      if (!active) {
-        console.log('  ✖ No active role, skipping');
-      } else {
-        console.log('  ✔ Active role id:', active.role.id);
-
-        // ב. מצא את התעריף האחרון שהחל עד אותו חודש
-        const rate = allRates
-          .filter(
-            (r) =>
-              r.role.id === active.role.id &&
-              new Date(r.effective_from).getTime() <= iter.getTime(),
-          )
-          .sort(
-            (a, b) => +new Date(b.effective_from) - +new Date(a.effective_from),
-          )[0];
-
-        if (rate) {
-          console.log('  💰 Using rate:', rate.amount);
-          totalDue += rate.amount;
-          console.log(`totalDue`,totalDue);
-          
-        } else {
-          console.log('  ✖ No rate found, skipping');
-        }
-      }
-
-      // מעבר לחודש הבא
-      iter.setMonth(iter.getMonth() + 1);
-    }
-
-    console.log('🏁 totalDue:', totalDue);
-    return totalDue;
+ async calculateTotalDue(userId: number): Promise<number> {
+  // 1. שליפת המשתמש ובדיקות
+  const user = await this.usersRepository.findOne({
+    where: { id: userId, is_admin: false },
+    relations: ['payment_details'],
+  });
+  if (!user) throw new BadRequestException('User not found');
+  if (!user.payment_details?.charge_date) {
+    throw new BadRequestException('Missing payment details');
   }
+
+  // 2. היסטוריית הדרגות, ממוינת לפי תאריך עולה
+  const history = await this.roleHistoryRepo.find({
+    where: { user: { id: userId } },
+    relations: ['role'],
+    order: { from_date: 'ASC' },
+  });
+  if (history.length === 0) {
+    throw new BadRequestException('No role history for user');
+  }
+
+  // 3. תעריפים לכל הדרגות
+  const allRates = await this.ratesRepo.find({ relations: ['role'] });
+  if (allRates.length === 0) {
+    throw new BadRequestException('No monthly rates defined');
+  }
+
+  // --- Helpers: עבודה לפי חודש ב-UTC כדי למנוע "גלישה" לחודש קודם/הבא בגלל timezone
+  const toMonthStartUTC = (d: Date) =>
+    new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
+
+  // 4. נקודת ההתחלה – ראש החודש של החודש הראשון בהיסטוריה (UTC)
+  const firstFrom = new Date(history[0].from_date as any);
+  let iter = toMonthStartUTC(firstFrom);
+
+  // אם אתה רוצה *לא* לחייב על חודש ההצטרפות כשהוא באמצע חודש – תפתח את זה:
+  // if (firstFrom.getUTCDate() > 1) iter.setUTCMonth(iter.getUTCMonth() + 1);
+
+  // 5. נקודת הסיום – תחילת החודש הבא (UTC) אבל כ-EXCLUSIVE (לא נכלל בלולאה)
+  const today = new Date();
+  const endExclusive = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 1),
+  );
+
+  let totalDue = 0;
+
+  // 6. לולאה חודש-חודש: iter < endExclusive (ככה לא מחשב "עוד חודש")
+  while (iter.getTime() < endExclusive.getTime()) {
+    // א. הדרגה הפעילה בחודש הזה (לפי from_date)
+    const active = history
+      .filter((h) => toMonthStartUTC(new Date(h.from_date as any)).getTime() <= iter.getTime())
+      .sort((a, b) => +new Date(b.from_date as any) - +new Date(a.from_date as any))[0];
+
+    if (active) {
+      // ב. התעריף האחרון שנכנס לתוקף עד החודש הזה
+      const rate = allRates
+        .filter(
+          (r) =>
+            r.role.id === active.role.id &&
+            toMonthStartUTC(new Date(r.effective_from as any)).getTime() <= iter.getTime(),
+        )
+        .sort((a, b) => +new Date(b.effective_from as any) - +new Date(a.effective_from as any))[0];
+
+      if (rate) totalDue += rate.amount;
+    }
+
+    // חודש הבא (UTC)
+    iter.setUTCMonth(iter.getUTCMonth() + 1);
+  }
+
+  return totalDue;
+}
 
   async getUserTotalDeposits(userId: number): Promise<number> {
     const UserTotalDeposits =
