@@ -103,92 +103,102 @@ export class MonthlyDepositsService {
       throw new BadRequestException(error.message);
     }
   }
-  async updateMonthlyDeposit(id: number, payment_details: updateMonthlyDepositDto) {
-  const {amount:newAmount,deposit_date:newDepositDate} = payment_details;
+ async updateMonthlyDeposit(id: number, payment_details: updateMonthlyDepositDto) {
+  const { amount: newAmount, deposit_date: newDepositDate } = payment_details;
   const newDate = new Date(newDepositDate);
-  if(newAmount <= 0){
+
+  if (newAmount <= 0) {
     throw new BadRequestException('Amount must be greater than zero');
   }
-  return await this.monthlyDepositsRepository.manager.transaction(
+
+  // 1) מבצעים עדכון בתוך טרנזקציה
+  const updatedDeposit = await this.monthlyDepositsRepository.manager.transaction(
     async (manager) => {
-      // 1. מביאים את התרומה הקיימת
       const existing = await manager.findOne(MonthlyDepositsEntity, {
         where: { id },
         relations: { user: true },
       });
-  
-      if (!existing) {
-        throw new BadRequestException('Deposit not found');
-      }
-  
+
+      if (!existing) throw new BadRequestException('Deposit not found');
+
       const oldAmount = existing.amount;
       const oldDate = existing.deposit_date;
       const oldYear = getYearFromDate(oldDate);
       const newYear = getYearFromDate(newDate);
       const deltaAmount = newAmount - oldAmount;
       const user = existing.user;
-  
-      // 2. מעדכנים את רשומת התרומה עצמה
+
+      // מעדכנים את התרומה
       existing.amount = newAmount;
       existing.deposit_date = newDate;
       existing.year = newYear;
       existing.month = getMonthFromDate(newDate);
       existing.description = payment_details.description;
       existing.payment_method = payment_details.payment_method;
-  
-      // 3. מעדכנים את רשומת המשתמש של התרומה
+
+      // עדכונים נלווים
       await this.userFinancialsService.recordMonthlyDeposit(user, deltaAmount);
       await this.fundsOverviewService.addMonthlyDeposit(deltaAmount);
-      if(newYear == oldYear){
-        await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, deltaAmount);
-      await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, deltaAmount);
 
-      }
-      else{
+      if (newYear === oldYear) {
+        await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, deltaAmount);
+        await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, deltaAmount);
+      } else {
         await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
         await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
+
         await this.userFinancialByYearService.recordMonthlyDeposit(user, newYear, newAmount);
         await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, newAmount);
       }
-            await this.usersService.updateUserMonthlyBalance(user);
 
-      // 4. מוחקים את התרומה הקיימת
-      // await manager.remove(existing);
-  
-      // 5. מוסיפים את התרומה החדשה
+      // שומרים בתוך הטרנזקציה
       await manager.save(existing);
-  
-      // 6. מביאים את התרומה החדשה
-      return await manager.findOne(MonthlyDepositsEntity, {
-        where: { id },
-        relations: { user: true },
-      });
-    }
-  )
 
-  }
-async deleteMonthlyDeposit(id: number) {
-  // קודם כל נביא את ה-entity דרך ה-repository הרגיל
-  const existing = await this.monthlyDepositsRepository.findOne({
+      // מחזירים את השורה המעודכנת
+      return existing;
+    },
+  );
+
+  // 2) רק אחרי שהטרנזקציה הסתיימה (commit) מחשבים בלאנס
+  await this.usersService.updateUserMonthlyBalance(updatedDeposit.user);
+
+  // אופציונלי: להחזיר מחדש מה-DB
+  return this.monthlyDepositsRepository.findOne({
     where: { id },
     relations: { user: true },
   });
+}
 
-  if (!existing) {
-    throw new BadRequestException('Deposit not found');
-  }
+async deleteMonthlyDeposit(id: number) {
+  // 1) טרנזקציה למחיקה + עדכוני סכומים
+  const deletedUser = await this.monthlyDepositsRepository.manager.transaction(
+    async (manager) => {
+      const existing = await manager.findOne(MonthlyDepositsEntity, {
+        where: { id },
+        relations: { user: true },
+      });
 
-  const oldAmount = existing.amount;
-  const oldDate = existing.deposit_date;
-  const oldYear = getYearFromDate(oldDate);
-  const user = existing.user;
+      if (!existing) throw new BadRequestException('Deposit not found');
 
-  // כל ה-await-ים שלך, כמו שהם
-  await this.userFinancialsService.recordMonthlyDeposit(user, -oldAmount);
-  await this.fundsOverviewService.addMonthlyDeposit(-oldAmount);
-  await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
-  await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
-  return await this.monthlyDepositsRepository.delete(id);
+      const oldAmount = existing.amount;
+      const oldYear = getYearFromDate(existing.deposit_date);
+      const user = existing.user;
+
+      await this.userFinancialsService.recordMonthlyDeposit(user, -oldAmount);
+      await this.fundsOverviewService.addMonthlyDeposit(-oldAmount);
+      await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
+      await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
+
+      await manager.delete(MonthlyDepositsEntity, { id });
+
+      return user; // נחזיר את המשתמש כדי לחשב בלאנס אחרי commit
+    },
+  );
+
+  // 2) אחרי commit: מחשבים בלאנס
+  await this.usersService.updateUserMonthlyBalance(deletedUser);
+
+  return { message: 'Deposit deleted successfully.' };
 }
 
 }  

@@ -255,20 +255,24 @@ async onApplicationBootstrap() {
   }
 
   async updateUserMonthlyBalance(user: UserEntity) {
-    const paymentDetails = await this.paymentDetailsRepository.findOne({
-      where: { user: { id: user.id, is_admin: false } },
-      relations: ['user'],
-    });
-    if (!paymentDetails) {
-      throw new Error('Payment details not found for user');
-    }
+  const paymentDetails = await this.paymentDetailsRepository.findOne({
+    where: { user: { id: user.id, is_admin: false } },
+    relations: ['user'],
+  });
 
-    const balanceData = await this.calculateUserMonthlyBalance(user);
-    paymentDetails.monthly_balance = balanceData.balance;
-    await this.paymentDetailsRepository.save(paymentDetails);
-
-    return paymentDetails.monthly_balance;
+  if (!paymentDetails) {
+    // אם באמת מותר למחוק payment_details – אל תפיל פה את המערכת
+    // אפשר להחזיר null או 0 או לזרוק חריגה "מסודרת"
+    return null;
   }
+
+  const balanceData = await this.calculateUserMonthlyBalance(user);
+  paymentDetails.monthly_balance = balanceData.balance;
+
+  await this.paymentDetailsRepository.save(paymentDetails);
+  return paymentDetails.monthly_balance;
+}
+
   async getAllUsersBalances(): Promise<
     { user: string; total_due: number; total_paid: number; balance: number }[]
   > {
