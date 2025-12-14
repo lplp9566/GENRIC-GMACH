@@ -1,4 +1,9 @@
-import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoanEntity } from '../Entity/loans.entity';
 import { Repository } from 'typeorm';
@@ -28,7 +33,7 @@ export class LoanActionsService {
     private readonly loansRepo: Repository<LoanEntity>,
     @InjectRepository(LoanActionEntity)
     private readonly paymentsRepo: Repository<LoanActionEntity>,
-    @InjectRepository(PaymentDetailsEntity)
+    @Inject(forwardRef(() => LoansService))
     private readonly loansService: LoansService,
     private readonly userFinByYear: UserFinancialByYearService,
     private readonly userFin: UserFinancialService,
@@ -38,23 +43,23 @@ export class LoanActionsService {
     private readonly paymentDetailsService: PaymentDetailsService,
 
     @Inject(forwardRef(() => LoanActionBalanceService))
-    private readonly LoanActionBalanceService:LoanActionBalanceService
+    private readonly LoanActionBalanceService: LoanActionBalanceService,
   ) {}
   async handleLoanAction(dto: LoanActionDto): Promise<LoanActionEntity> {
     try {
       switch (dto.action_type) {
         case LoanPaymentActionType.PAYMENT:
           return this.addLoanPayment(dto);
-  
+
         case LoanPaymentActionType.AMOUNT_CHANGE:
           return this.loansService.changeLoanAmount(dto);
-  
+
         case LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE:
           return this.loansService.changeMonthlyPayment(dto);
-  
+
         case LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE:
           return this.loansService.changeDateOfPayment(dto);
-  
+
         default:
           throw new Error(`Unknown action type: ${dto.action_type}`);
       }
@@ -76,7 +81,7 @@ export class LoanActionsService {
       if (!loan.isActive) {
         throw new BadRequestException('Cannot operate on a closed loan');
       }
-      if(dto.value> loan.remaining_balance) {
+      if (dto.value > loan.remaining_balance) {
         throw new BadRequestException('Payment exceeds remaining balance');
       }
       const newPayment = this.paymentsRepo.create({
@@ -91,15 +96,16 @@ export class LoanActionsService {
       await this.paymentsRepo.save(newPayment);
 
       loan.remaining_balance -= dto.value;
-      loan.total_remaining_payments +=1
+      loan.total_remaining_payments += 1;
       if (loan.remaining_balance < 0) loan.remaining_balance = 0;
-    
 
       loan.total_installments = loan.remaining_balance / loan.monthly_payment;
-            if (loan.remaining_balance === 0) {
+      if (loan.remaining_balance === 0) {
         loan.isActive = false;
-        await this.paymentDetailsService.deleteLoanBalance(loan.id, loan.user.id);
-
+        await this.paymentDetailsService.deleteLoanBalance(
+          loan.id,
+          loan.user.id,
+        );
       }
       await this.loansRepo.save(loan);
 
@@ -110,10 +116,9 @@ export class LoanActionsService {
         this.fundsOverview.repayLoan(dto.value),
         this.fundsOverviewByYearService.recordLoanRepaid(year, dto.value),
       ]);
-      await this.LoanActionBalanceService.computeLoanNetBalance(loan.id)
-      
-      return newPayment;
+      await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
 
+      return newPayment;
     } catch (error) {
       console.error('❌ Error in addPayment:', error.message);
       throw new BadRequestException(error.message);
@@ -138,7 +143,7 @@ export class LoanActionsService {
       throw new Error(error.message);
     }
   }
- async getAllActions(): Promise<LoanActionEntity[]> {
+  async getAllActions(): Promise<LoanActionEntity[]> {
     try {
       const actions = await this.paymentsRepo.find({
         order: { date: 'ASC' },

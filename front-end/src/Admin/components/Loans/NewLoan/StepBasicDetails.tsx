@@ -24,16 +24,18 @@ const StepBasicDetails: React.FC<StepBasicDetailsProps> = ({
   onFieldChange,
   onUserChange,
 }) => {
-  const userselected = useSelector((state: RootState) => state.AdminUsers.selectedUser);  
+  const userselected = useSelector(
+    (state: RootState) => state.AdminUsers.selectedUser
+  );
   const today = new Date().toISOString().split("T")[0];
   return (
     <Stack spacing={2}>
-               <SelectAllUsers
-              value={newLoan.user || userselected?.id}
-              onChange={onUserChange}
-              label="בחר משתמש*"
-              color="success"
-            />
+      <SelectAllUsers
+        value={newLoan.user || userselected?.id}
+        onChange={onUserChange}
+        label="בחר משתמש*"
+        color="success"
+      />
       <TextField
         label="סכום הלוואה"
         name="loan_amount"
