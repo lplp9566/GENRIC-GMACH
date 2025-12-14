@@ -57,13 +57,18 @@ console.log(date);
 
       <DialogContent>
         <Stack spacing={2} pt={1}>
-          <TextField
-            type="number"
-            label="סכום חודשי"
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
-            fullWidth
-          />
+<TextField
+  label="סכום חודשי"
+  type="number"
+  value={amount}
+  onChange={(e) => setAmount(e.target.value === "" ? 0 : parseFloat(e.target.value))}
+  fullWidth
+  inputProps={{
+    step: "0.01",   // מאפשר עשרוני
+    min: "0",
+  }}
+/>
+
 
           <TextField
             type="date"

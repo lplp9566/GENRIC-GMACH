@@ -103,6 +103,7 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
 
           <TextField
             fullWidth
+            type="number"
             label="סכום (₪) "
             dir="rtl"
             size="medium"
@@ -111,6 +112,10 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
             onChange={(e) =>
               setManageRank({ ...manageRank, amount: Number(e.target.value) })
             }
+            inputProps={{
+              step: "0.01", // מאפשר עשרוני
+              min: "0",
+            }}
           />
           <TextField
             sx={{ marginTop: 4 }}

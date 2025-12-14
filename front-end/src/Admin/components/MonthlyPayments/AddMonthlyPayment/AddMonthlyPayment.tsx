@@ -28,6 +28,7 @@ import { createMonthlyPayment, gatAllMonthlyPayments, getMonthlyPaymentsByUserId
 import { payment_method_enum } from "../../Users/UsersDto";
 import { toast } from "react-toastify";
 import { RtlProvider } from "../../../../Theme/rtl";
+import { trackEvent } from "../../../trackEvent";
 
 export const AddPaymentModal: React.FC = () => {
   const open = useSelector(
@@ -74,6 +75,7 @@ export const AddPaymentModal: React.FC = () => {
   };
 
   const handleSubmit = () => {
+            trackEvent("דמי חבר", "הוספה", "תשלום חודשי ", newPayment.amount);
             handleClose();
     const targetUserIds = isMultiUser
       ? selectedUsers
@@ -95,6 +97,7 @@ export const AddPaymentModal: React.FC = () => {
           })
         ).unwrap()
       )
+      
     );
 
     toast.promise(
