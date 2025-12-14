@@ -24,7 +24,11 @@ import { AppDispatch, RootState } from "../../../../store/store";
 import { setMonthlyPaymentModalMode } from "../../../../store/features/Main/AppMode";
 import { paymentMethod } from "../MonthlyPaymentsDto";
 import SelectAllUsers from "../../SelectUsers/SelectAllUsers";
-import { createMonthlyPayment, gatAllMonthlyPayments, getMonthlyPaymentsByUserId } from "../../../../store/features/admin/adminMonthlyPayments";
+import {
+  createMonthlyPayment,
+  gatAllMonthlyPayments,
+  getMonthlyPaymentsByUserId,
+} from "../../../../store/features/admin/adminMonthlyPayments";
 import { payment_method_enum } from "../../Users/UsersDto";
 import { toast } from "react-toastify";
 import { RtlProvider } from "../../../../Theme/rtl";
@@ -57,9 +61,7 @@ export const AddPaymentModal: React.FC = () => {
   const handleClose = () => {
     dispatch(setMonthlyPaymentModalMode(false));
   };
-    const allUsers = useSelector(
-      (state: RootState) => state.AdminUsers.allUsers
-    );
+  const allUsers = useSelector((state: RootState) => state.AdminUsers.allUsers);
   const selectedUser = useSelector(
     (state: RootState) => state.AdminUsers.selectedUser
   );
@@ -75,11 +77,9 @@ export const AddPaymentModal: React.FC = () => {
   };
 
   const handleSubmit = () => {
-            trackEvent("דמי חבר", "הוספה", "תשלום חודשי ", newPayment.amount);
-            handleClose();
-    const targetUserIds = isMultiUser
-      ? selectedUsers
-      : [newPayment.userId];
+    trackEvent("דמי חבר", "הוספה", "תשלום חודשי ", newPayment.amount);
+    handleClose();
+    const targetUserIds = isMultiUser ? selectedUsers : [newPayment.userId];
 
     const basePayload = {
       amount: newPayment.amount,
@@ -97,13 +97,12 @@ export const AddPaymentModal: React.FC = () => {
           })
         ).unwrap()
       )
-      
     );
 
     toast.promise(
       allPromises,
       {
-        pending:isMultiUser
+        pending: isMultiUser
           ? `מוסיף תשלום של ${newPayment.amount} ש"ח ל־${targetUserIds.length} משתמשים...`
           : `מוסיף תשלום של ${newPayment.amount} ש"ח...`,
         success: isMultiUser
@@ -116,11 +115,10 @@ export const AddPaymentModal: React.FC = () => {
 
     allPromises
       .then(() => {
-    if (selectedUser) {
+        if (selectedUser) {
           dispatch(getMonthlyPaymentsByUserId(selectedUser.id));
-        }
-        else{
-        dispatch(gatAllMonthlyPayments());
+        } else {
+          dispatch(gatAllMonthlyPayments());
         }
       })
       .catch(() => {
@@ -162,7 +160,7 @@ export const AddPaymentModal: React.FC = () => {
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: 700, m: 0 }}>
-            הוספת תשלום דמי חבר 
+            הוספת תשלום דמי חבר
           </Typography>
         </DialogTitle>
 
@@ -273,7 +271,9 @@ export const AddPaymentModal: React.FC = () => {
                         {selectedUsers.map((id) => (
                           <Chip
                             key={id}
-                            label={`${allUsers.find((u) => u.id === id)?.first_name} ${allUsers.find((u) => u.id === id)?.last_name}`}
+                            label={`${
+                              allUsers.find((u) => u.id === id)?.first_name
+                            } ${allUsers.find((u) => u.id === id)?.last_name}`}
                             onDelete={() => handleRemoveMultiUser(id)}
                             color="success"
                             variant="outlined"
@@ -300,7 +300,6 @@ export const AddPaymentModal: React.FC = () => {
                 }))
               }
             />
-
 
             <TextField
               label="תאריך*"
