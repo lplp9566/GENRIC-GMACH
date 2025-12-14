@@ -14,20 +14,26 @@ import { UserRoleHistoryModule } from '../user_role_history/user_role_history.mo
 import { MembershipRolesModule } from '../membership_roles/membership_roles.module';
 import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates.module';
 import { WhatsappModule } from '../whatsapp/whatsapp.module';
+import { RoleMonthlyRateEntity } from '../role_monthly_rates/Entity/role_monthly_rates.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity, PaymentDetailsEntity]),
-    forwardRef(() => MonthlyDepositsModule),
+
+TypeOrmModule.forFeature([
+  UserEntity,
+  PaymentDetailsEntity,
+  RoleMonthlyRateEntity,
+]),    forwardRef(() => MonthlyDepositsModule),
     forwardRef(() => LoanActionsModule),
     forwardRef(() => RequestsModule),
     forwardRef(() => UserRoleHistoryModule),
     forwardRef(() => MembershipRolesModule),
     forwardRef(() => WhatsappModule),
+    forwardRef(() => RoleMonthlyRatesModule),
+
     PaymentDetailsModule,
-    // cSpell:ignore Financials
     UserFinancialsModule,
-    RoleMonthlyRatesModule
+
   ],
   controllers: [UsersController],
   providers: [UsersService, UserBalanceCronService],
