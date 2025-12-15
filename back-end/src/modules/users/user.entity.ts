@@ -19,6 +19,7 @@ import { DonationsEntity } from '../donations/Entity/donations.entity';
 import { DepositsEntity } from '../deposits/Entity/deposits.entity';
 import { UserRoleHistoryEntity } from '../user_role_history/Entity/user_role_history.entity';
 import { MembershipRoleEntity } from '../membership_roles/Entity/membership_rols.entity';
+import { MembershipType } from './userTypes';
 // cSpell:ignore Financials
 @Entity('users')
 export class UserEntity {
@@ -33,15 +34,16 @@ export class UserEntity {
 
   @Column({ type: 'text' })
   id_number: string;
-  
+
   @Column({
     type: 'date',
+    nullable: true,
     transformer: {
-      from: (value: string) => new Date(value),
-      to: (value: Date) => value,
+      from: (value: string | null) => (value ? new Date(value) : null),
+      to: (value: Date | null) => value,
     },
   })
-  join_date: Date;
+  join_date: Date | null;
   @Column({ type: 'text' })
   password: string;
 
@@ -59,6 +61,14 @@ export class UserEntity {
     { cascade: true },
   )
   payment_details: PaymentDetailsEntity;
+  @Column({
+    type: 'enum',
+    enum: MembershipType,
+    default: MembershipType.MEMBER,
+    name: 'membership_type',
+  })
+  membership_type: MembershipType;
+
   @ManyToOne(() => MembershipRoleEntity, { nullable: true, eager: true })
   current_role: MembershipRoleEntity;
 

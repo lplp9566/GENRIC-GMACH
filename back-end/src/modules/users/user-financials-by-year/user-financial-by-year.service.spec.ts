@@ -4,6 +4,7 @@ import { UserFinancialByYearService } from './user-financial-by-year.service';
 import { UserFinancialByYearEntity } from './user-financial-by-year.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../user.entity';
+import { MembershipType } from '../userTypes';
 
 const mockRepo = () => ({
   find: jest.fn(),
@@ -28,6 +29,7 @@ describe('UserFinancialByYearService', () => {
     is_admin: false,
     payment_details: {} as any,
     loans: [],
+    membership_type: MembershipType.MEMBER,
     financialHistoryByYear: [],
     userFinancials: {} as any,
     monthly_deposits: [],

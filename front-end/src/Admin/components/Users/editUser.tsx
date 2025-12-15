@@ -68,7 +68,7 @@ const handlePaymentChange =
       }
     );
     await promise;
-    await dispatch(getAllUsers());
+    await dispatch(getAllUsers( {isAdmin: false}));
 
     onClose();
   };

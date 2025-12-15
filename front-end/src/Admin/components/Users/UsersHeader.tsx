@@ -1,17 +1,27 @@
 import {
   Box,
   Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Stack,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import { FC } from "react";
 import { useNavigate } from "react-router-dom";
+interface UsersHeaderProps {
+  filter: "all" | "members" | "friends";
+  setFilter: React.Dispatch<
+    React.SetStateAction<"all" | "members" | "friends">
+  >;
+}
+const UsersHeader: FC<UsersHeaderProps> = ({ filter, setFilter }) => {
+  const navigate = useNavigate();
 
-const UsersHeader = () => {
-      const navigate = useNavigate();
-    
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down("sm"));
   return (
@@ -58,9 +68,25 @@ const UsersHeader = () => {
           justifyContent={isXs ? "center" : "space-between"}
           alignItems="center"
         >
+          <FormControl size="small" sx={{ width: isXs ? "100%" : "auto" }}>
+            <InputLabel id="users-filter-label">סינון</InputLabel>
+            <Select
+              labelId="users-filter-label"
+              value={filter}
+              label="סינון"
+              onChange={(e) =>
+                setFilter(e.target.value as "all" | "members" | "friends")
+              }
+            >
+              <MenuItem value="all">הכל</MenuItem>
+              <MenuItem value="members">חברים</MenuItem>
+              <MenuItem value="friends">ידידים</MenuItem>
+            </Select>
+          </FormControl>
+
           <Button
             variant="contained"
-             onClick={() => navigate("/users/new")}
+            onClick={() => navigate("/users/new")}
             sx={{
               bgcolor: "#2a8c82",
               color: "#fff",
@@ -73,9 +99,9 @@ const UsersHeader = () => {
             הוסף משתמש
           </Button>
 
-          {/* <Button
+          <Button
             variant="outlined"
-            onClick={handleManageOpen}
+            // onClick={}
             sx={{
               borderColor: "#2a8c82",
               color: "#2a8c82",
@@ -87,7 +113,7 @@ const UsersHeader = () => {
             }}
           >
             ניהול דרגת משתמש
-          </Button> */}
+          </Button>
         </Box>
       </Stack>
     </Paper>

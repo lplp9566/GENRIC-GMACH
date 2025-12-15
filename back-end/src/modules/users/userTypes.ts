@@ -16,6 +16,9 @@ userData: IUserCreate
 paymentData: IPaymentDetails
 }
 
+export enum MembershipType{
+  MEMBER = 'MEMBER',
+  FRIEND = 'FRIEND',}
 export interface IUserCreate {
   first_name: string
   last_name: string

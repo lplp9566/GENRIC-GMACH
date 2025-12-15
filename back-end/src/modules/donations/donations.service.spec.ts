@@ -12,6 +12,7 @@ import { PaymentDetailsEntity } from '../users/payment-details/payment_details.e
 import { UserFinancialEntity } from '../users/user-financials/user-financials.entity';
 import { DonationActionType } from './donations_dto';
 import { DonationsEntity } from './Entity/donations.entity';
+import { MembershipType } from '../users/userTypes';
 
 const mockDonationRepo = () => ({
   find: jest.fn(),
@@ -34,6 +35,7 @@ describe('DonationsService', () => {
     is_admin: false,
     payment_details: {} as PaymentDetailsEntity,
     loans: [],
+    membership_type: MembershipType.MEMBER,
     financialHistoryByYear: [],
     userFinancials: {} as UserFinancialEntity,
     monthly_deposits: [],

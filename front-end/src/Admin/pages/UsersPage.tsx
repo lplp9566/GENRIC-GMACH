@@ -1,5 +1,5 @@
 // src/pages/UsersPage.tsx
-import  { useEffect } from "react";
+import  { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
 import { getAllUsers } from "../../store/features/admin/adminUsersSlice";
@@ -9,19 +9,22 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-
 import UsersHeader from "../components/Users/UsersHeader";
 import UserCard from "../components/Users/UserCard";
 
-
-
 export default function UsersPage() {
   const dispatch = useDispatch<AppDispatch>();
-  const users = useSelector((s: RootState) => s.AdminUsers.allUsers);
-
-  useEffect(() => {
-    dispatch(getAllUsers());
-  }, [dispatch]);
+  const usersSelcter = useSelector((s: RootState) => s.AdminUsers.allUsers);
+const [filter, setFilter] = useState<"all" | "members" | "friends">("all");
+useEffect(() => {
+  if (filter === "all") {
+    dispatch(getAllUsers({ isAdmin: false }));
+  } else if (filter === "members") {
+    dispatch(getAllUsers({ isAdmin: false, membershipType: "MEMBER" }));
+  } else {
+    dispatch(getAllUsers({ isAdmin: false, membershipType: "FRIEND" }));
+  }
+}, [dispatch, filter]);
 
   return (
     <Container
@@ -33,7 +36,7 @@ export default function UsersPage() {
         fontFamily: "Heebo, Arial, sans-serif",
       }}
     >
-      <UsersHeader />
+      <UsersHeader filter={filter} setFilter={setFilter} />
 
       <Box
         sx={{
@@ -44,9 +47,9 @@ export default function UsersPage() {
           boxShadow: 1,
         }}
       >
-        {users?.length ? (
+        {usersSelcter?.length ? (
           <Grid container spacing={3}>
-            {users.map((u) => (
+            {usersSelcter.map((u) => (
               <Grid key={u.id} item xs={12} sm={6} md={4} lg={3}>
                 <UserCard user={u} />
               </Grid>

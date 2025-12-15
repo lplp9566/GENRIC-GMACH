@@ -75,6 +75,7 @@ interface Props {
         InputProps={{ inputProps: { min: 0, max: maxAmount } }}
         onChange={handleAmountChange}
         size="small"
+        type="number"
         // sx={{ minWidth: 120 }}
       />
 

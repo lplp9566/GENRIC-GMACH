@@ -16,7 +16,7 @@ import { UserRoleHistoryService } from '../user_role_history/user_role_history.s
 import { MembershipRoleEntity } from '../membership_roles/Entity/membership_rols.entity';
 import { RoleMonthlyRateEntity } from '../role_monthly_rates/Entity/role_monthly_rates.entity';
 import { ConfigService } from '@nestjs/config';
-import { payment_method } from './userTypes';
+import { MembershipType, payment_method } from './userTypes';
 import { log } from 'console';
 
 @Injectable()
@@ -26,15 +26,12 @@ export class UsersService {
     private usersRepository: Repository<UserEntity>,
     @InjectRepository(MembershipRoleEntity)
     private membershipRolesRepo: Repository<MembershipRoleEntity>,
-
     @InjectRepository(PaymentDetailsEntity)
     private paymentDetailsRepository: Repository<PaymentDetailsEntity>,
     @InjectRepository(UserRoleHistoryEntity)
     private readonly roleHistoryRepo: Repository<UserRoleHistoryEntity>,
-
     @InjectRepository(RoleMonthlyRateEntity)
     private readonly ratesRepo: Repository<RoleMonthlyRateEntity>,
-
     @Inject(forwardRef(() => MonthlyDepositsService))
     private readonly monthlyDepositsService: MonthlyDepositsService,
     @Inject(forwardRef(() => UserRoleHistoryService))
@@ -43,13 +40,29 @@ export class UsersService {
     private readonly config: ConfigService, 
   ) {}
  
-  async getUserPaymentDetails(
+  async getAllMemberUserPaymentDetails(
     userId: number,
   ): Promise<PaymentDetailsEntity | null> {
     return this.paymentDetailsRepository.findOne({
-      where: { user: { id: userId, is_admin: false } },
+      where: { user: { id: userId, is_admin: false , membership_type: MembershipType.MEMBER} },
     });
   }
+  async getAllMembersAndFriends(): Promise<UserEntity[]> {
+    return this.usersRepository.find({
+      where: { is_admin: false },
+    });
+  }
+ async findUsers(filters: { membershipType?: MembershipType; isAdmin?: boolean }) {
+  const where: any = {};
+
+  if (filters.isAdmin !== undefined) where.is_admin = filters.isAdmin;
+  if (filters.membershipType) where.membership_type = filters.membershipType;
+
+  return this.usersRepository.find({
+    where,
+    relations: ['payment_details', 'current_role'],
+  });
+} 
 async onApplicationBootstrap() {
     if (this.config.get('SEED_ADMIN') !== 'true') return;
 
@@ -62,12 +75,6 @@ async onApplicationBootstrap() {
 
     // תפקיד ברירת מחדל אם נדרש ע"י הסכמה
     const defaultRole = await this.membershipRolesRepo.findOne({ where: { name: 'Member' } });
-
-    // הכנה: האש לסיסמה (כי הפונקציה שלך מצפה לסיסמה גולמית ומבצעת האש בתוכה;
-    // אם היא כבר מבצעת האש – תן לה את הגולמית, אחרת האש כאן)
-    // const hashed = await bcrypt.hash(password, 12);
-
-    // userData + paymentData "ריקים" (כדי לא להישבר בוולידציה)
     await this.createUserAndPaymentInfo(
       {
         first_name: 'מנהל',
@@ -79,6 +86,7 @@ async onApplicationBootstrap() {
          phone_number: '0501234567',
         current_role: null as any,
         join_date: new Date(),
+        membership_type: MembershipType.FRIEND
       },
       {
         payment_method: payment_method.bank_transfer,     
@@ -86,16 +94,12 @@ async onApplicationBootstrap() {
         bank_number: 1,
         bank_branch: 1,
         bank_account_number: 1,
-       
       },
     );
-
-    // this.logger.log(`Admin user seeded: ${email}`);
   }
   async createUserAndPaymentInfo(
     userData: Partial<UserEntity>,
     paymentData: Partial<PaymentDetailsEntity>,
-    // roleData: Partial<UserRoleHistoryEntity>,
   ): Promise<UserEntity> {
     try {
     
@@ -120,7 +124,7 @@ async onApplicationBootstrap() {
       newUser.payment_details = paymentDetails;
       if (userData.current_role) {
         await this.userRoleHistoryService.createUserRoleHistory({
-          from_date: newUser.join_date,
+          from_date: newUser.join_date!,
           userId: savedUser.id,
           roleId: userWithCurrentRole?.current_role.id!,
         });
@@ -230,7 +234,6 @@ async onApplicationBootstrap() {
       if (rate) totalDue += rate.amount;
     }
 
-    // חודש הבא (UTC)
     iter.setUTCMonth(iter.getUTCMonth() + 1);
   }
 

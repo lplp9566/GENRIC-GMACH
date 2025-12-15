@@ -104,6 +104,7 @@ const MonthlyPaymentChangeLoanForm: React.FC<Props> = ({
         onChange={(e) => setMonthly(+e.target.value)}
         size="small"
         fullWidth
+        type="number"
       />
 
       <Button

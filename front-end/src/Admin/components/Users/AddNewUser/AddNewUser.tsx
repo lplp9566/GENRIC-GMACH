@@ -9,14 +9,20 @@ import useNewUserForm from "../../../Hooks/UsersHooks/NewUserForm";
 import PaymentMethodStep from "./PaymentMethodStep";
 import StepUserDetails from "./StepUserDetails";
 import StepperNavigation from "../../StepperNavigation/StepperNavigation";
+import StepMembershipType from "./StepMembershipType";
+import { MembershipType } from "../UsersDto";
 const GREEN_MAIN = "#0b5e29";
 const GREEN_LIGHT = "#e8f5e9";
-export const NEW_USER_STEPS = [
+const MEMBER_STEPS = [
+  "סוג משתמש",
   "פרטים אישיים",
   "פרטי חשבון",
   "אופן תשלום",
   "סיכום ואישור",
 ];
+
+const FRIEND_STEPS = ["סוג משתמש", "פרטים אישיים", "סיכום ואישור"];
+
 const NewUserForm: React.FC = () => {
   const navigate = useNavigate();
 
@@ -30,6 +36,8 @@ const NewUserForm: React.FC = () => {
     setData,
     handlePaymentFieldChange,
   } = useNewUserForm(navigate);
+  const isFriend = data.userData.membership_type === MembershipType.FRIEND;
+  const steps = isFriend ? FRIEND_STEPS : MEMBER_STEPS;
 
   return (
     <RtlProvider>
@@ -45,7 +53,7 @@ const NewUserForm: React.FC = () => {
       >
         <Card
           component="form"
-          onSubmit={handleSubmit}
+          onSubmit={(e) => handleSubmit(e, steps.length)}
           sx={{
             width: { xs: "100%", sm: 600 },
             p: 4,
@@ -63,28 +71,31 @@ const NewUserForm: React.FC = () => {
             הוספת משתמש חדש
           </Typography>
 
-          <StepperNavigation steps={NEW_USER_STEPS} activeStep={activeStep} />
-
+          <StepperNavigation steps={steps} activeStep={activeStep} />
           {activeStep === 0 && (
+            <StepMembershipType data={data} setData={setData} />
+          )}
+          {activeStep === 1 && (
             <StepUserDetails
               data={data}
               onUserChange={handleUserChange}
               setData={setData}
             />
           )}
-          {activeStep === 1 && (
-            <StepBankDetails
-              data={data}
-              onFieldChange={handleBankFieldChange}
-            />
-          )}
-          {activeStep === 2 && (
+          {activeStep === 2 &&
+            data.userData.membership_type == MembershipType.MEMBER && (
+              <StepBankDetails
+                data={data}
+                onFieldChange={handleBankFieldChange}
+              />
+            )}
+          {activeStep === 3 && (
             <PaymentMethodStep
               data={data}
               onFieldChange={handlePaymentFieldChange}
             />
           )}
-          {activeStep === 3 && <StepSummary data={data} />}
+          {activeStep === 4 && <StepSummary data={data} />}
 
           <Box
             sx={{
@@ -100,7 +111,7 @@ const NewUserForm: React.FC = () => {
               }}
               variant="contained"
             >
-              {activeStep === NEW_USER_STEPS.length - 1 ? "צור משתמש" : "המשך"}
+              {activeStep === steps.length - 1 ? "צור משתמש" : "המשך"}
             </Button>
             <Button
               type="button"

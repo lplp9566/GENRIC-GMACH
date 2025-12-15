@@ -32,7 +32,7 @@ const SelectAllUsers: React.FC<Props> = ({
   console.log(value);
   
   useEffect(() => {
-    dispatch(getAllUsers());
+    dispatch(getAllUsers( { isAdmin: false }));
   }, [dispatch]);
 
   const handleChange = (event: SelectChangeEvent<string>) => {

@@ -4,9 +4,8 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AppDispatch } from "../../../store/store";
-import { IAddUserFormData, payment_method_enum } from "../../components/Users/UsersDto";
+import { IAddUserFormData, MembershipType, payment_method_enum } from "../../components/Users/UsersDto";
 import { createUser } from "../../../store/features/admin/adminUsersSlice";
-import { NEW_USER_STEPS } from "../../components/Users/AddNewUser/AddNewUser";
 import { SelectChangeEvent } from "@mui/material";
 
 export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) => {
@@ -14,18 +13,18 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
   const navigate = navigateParam ?? useNavigate();
 
   const [activeStep, setActiveStep] = useState(0);
-
   const [data, setData] = useState<IAddUserFormData>({
     userData: {
       first_name: "",
       last_name: "",
       id_number: "",
-      join_date: "",
+      join_date: null,
       password: "",
       email_address: "",
       phone_number: "",
       is_admin: false,
-      current_role: 1,
+      current_role: null,
+      membership_type: MembershipType.MEMBER,
     },
     paymentData: {
       bank_number: null,
@@ -87,20 +86,20 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
     }));
   };
 
- const handleSubmit = (e: React.FormEvent) => {
+ const handleSubmit = (e: React.FormEvent,stepsCount: number) => {
+  console.table(data);
+  
   e.preventDefault();
-  if (activeStep < NEW_USER_STEPS.length - 1) {
+if (activeStep < stepsCount - 1) {
     setActiveStep((prev) => prev + 1);
     return;
   }
 
-  const requiredUserFields = [
+  const requiredUserFields  = data.userData.membership_type === MembershipType.MEMBER ? ["first_name", "last_name", "id_number", "join_date", "password", "email_address", "phone_number"]as const : [
     "first_name",
     "last_name",
     "id_number",
-    "join_date",
     "password",
-    "email_address",
     "phone_number"
   ] as const;
 
@@ -113,7 +112,6 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
     return;
   }
 
-  // בדיקות נוספות לדוגמה
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(data.userData.email_address)) {
     toast.warn("כתובת האימייל לא תקינה");
@@ -129,15 +127,19 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
     return;
   }
   if (
-    data.paymentData.charge_date === null ||
-    data.paymentData.charge_date > 31 ||
-    data.paymentData.charge_date < 1
+    data.userData.membership_type === MembershipType.MEMBER 
+
   ) {
+
+    data.paymentData.charge_date === null ||
+    data.paymentData.charge_date! > 31 ||
+    data.paymentData.charge_date! < 1
+   {
     toast.warn("נא למלא את תאריך החיוב באופן תקין");
     return;
   }
+  }
 
-  // רק אחרי שכל הבדיקות עברו, מבצע יצירה
   const promise = dispatch(createUser(data));
   toast.promise(
     promise,
@@ -160,6 +162,7 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
         phone_number: "",
         is_admin: false,
         current_role: 1,
+        membership_type: MembershipType.FRIEND
       },
       paymentData: {
         bank_number: 0,

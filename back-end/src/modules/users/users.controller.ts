@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserEntity } from './user.entity';
 import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
 import { AdminGuard } from '../auth/admin.guard';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { UpdateUserWithPaymentDto } from './userTypes';
+import { MembershipType, UpdateUserWithPaymentDto } from './userTypes';
 
 @Controller('users')
 export class UsersController {
@@ -22,16 +22,23 @@ export class UsersController {
     const { userData, paymentData } = body;
     return this.usersService.createUserAndPaymentInfo(userData, paymentData);
   }
-  @UseGuards(JwtAuthGuard, AdminGuard)
-  @Get()
-  async getAllUsers() {
-    return this.usersService.getAllUsers();
-  }
+@Get()
+@UseGuards(JwtAuthGuard, AdminGuard)
+async getAllUsers(
+  @Query('membershipType') membershipType?: MembershipType,
+  @Query('isAdmin') isAdmin?: string,
+) {
+  return this.usersService.findUsers({
+    membershipType,
+    isAdmin: isAdmin === undefined ? undefined : isAdmin === 'true',
+  });
+}
   @UseGuards(JwtAuthGuard)
   @Get('UsersData')
   async getUsersData(@Body() body: { userId: number }) {
     return this.usersService.getUserById(body.userId);
   }
+
   @Get('keep-alive')
   async keepAlive() {
     return this.usersService.keepAlive();
@@ -39,7 +46,7 @@ export class UsersController {
   // @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('balance')
   async getUserBalance(@Body() body: { userId: number }) {
-    const paymentDetails = await this.usersService.getUserPaymentDetails(
+    const paymentDetails = await this.usersService.getAllMemberUserPaymentDetails(
       body.userId,
     );
     return {

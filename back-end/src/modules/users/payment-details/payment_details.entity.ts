@@ -19,19 +19,19 @@ export class PaymentDetailsEntity {
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
-  @Column({type: 'int'})
+  @Column({type: 'int', default: null})
   bank_number: number;
 
-  @Column({type: 'int'})
+  @Column({type: 'int', default: null})
   bank_branch: number;
 
-  @Column({type: 'int'})
+  @Column({type: 'int', default: null})
   bank_account_number: number;
 
-  @Column({type: 'int'})
+  @Column({type: 'int', default: null})
   charge_date: number;
 
-  @Column({type: 'enum', enum: payment_method})
+  @Column({type: 'enum', enum: payment_method ,default:null})
   payment_method: payment_method;
 
   @Column({ type: 'float', default: 0 })

@@ -19,7 +19,7 @@ export const Navbar: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const usersLoaded = useSelector((s: RootState) => s.AdminUsers.allUsers.length);
   useEffect(() => {
-    if (usersLoaded === 0) dispatch(getAllUsers());
+    if (usersLoaded === 0) dispatch(getAllUsers({ isAdmin: false }));
   }, [dispatch, usersLoaded]);
 
   return (

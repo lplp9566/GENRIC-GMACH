@@ -24,12 +24,19 @@ const initialState: AdminUsersType = {
   createUserStatus: "idle",
 };
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-export const getAllUsers = createAsyncThunk("admin/getAllUsers", async () => {
-  const response = await axios.get(`${BASE_URL}/users`);
-  console.log("Fetched users:", response.data);
-
-  return response.data;
-});
+export const getAllUsers = createAsyncThunk(
+  "admin/getUsers",
+  async (filters: { membershipType?: string; isAdmin: boolean }) => {
+    const response = await axios.get(`${BASE_URL}/users`, {
+      params: {
+        membershipType: filters.membershipType!,
+        isAdmin: filters.isAdmin,
+      },
+    });
+    console.log(response.data);
+    return response.data;
+  }
+);
 export const createUser = createAsyncThunk(
   "admin/createUser",
   async (user: IAddUserFormData) => {

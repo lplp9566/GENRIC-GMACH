@@ -108,7 +108,7 @@ const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
         </Typography>
         <TextField
           label="סכום חדש"
-          // type="number"
+          type="number"
           value={newAmount}
           onChange={(e) => setNewAmount(+e.target.value)}
           size="small"
