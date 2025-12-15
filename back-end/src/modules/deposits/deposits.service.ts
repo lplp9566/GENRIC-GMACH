@@ -104,7 +104,6 @@ export class DepositsService {
       if(deposit.current_balance == 0){
         deposit.isActive = false;
       }
-      await this.fundsOverviewService.decreaseUserDepositsTotal(amount);
       const year = getYearFromDate(date);
       const user = deposit.user;
       await this.fundsOverviewService.decreaseUserDepositsTotal(amount);

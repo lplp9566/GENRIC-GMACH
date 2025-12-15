@@ -269,7 +269,7 @@ async adjustSpecialFund(fundName: string, delta: number) {
   /**
    * הפחתת סך הפקדונות של משתמשים (לדוגמה בעת החזר).
    */
-  async decreaseUserDepositsTotal(amount: number) {
+  async decreaseUserDepositsTotal(amount: number) {    
     try {
       const fund = await this.getFundsOverviewRecord();
       fund.own_equity -= amount;
