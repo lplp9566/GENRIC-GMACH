@@ -74,6 +74,7 @@ const DonationHeader = () => {
           >
             משיכה מקרן{" "}
           </Button>
+          <Button>הוספת קרן </Button>
         </Box>
       </Stack>
     </Paper>
