@@ -121,7 +121,7 @@ const AddDonationModal: React.FC = () => {
           >
             {/* בחירת משתמש */}
             <SelectAllUsers
-            filter="all"
+              filter="all"
               value={userId}
               onChange={(id) => setUserId(id)}
               label="בחר משתמש*"
@@ -184,6 +184,16 @@ const AddDonationModal: React.FC = () => {
               value={amount}
               onChange={(e) => setAmount(+e.target.value)}
               inputProps={{ min: 0, step: "0.5" }}
+              sx={{
+                "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                  {
+                    WebkitAppearance: "none",
+                    margin: 0,
+                  },
+                "& input[type=number]": {
+                  MozAppearance: "textfield",
+                },
+              }}
             />
           </Box>
         </DialogContent>
