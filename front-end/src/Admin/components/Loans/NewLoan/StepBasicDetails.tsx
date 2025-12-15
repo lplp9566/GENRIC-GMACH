@@ -35,6 +35,7 @@ const StepBasicDetails: React.FC<StepBasicDetailsProps> = ({
         onChange={onUserChange}
         label="בחר משתמש*"
         color="success"
+        filter="members"
       />
       <TextField
         label="סכום הלוואה"

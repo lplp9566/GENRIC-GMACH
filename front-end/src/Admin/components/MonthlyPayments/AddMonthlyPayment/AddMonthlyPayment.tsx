@@ -234,6 +234,7 @@ export const AddPaymentModal: React.FC = () => {
                   }
                   label="בחר משתמש*"
                   color="success"
+                  filter="members"
                 />
               )}
 
@@ -246,6 +247,7 @@ export const AddPaymentModal: React.FC = () => {
                         onChange={(id) => setTempMultiUserId(id)}
                         label="בחר משתמש להוספה*"
                         color="success"
+                        filter="members"
                       />
                     </Box>
                     <Button

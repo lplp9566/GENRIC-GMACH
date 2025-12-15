@@ -79,6 +79,7 @@ const NewDepositModal: FC = () => {
           <Box component="form" noValidate autoComplete="off"
                sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <SelectAllUsers
+            filter="all"
               value={newDeposit.user}
               onChange={(id) => setNewDeposit((p) => ({ ...p, user: id }))}
               label="בחר משתמש*"

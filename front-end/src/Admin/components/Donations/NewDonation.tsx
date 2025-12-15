@@ -121,6 +121,7 @@ const AddDonationModal: React.FC = () => {
           >
             {/* בחירת משתמש */}
             <SelectAllUsers
+            filter="all"
               value={userId}
               onChange={(id) => setUserId(id)}
               label="בחר משתמש*"

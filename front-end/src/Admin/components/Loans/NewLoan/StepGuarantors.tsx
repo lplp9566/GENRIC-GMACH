@@ -33,6 +33,7 @@ const StepGuarantors: React.FC<StepGuarantorsProps> = ({
     </Button>
     {guarantors.map((g, i) => (
       <SelectAllUsers
+        filter="members"
         key={i}
         label={`ערב #${i + 1}`}
         value={g.id}
