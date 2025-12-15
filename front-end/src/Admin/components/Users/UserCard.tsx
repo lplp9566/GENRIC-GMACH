@@ -14,6 +14,8 @@ import {
   IconButton,
   List,
   ListItem,
+  ListItemAvatar,
+  ListItemText,
   Stack,
   styled,
   Typography,
@@ -122,16 +124,16 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
             </Stack>
           </CardContent>
         )}
-{user.membership_type == MembershipType.FRIEND && (
-  <Button
-    variant="outlined"
-    size="small"
-    // onClick={onEdit}
-    // startIcon={<EditIcon />}
-  >
-    הפוך לחבר 
-  </Button>
-)}
+        {user.membership_type == MembershipType.FRIEND && (
+          <Button
+            variant="outlined"
+            size="small"
+            // onClick={onEdit}
+            // startIcon={<EditIcon />}
+          >
+            הפוך לחבר
+          </Button>
+        )}
         <Divider />
 
         <CardActions disableSpacing sx={{ px: 2, py: 1 }}>
@@ -152,7 +154,6 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
                 <Typography variant="subtitle2" gutterBottom>
                   מאזן חודשי
                 </Typography>
-
                 <Typography
                   variant="h6"
                   color={balanceColor + ".main"}
@@ -160,11 +161,10 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
                 >
                   {mb.toLocaleString()} ₪
                 </Typography>
-
                 <Typography variant="subtitle2" gutterBottom>
-                  פירוט הלוואות
+                  {" "}
+                  פירוט הלוואות{" "}
                 </Typography>
-
                 <List disablePadding sx={{ mb: 2 }}>
                   {loans.map((ln) => {
                     const neg = ln.balance < 0;
@@ -177,11 +177,27 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
                           mb: 1,
                         }}
                       >
-                        ...
+                        <ListItemAvatar>
+                          {" "}
+                          <Avatar
+                            sx={{
+                              bgcolor: neg ? "error.main" : "success.main",
+                            }}
+                          >
+                            {neg ? <WarningAmberIcon /> : <SavingsIcon />}
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={`#${ln.loanId}`}
+                          secondary={`${ln.balance.toLocaleString()} ₪`}
+                          secondaryTypographyProps={{
+                            color: neg ? "error.main" : "text.primary",
+                          }}
+                        />
                       </ListItem>
                     );
-                  })}
-                </List>
+                  })}{" "}
+                </List>{" "}
               </>
             )}
 
