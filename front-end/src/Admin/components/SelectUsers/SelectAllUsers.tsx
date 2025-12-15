@@ -20,7 +20,6 @@ interface Props {
 }
 
 const SelectAllUsers: React.FC<Props> = ({
-
   onChange,
   label = "בחר משתמש",
   value,
@@ -34,7 +33,10 @@ const SelectAllUsers: React.FC<Props> = ({
   console.log(value);
   
 useEffect(() => {
+  console.log({filter});
   if (filter === "all") {
+    
+    
     dispatch(getAllUsers({ isAdmin: false }));
   } else if (filter === "members") {
     dispatch(getAllUsers({ isAdmin: false, membershipType: "MEMBER" }));
@@ -42,7 +44,6 @@ useEffect(() => {
     dispatch(getAllUsers({ isAdmin: false, membershipType: "FRIEND" }));
   }
 }, [dispatch, filter]);
-
   const handleChange = (event: SelectChangeEvent<string>) => {
     onChange(Number(event.target.value));
   };

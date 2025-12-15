@@ -27,16 +27,14 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const getAllUsers = createAsyncThunk(
   "admin/getUsers",
   async (filters: { membershipType?: string; isAdmin: boolean }) => {
-    const response = await axios.get(`${BASE_URL}/users`, {
-      params: {
-        membershipType: filters.membershipType!,
-        isAdmin: filters.isAdmin,
-      },
-    });
-    console.log(response.data);
+    const params: any = { isAdmin: filters.isAdmin };
+    if (filters.membershipType) params.membershipType = filters.membershipType;
+
+    const response = await axios.get(`${BASE_URL}/users`, { params });
     return response.data;
   }
 );
+
 export const createUser = createAsyncThunk(
   "admin/createUser",
   async (user: IAddUserFormData) => {
@@ -86,7 +84,7 @@ export const AdminUsersSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getAllUsers.pending, (state) => {
-        (state.status = "pending"), (state.error = null), (state.allUsers = []);
+        (state.status = "pending"), (state.error = null);
       })
       .addCase(getAllUsers.fulfilled, (state, action) => {
         (state.status = "fulfilled"),

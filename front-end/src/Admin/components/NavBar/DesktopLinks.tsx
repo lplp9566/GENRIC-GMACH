@@ -45,7 +45,7 @@ export const DesktopLinks: React.FC = () => {
         </Button>
       ))}
 
-      <UserSelect />
+      {/* <UserSelect /> */}
 
       <IconButton sx={{ ml: 1, color: NAV_TXT }}>
         <Badge badgeContent={1} color="error">
