@@ -32,6 +32,7 @@ import { UserRoleHistoryController } from './modules/user_role_history/user_role
 import { UserRoleHistoryModule } from './modules/user_role_history/user_role_history.module';
 
 import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
+import { FundsModule } from './modules/funds/funds.module';
 
 
 @Module({
@@ -78,6 +79,7 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
     RoleMonthlyRatesModule,
     UserRoleHistoryModule,
     WhatsappModule,
+    FundsModule,
   ],
   providers: [ExpensesService, UserRoleHistoryService],
   controllers: [UserRoleHistoryController,],
