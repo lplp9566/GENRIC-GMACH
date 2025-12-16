@@ -47,23 +47,15 @@ export class FundsOverviewByYearService {
     return this.fundsOverviewByYearRepo.save(record);
   }
 
-  async adjustSpecialFundDonationByName(year: number, fundName: string, amount: number) {
+  async adjustSpecialFundDonationByName(year: number, amount: number) {
     const record = await this.getOrCreateOverview(year);
-    if (!record["fund_details_donated"]) {
-      record["fund_details_donated"] = {};
-    }
-    record["fund_details_donated"][fundName] = (record["fund_details_donated"][fundName] || 0) + amount;
     record.special_fund_donations += amount;
     return this.fundsOverviewByYearRepo.save(record);
   }
 
-  async recordSpecialFundWithdrawalByName(year: number, fundName: string, amount: number) {
+  async recordSpecialFundWithdrawalByName(year: number, amount: number) {
     const record = await this.getOrCreateOverview(year);
-    if (!record["fund_details_donated"] || !record["fund_details_donated"][fundName]) {
-      throw new Error('No such fund to withdraw from');
-    }
-    record["fund_details_withdrawn"][fundName] = (record["fund_details_withdrawn"][fundName] || 0) + amount;
-    record.total_fixed_deposits_withdrawn += amount;
+    record.total_special_funds_withdrawn += amount;
     return this.fundsOverviewByYearRepo.save(record);
   }
 

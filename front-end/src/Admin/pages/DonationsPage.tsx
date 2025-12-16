@@ -4,8 +4,13 @@ import { Box, Container, Grid, Alert } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
 
-import { getAllDonations } from "../../store/features/admin/adminDonationsSlice";
-import { getFundsOverview } from "../../store/features/admin/adminFundsOverviewSlice";
+import {
+  getAllDonations,
+  getAllFunds, // ✅ חדש
+} from "../../store/features/admin/adminDonationsSlice";
+
+// ❌ לא צריך יותר בדף הזה (אם אתה באמת עובר למקור Funds)
+// import { getFundsOverview } from "../../store/features/admin/adminFundsOverviewSlice";
 
 import DonationsTable, { DonationRow, SortBy, SortDir } from "../components/Donations/DonationsTable";
 import FundsPanel, { FundCardData } from "../components/Donations/FundPanel";
@@ -14,7 +19,6 @@ import Frame from "../components/Donations/Frame";
 import KpiRow from "../components/Donations/KpiRow";
 import DonationHeader from "../components/Donations/DonationHeader";
 import NewDonation from "../components/Donations/NewDonation";
-import { IFundsOverview } from "../components/FundsOverview/FundsOverviewDto";
 import WithdrawFundModal from "../components/Donations/WithdrawFond";
 
 type ViewMode = "split" | "left" | "right";
@@ -51,21 +55,19 @@ function getDonorId(d: any): string | null {
   const key = String(raw).trim();
   return key || null;
 }
-function toFundCards(details: any): FundCardData[] {
-  if (!details) return [];
-  if (Array.isArray(details)) {
-    return details.map((f: any) => {
-      const name = f?.name ?? f?.label ?? f?.fund_name ?? f?.key ?? f?.donation_reason ?? "";
-      const total = f?.value ?? f?.amount ?? f?.total ?? 0;
-      return { key: normalizeKey(name), label: String(name), total: Number(total) || 0 };
-    });
-  }
-  return Object.entries(details).map(([name, total]) => ({
-    key: normalizeKey(name),
-    label: String(name),
-    total: Number(total) || 0,
-  }));
+
+// ✅ חדש: בניית כרטיסי קרנות מתוך רשימת funds
+function toFundCardsFromFunds(funds: any): FundCardData[] {
+  if (!Array.isArray(funds)) return [];
+  return funds
+    .map((f: any) => ({
+      key: normalizeKey(f?.name),
+      label: String(f?.name ?? ""),
+      total: Number(f?.balance ?? 0) || 0,
+    }))
+    .filter((x: FundCardData) => x.label); // לא להציג קרן ריקה
 }
+
 // אגרגציה פר־משתמש (נטו)
 function computeOverviewForUserNet(donations: any[]): { regularTotal: number; fundCards: FundCardData[] } {
   let regular = 0;
@@ -88,14 +90,6 @@ function computeOverviewForUserNet(donations: any[]): { regularTotal: number; fu
   }));
   return { regularTotal: regular, fundCards };
 }
-// מה־DB (FundsOverview) – גלובלי
-function computeOverviewFromDB(f: IFundsOverview | null | undefined): { regularTotal: number; fundCards: FundCardData[] } {
-  if (!f) return { regularTotal: 0, fundCards: [] };
-  return {
-    regularTotal: Number(f.total_equity_donations) || 0,
-    fundCards: toFundCards(f.fund_details),
-  };
-}
 
 // -------- Component --------
 const DonationsHomePage: FC = () => {
@@ -103,16 +97,18 @@ const DonationsHomePage: FC = () => {
 
   const addDonationModal = useSelector((s: RootState) => s.mapModeSlice.AddDonationModal);
   const withdrawDonationModal = useSelector((s: RootState) => s.mapModeSlice.withdrawDonationModal);
+
   const { allDonations, status: donationsStatus, error } = useSelector((s: RootState) => s.AdminDonationsSlice);
+  const funds = useSelector((s: RootState) => s.AdminDonationsSlice.fundDonation); // ✅ חדש
+
   const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
-  const fundsOverview = useSelector((s: RootState) => s.AdminFundsOverviewReducer.fundsOverview);
 
   // טעינה ראשונית
   useEffect(() => {
     if (donationsStatus === "idle") {
       dispatch(getAllDonations({} as any));
     }
-    dispatch(getFundsOverview());
+    dispatch(getAllFunds()); // ✅ במקום getFundsOverview
   }, [dispatch, donationsStatus]);
 
   // רענון אחרי סגירת מודאל
@@ -121,21 +117,20 @@ const DonationsHomePage: FC = () => {
   useEffect(() => {
     if (wasOpen.current && !addDonationModal) {
       dispatch(getAllDonations({} as any));
-      dispatch(getFundsOverview());
+      dispatch(getAllFunds()); // ✅
       setView("split");
     }
     wasOpen.current = addDonationModal;
   }, [addDonationModal, dispatch]);
 
-  // ********* רענון FundsOverview בכל שינוי תרומות *********
+  // ********* רענון קרנות בכל שינוי תרומות *********
   const donations = Array.isArray(allDonations) ? allDonations : [];
   const donationsSig = useMemo(
     () => JSON.stringify(donations.map((d: any) => ({ id: d?.id, amount: d?.amount, action: d?.action, date: d?.date, reason: d?.donation_reason }))),
     [donations]
   );
   useEffect(() => {
-    // בכל שינוי בליסט/תוכן התרומות – למשוך Overview עדכני מהשרת
-    dispatch(getFundsOverview());
+    dispatch(getAllFunds()); // ✅ במקום getFundsOverview
   }, [dispatch, donationsSig]);
 
   const selectedUserId = selectedUser?.id != null ? String(selectedUser.id) : null;
@@ -240,15 +235,19 @@ const DonationsHomePage: FC = () => {
   // ---------- Right panel ----------
   const right = useMemo(() => {
     if (selectedUserId) return computeOverviewForUserNet(donationsBase);
-    return computeOverviewFromDB(fundsOverview);
-  }, [selectedUserId, donationsBase, fundsOverview]);
+
+    return {
+      regularTotal: 0,
+      fundCards: toFundCardsFromFunds(funds),
+    };
+  }, [selectedUserId, donationsBase, funds]);
 
   // key כדי לאלץ רנדר כשנתוני הקרנות משתנים
   const fundsPanelKey = useMemo(() => {
     return selectedUserId
       ? `user-${selectedUserId}-${donationsSig}`
-      : `db-${JSON.stringify(fundsOverview?.fund_details ?? {})}-${fundsOverview?.total_equity_donations ?? 0}`;
-  }, [selectedUserId, donationsSig, fundsOverview]);
+      : `funds-${JSON.stringify((funds ?? []).map((f: any) => ({ id: f?.id, b: f?.balance })))}`;
+  }, [selectedUserId, donationsSig, funds]);
 
   function handleSortClick(key: SortBy) {
     if (sortBy === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));

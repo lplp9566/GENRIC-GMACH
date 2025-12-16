@@ -16,7 +16,6 @@ export class FundsOverviewByYearController {
   ) {
     return await this.fundsOverviewByYearService.recordSpecialFundWithdrawalByName(
       body.year,
-      body.fundName,
       body.amount,
     );
   }

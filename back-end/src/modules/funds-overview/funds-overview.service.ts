@@ -73,7 +73,6 @@ export class FundsOverviewService {
     }
   }
 
-
   async addMonthlyDeposit(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
@@ -104,27 +103,20 @@ export class FundsOverviewService {
       throw new BadRequestException(error.message);
     }
   }
-async adjustSpecialFund(fundName: string, delta: number) {
-  try {
-    const fund = await this.getFundsOverviewRecord();
-    if (!fund.fund_details) {
-      fund.fund_details = {};
+  async adjustSpecialFund(delta: number) {
+    try {
+      const fund = await this.getFundsOverviewRecord();
+      fund.special_funds += delta;
+      fund.own_equity += delta;
+      fund.total_donations += delta;
+      fund.available_funds += delta;
+
+      await this.fundsOverviewRepository.save(fund);
+      return fund;
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
-
-    fund.fund_details[fundName] =
-      (fund.fund_details[fundName] || 0) + delta;
-
-    fund.special_funds += delta;
-    fund.own_equity += delta;
-    fund.total_donations += delta;
-    fund.available_funds += delta;
-
-    await this.fundsOverviewRepository.save(fund);
-    return fund;
-  } catch (error) {
-    throw new BadRequestException(error.message);
   }
-}
   /**
    * השקעה מהקרן.
    */
@@ -176,8 +168,7 @@ async adjustSpecialFund(fundName: string, delta: number) {
       if (!fund.fund_details) {
         fund.fund_details = {};
       }
-      fund.fund_details[fundName] =
-        (fund.fund_details[fundName] || 0) + amount;
+      fund.fund_details[fundName] = (fund.fund_details[fundName] || 0) + amount;
 
       fund.special_funds += amount;
       fund.own_equity += amount;
@@ -210,19 +201,9 @@ async adjustSpecialFund(fundName: string, delta: number) {
   /**
    * משיכה מקרן מיוחדת קיימת.
    */
-  async reduceFundAmount(fundName: string, amount: number) {
+  async reduceFundAmount( amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
-      if (!fund.fund_details) {
-        fund.fund_details = {};
-      }
-      if (!fund.fund_details[fundName]) {
-        throw new Error('לא קיים כסף בקרן הזה');
-      }
-      if (fund.fund_details[fundName] < amount) {
-        throw new Error('אין מספיק כסף בקרן הזו');
-      }
-      fund.fund_details[fundName] -= amount;
       fund.special_funds -= amount;
       fund.own_equity -= amount;
       fund.available_funds -= amount;
@@ -269,7 +250,7 @@ async adjustSpecialFund(fundName: string, delta: number) {
   /**
    * הפחתת סך הפקדונות של משתמשים (לדוגמה בעת החזר).
    */
-  async decreaseUserDepositsTotal(amount: number) {    
+  async decreaseUserDepositsTotal(amount: number) {
     try {
       const fund = await this.getFundsOverviewRecord();
       fund.own_equity -= amount;

@@ -1,4 +1,10 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { UserEntity } from '../../users/user.entity';
 
 @Entity('funds')
@@ -14,4 +20,6 @@ export class FundEntity {
 
   @CreateDateColumn()
   createdAt: Date;
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  balance: number;
 }

@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs
 import { DonationsService } from './donations.service';
 import { DonationsEntity } from './Entity/donations.entity';
 import { IsNumber, IsPositive } from 'class-validator';
+import { CreateDonationDto } from '../funds/fundsDto';
 export class UpdateDonationDto {
   @IsNumber()
   @IsPositive()
@@ -12,10 +13,10 @@ export class UpdateDonationDto {
 @Controller('donations')
 export class DonationsController {
   constructor(private readonly donationsService: DonationsService) {}
-  @Post()
-  async createDonation(@Body() donation: DonationsEntity) {
-    return this.donationsService.createDonation(donation);
-  }
+    @Post()
+async createDonation(@Body() dto: CreateDonationDto) {
+  return this.donationsService.createDonation(dto);
+}
   @Get()
   async getDonations(
   ) {

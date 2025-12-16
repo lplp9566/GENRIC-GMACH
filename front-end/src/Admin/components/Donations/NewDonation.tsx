@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -19,25 +19,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { useNavigate } from "react-router-dom";
 import { setAddDonationModal } from "../../../store/features/Main/AppMode";
-import { createDonation } from "../../../store/features/admin/adminDonationsSlice";
+import {
+  createDonation,
+  getAllFunds, // ✅ חדש
+} from "../../../store/features/admin/adminDonationsSlice";
 import { DonationActionType, ICreateDonation } from "./DonationDto";
 
 type DonationKind = "regular" | "fund";
 
-export type NewDonationPayload = {
-  user: number;
-  amount: number;
-  donation_reason: string; // תמיד קיים: "equally" לתרומה רגילה, או שם הקרן
-  action: "donation";
-  date: Date; // תמיד "donation"
-};
-
-// type Props = {
-//   open: boolean;
-//   onClose: () => void;
-//   onSubmit: (payload: NewDonationPayload) => void; // dispatch ל-API אצלך
-//   defaultUserId?: number;
-// };
 const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
 
 const AddDonationModal: React.FC = () => {
@@ -46,26 +35,57 @@ const AddDonationModal: React.FC = () => {
   const [fundName, setFundName] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
   const [date, setDate] = useState<string>(today);
+
   const open = useSelector((s: RootState) => s.mapModeSlice.AddDonationModal);
+  const funds = useSelector((s: RootState) => s.AdminDonationsSlice.fundDonation); // ✅
+
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+
+  // ✅ טען קרנות כשנפתח המודאל
+  useEffect(() => {
+    if (open) {
+      dispatch(getAllFunds());
+    }
+  }, [open, dispatch]);
+
+  const fundNames = useMemo<string[]>(() => {
+    if (!Array.isArray(funds)) return [];
+    return funds
+      .map((f: any) => String(f?.name ?? "").trim())
+      .filter(Boolean);
+  }, [funds]);
+
+  // אם עברנו ל"תרומה רגילה" – ננקה בחירת קרן
+  useEffect(() => {
+    if (kind === "regular") setFundName("");
+  }, [kind]);
+
+  // אם הקרן שנבחרה לא קיימת יותר – ננקה
+  useEffect(() => {
+    if (fundName && fundNames.length && !fundNames.includes(fundName)) {
+      setFundName("");
+    }
+  }, [fundNames, fundName]);
+
   // ולידציה בסיסית
   const isValid = useMemo(() => {
     if (!userId || amount <= 0) return false;
     if (kind === "fund" && !fundName.trim()) return false;
+    if (!date) return false;
     return true;
-  }, [userId, amount, kind, fundName]);
+  }, [userId, amount, kind, fundName, date]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const payload: ICreateDonation = {
       user: userId!,
       amount,
-      date: date!,
+      date,
       action: DonationActionType.donation,
-      donation_reason: kind === "regular" ? "Equity" : fundName.trim(),
+      donation_reason: kind === "regular" ? "Equity" : fundName.trim(), // ✅ תאימות
     };
-    dispatch(createDonation(payload));
-    // dispatch(getFundsOverview())
+
+    await dispatch(createDonation(payload));
     navigate("/donations");
     handleClose();
   };
@@ -77,7 +97,7 @@ const AddDonationModal: React.FC = () => {
   return (
     <RtlProvider>
       <Dialog
-        open={open!}
+        open={!!open}
         onClose={handleClose}
         fullWidth
         maxWidth="sm"
@@ -152,17 +172,36 @@ const AddDonationModal: React.FC = () => {
               </Select>
             </FormControl>
 
-            {/* שם קרן (נראה רק אם נבחר "קרן") */}
+            {/* ✅ בחירת קרן (רק אם נבחר "קרן") */}
             {kind === "fund" && (
-              <TextField
-                label="שם הקרן*"
-                size="medium"
-                color="success"
-                fullWidth
-                value={fundName}
-                onChange={(e) => setFundName(e.target.value)}
-              />
+              <FormControl fullWidth size="small">
+                <InputLabel
+                  id="fund-label"
+                  sx={{
+                    color: "success.main",
+                    "&.Mui-focused": { color: "success.dark" },
+                  }}
+                >
+                  קרן*
+                </InputLabel>
+                <Select
+                  disabled={!fundNames.length}
+                  labelId="fund-label"
+                  value={fundName}
+                  label="קרן*"
+                  color="success"
+                  size="medium"
+                  onChange={(e) => setFundName(String(e.target.value))}
+                >
+                  {fundNames.map((name) => (
+                    <MenuItem key={name} value={name} dir="rtl">
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             )}
+
             <TextField
               label="תאריך*"
               type="date"
@@ -185,11 +224,10 @@ const AddDonationModal: React.FC = () => {
               onChange={(e) => setAmount(+e.target.value)}
               inputProps={{ min: 0, step: "0.5" }}
               sx={{
-                "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
-                  {
-                    WebkitAppearance: "none",
-                    margin: 0,
-                  },
+                "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
+                  WebkitAppearance: "none",
+                  margin: 0,
+                },
                 "& input[type=number]": {
                   MozAppearance: "textfield",
                 },

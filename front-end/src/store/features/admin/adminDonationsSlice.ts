@@ -1,7 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   ICreateDonation,
+  ICreateFund,
   IDonation,
+  IFundDonation,
   IUpdateDonation,
 } from "../../../Admin/components/Donations/DonationDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
@@ -15,6 +17,10 @@ interface AdminDonationType {
   CreateDonationStatus: Status;
   withdrawStatus: Status;
   editDonationStatus: Status;
+  fundDonationStatus: Status ;
+  fundDonation: IFundDonation[];
+  createFundDonationStatus: Status
+
 }
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const initialState: AdminDonationType = {
@@ -24,6 +30,9 @@ const initialState: AdminDonationType = {
   CreateDonationStatus: "idle",
   withdrawStatus: "idle",
   editDonationStatus: "idle",
+  fundDonationStatus: "idle",
+  fundDonation: [],
+  createFundDonationStatus: "idle",
 };
 export const getAllDonations = createAsyncThunk<IDonation[]
 >("admin/getAllDonations", async () => {
@@ -54,6 +63,20 @@ export const updateDonationById = createAsyncThunk<IDonation, IUpdateDonation>(
     return data;
   }
 );
+export const createFundDonation = createAsyncThunk<IFundDonation, ICreateFund>(
+  "admin/createFundDonation",
+  async (donation) => {
+    const { data } = await axios.post<IFundDonation>(`${BASE_URL}/funds`, donation);
+    return data;
+  }
+)
+export const getAllFunds = createAsyncThunk<IFundDonation[]
+>("admin/getAllFunds", async () => {
+  const { data } = await axios.get<IFundDonation[]>(
+    `${BASE_URL}/funds`,
+  );
+  return data;
+})
 export const AdminDonationsSlice = createSlice({
   name: "adminDonations",
   initialState,
@@ -111,9 +134,39 @@ export const AdminDonationsSlice = createSlice({
       if (index !== -1) {
         state.allDonations[index] = update;
       }
-        });
-      }}
-    )
+        })
+      .addCase(updateDonationById.rejected, (state, action) => {
+        state.editDonationStatus = "rejected";
+        state.error = action.error.message ?? "Failed to update donation";
+      })
+      .addCase(createFundDonation.pending, (state) => {
+        state.fundDonationStatus = "pending";
+        state.error = null;
+      })
+      .addCase(createFundDonation.fulfilled, (state, action) => {
+        state.fundDonationStatus = "fulfilled";
+        state.fundDonation.push(action.payload);
+      })
+      .addCase(createFundDonation.rejected, (state, action) => {
+        state.fundDonationStatus = "rejected";
+        state.error = action.error.message ?? "Failed to create donation";
+      }).addCase(getAllFunds.pending, (state) => {
+        state.fundDonationStatus = "pending";
+        state.error = null;
+      })
+      .addCase(getAllFunds.fulfilled, (state, action) => {
+        state.fundDonationStatus = "fulfilled";
+        state.fundDonation = action.payload;
+      })
+      .addCase(getAllFunds.rejected, (state, action) => {
+        state.fundDonationStatus = "rejected";
+        state.error = action.error.message ?? "Failed to fetch donations";
+
+      })
+  },
+
+});
+
       
 // export const { setPage } = AdminDonationsSlice.actions;
 export default AdminDonationsSlice.reducer;

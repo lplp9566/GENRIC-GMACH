@@ -25,3 +25,12 @@ export interface IUpdateDonation {
     date:string
     amount:number
 }
+export interface IFundDonation {
+       id: number,
+       name: string,
+       createdAt:Date
+       balance:string
+}
+export interface ICreateFund{
+    name:string
+}

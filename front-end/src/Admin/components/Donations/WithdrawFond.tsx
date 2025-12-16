@@ -19,15 +19,12 @@ import { AppDispatch, RootState } from "../../../store/store";
 import { RtlProvider } from "../../../Theme/rtl";
 import {
   withdrawDonation,
+  getAllFunds, // ✅ חדש
 } from "../../../store/features/admin/adminDonationsSlice";
 import { DonationActionType, ICreateDonation } from "./DonationDto";
 import { useNavigate } from "react-router-dom";
 import { setWithdrawDonationModal } from "../../../store/features/Main/AppMode";
-
-// type Props = {
-//   open: boolean;
-//   onClose: () => void;
-// };
+import { toast } from "react-toastify";
 
 const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
@@ -35,61 +32,67 @@ const WithdrawFundModal: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  // קרנות מתוך ה־store
-  const rawFundDetails = useSelector(
-    (s: RootState) => s.AdminFundsOverviewReducer.fundsOverview?.fund_details
-  );
-  const open = useSelector(
-    (s: RootState) => s.mapModeSlice.withdrawDonationModal
-  );
+  const open = useSelector((s: RootState) => s.mapModeSlice.withdrawDonationModal);
+
+  // ✅ קרנות מתוך ה-store החדש
+  const funds = useSelector((s: RootState) => s.AdminDonationsSlice.fundDonation);
 
   // שדות
   const [fundName, setFundName] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
   const [date, setDate] = useState<string>(today);
-  // הפקת שמות הקרנות (גמיש לשמות שדה שונים)
-const fundNames = useMemo<string[]>(() => {
-  if (!rawFundDetails) return [];
-//   if (Array.isArray(rawFundDetails)) {
-//     // במידה ויום אחד זה יחזור כמערך של אובייקטים – תשאיר את הגיבוי
-//     return rawFundDetails
-//       .map((f: any) => f?.name ?? f?.fund_name ?? f?.donation_reason ?? f?.key ?? "")
-//       .filter(Boolean);
-//   }
-  if (typeof rawFundDetails === "object") {
-    // עכשיו: זה המצב שלך – אובייקט: { "קרן X": 241, "קרן Y": 68 }
-    return Object.keys(rawFundDetails).map(String);
-  }
-  return [];
-}, [rawFundDetails]);
+
+  // ✅ משיכת קרנות כשמודאל נפתח
+  useEffect(() => {
+    if (open) {
+      dispatch(getAllFunds());
+    }
+  }, [open, dispatch]);
+
+  // ✅ רשימת שמות הקרנות מהטבלה
+  const fundNames = useMemo<string[]>(() => {
+    if (!Array.isArray(funds)) return [];
+    return funds
+      .map((f: any) => String(f?.name ?? "").trim())
+      .filter(Boolean);
+  }, [funds]);
+
+  // אם הקרן שנבחרה כבר לא קיימת ברשימה – ננקה
+  useEffect(() => {
+    if (fundName && fundNames.length && !fundNames.includes(fundName)) {
+      setFundName("");
+    }
+  }, [fundNames, fundName]);
 
   const isValid = useMemo(() => {
     return !!fundName && amount > 0 && !!date;
   }, [fundName, amount, date]);
+
   const onClose = () => {
     dispatch(setWithdrawDonationModal(false));
   };
+
   const handleSubmit = async () => {
     const payload: ICreateDonation = {
       amount,
       date,
       action: DonationActionType.withdraw,
-      donation_reason: fundName.trim(), // שם הקרן
+      donation_reason: fundName.trim(), // ✅ עדיין שולחים שם קרן (תאימות)
     };
+    toast.promise(dispatch(withdrawDonation(payload)), {
+      pending: "משיכת כסף מקרן...",
+      success: "הכסף נשלח בהצלחה",
+      error: "שגיאה בשליחת הכסף",
+    })
 
-    await dispatch(withdrawDonation(payload));
     onClose();
     navigate("/donations");
   };
-useEffect(() => {
-  console.log("fund_details:", rawFundDetails);
-}, [rawFundDetails]);
-
 
   return (
     <RtlProvider>
       <Dialog
-        open={open!}
+        open={!!open}
         onClose={onClose}
         fullWidth
         maxWidth="sm"
@@ -137,14 +140,22 @@ useEffect(() => {
               >
                 קרן*
               </InputLabel>
-              <Select disabled={!fundNames.length} onChange={(e) => setFundName(e.target.value)} value={fundName} labelId="fund-label" label="קרן*" color="success" size="medium" >
+
+              <Select
+                disabled={!fundNames.length}
+                onChange={(e) => setFundName(String(e.target.value))}
+                value={fundName}
+                labelId="fund-label"
+                label="קרן*"
+                color="success"
+                size="medium"
+              >
                 {fundNames.map((name) => (
                   <MenuItem key={name} value={name} dir="rtl">
                     {name}
                   </MenuItem>
                 ))}
               </Select>
-      
             </FormControl>
 
             {/* תאריך */}

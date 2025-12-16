@@ -9,19 +9,22 @@ import { UserFinancialsModule } from '../users/user-financials/user-financials.m
 import { UsersModule } from '../users/users.module';
 import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overview-by-year.module';
 import { DonationsEntity } from './Entity/donations.entity';
+import { FundsModule } from '../funds/funds.module';
+import { FundYearStatsEntity } from '../funds/Entity/fund-year-stats.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       DonationsEntity,
-      
+      FundYearStatsEntity
     ]),
     MonthlyDepositsModule,
     UserFinancialByYearModule,
     UsersModule,
     UserFinancialsModule,
     FundsOverviewModule, 
-    FundsOverviewByYearModule
+    FundsOverviewByYearModule,
+    FundsModule
   ],
   controllers: [DonationsController],
   providers: [

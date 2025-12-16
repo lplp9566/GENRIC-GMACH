@@ -5,10 +5,19 @@ import {
   setAddDonationModal,
   setWithdrawDonationModal,
 } from "../../../store/features/Main/AppMode";
+import { useEffect, useState } from "react";
+import AddFundModal from "./AddFundModal";
+import { getAllFunds } from "../../../store/features/admin/adminDonationsSlice";
 
 const DonationHeader = () => {
   const dispatch = useDispatch<AppDispatch>();
+const [addFundModal, setaddFundModal] = useState(false)
+  useEffect(() => {
+    
+  dispatch(getAllFunds())
 
+  }, [])
+    
   return (
     <Paper
       elevation={3}
@@ -74,9 +83,10 @@ const DonationHeader = () => {
           >
             משיכה מקרן{" "}
           </Button>
-          <Button>הוספת קרן </Button>
+          <Button onClick={()=> setaddFundModal(true)}>הוספת קרן </Button>
         </Box>
       </Stack>
+      {addFundModal && <AddFundModal open={addFundModal} onClose={() => setaddFundModal(false)} />}
     </Paper>
   );
 };

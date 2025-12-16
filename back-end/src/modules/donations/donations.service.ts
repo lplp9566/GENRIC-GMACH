@@ -14,19 +14,26 @@ import { UserFinancialService } from '../users/user-financials/user-financials.s
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { DonationActionType, IWindowDonations } from './donations_dto';
 import { DonationsEntity } from './Entity/donations.entity';
-import { log } from 'console';
 import { UpdateDonationDto } from './donations.controller';
+import { CreateDonationDto } from '../funds/fundsDto';
+import { FundsService } from '../funds/funds.service';
+import { FundYearStatsEntity } from '../funds/Entity/fund-year-stats.entity';
+import { FundEntity } from '../funds/Entity/funds.entity';
 
 @Injectable()
 export class DonationsService {
   constructor(
     @InjectRepository(DonationsEntity)
     private donationsRepository: Repository<DonationsEntity>,
+    @InjectRepository(FundYearStatsEntity)
+    private fundYearRepo: Repository<FundYearStatsEntity>,
+
     private readonly usersService: UsersService,
     private readonly userFinancialsyYearService: UserFinancialByYearService,
     private readonly userFinancialsService: UserFinancialService,
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly fundsOvirewviewServiceByYear: FundsOverviewByYearService,
+    private readonly fundsService: FundsService,
   ) {}
 
   async getDonations() {
@@ -35,7 +42,7 @@ export class DonationsService {
 
   async createEquityDonation(donation: DonationsEntity) {
     const year = getYearFromDate(donation.date);
-    const user = await this.usersService.getUserById(Number(donation.user));
+    const user = donation.user;
     if (!user) throw new BadRequestException('User not found');
 
     await this.userFinancialsyYearService.adjustEquityDonation(
@@ -53,232 +60,327 @@ export class DonationsService {
       donation.amount,
     );
     const saved = await this.donationsRepository.save(donation);
-  const withUser = await this.donationsRepository.findOne({
-    where: { id: saved.id },
-    relations: { user: true },
-  });
+    const withUser = await this.donationsRepository.findOne({
+      where: { id: saved.id },
+      relations: { user: true },
+    });
 
     return withUser;
   }
 
   async createFundDonation(donation: DonationsEntity) {
+    const fundName = String(donation.donation_reason ?? '').trim();
+    const fund = await this.fundsService.findOrCreateByName(
+      fundName,
+      donation.user ?? undefined,
+    );
+
+    donation.fund = fund;
+    donation.fundId = fund.id;
+
     const year = getYearFromDate(donation.date);
-    const user = await this.usersService.getUserById(Number(donation.user));
-    if (!user) throw new BadRequestException('User not found');
-    await this.userFinancialsyYearService.adjustSpecialFundDonation(
-      user,
-      year,
-      donation.amount,
-    );
-    await this.userFinancialsService.adjustSpecialFundDonation(
-      user,
-      donation.amount,
-    );
-    await this.fundsOverviewService.addSpecialFund(
-      donation.donation_reason,
-      donation.amount,
-    );
-    await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(
-      year,
-      donation.donation_reason,
-      donation.amount,
-    );
-    await this.userFinancialsService.adjustSpecialFundDonation(
-      user,
-      donation.amount,
-    );
 
-    const saved = await this.donationsRepository.save(donation);
-  const withUser = await this.donationsRepository.findOne({
-    where: { id: saved.id },
-    relations: { user: true },
-  });
-
-    return withUser;
-  }
-
-  async createDonation(donation: DonationsEntity) {  
-    if (!donation) {
-      throw new BadRequestException('Donation is required');
-    }
-    // if (!donation.user) {
-    //   throw new BadRequestException('User is required');
-    // }
-    // if (donation.action) {
-    //   throw new BadRequestException('Amount must be greater than zero');
-    // }
-    if (donation.action == DonationActionType.donation) {
-      if (donation.donation_reason === 'Equity') {
-        return await this.createEquityDonation(donation);
-      } else {
-        return await this.createFundDonation(donation);
-      }
-    } else if (donation.action == DonationActionType.withdraw) {
-      return await this.withdrawSpecialFund(donation);
-    }
-  }
-  async withdrawSpecialFund(donation: DonationsEntity) {
-    try {
-      const year = getYearFromDate(donation.date);
-      // const user = await this.usersService.getUserById(Number(donation.user));
-      // if (!user) throw new BadRequestException('User not found');
-      await this.fundsOverviewService.reduceFundAmount(
-        donation.donation_reason,
-        donation.amount,
-      );
-      await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(
+    return this.donationsRepository.manager.transaction(async (manager) => {
+      await this.applyFundMovement(
+        manager,
+        fund,
         year,
-        donation.donation_reason,
         donation.amount,
+        'deposit',
       );
-      const donationRecord = await this.donationsRepository.save(donation);
-      const withUser = await this.donationsRepository.findOne({
-        where: { id: donationRecord.id },
+
+      // שמירת donation
+      const saved = await manager.save(DonationsEntity, donation);
+      await this.fundsOverviewService.adjustSpecialFund(donation.amount);
+      await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(year, donation.amount);
+      return manager.findOne(DonationsEntity, {
+        where: { id: saved.id },
         relations: { user: true },
       });
-      return withUser;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+    });
   }
-async updateDonation(id: number, dto: UpdateDonationDto) {
-  const { amount: newAmount, date: newDateString } = dto;
-  const newDate = new Date(newDateString);
 
-  if (newAmount <= 0) {
+  async createDonation(dto: CreateDonationDto) {
+    const donation = new DonationsEntity();
+    donation.amount = dto.amount;
+    donation.date = new Date(dto.date);
+    donation.action = dto.action;
+    donation.donation_reason = dto.donation_reason;
+
+    // אם נשלח userId – נטען משתמש
+    if (dto.user != null) {
+      donation.user = await this.usersService.getUserById(Number(dto.user));
+      // אם תרצה פה בדיקה NotFound
+    }
+
+    if (donation.action === DonationActionType.donation) {
+      if (String(donation.donation_reason).trim().toLowerCase() === 'equity') {
+        return this.createEquityDonation(donation);
+      } else {
+        return this.createFundDonation(donation);
+      }
+    }
+
+    if (donation.action === DonationActionType.withdraw) {
+      return this.withdrawSpecialFund(donation);
+    }
+
+    throw new BadRequestException('Invalid action');
+  }
+
+  async withdrawSpecialFund(donation: DonationsEntity) {
+    const fundName = String(donation.donation_reason ?? '').trim();
+    const fund = await this.fundsService.findOrCreateByName(
+      fundName,
+      donation.user ?? undefined,
+    );
+
+    donation.fund = fund;
+    donation.fundId = fund.id;
+
+    const year = getYearFromDate(donation.date);
+
+    return this.donationsRepository.manager.transaction(async (manager) => {
+      await this.applyFundMovement(
+        manager,
+        fund,
+        year,
+        donation.amount,
+        'withdraw',
+      );
+
+      const saved = await manager.save(DonationsEntity, donation);
+      await this.fundsOverviewService.reduceFundAmount( donation.amount);
+      await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(year, donation.amount);
+      return manager.findOne(DonationsEntity, {
+        where: { id: saved.id },
+        relations: { user: true },
+      });
+    });
+  }
+
+  private async applyFundMovement(
+    manager: any,
+    fund: FundEntity,
+    year: number,
+    amount: number,
+    kind: 'deposit' | 'withdraw',
+  ) {
+    // 1) עדכון יתרה בקרן (atomic)
+    const delta = kind === 'withdraw' ? -amount : amount;
+    await manager.increment(FundEntity, { id: fund.id }, 'balance', delta);
+
+    // 2) עדכון טבלת שנה-קרן
+    let row = await manager.findOne(FundYearStatsEntity, {
+      where: { fundId: fund.id, year },
+    });
+    if (!row) {
+      row = manager.create(FundYearStatsEntity, {
+        fundId: fund.id,
+        year,
+        donatedTotal: '0',
+        withdrawnTotal: '0',
+      });
+    }
+
+    if (kind === 'deposit') {
+      // donatedTotal += amount
+      row.donatedTotal = String(Number(row.donatedTotal) + amount);
+    } else {
+      // withdrawnTotal += amount
+      row.withdrawnTotal = String(Number(row.withdrawnTotal) + amount);
+    }
+
+    await manager.save(row);
+  }
+
+async updateDonation(id: number, dto: UpdateDonationDto) {
+  const newAmount = Number(dto.amount);
+  const newDate = new Date(dto.date);
+
+  if (!Number.isFinite(newAmount) || newAmount <= 0) {
     throw new BadRequestException('Amount must be greater than zero');
   }
+  if (isNaN(newDate.getTime())) {
+    throw new BadRequestException('Invalid date');
+  }
 
-  return await this.donationsRepository.manager.transaction(
-    async (manager) => {
-      // 1. מביאים את התרומה הקיימת
-      const existing = await manager.findOne(DonationsEntity, {
-        where: { id },
-        relations: { user: true },
-      });
+  return this.donationsRepository.manager.transaction(async (manager) => {
+    // חשוב: טוענים גם fund כדי שנדע לעדכן balances
+    const existing = await manager.findOne(DonationsEntity, {
+      where: { id },
+      relations: { user: true, fund: true },
+    });
 
-      if (!existing) {
-        throw new BadRequestException('Donation not found');
-      }
+    if (!existing) throw new BadRequestException('Donation not found');
 
-      const oldAmount = existing.amount;
-      const oldDate = existing.date;
-      const oldYear = getYearFromDate(oldDate);
-      const newYear = getYearFromDate(newDate);
-      const deltaAmount = newAmount - oldAmount;
-      const user = existing.user;
+    const oldAmount = Number(existing.amount);
+    const oldDate = new Date(existing.date);
+    const oldYear = getYearFromDate(oldDate);
+    const newYear = getYearFromDate(newDate);
 
-      // 2. מעדכנים את רשומת התרומה עצמה
-      existing.amount = newAmount;
-      existing.date = newDate;
-      await manager.save(existing);
+    const deltaAmount = newAmount - oldAmount;
 
-      // 🧩 3. טבלאות גלובליות (לא לפי שנה) – רק deltaAmount
-      if (existing.action === DonationActionType.donation) {
-        if (existing.donation_reason === 'Equity') {
-          // Equity גלובלי
-          await this.userFinancialsService.adjustEquityDonation(
-            user,
-            deltaAmount,
-          );
-          await this.fundsOverviewService.adjustDonation(deltaAmount);
-        } else {
-          // Special Fund גלובלי
-          await this.userFinancialsService.adjustSpecialFundDonation(
-            user,
-            deltaAmount,
-          );
-          await this.fundsOverviewService.adjustSpecialFund(
-            existing.donation_reason,
-            deltaAmount,
-          );
-        }
-      }
-
-      // 🧩 4. טבלאות לפי שנה – כאן נכנס עניין ה"שינוי שנה"
-      if (existing.action === DonationActionType.donation) {
-        if (existing.donation_reason === 'Equity') {
-          if (oldYear === newYear) {
-            // אותה שנה → רק deltaAmount
-            await this.userFinancialsyYearService.adjustEquityDonation(
-              user,
-              oldYear,
-              deltaAmount,
-            );
-            await this.fundsOvirewviewServiceByYear.adjustEquityDonation(
-              oldYear,
-              deltaAmount,
-            );
-          } else {
-            // שנה השתנתה → -oldAmount מהשנה הישנה +newAmount בשנה החדשה
-            await this.userFinancialsyYearService.adjustEquityDonation(
-              user,
-              oldYear,
-              -oldAmount,
-            );
-            await this.userFinancialsyYearService.adjustEquityDonation(
-              user,
-              newYear,
-              newAmount,
-            );
-
-            await this.fundsOvirewviewServiceByYear.adjustEquityDonation(
-              oldYear,
-              -oldAmount,
-            );
-            await this.fundsOvirewviewServiceByYear.adjustEquityDonation(
-              newYear,
-              newAmount,
-            );
-          }
-        } else {
-          // Special Fund לפי שנה
-          const fundName = existing.donation_reason;
-
-          if (oldYear === newYear) {
-            await this.userFinancialsyYearService.adjustSpecialFundDonation(
-              user,
-              oldYear,
-              deltaAmount,
-            );
-            await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(
-              oldYear,
-              fundName,
-              deltaAmount,
-            );
-          } else {
-            await this.userFinancialsyYearService.adjustSpecialFundDonation(
-              user,
-              oldYear,
-              -oldAmount,
-            );
-            await this.userFinancialsyYearService.adjustSpecialFundDonation(
-              user,
-              newYear,
-              newAmount,
-            );
-
-            await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(
-              oldYear,
-              fundName,
-              -oldAmount,
-            );
-            await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(
-              newYear,
-              fundName,
-              newAmount,
-            );
-          }
-        }
-      }
-
-      // 5. מחזירים את התרומה המעודכנת עם המשתמש
-      return await manager.findOne(DonationsEntity, {
+    // אם לא השתנה כלום – מחזירים
+    if (deltaAmount === 0 && oldYear === newYear) {
+      return manager.findOne(DonationsEntity, {
         where: { id: existing.id },
-        relations: { user: true },
+        relations: { user: true, fund: true },
       });
-    },
-  );
+    }
+
+    // 1) מעדכנים את רשומת התרומה עצמה
+    existing.amount = newAmount;
+    existing.date = newDate;
+    await manager.save(existing);
+
+    const user = existing.user ?? null;
+    const isEquity = String(existing.donation_reason ?? '')
+      .trim()
+      .toLowerCase() === 'equity';
+
+    const isFund = !isEquity; // אצלך: כל מה שלא Equity נחשב “קרן מיוחדת”
+    const fundName = isFund ? String(existing.donation_reason ?? '').trim() : null;
+
+    // Helpers: upsert + עדכון טבלת fund_year_stats (עם סכום יכול להיות גם שלילי)
+    const bumpFundYear = async (
+      fundId: number,
+      year: number,
+      kind: 'deposit' | 'withdraw',
+      delta: number,
+    ) => {
+      let row = await manager.findOne(FundYearStatsEntity, {
+        where: { fundId, year },
+      });
+
+      if (!row) {
+        row = manager.create(FundYearStatsEntity, {
+          fundId,
+          year,
+          donatedTotal: '0',
+          withdrawnTotal: '0',
+        });
+      }
+
+      if (kind === 'deposit') {
+        row.donatedTotal = String(Number(row.donatedTotal) + delta);
+      } else {
+        row.withdrawnTotal = String(Number(row.withdrawnTotal) + delta);
+      }
+
+      await manager.save(row);
+    };
+
+    // 2) עדכוני Funds (balance + yearly) — רק אם זו קרן מיוחדת ויש fundId
+    // (אם עדיין אין fundId לנתונים ישנים, אפשר ליצור פה fund ולשייך—אבל לא נכנסתי לזה כרגע)
+    if (isFund && existing.fundId) {
+      const fundId = existing.fundId;
+
+      // action donation => "deposit" לקרן
+      // action withdraw => "withdraw" מקרן
+      const kind: 'deposit' | 'withdraw' =
+        existing.action === DonationActionType.withdraw ? 'withdraw' : 'deposit';
+
+      // שינוי שנה: צריך להזיז -oldAmount מהשנה הישנה ו +newAmount לשנה החדשה
+      if (oldYear !== newYear) {
+        // balance: קודם מבטלים את הישן ואז מוסיפים את החדש
+        // deposit: balance += (-oldAmount) ואז balance += (+newAmount)
+        // withdraw: balance -= (-oldAmount)? בפועל withdraw מוריד, לכן ביטול withdraw מחזיר כסף:
+        // אם kind=withdraw אז balance += oldAmount כדי לבטל, ואז balance -= newAmount כדי להחיל
+        if (kind === 'deposit') {
+          await manager.increment(FundEntity, { id: fundId }, 'balance', -oldAmount);
+          await manager.increment(FundEntity, { id: fundId }, 'balance', +newAmount);
+
+          await bumpFundYear(fundId, oldYear, 'deposit', -oldAmount);
+          await bumpFundYear(fundId, newYear, 'deposit', +newAmount);
+        } else {
+          await manager.increment(FundEntity, { id: fundId }, 'balance', +oldAmount);
+          await manager.increment(FundEntity, { id: fundId }, 'balance', -newAmount);
+
+          await bumpFundYear(fundId, oldYear, 'withdraw', -oldAmount);
+          await bumpFundYear(fundId, newYear, 'withdraw', +newAmount);
+        }
+      } else {
+        // אותה שנה: מספיק delta אחד
+        if (kind === 'deposit') {
+          await manager.increment(FundEntity, { id: fundId }, 'balance', deltaAmount);
+          await bumpFundYear(fundId, oldYear, 'deposit', deltaAmount);
+        } else {
+          // withdraw: הגדלת סכום withdraw מורידה עוד כסף => balance -= delta
+          await manager.increment(FundEntity, { id: fundId }, 'balance', -deltaAmount);
+          await bumpFundYear(fundId, oldYear, 'withdraw', deltaAmount);
+        }
+      }
+    }
+
+    // 3) עדכונים דרך הסרוויסים הקיימים (כמו שביקשת – נשארים)
+    // Equity donation
+    if (existing.action === DonationActionType.donation && isEquity) {
+      if (!user) throw new BadRequestException('User not found');
+
+      // גלובלי
+      await this.userFinancialsService.adjustEquityDonation(user, deltaAmount);
+      await this.fundsOverviewService.adjustDonation(deltaAmount);
+
+      // לפי שנה
+      if (oldYear === newYear) {
+        await this.userFinancialsyYearService.adjustEquityDonation(user, oldYear, deltaAmount);
+        await this.fundsOvirewviewServiceByYear.adjustEquityDonation(oldYear, deltaAmount);
+      } else {
+        await this.userFinancialsyYearService.adjustEquityDonation(user, oldYear, -oldAmount);
+        await this.userFinancialsyYearService.adjustEquityDonation(user, newYear, +newAmount);
+
+        await this.fundsOvirewviewServiceByYear.adjustEquityDonation(oldYear, -oldAmount);
+        await this.fundsOvirewviewServiceByYear.adjustEquityDonation(newYear, +newAmount);
+      }
+    }
+
+    // Fund deposit (תרומה לקרן מיוחדת)
+    if (existing.action === DonationActionType.donation && isFund) {
+      if (!user) throw new BadRequestException('User not found');
+      if (!fundName) throw new BadRequestException('Fund name is required');
+
+      // גלובלי
+      await this.userFinancialsService.adjustSpecialFundDonation(user, deltaAmount);
+      await this.fundsOverviewService.adjustSpecialFund(deltaAmount);
+
+      // לפי שנה
+      if (oldYear === newYear) {
+        await this.userFinancialsyYearService.adjustSpecialFundDonation(user, oldYear, deltaAmount);
+        await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(oldYear, deltaAmount);
+      } else {
+        await this.userFinancialsyYearService.adjustSpecialFundDonation(user, oldYear, -oldAmount);
+        await this.userFinancialsyYearService.adjustSpecialFundDonation(user, newYear, +newAmount);
+
+        await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(oldYear, -oldAmount);
+        await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(newYear, +newAmount);
+      }
+    }
+
+    // Fund withdraw (משיכה מקרן מיוחדת)
+    if (existing.action === DonationActionType.withdraw && isFund) {
+      if (!fundName) throw new BadRequestException('Fund name is required');
+
+      // גלובלי: משתמשים ב-reduceFundAmount עם delta
+      // אם deltaAmount חיובי => מושכים עוד
+      // אם deltaAmount שלילי => מחזירים חלק (כלומר "משיכה פחותה")
+      await this.fundsOverviewService.reduceFundAmount( deltaAmount);
+
+      // לפי שנה
+      if (oldYear === newYear) {
+        await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(oldYear, deltaAmount);
+      } else {
+        await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(oldYear, -oldAmount);
+        await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(newYear, +newAmount);
+      }
+    }
+
+    // 4) מחזירים מעודכן
+    return manager.findOne(DonationsEntity, {
+      where: { id: existing.id },
+      relations: { user: true, fund: true },
+    });
+  });
 }
 
 }
