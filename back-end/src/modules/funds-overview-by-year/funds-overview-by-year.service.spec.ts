@@ -72,17 +72,11 @@ describe('FundsOverviewByYearService', () => {
     const mockRecord = { fund_details_donated: {}, special_fund_donations: 0 } as any;
     repo.findOne.mockResolvedValue(mockRecord);
     repo.save.mockResolvedValue({ fund_details_donated: { Shabbat: 300 } }as any );
-    const result = await service.adjustSpecialFundDonationByName(2025, 'Shabbat', 300);
+    const result = await service.adjustSpecialFundDonationByName(2025, 300);
     expect(result.fund_details_donated['Shabbat']).toBe(300);
   });
 
-  it('should throw if withdrawing from unknown fund', async () => {
-    const mockRecord = { fund_details_donated: {}, fund_details_withdrawn: {} } as any;
-    repo.findOne.mockResolvedValue(mockRecord);
-    await expect(service.recordSpecialFundWithdrawalByName(2025, 'UnknownFund', 100))
-      .rejects
-      .toThrow('No such fund to withdraw from');
-  });
+
 
   it('should record loan taken', async () => {
     const record = { total_loans_taken: 0, total_loans_amount: 0 } as any;

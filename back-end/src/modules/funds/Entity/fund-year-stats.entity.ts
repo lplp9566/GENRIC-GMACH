@@ -1,5 +1,5 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { FundEntity } from '../../funds/Entity/funds.entity';
+import { FundEntity } from './funds.entity';
 
 @Entity('fund_year_stats')
 @Index(['fundId', 'year'], { unique: true })

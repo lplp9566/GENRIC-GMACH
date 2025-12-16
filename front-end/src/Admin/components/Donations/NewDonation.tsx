@@ -24,6 +24,7 @@ import {
   getAllFunds, // ✅ חדש
 } from "../../../store/features/admin/adminDonationsSlice";
 import { DonationActionType, ICreateDonation } from "./DonationDto";
+import { toast } from "react-toastify";
 
 type DonationKind = "regular" | "fund";
 
@@ -84,8 +85,11 @@ const AddDonationModal: React.FC = () => {
       action: DonationActionType.donation,
       donation_reason: kind === "regular" ? "Equity" : fundName.trim(), // ✅ תאימות
     };
-
-    await dispatch(createDonation(payload));
+    toast.promise(dispatch(createDonation(payload)), {
+      pending: "התרומה נשלחה בהצלחה",
+      success: "התרומה נשלחה בהצלחה",
+      error: "שגיאה בשליחת התרומה",
+    })
     navigate("/donations");
     handleClose();
   };

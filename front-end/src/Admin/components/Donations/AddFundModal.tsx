@@ -24,7 +24,7 @@ const AddFundModal:FC<AddFundModalProps> = ({open, onClose}) => {
                 error: "אירעה שגיאה בעת הוספת הקרן.",
             }
         )
-        
+        onClose();
     }
   return (
 <RtlProvider>
