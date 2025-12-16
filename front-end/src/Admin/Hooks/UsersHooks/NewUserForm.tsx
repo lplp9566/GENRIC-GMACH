@@ -130,14 +130,20 @@ if (activeStep < stepsCount - 1) {
     data.userData.membership_type === MembershipType.MEMBER 
 
   ) {
+        const cd = data.paymentData.charge_date;
+    if (cd == null || cd < 1 || cd > 31) {
+      toast.warn("נא למלא את תאריך החיוב באופן תקין");
+      return;
+    }
 
-    data.paymentData.charge_date === null ||
-    data.paymentData.charge_date! > 31 ||
-    data.paymentData.charge_date! < 1
-   {
-    toast.warn("נא למלא את תאריך החיוב באופן תקין");
-    return;
-  }
+
+    // data.paymentData.charge_date === null ||
+    // data.paymentData.charge_date! > 31 ||
+    // data.paymentData.charge_date! < 1
+  //  {
+  //   toast.warn("נא למלא את תאריך החיוב באופן תקין");
+  //   return;
+  // }
   }
 
   const promise = dispatch(createUser(data));

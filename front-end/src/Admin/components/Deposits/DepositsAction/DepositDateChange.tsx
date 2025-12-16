@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import BringForwardModal from "./DepositCheckModal";
 import { RootState } from "../../../../store/store";
 import { useSelector } from "react-redux";
+import { trackEvent } from "../../../trackEvent";
 
 interface DepositDateChangeProps {
   depositId: number;
@@ -50,6 +51,7 @@ const DepositDateChange: React.FC<DepositDateChangeProps> = ({
       )
       setDate("")
       setUpdateDate("")
+      trackEvent("הפקדות", "עדכון", "תאריך החדש", depositId);
     } catch (err: any) {
       toast.error(err?.message ?? "אירעה שגיאה בשמירת הפעולה");
     }

@@ -12,6 +12,7 @@ import { ICreateDeposits } from "../depositsDto";
 import { setAddDepositModal } from "../../../../store/features/Main/AppMode";
 import { toast } from "react-toastify";
 import { createDeposit } from "../../../../store/features/admin/adminDepositsSlice";
+import { trackEvent } from "../../../trackEvent";
 
 const NewDepositModal: FC = () => {
   const open = useSelector((s: RootState) => s.mapModeSlice.AddDepositModal);
@@ -55,8 +56,9 @@ const NewDepositModal: FC = () => {
 
     promise
       .then(() => {
+        trackEvent("הפקדות", "הוספה", "הפקדה", newDeposit.initialDeposit);
         handleClose();
-        navigate("/deposits"); // עדכן לנתיב הנכון אצלך
+        navigate("/deposits"); 
       })
       .catch(() => {});
   };
