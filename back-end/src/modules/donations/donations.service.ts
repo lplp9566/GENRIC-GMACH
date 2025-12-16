@@ -17,8 +17,8 @@ import { DonationsEntity } from './Entity/donations.entity';
 import { UpdateDonationDto } from './donations.controller';
 import { CreateDonationDto } from '../funds/fundsDto';
 import { FundsService } from '../funds/funds.service';
-import { FundYearStatsEntity } from '../funds/entity/fund-year-stats.entity';
-import { FundEntity } from '../funds/entity/funds.entity';
+import { FundYearStatsEntity } from '../funds/Entity/fund-year-stats.entity';
+import { FundEntity } from '../funds/Entity/funds.entity';
 
 @Injectable()
 export class DonationsService {
