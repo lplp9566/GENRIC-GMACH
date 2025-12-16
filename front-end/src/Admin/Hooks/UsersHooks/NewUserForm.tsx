@@ -135,15 +135,6 @@ if (activeStep < stepsCount - 1) {
       toast.warn("נא למלא את תאריך החיוב באופן תקין");
       return;
     }
-
-
-    // data.paymentData.charge_date === null ||
-    // data.paymentData.charge_date! > 31 ||
-    // data.paymentData.charge_date! < 1
-  //  {
-  //   toast.warn("נא למלא את תאריך החיוב באופן תקין");
-  //   return;
-  // }
   }
 
   const promise = dispatch(createUser(data));
