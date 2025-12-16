@@ -108,7 +108,8 @@ const DonationsHomePage: FC = () => {
     if (donationsStatus === "idle") {
       dispatch(getAllDonations({} as any));
     }
-    dispatch(getAllFunds()); // ✅ במקום getFundsOverview
+    dispatch(getAllFunds()); 
+    
   }, [dispatch, donationsStatus]);
 
   // רענון אחרי סגירת מודאל

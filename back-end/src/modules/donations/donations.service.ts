@@ -19,6 +19,8 @@ import { CreateDonationDto } from '../funds/fundsDto';
 import { FundsService } from '../funds/funds.service';
 import { FundYearStatsEntity } from '../funds/Entity/fund-year-stats.entity';
 import { FundEntity } from '../funds/Entity/funds.entity';
+import { addWeeks } from 'date-fns';
+import { abort } from 'process';
 
 @Injectable()
 export class DonationsService {
@@ -93,6 +95,8 @@ export class DonationsService {
       const saved = await manager.save(DonationsEntity, donation);
       await this.fundsOverviewService.adjustSpecialFund(donation.amount);
       await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(year, donation.amount);
+      await this.userFinancialsService.adjustSpecialFundDonation( donation.user, donation.amount);
+      await this.userFinancialsyYearService.adjustSpecialFundDonation(donation.user, year, donation.amount);
       return manager.findOne(DonationsEntity, {
         where: { id: saved.id },
         relations: { user: true },
