@@ -27,14 +27,14 @@ const EditDonationModal = ({
   onClose,
 }: EditDonationModalProps) => {
   const dispatch = useDispatch<AppDispatch>();
-
   const { id, amount, date } = donation;
+console.log(donation);
 
   // state עבור העריכה
   const [newAmount, setNewAmount] = useState<number>(amount);
-  const [newDate, setNewDate] = useState<string>(
-    new Date(date).toISOString().split("T")[0]
-  );
+const [newDate, setNewDate] = useState<string>(date);
+
+
   
 
   const handleSubmit = async () => {

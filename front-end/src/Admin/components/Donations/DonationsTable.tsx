@@ -48,10 +48,24 @@ const DonationsTable: FC<DonationsTableProps> = ({
   }
   const [editMode, setEditMode] = useState<boolean>(false);
   const [selectedDonation, setSelectedDonation] = useState< DonationRow| null>(null);
-  const onClickEdit = (donation: DonationRow) => {
-    setSelectedDonation(donation);
-    setEditMode(true);
-  }
+  const ddmmyyyyToInputDate = (s: string) => {
+  if (!s) return "";
+
+  const match = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return "";
+
+  const [, dd, mm, yyyy] = match;
+  return `${yyyy}-${mm}-${dd}`; // YYYY-MM-DD
+};
+
+const onClickEdit = (donation: DonationRow) => {
+  setSelectedDonation({
+    ...donation,
+    date: ddmmyyyyToInputDate(donation.date),
+  });
+  setEditMode(true);
+};
+
   return (
     <Box sx={{ overflow: "auto" }}>
       <Table size="small" stickyHeader>
