@@ -37,7 +37,7 @@ export const getFundsOverview = createAsyncThunk(
 export const getFundsOverviewByYear = createAsyncThunk(
     '/admin/getFundsOverviewByYear',
     async()=>{
-        const response = await axios.get(`${BASE_URL}/funds-overview-by-year`|| "http://localhost:3000/funds-overview-by-year");
+        const response = await axios.get(`${BASE_URL}/funds-overview-by-year`);
         return response.data
     }
 )
