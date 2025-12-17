@@ -55,7 +55,18 @@ function getDonorId(d: any): string | null {
   const key = String(raw).trim();
   return key || null;
 }
+function computeRegularTotalFromDonations(donations: any[]): number {
+  return (donations ?? []).reduce((sum: number, d: any) => {
+    const reason = String(d?.donation_reason ?? "").trim().toLowerCase();
+    const isRegular = !reason || reason === "equity" || reason === "equality";
+    if (!isRegular) return sum;
 
+    const amt = Number(d?.amount ?? 0) || 0;
+    const action = String(d?.action ?? "").toLowerCase();
+    const sign = action === "withdraw" ? -1 : 1;
+    return sum + sign * amt;
+  }, 0);
+}
 // ✅ חדש: בניית כרטיסי קרנות מתוך רשימת funds
 function toFundCardsFromFunds(funds: any): FundCardData[] {
   if (!Array.isArray(funds)) return [];
@@ -234,14 +245,15 @@ const DonationsHomePage: FC = () => {
   const kpiCount  = rows.length;
 
   // ---------- Right panel ----------
-  const right = useMemo(() => {
-    if (selectedUserId) return computeOverviewForUserNet(donationsBase);
+const right = useMemo(() => {
+  if (selectedUserId) return computeOverviewForUserNet(donationsBase);
 
-    return {
-      regularTotal: 0,
-      fundCards: toFundCardsFromFunds(funds),
-    };
-  }, [selectedUserId, donationsBase, funds]);
+  return {
+    regularTotal: computeRegularTotalFromDonations(donations), // ✅ פה התיקון
+    fundCards: toFundCardsFromFunds(funds),
+  };
+}, [selectedUserId, donationsBase, donations, funds]);
+
 
   // key כדי לאלץ רנדר כשנתוני הקרנות משתנים
   const fundsPanelKey = useMemo(() => {
