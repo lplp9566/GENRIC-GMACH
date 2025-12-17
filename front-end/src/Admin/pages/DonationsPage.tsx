@@ -307,6 +307,7 @@ const filteredForTable = useMemo(() => {
         userName: `${d.user?.first_name ?? ""} ${
           d.user?.last_name ?? ""
         }`.trim(),
+         userId: Number(d?.user?.id ?? d?.userId ?? d?.user_id ?? 0),
         amount: Number(d?.amount) || 0,
         date: formatDate(dt),
         action: d?.action ?? "—",

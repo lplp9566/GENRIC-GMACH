@@ -2,6 +2,7 @@ import { Paper, Stack, Box, Typography, Button } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store/store";
 import {
+  setAddDonationDraft,
   setAddDonationModal,
   setWithdrawDonationModal,
 } from "../../../store/features/Main/AppMode";
@@ -58,7 +59,11 @@ const [addFundModal, setaddFundModal] = useState(false)
         >
           <Button
             variant="contained"
-            onClick={() => dispatch(setAddDonationModal(true))}
+         onClick={() => {
+  dispatch(setAddDonationDraft(null));
+  dispatch(setAddDonationModal(true));
+}}
+
             sx={{
               backgroundColor: "green",
               color: "#ffffff",

@@ -1,15 +1,21 @@
 import {
   Box,
   CircularProgress,
+  IconButton,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
   TableSortLabel,
+  Tooltip,
 } from "@mui/material";
 import { FC, useState } from "react";
 import EditDonationModal from "./EditDonationModal";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../store/store";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { setAddDonationDraft, setAddDonationModal } from "../../../store/features/Main/AppMode";
 export type DonationRow = {
   id: string | number;
   userName: string;
@@ -17,6 +23,7 @@ export type DonationRow = {
   date: string;
   action: string;
   donation_reason: string;
+  userId: number;
 };
 export type SortBy = "date" | "amount";
 export type SortDir = "asc" | "desc";
@@ -65,6 +72,22 @@ const onClickEdit = (donation: DonationRow) => {
   });
   setEditMode(true);
 };
+const dispatch = useDispatch<AppDispatch>();
+
+const onClickDuplicate = (row: DonationRow) => {
+  const reason = String(row.donation_reason ?? "").trim();
+  const kind = reason.toLowerCase() === "equity" ? "regular" : "fund";
+
+  dispatch(setAddDonationDraft({
+    userId: row.userId,
+    kind,
+    fundName: kind === "fund" ? reason : "",
+    amount: row.amount,
+    date: ddmmyyyyToInputDate(row.date), // או לשים היום אם רוצים
+  }));
+
+  dispatch(setAddDonationModal(true));
+};
 
   return (
     <Box sx={{ overflow: "auto" }}>
@@ -89,6 +112,8 @@ const onClickEdit = (donation: DonationRow) => {
               align="right"
               sortDirection={sortBy === "date" ? sortDir : (false as any)}
             >
+  
+
               <TableSortLabel
                 active={sortBy === "date"}
                 direction={sortBy === "date" ? sortDir : "asc"}
@@ -99,6 +124,7 @@ const onClickEdit = (donation: DonationRow) => {
             </TableCell>
             <TableCell align="right"> פעולה</TableCell>
             <TableCell align="right">קרן/תרומה רגילה</TableCell>
+                        <TableCell align="right">שכפל</TableCell>
           </TableRow>
         </TableHead>
 
@@ -131,6 +157,20 @@ const onClickEdit = (donation: DonationRow) => {
                     ? "תרומה רגילה"
                     : ` קרן ${donationRow.donation_reason}`}
                 </TableCell>
+                <TableCell align="right" onClick={(e) => e.stopPropagation()}>
+  <Tooltip title="שכפל תרומה">
+    <IconButton
+      size="small"
+      onClick={(e) => {
+        e.stopPropagation(); // שלא יפעיל edit על שורה
+        onClickDuplicate(donationRow);
+      }}
+    >
+      <ContentCopyIcon fontSize="small" />
+    </IconButton>
+  </Tooltip>
+</TableCell>
+
               </TableRow>
             ))
           )}

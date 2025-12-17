@@ -18,7 +18,7 @@ import SelectAllUsers from "../SelectUsers/SelectAllUsers";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { useNavigate } from "react-router-dom";
-import { setAddDonationModal } from "../../../store/features/Main/AppMode";
+import { setAddDonationDraft, setAddDonationModal } from "../../../store/features/Main/AppMode";
 import {
   createDonation,
   getAllFunds, // ✅ חדש
@@ -37,25 +37,41 @@ const AddDonationModal: React.FC = () => {
   const [amount, setAmount] = useState<number>(0);
   const [date, setDate] = useState<string>(today);
 
-  const open = useSelector((s: RootState) => s.mapModeSlice.AddDonationModal);
+const open = useSelector((s: RootState) => s.mapModeSlice.AddDonationModal);
+const draft = useSelector((s: RootState) => s.mapModeSlice.AddDonationDraft);
+
   const funds = useSelector((s: RootState) => s.AdminDonationsSlice.fundDonation); // ✅
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  // ✅ טען קרנות כשנפתח המודאל
-  useEffect(() => {
-    if (open) {
-      dispatch(getAllFunds());
-    }
-  }, [open, dispatch]);
+useEffect(() => {
+  if (!open) return;
 
-  const fundNames = useMemo<string[]>(() => {
-    if (!Array.isArray(funds)) return [];
-    return funds
-      .map((f: any) => String(f?.name ?? "").trim())
-      .filter(Boolean);
-  }, [funds]);
+  dispatch(getAllFunds());
+
+  if (draft) {
+    setUserId(draft.userId);
+    setKind(draft.kind ?? "regular");
+    setFundName(draft.fundName ?? "");
+    setAmount(draft.amount ?? 0);
+    setDate(draft.date ?? today);
+  } else {
+    // פתיחה רגילה (איפוס)
+    setUserId(undefined);
+    setKind("regular");
+    setFundName("");
+    setAmount(0);
+    setDate(today);
+  }
+}, [open, draft, dispatch]);
+
+const fundNames = useMemo<string[]>(() => {
+  if (!Array.isArray(funds)) return [];
+  return funds
+    .map((f: any) => String(f?.name ?? "").trim())
+    .filter(Boolean);
+}, [funds]);
 
   // אם עברנו ל"תרומה רגילה" – ננקה בחירת קרן
   useEffect(() => {
@@ -68,6 +84,17 @@ const AddDonationModal: React.FC = () => {
       setFundName("");
     }
   }, [fundNames, fundName]);
+useEffect(() => {
+  if (!open) return;
+
+  if (draft) {
+    setUserId(draft.userId);
+    setKind(draft.kind ?? "regular");
+    setFundName(draft.fundName ?? "");
+    setAmount(draft.amount ?? 0);
+    setDate(draft.date ?? today);
+  }
+}, [open, draft]);
 
   // ולידציה בסיסית
   const isValid = useMemo(() => {
@@ -94,9 +121,11 @@ const AddDonationModal: React.FC = () => {
     handleClose();
   };
 
-  const handleClose = () => {
-    dispatch(setAddDonationModal(false));
-  };
+ const handleClose = () => {
+  dispatch(setAddDonationDraft(null));
+  dispatch(setAddDonationModal(false));
+};
+
 
   return (
     <RtlProvider>
@@ -188,21 +217,29 @@ const AddDonationModal: React.FC = () => {
                 >
                   קרן*
                 </InputLabel>
-                <Select
-                  disabled={!fundNames.length}
-                  labelId="fund-label"
-                  value={fundName}
-                  label="קרן*"
-                  color="success"
-                  size="medium"
-                  onChange={(e) => setFundName(String(e.target.value))}
-                >
-                  {fundNames.map((name) => (
-                    <MenuItem key={name} value={name} dir="rtl">
-                      {name}
-                    </MenuItem>
-                  ))}
-                </Select>
+<Select
+  disabled={!fundNames.length}
+  labelId="fund-label"
+  value={fundName}
+  label="קרן*"
+  color="success"
+  size="medium"
+  onChange={(e) => setFundName(String(e.target.value))}
+>
+
+  {fundName && !fundNames.includes(fundName) && (
+    <MenuItem value={fundName} dir="rtl">
+      {fundName}
+    </MenuItem>
+  )}
+
+  {fundNames.map((name) => (
+    <MenuItem key={name} value={name} dir="rtl">
+      {name}
+    </MenuItem>
+  ))}
+</Select>
+
               </FormControl>
             )}
 
