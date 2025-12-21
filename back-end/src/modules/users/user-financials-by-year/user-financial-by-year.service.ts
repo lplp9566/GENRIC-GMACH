@@ -87,6 +87,13 @@ async getUserFinancialsByYear() {
     record.total_loans_taken += amount;
     return this.userFinancialsByYearRepository.save(record);
   }
+  async adjustLoan(user: UserEntity, year: number,diff: number) {
+  const fund = await this.getOrCreateFinancialRecord(user,year);
+  fund.total_loans_taken += diff;
+
+  await this.userFinancialsByYearRepository.save(fund);
+}
+
   async recordLoanRepaid(user: UserEntity, year: number, amount: number) {
     const record = await this.getOrCreateFinancialRecord(user, year);
     record.total_loans_repaid += amount;

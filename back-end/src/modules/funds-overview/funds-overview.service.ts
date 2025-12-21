@@ -161,6 +161,16 @@ export class FundsOverviewService {
     await this.fundsOverviewRepository.save(fund);
     return fund;
   }
+async adjustLoan(diff: number) {
+  const fund = await this.getFundsOverviewRecord();
+
+  // diff > 0 → הלוואה גדלה → כסף יוצא
+  // diff < 0 → הלוואה קטנה → כסף חוזר
+  fund.total_loaned_out += diff;
+  fund.available_funds -= diff;
+
+  await this.fundsOverviewRepository.save(fund);
+}
 
   /**
    * תרומת קרן מיוחדת (special fund).

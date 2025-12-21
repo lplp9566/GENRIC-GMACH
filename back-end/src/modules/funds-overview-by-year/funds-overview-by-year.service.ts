@@ -11,7 +11,9 @@ export class FundsOverviewByYearService {
   ) {}
 
   async getOrCreateOverview(year: number): Promise<FundsOverviewByYearEntity> {
-    let record = await this.fundsOverviewByYearRepo.findOne({ where: { year } });
+    let record = await this.fundsOverviewByYearRepo.findOne({
+      where: { year },
+    });
     if (!record) {
       record = this.fundsOverviewByYearRepo.create({
         year,
@@ -32,7 +34,7 @@ export class FundsOverviewByYearService {
     return record;
   }
   async getAllFundsOverview(): Promise<FundsOverviewByYearEntity[]> {
-      return this.fundsOverviewByYearRepo.find({order: {year: 'ASC'}});
+    return this.fundsOverviewByYearRepo.find({ order: { year: 'ASC' } });
   }
   async recordMonthlyDeposit(year: number, amount: number) {
     const record = await this.getOrCreateOverview(year);
@@ -65,12 +67,17 @@ export class FundsOverviewByYearService {
     record.total_loans_amount += loanAmount;
     return this.fundsOverviewByYearRepo.save(record);
   }
+  async recordFixLoan(year: number, diff: number) {
+    const fund = await this.getOrCreateOverview(year);
+    fund.total_loans_amount += diff;
+    await this.fundsOverviewByYearRepo.save(fund);
+  }
+
   async recordAddToLoan(year: number, amount: number) {
     const record = await this.getOrCreateOverview(year);
     record.total_loans_amount += amount;
     return this.fundsOverviewByYearRepo.save(record);
   }
-
 
   async recordLoanRepaid(year: number, amount: number) {
     const record = await this.getOrCreateOverview(year);
@@ -110,4 +117,4 @@ export class FundsOverviewByYearService {
     record.total_investments_out += amount;
     return this.fundsOverviewByYearRepo.save(record);
   }
-} 
+}

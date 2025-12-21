@@ -12,6 +12,7 @@ import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-over
 import { FundsFlowService } from './calcelete.service';
 import { LoanEntity } from './Entity/loans.entity';
 import { FindOpts, LoanStatus, PaginatedResult } from '../../common/index';
+import { EditLoanDto } from './loan-dto/editLoanDto';
 
 @Injectable()
 export class LoansService {
@@ -263,4 +264,62 @@ export class LoansService {
       throw new Error(error.message);
     }
   }
+ async editLoanSimple(loanId: number, dto: EditLoanDto) {
+  const loan = await this.loansRepository.findOne({
+    where: { id: loanId },
+    relations: ['user'],
+  });
+
+  if (!loan) throw new BadRequestException('Loan not found');
+  if (!loan.isActive) throw new BadRequestException('Loan not active');
+
+  const year = getYearFromDate(loan.loan_date);
+
+  // שינוי סכום הלוואה
+  if (dto.loan_amount !== undefined && dto.loan_amount !== loan.loan_amount) {
+    const oldAmount = Number(loan.loan_amount);
+    const newAmount = Number(dto.loan_amount);
+    const diff = newAmount - oldAmount; // + מגדיל, - מקטין
+
+    // אם מגדילים – חייבים כסף פנוי
+    if (diff > 0) {
+      const fund = await this.fundsOverviewService.getFundDetails();
+      if (Number(fund.available_funds) < diff) {
+        throw new BadRequestException(`אין מספיק כסף להגדלת ההלוואה ב־${diff} ₪`);
+      }
+    }
+
+    // עדכון הלוואה
+    loan.loan_amount = newAmount;
+    loan.remaining_balance = Number(loan.remaining_balance) + diff;
+
+    // עדכון FundsOverview (חשוב: פונקציה אחת שעובדת לשני הכיוונים)
+    await this.fundsOverviewService.adjustLoan(diff);
+    await this.fundsOverviewByYearService.recordFixLoan(year, diff);
+
+    // עדכון משתמש
+    await this.userFinancialsService.adjustLoan(loan.user, diff);
+    await this.userFinancialsByYearService.adjustLoan(loan.user, year, diff);
+  }
+
+  // שינוי תשלום חודשי
+  if (dto.monthly_payment !== undefined && dto.monthly_payment !== loan.monthly_payment) {
+    loan.monthly_payment = Number(dto.monthly_payment);
+  }
+
+  // שינוי תאריך חיוב
+  if (dto.payment_date !== undefined && dto.payment_date !== loan.payment_date) {
+    loan.payment_date = dto.payment_date;
+  }
+
+  // חישובים סופיים
+  loan.total_installments =
+    Number(loan.monthly_payment) > 0
+      ? Number(loan.remaining_balance) / Number(loan.monthly_payment)
+      : loan.total_installments;
+
+  // אם balance אצלך אמור להיות היתרה הנוכחית
+  return await this.loansRepository.save(loan);
+}
+
 }

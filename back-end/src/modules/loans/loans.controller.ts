@@ -1,9 +1,10 @@
-import { Controller, Post, Body, Get, Param, ParseIntPipe, Query, DefaultValuePipe, BadRequestException, ParseEnumPipe, ParseBoolPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe, Query, DefaultValuePipe, BadRequestException, ParseEnumPipe, ParseBoolPipe, Patch } from '@nestjs/common';
 import { LoansService } from './loans.service';
 import { LoanEntity } from './Entity/loans.entity';
 import { LoanActionEntity } from './loan-actions/Entity/loan_actions.entity';
 import { log } from 'console';
 import { FindOpts } from 'src/common';
+import { EditLoanDto } from './loan-dto/editLoanDto';
 export enum LoanStatus {
   ALL = 'all',
   ACTIVE = 'active',
@@ -67,5 +68,10 @@ export class LoansController {
   ){
     return this.loansService.getLoanById(id);
   }
-
+  @Patch(":id")
+  editLoan(@Param("id") id: string, @Body() dto: EditLoanDto) {
+    return this.loansService.editLoanSimple(Number(id), dto);
+  }
 }
+
+

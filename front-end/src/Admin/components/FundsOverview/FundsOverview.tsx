@@ -18,6 +18,7 @@ import SavingsIcon from "@mui/icons-material/Savings";
 import CreditCardOffIcon from "@mui/icons-material/CreditCardOff";
 import PriceChangeIcon from "@mui/icons-material/PriceChange";
 import MoneyOutlinedIcon from "@mui/icons-material/MoneyOutlined";
+import FundsOverviewTree from "./FundsOverviewTree/FundsOverviewTree";
 
 const FundsOverview: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -62,9 +63,37 @@ const FundsOverview: React.FC = () => {
     { label: "מזומן", value: fundsOverview.cash_holdings, Icon: AttachMoneyIcon },
     { label: "הוצאות", value: fundsOverview.total_expenses, Icon: CreditCardOffIcon },
   ];
-
   const max = fundsOverview.own_equity;
   const COLORS = ["#FF6B6B", "#4ECDC4", "#556270", "#C7F464", "#FFCC5C", "#96CEB4"];
+const byLabel = (name: string) => items.find((x) => x.label === name)?.value ?? 0;
+
+const tree = {
+  id: "own_equity",
+  label: "הון עצמי",
+  value: byLabel("הון עצמי"),
+  color: COLORS[0],
+  children: [
+    { id: "liquid", label: "כסף נזיל", value: byLabel("כסף נזיל"), color: COLORS[1] },
+    { id: "loans", label: "בהלוואות", value: byLabel("בהלוואות"), color: COLORS[2] },
+    { id: "invest", label: "בהשקעות", value: byLabel("בהשקעות"), color: COLORS[3] },
+    { id: "special", label: "קרנות מיוחדות", value: byLabel("קרנות מיוחדות"), color: COLORS[4] },
+
+    {
+      id: "gmachFund",
+      label: 'קרן הגמ"ח',
+      value: byLabel('קרן הגמ"ח'),
+      color: COLORS[5],
+      children: [
+        { id: "regularDon", label: "תרומות רגילות", value: byLabel("תרומות רגילות"), color: COLORS[1] },
+        { id: "membership", label: "דמי חבר", value: byLabel("דמי חבר"), color: COLORS[3] },
+        { id: "standingReturn", label: 'החזרי הו"ק', value: byLabel('החזרי הו"ק'), color: COLORS[4] },
+        { id: "totalDon", label: "סך התרומות", value: byLabel("סך התרומות"), color: COLORS[2] },
+        { id: "deposits", label: "פיקדונות", value: byLabel("פיקדונות"), color: COLORS[5] },
+      ],
+    },
+  ],
+};
+
 
   const handleDisplayModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDisplayMode(event.target.checked ? "gauge" : "default");
@@ -143,12 +172,12 @@ const FundsOverview: React.FC = () => {
         </Grid>
       </Grid>
 
-      {displayMode === "gauge" ? (
-        <FundsOverviewGauge COLORS={COLORS} items={items} max={max} />
-      ) : (
-        // ✅ פה השינוי: funds במקום fundsOverview.fund_details
-        <FundsOverviewDefault items={items} funds={funds} />
-      )}
+{displayMode === "gauge" ? (
+  <FundsOverviewGauge COLORS={COLORS} items={items} max={max}/>
+) : (
+  <FundsOverviewDefault items={items} funds={funds} />
+)}
+
     </Box>
   );
 };

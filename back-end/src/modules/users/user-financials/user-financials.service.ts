@@ -65,6 +65,16 @@ async recordMonthlyDeposit(user: UserEntity, amount: number) {
         record.total_loans_taken += amount;
         return this.userFinancialsRepository.save(record);
       }
+      async adjustLoan(user: UserEntity,diff: number,) {
+  const fund = await this.getOrCreateUserFinancials(user);
+
+  // diff > 0 → הלוואה גדלה → כסף יוצא
+  // diff < 0 → הלוואה קטנה → כסף חוזר
+  fund.total_loans_taken += diff;
+
+  await this.userFinancialsRepository.save(fund);
+}
+
     async recordLoanRepaid(user: UserEntity, amount: number) {
         const record = await this.getOrCreateUserFinancials(user);
         record.total_loans_repaid += amount;
