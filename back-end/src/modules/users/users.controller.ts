@@ -28,6 +28,7 @@ async getAllUsers(
   @Query('membershipType') membershipType?: MembershipType,
   @Query('isAdmin') isAdmin?: string,
 ) {
+  
   return this.usersService.findUsers({
     membershipType,
     isAdmin: isAdmin === undefined ? undefined : isAdmin === 'true',

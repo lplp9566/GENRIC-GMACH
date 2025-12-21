@@ -61,7 +61,7 @@ const sortedActions = useMemo(() => {
     currentSortField === field ? (currentSortDirection === "asc" ? " ▲" : " ▼") : "";
 
   return (
-    <Paper elevation={3} sx={{ p: 3, borderRadius: 2, width: "100%" }}>
+    <Paper elevation={3} sx={{ p: 9, borderRadius: 2, width: "65%" }}>
       <Typography variant="h6" sx={{ fontWeight: 600, mb: 1,textAlign:"center" }}>
         פעולות על הלוואה
       </Typography>

@@ -34,7 +34,7 @@ const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
 
   if (!Loan) return null;
   const newLoan: ICreateLoan = {
-    loan_amount: Loan.remaining_balance + Number(newAmount),
+    loan_amount:  Number(newAmount),
     loan_date: Loan.loan_date,
     purpose: Loan.purpose,
     monthly_payment: Loan.monthly_payment,
@@ -50,14 +50,6 @@ const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
       const handleDateChange = (
         e: React.ChangeEvent<HTMLInputElement>
       ) => {
-        const selectedDate = new Date(e.target.value);
-        const loanDate = new Date(loanDetails?.loan_date!);
-        if (selectedDate < loanDate) {
-          toast.error(
-            "תאריך הפעולה לא יכול להיות לפני תאריך תחילת ההלוואה"
-          );
-          return;
-        }
         setDate(e.target.value);
       };
   const handle = () => {
