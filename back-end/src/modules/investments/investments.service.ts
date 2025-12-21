@@ -26,9 +26,9 @@ export class InvestmentsService {
 ) {
     try {
       const { investment_name, amount, start_date ,company_name,investment_by,investment_portfolio_number} = dto;
-      await this.fundsOverviewService.addInvestment(amount);
+      await this.fundsOverviewService.addInvestment(Number (amount));
       const year = getYearFromDate(start_date);
-      await this.fundsOverviewByYearService.recordInvestmentOut(year, amount);
+      await this.fundsOverviewByYearService.recordInvestmentOut(year, Number(amount));
       const investment = this.investmentRepo.create({
         investment_name,
         total_principal_invested: amount,

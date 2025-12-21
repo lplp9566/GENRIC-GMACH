@@ -125,8 +125,11 @@ export class FundsOverviewService {
     if (amount > fund.available_funds) {
       throw new NotFoundException('not enough funds');
     }
+    console.log(amount);
+    
     fund.available_funds -= amount;
     fund.total_invested += amount;
+    
     await this.fundsOverviewRepository.save(fund);
     return fund;
   }
