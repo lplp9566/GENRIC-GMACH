@@ -333,8 +333,19 @@ useEffect(() => {
               size="medium"
               color="success"
               fullWidth
+              type="number"
               inputProps={{ min: 0 }}
               value={newPayment.amount}
+                 sx={{
+                "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                  {
+                    WebkitAppearance: "none",
+                    margin: 0,
+                  },
+                "& input[type=number]": {
+                  MozAppearance: "textfield",
+                },
+              }}
               onChange={(e) =>
                 setNewPayment((p) => ({
                   ...p,

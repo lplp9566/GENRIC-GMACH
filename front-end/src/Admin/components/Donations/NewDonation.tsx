@@ -18,7 +18,10 @@ import SelectAllUsers from "../SelectUsers/SelectAllUsers";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { useNavigate } from "react-router-dom";
-import { setAddDonationDraft, setAddDonationModal } from "../../../store/features/Main/AppMode";
+import {
+  setAddDonationDraft,
+  setAddDonationModal,
+} from "../../../store/features/Main/AppMode";
 import {
   createDonation,
   getAllFunds, // ✅ חדש
@@ -37,41 +40,41 @@ const AddDonationModal: React.FC = () => {
   const [amount, setAmount] = useState<number>(0);
   const [date, setDate] = useState<string>(today);
 
-const open = useSelector((s: RootState) => s.mapModeSlice.AddDonationModal);
-const draft = useSelector((s: RootState) => s.mapModeSlice.AddDonationDraft);
+  const open = useSelector((s: RootState) => s.mapModeSlice.AddDonationModal);
+  const draft = useSelector((s: RootState) => s.mapModeSlice.AddDonationDraft);
 
-  const funds = useSelector((s: RootState) => s.AdminDonationsSlice.fundDonation); // ✅
+  const funds = useSelector(
+    (s: RootState) => s.AdminDonationsSlice.fundDonation
+  ); // ✅
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-useEffect(() => {
-  if (!open) return;
+  useEffect(() => {
+    if (!open) return;
 
-  dispatch(getAllFunds());
+    dispatch(getAllFunds());
 
-  if (draft) {
-    setUserId(draft.userId);
-    setKind(draft.kind ?? "regular");
-    setFundName(draft.fundName ?? "");
-    setAmount(draft.amount ?? 0);
-    setDate(draft.date ?? today);
-  } else {
-    // פתיחה רגילה (איפוס)
-    setUserId(undefined);
-    setKind("regular");
-    setFundName("");
-    setAmount(0);
-    setDate(today);
-  }
-}, [open, draft, dispatch]);
+    if (draft) {
+      setUserId(draft.userId);
+      setKind(draft.kind ?? "regular");
+      setFundName(draft.fundName ?? "");
+      setAmount(draft.amount ?? 0);
+      setDate(draft.date ?? today);
+    } else {
+      // פתיחה רגילה (איפוס)
+      setUserId(undefined);
+      setKind("regular");
+      setFundName("");
+      setAmount(0);
+      setDate(today);
+    }
+  }, [open, draft, dispatch]);
 
-const fundNames = useMemo<string[]>(() => {
-  if (!Array.isArray(funds)) return [];
-  return funds
-    .map((f: any) => String(f?.name ?? "").trim())
-    .filter(Boolean);
-}, [funds]);
+  const fundNames = useMemo<string[]>(() => {
+    if (!Array.isArray(funds)) return [];
+    return funds.map((f: any) => String(f?.name ?? "").trim()).filter(Boolean);
+  }, [funds]);
 
   // אם עברנו ל"תרומה רגילה" – ננקה בחירת קרן
   useEffect(() => {
@@ -84,17 +87,17 @@ const fundNames = useMemo<string[]>(() => {
       setFundName("");
     }
   }, [fundNames, fundName]);
-useEffect(() => {
-  if (!open) return;
+  useEffect(() => {
+    if (!open) return;
 
-  if (draft) {
-    setUserId(draft.userId);
-    setKind(draft.kind ?? "regular");
-    setFundName(draft.fundName ?? "");
-    setAmount(draft.amount ?? 0);
-    setDate(draft.date ?? today);
-  }
-}, [open, draft]);
+    if (draft) {
+      setUserId(draft.userId);
+      setKind(draft.kind ?? "regular");
+      setFundName(draft.fundName ?? "");
+      setAmount(draft.amount ?? 0);
+      setDate(draft.date ?? today);
+    }
+  }, [open, draft]);
 
   // ולידציה בסיסית
   const isValid = useMemo(() => {
@@ -116,16 +119,15 @@ useEffect(() => {
       pending: "התרומה נשלחה בהצלחה",
       success: "התרומה נשלחה בהצלחה",
       error: "שגיאה בשליחת התרומה",
-    })
+    });
     navigate("/donations");
     handleClose();
   };
 
- const handleClose = () => {
-  dispatch(setAddDonationDraft(null));
-  dispatch(setAddDonationModal(false));
-};
-
+  const handleClose = () => {
+    dispatch(setAddDonationDraft(null));
+    dispatch(setAddDonationModal(false));
+  };
 
   return (
     <RtlProvider>
@@ -217,29 +219,27 @@ useEffect(() => {
                 >
                   קרן*
                 </InputLabel>
-<Select
-  disabled={!fundNames.length}
-  labelId="fund-label"
-  value={fundName}
-  label="קרן*"
-  color="success"
-  size="medium"
-  onChange={(e) => setFundName(String(e.target.value))}
->
+                <Select
+                  disabled={!fundNames.length}
+                  labelId="fund-label"
+                  value={fundName}
+                  label="קרן*"
+                  color="success"
+                  size="medium"
+                  onChange={(e) => setFundName(String(e.target.value))}
+                >
+                  {fundName && !fundNames.includes(fundName) && (
+                    <MenuItem value={fundName} dir="rtl">
+                      {fundName}
+                    </MenuItem>
+                  )}
 
-  {fundName && !fundNames.includes(fundName) && (
-    <MenuItem value={fundName} dir="rtl">
-      {fundName}
-    </MenuItem>
-  )}
-
-  {fundNames.map((name) => (
-    <MenuItem key={name} value={name} dir="rtl">
-      {name}
-    </MenuItem>
-  ))}
-</Select>
-
+                  {fundNames.map((name) => (
+                    <MenuItem key={name} value={name} dir="rtl">
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Select>
               </FormControl>
             )}
 
@@ -262,13 +262,14 @@ useEffect(() => {
               color="success"
               fullWidth
               value={amount}
-              onChange={(e) => setAmount(+e.target.value)}
-              inputProps={{ min: 0, step: "0.5" }}
+              onChange={(e) => setAmount( Number(e.target.value))}
+              inputProps={{ min: 0 }}
               sx={{
-                "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
-                  WebkitAppearance: "none",
-                  margin: 0,
-                },
+                "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                  {
+                    WebkitAppearance: "none",
+                    margin: 0,
+                  },
                 "& input[type=number]": {
                   MozAppearance: "textfield",
                 },
