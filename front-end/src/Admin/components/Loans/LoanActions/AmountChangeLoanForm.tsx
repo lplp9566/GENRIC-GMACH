@@ -10,7 +10,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../store/store";
 import { setLoanModalMode } from "../../../../store/features/Main/AppMode";
 import CheckLoanModal from "../CheckLoanModal";
-import { toast } from "react-toastify";
 
 interface Props {
   loanId: number;
@@ -18,9 +17,6 @@ interface Props {
 }
 
 const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
-    const loanDetails = useSelector(
-      (s: RootState) => s.AdminLoansSlice.loanDetails
-    );
   const dispatch = useDispatch<AppDispatch>();
   const [newAmount, setNewAmount] = useState<number | "">("");
   const [date, setDate] = useState<string>("");
