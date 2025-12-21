@@ -1,5 +1,5 @@
 // src/components/AddPaymentModal.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -33,8 +33,17 @@ import { payment_method_enum } from "../../Users/UsersDto";
 import { toast } from "react-toastify";
 import { RtlProvider } from "../../../../Theme/rtl";
 import { trackEvent } from "../../../trackEvent";
-
-export const AddPaymentModal: React.FC = () => {
+interface AddPaymentModalProps {
+  cape: boolean;
+  userDto?: {
+    userid: number;
+    amount: number;
+    depositDate: string;
+    method: payment_method_enum;
+    description?: string;
+  };
+}
+export const AddPaymentModal: React.FC<AddPaymentModalProps> = ({cape,userDto}) => {
   const open = useSelector(
     (s: RootState) => s.mapModeSlice.MonthlyPaymentModalMode
   );
@@ -57,6 +66,37 @@ export const AddPaymentModal: React.FC = () => {
     method: paymentMethod[0].value as payment_method_enum,
     description: "",
   });
+useEffect(() => {
+  // מצב "עריכה/השלמה" (cape)
+  if (cape && userDto) {
+    setIsMultiUser(false);
+    setSelectedUsers([]);
+    setTempMultiUserId(null);
+
+    setNewPayment({
+      userId: userDto.userid ?? 0,
+      amount: Number(userDto.amount ?? 0),
+      depositDate: userDto.depositDate
+        ? userDto.depositDate.slice(0, 10) // אם הגיע ISO
+        : today,
+      method:
+        (userDto.method as payment_method_enum) ??
+        (paymentMethod[0].value as payment_method_enum),
+      description: userDto.description ?? "",
+    });
+
+    return;
+  }
+
+  // מצב "הוספה חדשה"
+  setNewPayment({
+    userId: 0,
+    amount: 0,
+    depositDate: today,
+    method: paymentMethod[0].value as payment_method_enum,
+    description: "",
+  });
+}, [cape, userDto, today]);
 
   const handleClose = () => {
     dispatch(setMonthlyPaymentModalMode(false));

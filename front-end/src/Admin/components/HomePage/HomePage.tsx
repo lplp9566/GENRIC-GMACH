@@ -131,7 +131,7 @@ const HomePage: React.FC = () => {
               </Grid>
             ))}
           </Grid>
-          {paymentModal && <AddPaymentModal />}
+          {paymentModal && <AddPaymentModal cape ={false} />}
           {depositModal && <NewDepositModal />}
           <Box mt={10}>
             <Typography variant="h5" fontWeight={700} mb={2} textAlign="center">

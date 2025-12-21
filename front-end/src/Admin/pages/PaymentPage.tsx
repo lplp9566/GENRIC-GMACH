@@ -95,7 +95,7 @@ const paymentsThisYear = useMemo(
       }}
     >
       {paymentModal && (
-        <AddPaymentModal/>
+        <AddPaymentModal cape= {false}/>
       )}
       <MonthlyPaymentHeader />
       <Box

@@ -10,15 +10,18 @@ import {
 } from "@mui/material";
 import { IMonthlyPayment, paymentMethod } from "../MonthlyPaymentsDto";
 import { fmtDate } from "../../../../common/genricFunction";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MonthlyPaymentEditModal from "./MonthlyPaymentEditModal";
 import ConfirmModal from "../../genricComponents/confirmModal";
 import { toast } from "react-toastify";
 import { deleteMonthlyPayment } from "../../../../store/features/admin/adminMonthlyPayments";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../../store/store";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
+import { AddPaymentModal } from "../AddMonthlyPayment/AddMonthlyPayment";
+import { setMonthlyPaymentModalMode } from "../../../../store/features/Main/AppMode";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 interface MonthlyPaymentProps {
   paymentsThisMonth: IMonthlyPayment[];
@@ -32,7 +35,16 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
     useState<IMonthlyPayment | null>(null);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [deleteMode, setDeleteMode] = useState<boolean>(false);
+  const [copyMode, setcopyMode] = useState(false);
+  const modalOpen = useSelector(
+    (s: RootState) => s.mapModeSlice.MonthlyPaymentModalMode
+  );
 
+  useEffect(() => {
+    if (!modalOpen) {
+      setcopyMode(false);
+    }
+  }, [modalOpen]);
   const onDelete = async () => {
     console.log(selectedPayment);
 
@@ -85,12 +97,7 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
                     }
                   </TableCell>
                   <TableCell align="right">{p.description}</TableCell>
-                  <TableCell
-                    align="right"
-                    onClick={(e) => e.stopPropagation()
-                      
-                    }
-                  >
+                  <TableCell align="right" onClick={(e) => e.stopPropagation()}>
                     <Tooltip title="עריכת תשלום">
                       <IconButton
                         color="primary"
@@ -100,13 +107,26 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
                           setEditMode(true);
                         }}
                       >
-                        <EditIcon 
+                        <EditIcon
                           sx={{ color: "primary.main" }}
                           onClick={() => {
                             setSelectedPayment(p);
                             setEditMode(true);
                           }}
                         />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="העתקת פעולה">
+                      <IconButton
+                        color="primary"
+                        size="small"
+                        onClick={() => {
+                          setSelectedPayment(p);
+                          setcopyMode(true);
+                          dispatch(setMonthlyPaymentModalMode(true));
+                        }}
+                      >
+                        <ContentCopyIcon sx={{ fontSize: 20 }} />
                       </IconButton>
                     </Tooltip>
 
@@ -150,6 +170,18 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
                 open={deleteMode}
                 onSubmit={onDelete}
                 text={"האם ברצונך למחוק את התשלום?"}
+              />
+            )}
+            {copyMode && selectedPayment && (
+              <AddPaymentModal
+                cape={true}
+                userDto={{
+                  userid: selectedPayment.user.id,
+                  amount: Number(selectedPayment.amount),
+                  depositDate: selectedPayment.deposit_date.slice(0, 10),
+                  method: selectedPayment.payment_method,
+                  description: selectedPayment.description ?? "",
+                }}
               />
             )}
           </TableBody>
