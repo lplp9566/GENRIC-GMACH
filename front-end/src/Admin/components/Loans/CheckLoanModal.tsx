@@ -27,16 +27,15 @@ interface Props {
   onClose: () => void;
   type: "create" | "update";
   dto?: ICreateLoanAction;
-  onSubmit?: (dto: ICreateLoanAction) => void;
+  onSubmit: () => void;
 }
 
 const CheckLoanModal: React.FC<Props> = ({
   onClose,
   loan,
   type,
-  dto,
   onSubmit,
-}) => {
+}) => {  
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -80,20 +79,11 @@ const CheckLoanModal: React.FC<Props> = ({
         });
     }
 
-    if (type === "update" && onSubmit && dto) {
-      const updatePromise = (async () => {
-        onSubmit(dto);
-      })();
-
-      toast.promise(
-        updatePromise,
-        {
-          pending: "מעדכן הלוואה…",
-          success: "ההלוואה עודכנה בהצלחה! 👌",
-          error: "שגיאה בעדכון ההלוואה 💥",
-        },
-        { autoClose: 3000 }
-      ).finally(() => {
+    if (type === "update" && onSubmit) {
+      (async () => {
+        onSubmit();
+      })()
+      .finally(() => {
         dispatch(setCheckLoanStatus("idle"));
         dispatch(setLoanActionStatus("idle"));
         dispatch(setLoanModalMode(false));

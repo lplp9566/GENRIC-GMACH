@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
 import { FindOptionsGeneric, PaginatedResult } from "../../../common/indexTypes";
-import { ICreateLoan, ICreateLoanAction, ILoanAction, ILoanCheckResponse, ILoanWithPayment, ILoanWithUser } from "../../../Admin/components/Loans/LoanDto";
+import { ICreateLoan, ICreateLoanAction, IEditLoan, ILoanAction, ILoanCheckResponse, ILoanWithPayment, ILoanWithUser } from "../../../Admin/components/Loans/LoanDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
 
 interface AdminLoanType {
@@ -13,6 +13,7 @@ interface AdminLoanType {
   createLoanStatus: Status;
   loanDeleteStatus: Status;
   createLoanActionStatus: Status;
+  editLoanStatus:Status
   error: string | null;
   page: number;
   pageCount: number;
@@ -34,7 +35,7 @@ const initialState: AdminLoanType = {
   page: 1,
   total: 0,
   loanDetails: null,
-
+  editLoanStatus:"idle",
   checkLoanResponse: {
     ok: false,
     error: "",
@@ -98,6 +99,13 @@ export const getLoanDetails = createAsyncThunk(
       { params: { id } } 
     );
     console.log(response.data)
+    return response.data;
+  }
+);
+export const editLoan = createAsyncThunk(
+  "admin/editLoan",
+  async (loan: IEditLoan) => {
+    const response = await axios.patch(`${BASE_URL}/loans/${loan.loan}`, loan);
     return response.data;
   }
 );
@@ -195,7 +203,27 @@ export const AdminLoansSlice = createSlice({
       .addCase(createLoanAction.rejected, (state, action) => {
         state.createLoanActionStatus = "rejected";
         state.error = action.error.message! ;
-      });
+      })
+   .addCase(editLoan.pending, (state) => {
+  state.editLoanStatus = "pending";
+  state.error = null;
+})
+.addCase(editLoan.fulfilled, (state, action) => {
+  state.editLoanStatus = "fulfilled";
+  state.loanDetails = action.payload; // אם זה אותו מבנה
+  state.error = null;
+
+  // ✅ לעדכן את הרשימה כדי שהטבלה תשתנה מיד
+  const updated = action.payload; // נניח שהוא ILoanWithUser (או לפחות כולל id)
+  const idx = state.allLoans.findIndex(l => l.id === updated.id);
+  if (idx !== -1) {
+    state.allLoans[idx] = updated;
+  }
+})
+.addCase(editLoan.rejected, (state, action) => {
+  state.editLoanStatus = "rejected";
+  state.error = action.error.message ?? null;
+});
   },
 });
 export const { setPage, setCheckLoanStatus ,setLoanActionStatus} = AdminLoansSlice.actions;

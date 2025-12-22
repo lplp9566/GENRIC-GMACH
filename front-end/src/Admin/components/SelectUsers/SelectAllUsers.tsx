@@ -29,12 +29,11 @@ const SelectAllUsers: React.FC<Props> = ({
   const dispatch = useDispatch<AppDispatch>();
   const allUsers = useSelector(
     (state: RootState) => state.AdminUsers.allUsers
-  );
-  console.log(value);
-  
+  );  
 useEffect(() => {
   console.log({filter});
   if (filter === "all") {
+    console.log(value);
     
     
     dispatch(getAllUsers({ isAdmin: false }));

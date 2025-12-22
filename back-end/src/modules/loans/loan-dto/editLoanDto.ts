@@ -30,4 +30,7 @@ export class EditLoanDto {
 
   @IsOptional()
   guarantor2?: any;
+
+    @IsOptional()
+   purpose?: string;
 }

@@ -15,7 +15,6 @@ interface Props {
 
 const MonthlyPaymentChangeLoanForm: React.FC<Props> = ({
   loanId,
-  onSubmit,
 }) => {
     const dispatch = useDispatch<AppDispatch>();
   const [monthly, setMonthly] = useState<number | "">(0);
@@ -68,7 +67,7 @@ const MonthlyPaymentChangeLoanForm: React.FC<Props> = ({
           loan={newLoan}
           type="update"
          dto={dto}
-         onSubmit={onSubmit}
+         onSubmit={() => {}}
         />
       )}
     <Box

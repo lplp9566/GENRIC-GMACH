@@ -1,4 +1,4 @@
-// src/components/LoanActions/Actions.tsx
+
 import React, { useState } from "react";
 import {
   Box,
@@ -42,7 +42,7 @@ export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit,max}) => 
             sx={{ backgroundColor: "#FFF", borderRadius: 1 }}
           >
             <MenuItem value={LoanPaymentActionType.PAYMENT}>תשלום הלוואה</MenuItem>
-            <MenuItem value={LoanPaymentActionType.AMOUNT_CHANGE}>
+            {/* <MenuItem value={LoanPaymentActionType.AMOUNT_CHANGE}>
               שינוי סכום הלוואה
             </MenuItem>
             <MenuItem value={LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE}>
@@ -50,7 +50,7 @@ export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit,max}) => 
             </MenuItem>
             <MenuItem value={LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE}>
               שינוי יום תשלום
-            </MenuItem>
+            </MenuItem> */}
           </Select>
         </FormControl>
 

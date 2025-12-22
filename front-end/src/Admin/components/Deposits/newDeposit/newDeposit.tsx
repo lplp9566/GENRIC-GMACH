@@ -74,10 +74,6 @@ const NewDepositModal: FC = () => {
         </DialogTitle>
 
         <DialogContent sx={{ px: 4, pt: 3, pb: 2 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3, textAlign: "center" }}>
-            אנא מלא/י את כל השדות המסומנים בכוכבית
-          </Typography>
-
           <Box component="form" noValidate autoComplete="off"
                sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <SelectAllUsers

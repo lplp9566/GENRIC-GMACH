@@ -1,5 +1,5 @@
 // LoanCard.tsx
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardActionArea,
@@ -8,6 +8,7 @@ import {
   Typography,
   Chip,
   Grid,
+  Button,
 } from "@mui/material";
 import {
   AttachMoney as AttachMoneyIcon,
@@ -18,6 +19,7 @@ import {
   AccountBalanceWallet as RemainingIcon,
 } from "@mui/icons-material";
 import { ILoanWithUser } from "../LoanDto";
+import EditLoanModal from "./EtitLoanModal";
 
 interface LoanCardProps {
   loan: ILoanWithUser;
@@ -26,6 +28,8 @@ interface LoanCardProps {
 
 const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
   const balancePositive = (loan.balance ?? 0) >= 0;
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectedLoan, setSelectedLoan] = useState<ILoanWithUser | null>(null);
   return (
     <Card
       sx={{
@@ -37,7 +41,12 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
     >
       <CardActionArea onClick={onClick}>
         <CardContent sx={{ pt: 2, pb: 3, px: 3 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
             <Box textAlign="right">
               <Typography variant="h6" fontWeight={700}>
                 {loan.user.first_name} {loan.user.last_name}
@@ -70,6 +79,18 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
                 fontSize: "0.8rem",
               }}
             />
+            <Button
+              variant="contained"
+              size="small"
+              sx={{}}
+              onClick={(e) => {
+                e.stopPropagation(); 
+                setSelectedLoan(loan);
+                setEditOpen(true);
+              }}
+            >
+              ערוך
+            </Button>
           </Box>
           <Grid container spacing={1} mb={2}>
             <Grid item xs={6}>
@@ -79,7 +100,11 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
                   <Typography variant="body2" color="text.secondary">
                     מטרת הלוואה
                   </Typography>
-                  <Typography variant="subtitle1" fontWeight={700} color="#1C3C3C">
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={700}
+                    color="#1C3C3C"
+                  >
                     {loan.purpose}
                   </Typography>
                 </Box>
@@ -92,7 +117,11 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
                   <Typography variant="body2" color="text.secondary">
                     סכום
                   </Typography>
-                  <Typography variant="subtitle1" fontWeight={700} color="#006CF0">
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={700}
+                    color="#006CF0"
+                  >
                     ₪{loan.loan_amount.toLocaleString()}
                   </Typography>
                 </Box>
@@ -105,7 +134,11 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
                   <Typography variant="body2" color="text.secondary">
                     יום תשלום
                   </Typography>
-                  <Typography variant="subtitle1" fontWeight={700} color="#28A960">
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={700}
+                    color="#28A960"
+                  >
                     {loan.payment_date} לחודש
                   </Typography>
                 </Box>
@@ -118,7 +151,11 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
                   <Typography variant="body2" color="text.secondary">
                     תשלום חודשי
                   </Typography>
-                  <Typography variant="subtitle1" fontWeight={700} color="#28A960">
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={700}
+                    color="#28A960"
+                  >
                     ₪{loan.monthly_payment.toLocaleString()}
                   </Typography>
                 </Box>
@@ -131,7 +168,11 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
                   <Typography variant="body2" color="text.secondary">
                     תשלומים נשארו
                   </Typography>
-                  <Typography variant="subtitle1" fontWeight={700} color="#1C3C3C">
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={700}
+                    color="#1C3C3C"
+                  >
                     {Math.ceil(loan.total_installments)} תשלומים
                   </Typography>
                 </Box>
@@ -144,17 +185,29 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
                   <Typography variant="body2" color="text.secondary">
                     יתרה לסילוק
                   </Typography>
-                  <Typography variant="subtitle1" fontWeight={700} color="#D35400">
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={700}
+                    color="#D35400"
+                  >
                     ₪{loan.remaining_balance.toLocaleString()}
                   </Typography>
                 </Box>
               </Box>
             </Grid>
           </Grid>
-          </CardContent>
-        </CardActionArea>
-      </Card>
-    );
+        </CardContent>
+      </CardActionArea>
+      {selectedLoan && (
+        <EditLoanModal
+          open={editOpen}
+          onClose={() => setEditOpen(false)}
+          loan={selectedLoan}
+          
+        />
+      )}
+    </Card>
+  );
 };
 
 export default LoanCard;

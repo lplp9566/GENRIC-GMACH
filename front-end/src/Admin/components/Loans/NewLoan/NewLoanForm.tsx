@@ -43,7 +43,7 @@ const NewLoanForm: React.FC = () => {
   return (
     <>
       {openModal && (
-        <CheckLoanModal onClose={closeModal} loan={modalLoan} type="create" />
+        <CheckLoanModal onClose={closeModal} loan={modalLoan} type="create" onSubmit={()=>{}} />
       )}
       <RtlProvider>
         <Box

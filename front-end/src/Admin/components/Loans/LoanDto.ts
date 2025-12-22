@@ -83,3 +83,13 @@ export const ActionTypes = [
     value:LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE
   },
 ]
+export interface IEditLoan{
+    loan: number;
+  loan_amount: number;
+  monthly_payment?: number;
+  payment_date?: number;
+  loan_date?: string;
+  guarantor1?: string | null; // ✅ שם מלא
+  guarantor2?: string | null; // ✅ שם מלא
+  purpose?: string;
+}
