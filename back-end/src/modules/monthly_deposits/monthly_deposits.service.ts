@@ -90,7 +90,7 @@ export class MonthlyDepositsService {
       await Promise.all([
         this.userFinancialByYearService.recordMonthlyDeposit(user, year, payment_details.amount),
         this.userFinancialsService.recordMonthlyDeposit(user, payment_details.amount),
-        this.fundsOverviewService.addMonthlyDeposit(payment_details.amount),
+        // this.fundsOverviewService.addMonthlyDeposit(payment_details.amount),
 
         this.fundsOverviewByYearService.recordMonthlyDeposit(year, payment_details.amount),
       ]);

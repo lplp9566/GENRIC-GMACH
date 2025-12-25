@@ -14,6 +14,7 @@ import { MonthlyDepositsModule } from '../monthly_deposits/monthly_deposits.modu
 import { DepositsModule } from '../deposits/deposits.module';
 import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates.module';
 import { PaymentDetailsModule } from '../users/payment-details/payment-details.module';
+import { LoanActionsModule } from './loan-actions/loan-actions.module';
 
 @Module({
   imports: [
@@ -27,6 +28,9 @@ import { PaymentDetailsModule } from '../users/payment-details/payment-details.m
     RoleMonthlyRatesModule,
     PaymentDetailsModule,
     forwardRef(() => UsersModule),
+    forwardRef(() => LoanActionsModule),
+
+
   ],
   providers: [LoansService,FundsFlowService, ],
   controllers: [LoansController],

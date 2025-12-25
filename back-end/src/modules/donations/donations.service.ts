@@ -33,7 +33,7 @@ export class DonationsService {
     private readonly usersService: UsersService,
     private readonly userFinancialsyYearService: UserFinancialByYearService,
     private readonly userFinancialsService: UserFinancialService,
-    private readonly fundsOverviewService: FundsOverviewService,
+    // private readonly fundsOverviewService: FundsOverviewService,
     private readonly fundsOvirewviewServiceByYear: FundsOverviewByYearService,
     private readonly fundsService: FundsService,
   ) {}
@@ -56,7 +56,7 @@ export class DonationsService {
       user,
       donation.amount,
     );
-    await this.fundsOverviewService.adjustDonation(donation.amount);
+    // await this.fundsOverviewService.adjustDonation(donation.amount);
     await this.fundsOvirewviewServiceByYear.adjustEquityDonation(
       year,
       donation.amount,
@@ -93,7 +93,7 @@ export class DonationsService {
 
       // שמירת donation
       const saved = await manager.save(DonationsEntity, donation);
-      await this.fundsOverviewService.adjustSpecialFund(donation.amount);
+      // await this.fundsOverviewService.adjustSpecialFund(donation.amount);
       await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(year, donation.amount);
       await this.userFinancialsService.adjustSpecialFundDonation( donation.user, donation.amount);
       await this.userFinancialsyYearService.adjustSpecialFundDonation(donation.user, year, donation.amount);
@@ -154,7 +154,7 @@ export class DonationsService {
       );
 
       const saved = await manager.save(DonationsEntity, donation);
-      await this.fundsOverviewService.reduceFundAmount( donation.amount);
+      // await this.fundsOverviewService.reduceFundAmount( donation.amount);
       await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(year, donation.amount);
       return manager.findOne(DonationsEntity, {
         where: { id: saved.id },
@@ -324,7 +324,7 @@ async updateDonation(id: number, dto: UpdateDonationDto) {
 
       // גלובלי
       await this.userFinancialsService.adjustEquityDonation(user, deltaAmount);
-      await this.fundsOverviewService.adjustDonation(deltaAmount);
+      // await this.fundsOverviewService.adjustDonation(deltaAmount);
 
       // לפי שנה
       if (oldYear === newYear) {
@@ -346,7 +346,7 @@ async updateDonation(id: number, dto: UpdateDonationDto) {
 
       // גלובלי
       await this.userFinancialsService.adjustSpecialFundDonation(user, deltaAmount);
-      await this.fundsOverviewService.adjustSpecialFund(deltaAmount);
+      // await this.fundsOverviewService.adjustSpecialFund(deltaAmount);
 
       // לפי שנה
       if (oldYear === newYear) {
@@ -368,7 +368,7 @@ async updateDonation(id: number, dto: UpdateDonationDto) {
       // גלובלי: משתמשים ב-reduceFundAmount עם delta
       // אם deltaAmount חיובי => מושכים עוד
       // אם deltaAmount שלילי => מחזירים חלק (כלומר "משיכה פחותה")
-      await this.fundsOverviewService.reduceFundAmount( deltaAmount);
+      // await this.fundsOverviewService.reduceFundAmount( deltaAmount);
 
       // לפי שנה
       if (oldYear === newYear) {

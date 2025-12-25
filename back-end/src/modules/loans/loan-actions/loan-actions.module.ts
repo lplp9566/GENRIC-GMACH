@@ -20,7 +20,7 @@ import { LoanActionBalanceService } from './loan_action_balance.service';
     forwardRef(() => UsersModule),
     forwardRef(() =>  PaymentDetailsModule,),
     forwardRef(() => UsersModule),
-    LoansModule,
+    forwardRef(() => LoansModule),
     UserFinancialsModule,
     UserFinancialByYearModule,
     FundsOverviewModule,

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoanActionEntity } from './loan-actions/Entity/loan_actions.entity';
@@ -13,6 +13,7 @@ import { FundsFlowService } from './calcelete.service';
 import { LoanEntity } from './Entity/loans.entity';
 import { FindOpts, LoanStatus, PaginatedResult } from '../../common/index';
 import { EditLoanDto } from './loan-dto/editLoanDto';
+import { LoanActionBalanceService } from './loan-actions/loan_action_balance.service';
 
 @Injectable()
 export class LoansService {
@@ -27,7 +28,10 @@ export class LoansService {
     private readonly usersService: UsersService,
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
     private readonly fundsFlowService: FundsFlowService,
-  ) {}
+      @Inject(forwardRef(() => LoanActionBalanceService))
+          private readonly LoanActionBalanceService: LoanActionBalanceService,
+        ) {}
+
 
   async checkLoan(
     loanData: Partial<LoanEntity>,
@@ -145,6 +149,8 @@ export class LoansService {
         year,
         loanRecord.loan_amount,
       );
+            await this.LoanActionBalanceService.computeLoanNetBalance(loanData.id!);
+
       return loanRecord;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -318,8 +324,12 @@ export class LoansService {
       ? Number(loan.remaining_balance) / Number(loan.monthly_payment)
       : loan.total_installments;
 
+
   // אם balance אצלך אמור להיות היתרה הנוכחית
-  return await this.loansRepository.save(loan);
+  const result = await this.loansRepository.save(loan);
+  await this.LoanActionBalanceService.computeLoanNetBalance(loan.id!);
+
+  return result;
 }
 
 }

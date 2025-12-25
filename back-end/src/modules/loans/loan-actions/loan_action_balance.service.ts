@@ -107,7 +107,7 @@ export class LoanActionBalanceService {
     }
     // 9. רישום לוג ושמירה סופית
     await this.loansService.recordLoanBalance(loan.id, netBalance);
-    console.log(expectedPaid)
+    console.log({expectedPaid},{totalPaid},{netBalance});
     return netBalance;
   }
 }

@@ -13,10 +13,9 @@ export class OrderReturnEntity {
 
   @Column({ type: 'float' })
   amount: number;
-
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', nullable: true })
   paid: boolean;
 
-  @Column({ type: 'text', nullable  : true })
+  @Column({ type: 'text', nullable: true })
   note: string;
 }
