@@ -138,7 +138,7 @@ export class MonthlyDepositsService {
 
       // עדכונים נלווים
       await this.userFinancialsService.recordMonthlyDeposit(user, deltaAmount);
-      await this.fundsOverviewService.addMonthlyDeposit(deltaAmount);
+      // await this.fundsOverviewService.addMonthlyDeposit(deltaAmount);
 
       if (newYear === oldYear) {
         await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, deltaAmount);
@@ -185,7 +185,7 @@ async deleteMonthlyDeposit(id: number) {
       const user = existing.user;
 
       await this.userFinancialsService.recordMonthlyDeposit(user, -oldAmount);
-      await this.fundsOverviewService.addMonthlyDeposit(-oldAmount);
+      // await this.fundsOverviewService.addMonthlyDeposit(-oldAmount);
       await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
       await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
 

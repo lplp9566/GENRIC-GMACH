@@ -29,7 +29,7 @@ export class OrderReturnService {
     if (!user) throw new BadRequestException('User not found');
     await this.userFinancialsyYearService.recordStandingOrderReturn(user, year, orderReturn.amount);
     await this.userFinancialsService.recordStandingOrderReturn(user, orderReturn.amount);
-    await this.fundsOverviewService.addToStandingOrderReturn(orderReturn.amount);
+    // await this.fundsOverviewService.addToStandingOrderReturn(orderReturn.amount);
     await this.fundsOverviewByYearService.recordStandingOrderReturn(year, orderReturn.amount);
     return await this.orderReturnRepository.save(orderReturn);
   }

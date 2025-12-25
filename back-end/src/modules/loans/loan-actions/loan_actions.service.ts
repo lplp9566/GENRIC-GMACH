@@ -37,7 +37,7 @@ export class LoanActionsService {
     private readonly loansService: LoansService,
     private readonly userFinByYear: UserFinancialByYearService,
     private readonly userFin: UserFinancialService,
-    private readonly fundsOverview: FundsOverviewService,
+    // private readonly fundsOverview: FundsOverviewService,
     private readonly usersService: UsersService,
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
     private readonly paymentDetailsService: PaymentDetailsService,
@@ -113,7 +113,7 @@ export class LoanActionsService {
       await Promise.all([
         this.userFinByYear.recordLoanRepaid(loan.user, year, dto.value),
         this.userFin.recordLoanRepaid(loan.user, dto.value),
-        this.fundsOverview.repayLoan(dto.value),
+        // this.fundsOverview.repayLoan(dto.value),
         this.fundsOverviewByYearService.recordLoanRepaid(year, dto.value),
       ]);
       await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);

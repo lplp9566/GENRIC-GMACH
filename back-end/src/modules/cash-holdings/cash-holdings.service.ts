@@ -17,7 +17,7 @@ export class CashHoldingsService {
     private cashHoldingsRepository: Repository<CashHoldingsEntity>,
     private readonly UserService: UsersService,
     private readonly userFinancialsService: UserFinancialService,
-    private readonly fundsOverviewService: FundsOverviewService,
+    // private readonly fundsOverviewService: FundsOverviewService,
   ) {}
 
   async getCashHoldings() {
@@ -61,10 +61,10 @@ export class CashHoldingsService {
         cashHolding.amount,
         CashHoldingsTypesRecordType.add,
       );
-      await this.fundsOverviewService.recordCashHoldings(
-        cashHolding.amount,
-        CashHoldingsTypesRecordType.add,
-      );
+      // await this.fundsOverviewService.recordCashHoldings(
+      //   cashHolding.amount,
+      //   CashHoldingsTypesRecordType.add,
+      // );
       const newCashHolding = this.cashHoldingsRepository.create({
         amount: cashHolding.amount,
         user,
@@ -102,10 +102,10 @@ export class CashHoldingsService {
         cashHolding.amount,
         CashHoldingsTypesRecordType.add,
       );
-      await this.fundsOverviewService.recordCashHoldings(
-        cashHolding.amount,
-        CashHoldingsTypesRecordType.add,
-      );
+      // await this.fundsOverviewService.recordCashHoldings(
+      //   cashHolding.amount,
+      //   CashHoldingsTypesRecordType.add,
+      // );
 
      this.cashHoldingsRepository.save(existingCashHolding);
      return existingCashHolding;
@@ -146,10 +146,10 @@ export class CashHoldingsService {
         CashHoldingsTypesRecordType.subtract,
       );
 
-      await this.fundsOverviewService.recordCashHoldings(
-        cashHolding.amount,
-        CashHoldingsTypesRecordType.subtract,
-      );
+      // await this.fundsOverviewService.recordCashHoldings(
+      //   cashHolding.amount,
+      //   CashHoldingsTypesRecordType.subtract,
+      // );
 
       this.cashHoldingsRepository.save(existingCashHolding);
       return existingCashHolding;

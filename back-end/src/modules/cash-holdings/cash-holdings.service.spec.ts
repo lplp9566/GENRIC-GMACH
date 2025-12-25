@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { CashHoldingsEntity } from './Entity/cash-holdings.entity';
 import { UsersService } from '../users/users.service';
 import { UserFinancialService } from '../users/user-financials/user-financials.service';
-import { FundsOverviewService } from '../funds-overview/funds-overview.service';
+// import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { Repository } from 'typeorm';
 import { CashHoldingsTypesRecordType } from './cash-holdings-dto';
 
@@ -38,7 +38,7 @@ describe('CashHoldingsService', () => {
         { provide: getRepositoryToken(CashHoldingsEntity), useFactory: mockCashHoldingsRepository },
         { provide: UsersService, useFactory: mockUsersService },
         { provide: UserFinancialService, useFactory: mockUserFinancialsService },
-        { provide: FundsOverviewService, useFactory: mockFundsOverviewService },
+        // { provide: FundsOverviewService, useFactory: mockFundsOverviewService },
       ],
     }).compile();
 

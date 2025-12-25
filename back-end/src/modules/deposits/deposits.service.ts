@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { UserFinancialService } from '../users/user-financials/user-financials.service';
-import { FundsOverviewService } from '../funds-overview/funds-overview.service';
+// import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { getYearFromDate } from '../../services/services';
 import { DepositsEntity } from './Entity/deposits.entity';

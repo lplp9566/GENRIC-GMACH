@@ -194,7 +194,7 @@ export class LoansService {
       await Promise.all([
         this.userFinancialsByYearService.recordLoanTaken(loan.user, year, diff),
         this.userFinancialsService.recordLoanTaken(loan.user, diff),
-        this.fundsOverviewService.addLoan(diff),
+        // this.fundsOverviewService.addLoan(diff),
         this.fundsOverviewByYearService.recordAddToLoan(year, diff),
       ]);
       return await this.paymentsRepository.save({
@@ -300,7 +300,7 @@ export class LoansService {
     loan.remaining_balance = Number(loan.remaining_balance) + diff;
 
     // עדכון FundsOverview (חשוב: פונקציה אחת שעובדת לשני הכיוונים)
-    await this.fundsOverviewService.adjustLoan(diff);
+    // await this.fundsOverviewService.adjustLoan(diff);
     await this.fundsOverviewByYearService.recordFixLoan(year, diff);
 
     // עדכון משתמש
