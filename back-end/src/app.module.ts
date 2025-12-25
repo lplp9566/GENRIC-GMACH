@@ -48,7 +48,7 @@ import { FundsModule } from './modules/funds/funds.module';
         url: configService.get<string>('DATABASE_URL'),
         autoLoadEntities: true,
          synchronize: true,  
-           migrationsRun: true,         // ✅ יריץ migrations אוטומטית בעלייה
+           migrationsRun: false,         // ✅ יריץ migrations אוטומטית בעלייה
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
         ssl: process.env.NODE_ENV === 'production'
           ? { rejectUnauthorized: false } 

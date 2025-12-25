@@ -11,8 +11,6 @@ export class InvestmentsController {
   @Post()
   async createInitialInvestment(@Body() body: InvestmentInit
 ) {
-  console.log(body);
-  
     return this.investmentsService.createInitialInvestment(body);
   }
 

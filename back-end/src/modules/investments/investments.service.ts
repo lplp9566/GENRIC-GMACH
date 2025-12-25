@@ -18,7 +18,7 @@ export class InvestmentsService {
     @InjectRepository(InvestmentEntity)
     private readonly investmentRepo: Repository<InvestmentEntity>,
     private readonly transactionService: InvestmentTransactionService,
-    private readonly fundsOverviewService: FundsOverviewService,
+    // private readonly fundsOverviewService: FundsOverviewService,
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
   ) {}
 
@@ -26,7 +26,7 @@ export class InvestmentsService {
 ) {
     try {
       const { investment_name, amount, start_date ,company_name,investment_by,investment_portfolio_number} = dto;
-      await this.fundsOverviewService.addInvestment(Number (amount));
+      // await this.fundsOverviewService.addInvestment(Number (amount));
       const year = getYearFromDate(start_date);
       await this.fundsOverviewByYearService.recordInvestmentOut(year, Number(amount));
       const investment = this.investmentRepo.create({
@@ -59,7 +59,7 @@ export class InvestmentsService {
     try {
       const { id, amount, date } = dto;
       const investment = await this.findActiveInvestment(id);
-      await this.fundsOverviewService.addInvestment(amount);
+      // await this.fundsOverviewService.addInvestment(amount);
       const year = getYearFromDate(date);
       await this.fundsOverviewByYearService.recordInvestmentOut(year, amount);
       investment.total_principal_invested =
@@ -139,8 +139,7 @@ export class InvestmentsService {
         investment.is_active = false;
       }
 
-      investment.profit_realized =
-        investment.current_value - principalRemaining;
+      investment.profit_realized = investment.current_value - principalRemaining;
       investment.last_update = date;
 
       await this.investmentRepo.save(investment);
@@ -152,10 +151,10 @@ export class InvestmentsService {
         transaction_date: date,
         note: investment.is_active ? ' part of withdrawal' : 'full withdrawal',
       });
-      await this.fundsOverviewService.recordInvestmentEarnings(
-        principalWithdrawal,
-        profitWithdrawn,
-      );
+      // await this.fundsOverviewService.recordInvestmentEarnings(
+      //   principalWithdrawal,
+      //   profitWithdrawn,
+      // );
       const year = getYearFromDate(date);
       await this.fundsOverviewByYearService.recordInvestmentIn(
         year,

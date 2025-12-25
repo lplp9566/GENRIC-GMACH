@@ -139,7 +139,7 @@ export class LoansService {
         user,
         loanRecord.loan_amount,
       );
-      await this.fundsOverviewService.addLoan(loanData.loan_amount!);
+      // await this.fundsOverviewService.addLoan(loanData.loan_amount!);
       await this.fundsOverviewByYearService.recordLoanTaken(
         year,
         loanData.loan_amount!,

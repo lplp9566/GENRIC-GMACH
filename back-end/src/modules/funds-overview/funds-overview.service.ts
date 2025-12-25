@@ -14,6 +14,8 @@ export class FundsOverviewService {
   constructor(
     @InjectRepository(FundsOverviewViewEntity)
     private readonly fundsOverviewRepository: Repository<FundsOverviewViewEntity>,
+    @InjectRepository(FundsOverviewViewEntity)
+    private readonly fundsOverviewViewEntity: Repository<FundsOverviewViewEntity>,
   ) {}
 
   /**
@@ -302,7 +304,7 @@ async adjustLoan(diff: number) {
    */
   async getFundDetails(): Promise<FundsOverviewEntity> {
     try {
-      const fund = await this.fundsOverviewRepository.findOne({ where: {} });
+      const fund = await this.fundsOverviewViewEntity.findOne({ where: {} });
       if (!fund) {
         throw new NotFoundException('Fund details not found');
       }

@@ -19,7 +19,7 @@ export class DepositsService {
     private readonly usersService: UsersService,
     private readonly userFinancialByYearService: UserFinancialByYearService,
     private readonly userFinancialService: UserFinancialService,
-    private readonly fundsOverviewService: FundsOverviewService,
+    // private readonly fundsOverviewService: FundsOverviewService,
     private readonly fundsOverviewServiceByYear: FundsOverviewByYearService,
   ) {}
   async getDeposits(opts:FindOpts):Promise<PaginatedResult<DepositsEntity>> {
@@ -72,7 +72,7 @@ export class DepositsService {
       const year = getYearFromDate(deposit.start_date);
       const user = await this.usersService.getUserById(Number(deposit.user));
       if(!user) throw new Error('User not found');
-      await this.fundsOverviewService.addToDepositsTotal(deposit.initialDeposit);
+      // await this.fundsOverviewService.addToDepositsTotal(deposit.initialDeposit);
       await this.fundsOverviewServiceByYear.recordFixedDepositAdded(year,deposit.initialDeposit);
       await this.userFinancialService.recordFixedDepositAdded(user, deposit.initialDeposit);
       await this.userFinancialByYearService.recordFixedDepositAdded(user, year, deposit.initialDeposit);
@@ -106,7 +106,7 @@ export class DepositsService {
       }
       const year = getYearFromDate(date);
       const user = deposit.user;
-      await this.fundsOverviewService.decreaseUserDepositsTotal(amount);
+      // await this.fundsOverviewService.decreaseUserDepositsTotal(amount);
       await this.fundsOverviewServiceByYear.recordFixedDepositWithdrawn(year,amount);
       await this.userFinancialByYearService.recordFixedDepositWithdrawn(user, year, amount);
       await this.userFinancialService.recordFixedDepositWithdrawn(user, amount);
@@ -120,7 +120,7 @@ export class DepositsService {
   async addToDeposit(deposit: DepositsEntity, amount: number, date: Date) {
     try {
       deposit.current_balance += amount;
-      await this.fundsOverviewService.increaseUserDepositsTotal(amount);
+      // await this.fundsOverviewService.increaseUserDepositsTotal(amount);
       const year = getYearFromDate(date);
       const user = deposit.user;
       await this.fundsOverviewServiceByYear.recordFixedDepositAdded(year,amount);
