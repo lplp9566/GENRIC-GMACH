@@ -202,6 +202,8 @@ async onApplicationBootstrap() {
   // 4. נקודת ההתחלה – ראש החודש של החודש הראשון בהיסטוריה (UTC)
   const firstFrom = new Date(history[0].from_date as any);
   let iter = toMonthStartUTC(firstFrom);
+  console.log(user.join_date);
+  
 
   // אם אתה רוצה *לא* לחייב על חודש ההצטרפות כשהוא באמצע חודש – תפתח את זה:
   // if (firstFrom.getUTCDate() > 1) iter.setUTCMonth(iter.getUTCMonth() + 1);
