@@ -1,8 +1,10 @@
-
 import { Box, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-
-export default function NotAdmin() {
+import { IUser } from "../../Admin/components/Users/UsersDto";
+interface NotAdminProps {
+  user: IUser;
+}
+export default function NotAdmin({ user }: NotAdminProps) {
   const navigate = useNavigate();
 
   return (
@@ -14,13 +16,12 @@ export default function NotAdmin() {
       justifyContent="center"
       gap={2}
     >
+        <Typography variant="h4">שלום {user.first_name} {user.last_name}</Typography>
       <Typography variant="h4" color="error">
-הדף בבניה 🏗️
+        הדף בבניה 🏗️
       </Typography>
 
-      <Typography variant="body1">
-      בקרוב ...
-      </Typography>
+      <Typography variant="body1">בקרוב ...</Typography>
 
       <Button variant="contained" onClick={() => navigate("/")}>
         חזרה לדף התחברות

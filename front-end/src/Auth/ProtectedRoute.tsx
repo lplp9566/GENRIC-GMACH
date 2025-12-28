@@ -29,7 +29,7 @@ export default function ProtectedRoute() {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
    if (!user.is_admin) {
-    return <NotAdmin />;
+    return <NotAdmin user={user.user}/>;
   }
 
   return <Outlet />;

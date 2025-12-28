@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../../axiosInstance";
+import { IUser } from "../../../Admin/components/Users/UsersDto";
 
 type Status = "idle" | "pending" | "fulfilled" | "rejected";
 
@@ -9,6 +10,7 @@ export interface AuthUser {
   iat?: number;
   exp?: number;
   is_admin?: boolean;
+  user:IUser
 }
 
 export interface LoginDto { email: string; password: string; }
