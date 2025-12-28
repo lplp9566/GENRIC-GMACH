@@ -16,10 +16,6 @@ import { AppDispatch } from "../../../../store/store";
 import { editLoanAction } from "../../../../store/features/admin/adminLoanSlice";
 import { toast } from "react-toastify";
 
-type EditLoanActionPayload = {
-  date: string; // yyyy-mm-dd
-  value: number;
-};
 
 function toDateInputValue(dateLike: string | Date) {
   const d = new Date(dateLike);
@@ -51,6 +47,8 @@ export const EditLoanActionModal: React.FC<EditLoanActionModalProps> = ({
   console.log(action);
   
 const hendeleSave = async () => {
+        onClose();
+
    toast.promise(dispatch(editLoanAction({
         loanId: loanId,
       id: action!.id,
@@ -87,15 +85,6 @@ const hendeleSave = async () => {
     return "";
   };
 
-  const handleSave = async () => {
-    const msg = validate();
-    if (msg) {
-      setError(msg);
-      return;
-    }
-    setError("");
-    onClose();
-  };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
