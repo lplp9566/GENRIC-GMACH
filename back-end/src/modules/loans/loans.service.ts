@@ -134,7 +134,7 @@ export class LoansService {
       if (loanData.guarantor2) {
         loanRecord.guarantor2 = loanData.guarantor2;
       }
-      this.loansRepository.save(loanRecord);
+     const result = await this.loansRepository.save(loanRecord);
       // await this.userFinancialsService.recordLoanTaken(
       //   user,
       //   loanRecord.loan_amount,
@@ -149,9 +149,9 @@ export class LoansService {
       //   year,
       //   loanRecord.loan_amount,
       // );
-            await this.LoanActionBalanceService.computeLoanNetBalance(loanData.id!);
+            await this.LoanActionBalanceService.computeLoanNetBalance(result.id);
 
-      return loanRecord;
+      return result;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -334,7 +334,7 @@ export class LoansService {
 
   // אם balance אצלך אמור להיות היתרה הנוכחית
   const result = await this.loansRepository.save(loan);
-  await this.LoanActionBalanceService.computeLoanNetBalance(loan.id!);
+  await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
 
   return result;
 }
