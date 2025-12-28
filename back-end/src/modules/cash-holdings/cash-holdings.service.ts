@@ -17,7 +17,7 @@ export class CashHoldingsService {
     private cashHoldingsRepository: Repository<CashHoldingsEntity>,
     private readonly UserService: UsersService,
     private readonly userFinancialsService: UserFinancialService,
-    // private readonly fundsOverviewService: FundsOverviewService,
+    private readonly fundsOverviewService: FundsOverviewService,
   ) {}
 
   async getCashHoldings() {
@@ -56,11 +56,11 @@ export class CashHoldingsService {
 
   async createCashHolding(cashHolding: CashHoldingRequest, user: any) {
     try {
-      await this.userFinancialsService.recordCashHoldings(
-        user,
-        cashHolding.amount,
-        CashHoldingsTypesRecordType.add,
-      );
+      // await this.userFinancialsService.recordCashHoldings(
+      //   user,
+      //   cashHolding.amount,
+      //   CashHoldingsTypesRecordType.add,
+      // );
       // await this.fundsOverviewService.recordCashHoldings(
       //   cashHolding.amount,
       //   CashHoldingsTypesRecordType.add,
@@ -97,11 +97,11 @@ export class CashHoldingsService {
         throw new Error('Cash holding not found');
 
       existingCashHolding.amount += cashHolding.amount;
-      await this.userFinancialsService.recordCashHoldings(
-        user,
-        cashHolding.amount,
-        CashHoldingsTypesRecordType.add,
-      );
+      // await this.userFinancialsService.recordCashHoldings(
+      //   user,
+      //   cashHolding.amount,
+      //   CashHoldingsTypesRecordType.add,
+      // );
       // await this.fundsOverviewService.recordCashHoldings(
       //   cashHolding.amount,
       //   CashHoldingsTypesRecordType.add,
@@ -140,11 +140,11 @@ export class CashHoldingsService {
         existingCashHolding.is_active = false;
       }
 
-      await this.userFinancialsService.recordCashHoldings(
-        user,
-        cashHolding.amount,
-        CashHoldingsTypesRecordType.subtract,
-      );
+      // await this.userFinancialsService.recordCashHoldings(
+      //   user,
+      //   cashHolding.amount,
+      //   CashHoldingsTypesRecordType.subtract,
+      // );
 
       // await this.fundsOverviewService.recordCashHoldings(
       //   cashHolding.amount,

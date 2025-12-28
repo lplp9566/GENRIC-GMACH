@@ -135,10 +135,10 @@ export class LoansService {
         loanRecord.guarantor2 = loanData.guarantor2;
       }
       this.loansRepository.save(loanRecord);
-      await this.userFinancialsService.recordLoanTaken(
-        user,
-        loanRecord.loan_amount,
-      );
+      // await this.userFinancialsService.recordLoanTaken(
+      //   user,
+      //   loanRecord.loan_amount,
+      // );
       // await this.fundsOverviewService.addLoan(loanData.loan_amount!);
       // await this.fundsOverviewByYearService.recordLoanTaken(
       //   year,
@@ -193,7 +193,7 @@ export class LoansService {
       const year = getYearFromDate(dto.date);
       await Promise.all([
         // this.userFinancialsByYearService.recordLoanTaken(loan.user, year, diff),
-        this.userFinancialsService.recordLoanTaken(loan.user, diff),
+        // this.userFinancialsService.recordLoanTaken(loan.user, diff),
         // this.fundsOverviewService.addLoan(diff),
         // this.fundsOverviewByYearService.recordAddToLoan(year, diff),
       ]);
@@ -304,7 +304,7 @@ export class LoansService {
     // await this.fundsOverviewByYearService.recordFixLoan(year, diff);
 
     // עדכון משתמש
-    await this.userFinancialsService.adjustLoan(loan.user, diff);
+    // await this.userFinancialsService.adjustLoan(loan.user, diff);
     // await this.userFinancialsByYearService.adjustLoan(loan.user, year, diff);
   }
 

@@ -89,7 +89,7 @@ export class MonthlyDepositsService {
       await this.monthlyDepositsRepository.save(newDeposit);
       await Promise.all([
         // this.userFinancialByYearService.recordMonthlyDeposit(user, year, payment_details.amount),
-        this.userFinancialsService.recordMonthlyDeposit(user, payment_details.amount),
+        // this.userFinancialsService.recordMonthlyDeposit(user, payment_details.amount),
         // this.fundsOverviewService.addMonthlyDeposit(payment_details.amount),
 
         // this.fundsOverviewByYearService.recordMonthlyDeposit(year, payment_details.amount),
@@ -137,7 +137,7 @@ export class MonthlyDepositsService {
       existing.payment_method = payment_details.payment_method;
 
       // עדכונים נלווים
-      await this.userFinancialsService.recordMonthlyDeposit(user, deltaAmount);
+      // await this.userFinancialsService.recordMonthlyDeposit(user, deltaAmount);
       // await this.fundsOverviewService.addMonthlyDeposit(deltaAmount);
 
       if (newYear === oldYear) {
@@ -184,7 +184,7 @@ async deleteMonthlyDeposit(id: number) {
       const oldYear = getYearFromDate(existing.deposit_date);
       const user = existing.user;
 
-      await this.userFinancialsService.recordMonthlyDeposit(user, -oldAmount);
+      // await this.userFinancialsService.recordMonthlyDeposit(user, -oldAmount);
       // await this.fundsOverviewService.addMonthlyDeposit(-oldAmount);
       // await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
       // await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);

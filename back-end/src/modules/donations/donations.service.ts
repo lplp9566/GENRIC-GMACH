@@ -52,10 +52,10 @@ export class DonationsService {
     //   year,
     //   donation.amount,
     // );
-    await this.userFinancialsService.adjustEquityDonation(
-      user,
-      donation.amount,
-    );
+    // await this.userFinancialsService.adjustEquityDonation(
+    //   user,
+    //   donation.amount,
+    // );
     // await this.fundsOverviewService.adjustDonation(donation.amount);
     // await this.fundsOvirewviewServiceByYear.adjustEquityDonation(
     //   year,
@@ -95,7 +95,7 @@ export class DonationsService {
       const saved = await manager.save(DonationsEntity, donation);
       // await this.fundsOverviewService.adjustSpecialFund(donation.amount);
       // await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(year, donation.amount);
-      await this.userFinancialsService.adjustSpecialFundDonation( donation.user, donation.amount);
+      // await this.userFinancialsService.adjustSpecialFundDonation( donation.user, donation.amount);
       // await this.userFinancialsyYearService.adjustSpecialFundDonation(donation.user, year, donation.amount);
       return manager.findOne(DonationsEntity, {
         where: { id: saved.id },
@@ -323,7 +323,7 @@ async updateDonation(id: number, dto: UpdateDonationDto) {
       if (!user) throw new BadRequestException('User not found');
 
       // גלובלי
-      await this.userFinancialsService.adjustEquityDonation(user, deltaAmount);
+      // await this.userFinancialsService.adjustEquityDonation(user, deltaAmount);
       // await this.fundsOverviewService.adjustDonation(deltaAmount);
 
       // לפי שנה
@@ -345,7 +345,7 @@ async updateDonation(id: number, dto: UpdateDonationDto) {
       if (!fundName) throw new BadRequestException('Fund name is required');
 
       // גלובלי
-      await this.userFinancialsService.adjustSpecialFundDonation(user, deltaAmount);
+      // await this.userFinancialsService.adjustSpecialFundDonation(user, deltaAmount);
       // await this.fundsOverviewService.adjustSpecialFund(deltaAmount);
 
       // לפי שנה
