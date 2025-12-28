@@ -70,39 +70,44 @@ export class LoansService {
       return { ok: false, error: message, butten: true };
     }
   }
-  async getLoans(opts: FindOpts): Promise<PaginatedResult<LoanEntity>> {
-    const page = opts.page > 0 ? opts.page : 1;
-    const limit = opts.limit > 0 ? Math.min(opts.limit, 100) : 50;
+ async getLoans(opts: FindOpts): Promise<PaginatedResult<LoanEntity>> {
+  const page = opts.page > 0 ? opts.page : 1;
+  const limit = opts.limit > 0 ? Math.min(opts.limit, 100) : 50;
 
-    // בניית ה־where הדינמי
-    const where: any = {};
+  const todayDay = new Date().getDate(); // 1..31
 
-    // סינון לפי סטטוס
-    if (opts.status === LoanStatus.ACTIVE) {
-      where.isActive = true;
-    } else if (opts.status === LoanStatus.INACTIVE) {
-      where.isActive = false;
-    }
+  try {
+   const qb = this.loansRepository
+  .createQueryBuilder("loan")
+  .leftJoinAndSelect("loan.user", "user");
 
-    if (opts.userId) {
-      where.user = { id: opts.userId };
-    }
+if (opts.status === LoanStatus.ACTIVE) qb.andWhere("loan.isActive = :a", { a: true });
+else if (opts.status === LoanStatus.INACTIVE) qb.andWhere("loan.isActive = :a", { a: false });
 
-    try {
-      const [data, total] = await this.loansRepository.findAndCount({
-        where,
-        relations: ['user'],
-        skip: (page - 1) * limit,
-        take: limit,
-        order: { payment_date: 'DESC' },
-      });
+if (opts.userId) qb.andWhere("user.id = :uid", { uid: opts.userId });
 
-      const pageCount = Math.ceil(total / limit);
-      return { data, total, page, pageCount };
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+qb.addOrderBy(`CASE WHEN loan.balance < 0 THEN 0 ELSE 1 END`, "ASC");
+qb.addOrderBy(`CASE WHEN loan.balance < 0 THEN loan.balance ELSE 999999999 END`, "ASC");
+
+qb.addOrderBy(
+  `CASE
+     WHEN loan.payment_date >= :todayDay THEN loan.payment_date - :todayDay
+     ELSE loan.payment_date + 31 - :todayDay
+   END`,
+  "ASC",
+);
+
+qb.setParameter("todayDay", new Date().getDate());
+
+
+    const [data, total] = await qb.getManyAndCount();
+    const pageCount = Math.ceil(total / limit);
+
+    return { data, total, page, pageCount };
+  } catch (err: any) {
+    throw new BadRequestException(err.message);
   }
+}
 
   async createLoan(loanData: Partial<LoanEntity>) {
     try {
