@@ -271,6 +271,11 @@ export class LoansService {
     }
   }
  async editLoanSimple(loanId: number, dto: EditLoanDto) {
+    const toDate = (v: string | Date | undefined): Date | undefined => {
+  if (!v) return undefined;
+  const d = v instanceof Date ? v : new Date(v);
+  return isNaN(d.getTime()) ? undefined : d;
+}; 
   const loan = await this.loansRepository.findOne({
     where: { id: loanId },
     relations: ['user'],
@@ -299,6 +304,7 @@ export class LoansService {
     loan.loan_amount = newAmount;
     loan.remaining_balance = Number(loan.remaining_balance) + diff;
 
+
     // עדכון FundsOverview (חשוב: פונקציה אחת שעובדת לשני הכיוונים)
     // await this.fundsOverviewService.adjustLoan(diff);
     // await this.fundsOverviewByYearService.recordFixLoan(year, diff);
@@ -311,6 +317,7 @@ export class LoansService {
   // שינוי תשלום חודשי
   if (dto.monthly_payment !== undefined && dto.monthly_payment !== loan.monthly_payment) {
     loan.monthly_payment = Number(dto.monthly_payment);
+    
   }
 
   // שינוי תאריך חיוב
@@ -323,7 +330,7 @@ export class LoansService {
     Number(loan.monthly_payment) > 0
       ? Number(loan.remaining_balance) / Number(loan.monthly_payment)
       : loan.total_installments;
-
+    loan.loan_date =  toDate(dto.loan_date) || loan.loan_date;
 
   // אם balance אצלך אמור להיות היתרה הנוכחית
   const result = await this.loansRepository.save(loan);
