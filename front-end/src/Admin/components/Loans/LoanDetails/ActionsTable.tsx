@@ -8,18 +8,27 @@ import {
   TableCell,
   TableBody,
   Chip,
+  Stack,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import { ActionTypes, ILoanAction, LoanPaymentActionType } from "../LoanDto";
-
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditLoanActionModal from "./EditLoanActionModal";
 type SortField = "date" | "action_type" | "amount";
 type SortDirection = "asc" | "desc";
 
 interface ActionsTableProps {
   actions: ILoanAction[];
+  loanId: number;
 }
 
-export const ActionsTable: React.FC<ActionsTableProps> = ({ actions }) => {
+export const ActionsTable: React.FC<ActionsTableProps> = ({ actions, loanId }) => {
   const [currentSortField, setCurrentSortField] = useState<SortField>("date");
+  const [editModal, setEditModal] = useState<boolean>(false);
+  const [selected, setSelected] = useState<ILoanAction | null>(null);
   const [currentSortDirection, setCurrentSortDirection] =
     useState<SortDirection>("asc");
 
@@ -33,68 +42,101 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({ actions }) => {
     }
   };
   const ACTION_ORDER: LoanPaymentActionType[] = [
-  LoanPaymentActionType.PAYMENT,
-  LoanPaymentActionType.AMOUNT_CHANGE,
-  LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
-  LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
-];
+    LoanPaymentActionType.PAYMENT,
+    LoanPaymentActionType.AMOUNT_CHANGE,
+    LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
+    LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
+  ];
 
-const sortedActions = useMemo(() => {
-  const copy = [...actions];
-  copy.sort((a, b) => {
-    let cmp = 0;
-    if (currentSortField === "date") {
-      cmp = new Date(a.date).getTime() - new Date(b.date).getTime();
-    } else if (currentSortField === "amount") {
-      cmp = a.value - b.value;
-    } else {
-      const idxA = ACTION_ORDER.indexOf(a.action_type);
-      const idxB = ACTION_ORDER.indexOf(b.action_type);
-      cmp = idxA - idxB;
-    }
-    return currentSortDirection === "asc" ? cmp : -cmp;
-  });
-  return copy;
-}, [actions, currentSortField, currentSortDirection]);
+  const sortedActions = useMemo(() => {
+    const copy = [...actions];
+    copy.sort((a, b) => {
+      let cmp = 0;
+      if (currentSortField === "date") {
+        cmp = new Date(a.date).getTime() - new Date(b.date).getTime();
+      } else if (currentSortField === "amount") {
+        cmp = a.value - b.value;
+      } else {
+        const idxA = ACTION_ORDER.indexOf(a.action_type);
+        const idxB = ACTION_ORDER.indexOf(b.action_type);
+        cmp = idxA - idxB;
+      }
+      return currentSortDirection === "asc" ? cmp : -cmp;
+    });
+    return copy;
+  }, [actions, currentSortField, currentSortDirection]);
 
   const renderSortIndicator = (field: SortField) =>
-    currentSortField === field ? (currentSortDirection === "asc" ? " ▲" : " ▼") : "";
-
+    currentSortField === field
+      ? currentSortDirection === "asc"
+        ? " ▲"
+        : " ▼"
+      : "";
+ const handleEdit = (action: ILoanAction) => {
+    setSelected(action);
+    setEditModal(true);
+  };
   return (
-    <Paper elevation={3} sx={{ p: 9, borderRadius: 2, width: "65%" }}>
-      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1,textAlign:"center" }}>
+    <Paper elevation={3} sx={{ borderRadius: 2, width: "99%" }}>
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}
+      >
         פעולות על הלוואה
       </Typography>
-      {actions.length === 0 && (
-        <Typography>לא נמצאו פעולות</Typography>
-      )}
+      {actions.length === 0 && <Typography>לא נמצאו פעולות</Typography>}
       {actions.length > 0 && (
         <Table size="small" sx={{ borderSpacing: "0 6px" }}>
           <TableHead>
-            <TableRow sx={{ "& th": { background: "#E9F0F7", fontWeight: 700, cursor: "pointer" } }}>
-              <TableCell align="right" onClick={() => handleHeaderClick("date")}>
+            <TableRow
+              sx={{
+                "& th": {
+                  background: "#E9F0F7",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                },
+              }}
+            >
+              <TableCell
+                align="right"
+                onClick={() => handleHeaderClick("date")}
+              >
                 תאריך{renderSortIndicator("date")}
               </TableCell>
-              <TableCell align="center" onClick={() => handleHeaderClick("action_type")}>
+              <TableCell
+                align="center"
+                onClick={() => handleHeaderClick("action_type")}
+              >
                 סוג פעולה{renderSortIndicator("action_type")}
               </TableCell>
-              <TableCell align="left" onClick={() => handleHeaderClick("amount")}>
+              <TableCell
+                align="left"
+                onClick={() => handleHeaderClick("amount")}
+              >
                 סכום{renderSortIndicator("amount")}
+              </TableCell>
+              <TableCell align="center" sx={{ cursor: "default" }}>
+                פעולות
               </TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
             {sortedActions.map((action) => (
-              <TableRow key={action.id} hover sx={{ "& td": { border: "none" } }}>
+              <TableRow
+                key={action.id}
+                hover
+                sx={{ "& td": { border: "none" } }}
+              >
                 <TableCell align="right">
                   {new Date(action.date).toLocaleDateString("he-IL")}
                 </TableCell>
                 <TableCell align="center">
                   <Chip
                     label={
-                      ActionTypes.find((item) => item.value === action.action_type)
-                        ?.label || action.action_type
+                      ActionTypes.find(
+                        (item) => item.value === action.action_type
+                      )?.label || action.action_type
                     }
                     size="small"
                     color={
@@ -110,15 +152,66 @@ const sortedActions = useMemo(() => {
                     }
                   />
                 </TableCell>
-                <TableCell align="left" sx={{ fontWeight: 600, color: "#007BFF" }}>
-                  {action.action_type != LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE &&  "₪" }
-                 {action.value.toLocaleString()}
+                <TableCell
+                  align="left"
+                  sx={{ fontWeight: 600, color: "#007BFF" }}
+                >
+                  {action.action_type !=
+                    LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE && "₪"}
+                  {action.value.toLocaleString()}
+                </TableCell>
+
+                <TableCell align="center">
+                  <Stack
+                    direction="row"
+                    spacing={0.5}
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <Tooltip title="העתק">
+                      <IconButton size="small" onClick={() => {}}>
+                        <ContentCopyIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="ערוך">
+                      <span>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleEdit(action)}
+                          // disabled={!onEdit}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+
+                    <Tooltip title="מחק">
+                      <span>
+                        <IconButton
+                          size="small"
+                          onClick={() => {}}
+                          // disabled={!onDelete}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+                  </Stack>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       )}
+ {selected && (
+  <EditLoanActionModal
+    open={editModal}
+    action={selected}
+    onClose={() => setEditModal(false)}
+    loanId={loanId}
+  />
+)}
     </Paper>
   );
 };

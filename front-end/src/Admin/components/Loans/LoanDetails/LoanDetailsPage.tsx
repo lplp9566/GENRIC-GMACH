@@ -2,12 +2,7 @@
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Box,
-  Button,
-  Grid,
-  Divider,
-} from "@mui/material";
+import { Box, Button, Grid, Divider } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { AppDispatch, RootState } from "../../../../store/store";
 import { getLoanDetails } from "../../../../store/features/admin/adminLoanSlice";
@@ -101,8 +96,8 @@ const LoanDetailsPage: React.FC = () => {
           </Grid>
         )}
 
-        <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "30%" } }}>
-          <ActionsTable actions={loanDetails.actions ?? []} />
+        <Grid item xs={12} md={4}>
+          <ActionsTable actions={loanDetails.actions ?? []} loanId={loanId} />
         </Grid>
       </Grid>
     </Box>

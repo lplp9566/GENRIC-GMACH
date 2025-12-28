@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import { LoanActionsService } from "./loan_actions.service";
 import { LoanActionDto } from "../loan-dto/loanTypes";
 @Controller("loan-actions")
@@ -14,6 +14,14 @@ export class LoanActionsController {
   async getAllActions() {
     return this.loanPaymentsService.getAllActions();
   }
+@Patch(':id')
+edit(@Param('id') id: string, @Body() body: { date?: Date; value?: number }) {
+  return this.loanPaymentsService.editPayment(+id, body);
+}
+@Delete(':id')
+remove(@Param('id') id: string) {
+  return this.loanPaymentsService.deletePayment(+id);
+}
 }
 
 

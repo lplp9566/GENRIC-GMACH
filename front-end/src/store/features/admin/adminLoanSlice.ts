@@ -20,6 +20,8 @@ interface AdminLoanType {
   total: number;
   loanDetails: ILoanWithPayment | null;
   checkLoanResponse: ILoanCheckResponse;
+  editLoanActionStatus: Status;
+
 
 }
 const initialState: AdminLoanType = {
@@ -31,6 +33,7 @@ const initialState: AdminLoanType = {
   createLoanStatus: "idle",
   loanDeleteStatus: "idle",
   createLoanActionStatus: "idle",
+  editLoanActionStatus:"idle",
   pageCount: 1,
   page: 1,
   total: 0,
@@ -62,7 +65,6 @@ export const checkLoan = createAsyncThunk(
       `${BASE_URL}/loans/check-loan`,
       loan
     );
-    console.log(response);
     return response.data;
   }
 );
@@ -87,7 +89,6 @@ export const getAllLoanActions = createAsyncThunk(
   "admin/getAllLoanActions",
   async () => {
     const response = await axios.get(`${BASE_URL}/loan-actions`);
-    console.log(response);
     return response.data;
   }
 );
@@ -98,15 +99,25 @@ export const getLoanDetails = createAsyncThunk(
       `${BASE_URL}/loans/id`,
       { params: { id } } 
     );
-    console.log(response.data)
     return response.data;
   }
 );
-export const editLoan = createAsyncThunk(
+export const editLoan = createAsyncThunk (
   "admin/editLoan",
   async (loan: IEditLoan) => {
     const response = await axios.patch(`${BASE_URL}/loans/${loan.loan}`, loan);
     return response.data;
+  }
+);
+export const editLoanAction = createAsyncThunk(
+  "admin/editLoanAction",
+  async (loanAction: { id: number; loanId: number; date?: Date; value?: number }, thunkAPI) => {
+    const response = await axios.patch(
+      `${BASE_URL}/loan-actions/${loanAction.id}`,
+      loanAction
+    );
+    await thunkAPI.dispatch(getLoanDetails(loanAction.loanId));
+    return response.data; 
   }
 );
 export const AdminLoansSlice = createSlice({
@@ -223,6 +234,26 @@ export const AdminLoansSlice = createSlice({
 .addCase(editLoan.rejected, (state, action) => {
   state.editLoanStatus = "rejected";
   state.error = action.error.message ?? null;
+})
+.addCase(editLoanAction.pending, (state) => {
+  state.editLoanActionStatus = "pending";
+  state.error = null;
+})
+.addCase(editLoanAction.fulfilled, (state, { payload }) => {
+  state.editLoanActionStatus = "fulfilled";
+
+  const idx = state.loanDetails?.actions?.findIndex(
+    (x) => Number(x.id) === Number(payload.id)
+  );
+  
+  if (idx !== undefined && idx !== -1 && state.loanDetails?.actions) {
+    state.loanDetails.actions[idx] = payload;
+  }
+  state.error = null;
+})
+.addCase(editLoanAction.rejected, (state, action) => {
+  state.editLoanActionStatus = "rejected";
+  state.error = action.error.message ?? null;  
 });
   },
 });
