@@ -65,6 +65,7 @@ const EditLoanModal: React.FC<EditLoanModalProps> = ({
     payment_date: loan.payment_date,
     guarantor1: loan.guarantor1 ?? null,
     guarantor2: loan.guarantor2 ?? null,
+    
   });
   const { LoanModalMode } = useSelector(
     (state: RootState) => state.mapModeSlice
