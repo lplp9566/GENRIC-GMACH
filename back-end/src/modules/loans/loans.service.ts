@@ -316,7 +316,7 @@ export class LoansService {
 
   // שינוי תשלום חודשי
   if (dto.monthly_payment !== undefined && dto.monthly_payment !== loan.monthly_payment) {
-    loan.monthly_payment = Number(dto.monthly_payment);
+    loan.initial_monthly_payment = Number(dto.monthly_payment);
     
   }
 

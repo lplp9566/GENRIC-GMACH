@@ -7,6 +7,8 @@ import { createLoanAction, getLoanDetails } from "../../../store/features/admin/
 
 
 const useLoanSubmit =(loanId: number) =>{
+  console.log("hjkl;");
+  
   const dispatch = useDispatch<AppDispatch>();
 
   const handleSubmit = useCallback(

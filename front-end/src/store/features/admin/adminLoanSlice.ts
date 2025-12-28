@@ -78,6 +78,8 @@ export const createLoan = createAsyncThunk(
 export const createLoanAction = createAsyncThunk(
   "admin/createLoanAction",
   async (loanAction:ICreateLoanAction ) => {
+    console.log("sdfghjk");
+    
     const response = await axios.post<ICreateLoanAction>(
       `${BASE_URL}/loan-actions`,
       loanAction
