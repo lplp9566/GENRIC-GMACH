@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { IUser } from "../../../Admin/components/Users/UsersDto";
 axios.defaults.withCredentials = true;
 type DonationKind = "regular" | "fund";
 interface AppModeType {
@@ -10,6 +11,7 @@ interface AppModeType {
   AddDonationModal?: boolean;
   withdrawDonationModal?: boolean;
   AddDonationDraft?: AddDonationDraft | null;
+  user:IUser | null;
 }
 export type AddDonationDraft = {
   userId?: number;
@@ -26,6 +28,7 @@ const initialState: AppModeType = {
   AddDonationModal: false,
   withdrawDonationModal: false,
   AddDonationDraft: null,
+  user:null,
 };
 export const AppModeSlice = createSlice({
   name: "AppMode",
