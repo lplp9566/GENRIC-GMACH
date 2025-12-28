@@ -27,7 +27,7 @@ export class OrderReturnService {
     const year = getYearFromDate(orderReturn.date);
     const user = await this.usersService.getUserById(Number(orderReturn.user));
     if (!user) throw new BadRequestException('User not found');
-    await this.userFinancialsyYearService.recordStandingOrderReturn(user, year, orderReturn.amount);
+    // await this.userFinancialsyYearService.recordStandingOrderReturn(user, year, orderReturn.amount);
     await this.userFinancialsService.recordStandingOrderReturn(user, orderReturn.amount);
     // await this.fundsOverviewService.addToStandingOrderReturn(orderReturn.amount);
     // await this.fundsOverviewByYearService.recordStandingOrderReturn(year, orderReturn.amount);

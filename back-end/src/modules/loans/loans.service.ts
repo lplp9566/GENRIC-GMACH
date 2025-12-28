@@ -94,7 +94,7 @@ export class LoansService {
         relations: ['user'],
         skip: (page - 1) * limit,
         take: limit,
-        order: { loan_date: 'DESC' },
+        order: { payment_date: 'DESC' },
       });
 
       const pageCount = Math.ceil(total / limit);
@@ -144,11 +144,11 @@ export class LoansService {
       //   year,
       //   loanData.loan_amount!,
       // );
-      await this.userFinancialsByYearService.recordLoanTaken(
-        user,
-        year,
-        loanRecord.loan_amount,
-      );
+      // await this.userFinancialsByYearService.recordLoanTaken(
+      //   user,
+      //   year,
+      //   loanRecord.loan_amount,
+      // );
             await this.LoanActionBalanceService.computeLoanNetBalance(loanData.id!);
 
       return loanRecord;
@@ -192,7 +192,7 @@ export class LoansService {
         await this.loansRepository.save(loan);
       const year = getYearFromDate(dto.date);
       await Promise.all([
-        this.userFinancialsByYearService.recordLoanTaken(loan.user, year, diff),
+        // this.userFinancialsByYearService.recordLoanTaken(loan.user, year, diff),
         this.userFinancialsService.recordLoanTaken(loan.user, diff),
         // this.fundsOverviewService.addLoan(diff),
         // this.fundsOverviewByYearService.recordAddToLoan(year, diff),
@@ -305,7 +305,7 @@ export class LoansService {
 
     // עדכון משתמש
     await this.userFinancialsService.adjustLoan(loan.user, diff);
-    await this.userFinancialsByYearService.adjustLoan(loan.user, year, diff);
+    // await this.userFinancialsByYearService.adjustLoan(loan.user, year, diff);
   }
 
   // שינוי תשלום חודשי

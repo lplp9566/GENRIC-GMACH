@@ -75,7 +75,7 @@ export class DepositsService {
       // await this.fundsOverviewService.addToDepositsTotal(deposit.initialDeposit);
       // await this.fundsOverviewServiceByYear.recordFixedDepositAdded(year,deposit.initialDeposit);
       await this.userFinancialService.recordFixedDepositAdded(user, deposit.initialDeposit);
-      await this.userFinancialByYearService.recordFixedDepositAdded(user, year, deposit.initialDeposit);
+      // await this.userFinancialByYearService.recordFixedDepositAdded(user, year, deposit.initialDeposit);
       return await this.depositsRepo.save(deposit);
     } catch (error) {
         throw new BadRequestException(error.message);
@@ -108,7 +108,7 @@ export class DepositsService {
       const user = deposit.user;
       // await this.fundsOverviewService.decreaseUserDepositsTotal(amount);
       // await this.fundsOverviewServiceByYear.recordFixedDepositWithdrawn(year,amount);
-      await this.userFinancialByYearService.recordFixedDepositWithdrawn(user, year, amount);
+      // await this.userFinancialByYearService.recordFixedDepositWithdrawn(user, year, amount);
       await this.userFinancialService.recordFixedDepositWithdrawn(user, amount);
        await this.depositsRepo.save(deposit);
        return this.getDepositsActive();
@@ -124,7 +124,7 @@ export class DepositsService {
       const year = getYearFromDate(date);
       const user = deposit.user;
       // await this.fundsOverviewServiceByYear.recordFixedDepositAdded(year,amount);
-      await this.userFinancialByYearService.recordFixedDepositAdded(user, year, amount);
+      // await this.userFinancialByYearService.recordFixedDepositAdded(user, year, amount);
       await this.userFinancialService.recordFixedDepositAdded(user, amount);
        await this.depositsRepo.save(deposit);
        return this.getDepositsActive();

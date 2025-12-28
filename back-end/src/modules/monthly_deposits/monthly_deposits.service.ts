@@ -88,7 +88,7 @@ export class MonthlyDepositsService {
       });
       await this.monthlyDepositsRepository.save(newDeposit);
       await Promise.all([
-        this.userFinancialByYearService.recordMonthlyDeposit(user, year, payment_details.amount),
+        // this.userFinancialByYearService.recordMonthlyDeposit(user, year, payment_details.amount),
         this.userFinancialsService.recordMonthlyDeposit(user, payment_details.amount),
         // this.fundsOverviewService.addMonthlyDeposit(payment_details.amount),
 
@@ -142,12 +142,12 @@ export class MonthlyDepositsService {
 
       if (newYear === oldYear) {
         // await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, deltaAmount);
-        await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, deltaAmount);
+        // await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, deltaAmount);
       } else {
-        await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
+        // await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
         // await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
 
-        await this.userFinancialByYearService.recordMonthlyDeposit(user, newYear, newAmount);
+        // await this.userFinancialByYearService.recordMonthlyDeposit(user, newYear, newAmount);
         // await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, newAmount);
       }
 
@@ -187,7 +187,7 @@ async deleteMonthlyDeposit(id: number) {
       await this.userFinancialsService.recordMonthlyDeposit(user, -oldAmount);
       // await this.fundsOverviewService.addMonthlyDeposit(-oldAmount);
       // await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
-      await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
+      // await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
 
       await manager.delete(MonthlyDepositsEntity, { id });
 

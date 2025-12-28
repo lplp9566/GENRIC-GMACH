@@ -47,11 +47,11 @@ export class DonationsService {
     const user = donation.user;
     if (!user) throw new BadRequestException('User not found');
 
-    await this.userFinancialsyYearService.adjustEquityDonation(
-      user,
-      year,
-      donation.amount,
-    );
+    // await this.userFinancialsyYearService.adjustEquityDonation(
+    //   user,
+    //   year,
+    //   donation.amount,
+    // );
     await this.userFinancialsService.adjustEquityDonation(
       user,
       donation.amount,
@@ -96,7 +96,7 @@ export class DonationsService {
       // await this.fundsOverviewService.adjustSpecialFund(donation.amount);
       // await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(year, donation.amount);
       await this.userFinancialsService.adjustSpecialFundDonation( donation.user, donation.amount);
-      await this.userFinancialsyYearService.adjustSpecialFundDonation(donation.user, year, donation.amount);
+      // await this.userFinancialsyYearService.adjustSpecialFundDonation(donation.user, year, donation.amount);
       return manager.findOne(DonationsEntity, {
         where: { id: saved.id },
         relations: { user: true },
@@ -328,11 +328,11 @@ async updateDonation(id: number, dto: UpdateDonationDto) {
 
       // לפי שנה
       if (oldYear === newYear) {
-        await this.userFinancialsyYearService.adjustEquityDonation(user, oldYear, deltaAmount);
+        // await this.userFinancialsyYearService.adjustEquityDonation(user, oldYear, deltaAmount);
         // await this.fundsOvirewviewServiceByYear.adjustEquityDonation(oldYear, deltaAmount);
       } else {
-        await this.userFinancialsyYearService.adjustEquityDonation(user, oldYear, -oldAmount);
-        await this.userFinancialsyYearService.adjustEquityDonation(user, newYear, +newAmount);
+        // await this.userFinancialsyYearService.adjustEquityDonation(user, oldYear, -oldAmount);
+        // await this.userFinancialsyYearService.adjustEquityDonation(user, newYear, +newAmount);
 
         // await this.fundsOvirewviewServiceByYear.adjustEquityDonation(oldYear, -oldAmount);
         // await this.fundsOvirewviewServiceByYear.adjustEquityDonation(newYear, +newAmount);
@@ -350,11 +350,11 @@ async updateDonation(id: number, dto: UpdateDonationDto) {
 
       // לפי שנה
       if (oldYear === newYear) {
-        await this.userFinancialsyYearService.adjustSpecialFundDonation(user, oldYear, deltaAmount);
+        // await this.userFinancialsyYearService.adjustSpecialFundDonation(user, oldYear, deltaAmount);
         // await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(oldYear, deltaAmount);
       } else {
-        await this.userFinancialsyYearService.adjustSpecialFundDonation(user, oldYear, -oldAmount);
-        await this.userFinancialsyYearService.adjustSpecialFundDonation(user, newYear, +newAmount);
+        // await this.userFinancialsyYearService.adjustSpecialFundDonation(user, oldYear, -oldAmount);
+        // await this.userFinancialsyYearService.adjustSpecialFundDonation(user, newYear, +newAmount);
 
         // await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(oldYear, -oldAmount);
         // await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(newYear, +newAmount);

@@ -111,7 +111,7 @@ export class LoanActionsService {
 
       const year = getYearFromDate(dto.date);
       await Promise.all([
-        this.userFinByYear.recordLoanRepaid(loan.user, year, dto.value),
+        // this.userFinByYear.recordLoanRepaid(loan.user, year, dto.value),
         this.userFin.recordLoanRepaid(loan.user, dto.value),
         // this.fundsOverview.repayLoan(dto.value),
         // this.fundsOverviewByYearService.recordLoanRepaid(year, dto.value),
