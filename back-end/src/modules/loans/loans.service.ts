@@ -140,10 +140,10 @@ export class LoansService {
         loanRecord.loan_amount,
       );
       // await this.fundsOverviewService.addLoan(loanData.loan_amount!);
-      await this.fundsOverviewByYearService.recordLoanTaken(
-        year,
-        loanData.loan_amount!,
-      );
+      // await this.fundsOverviewByYearService.recordLoanTaken(
+      //   year,
+      //   loanData.loan_amount!,
+      // );
       await this.userFinancialsByYearService.recordLoanTaken(
         user,
         year,
@@ -195,7 +195,7 @@ export class LoansService {
         this.userFinancialsByYearService.recordLoanTaken(loan.user, year, diff),
         this.userFinancialsService.recordLoanTaken(loan.user, diff),
         // this.fundsOverviewService.addLoan(diff),
-        this.fundsOverviewByYearService.recordAddToLoan(year, diff),
+        // this.fundsOverviewByYearService.recordAddToLoan(year, diff),
       ]);
       return await this.paymentsRepository.save({
         loan,
@@ -301,7 +301,7 @@ export class LoansService {
 
     // עדכון FundsOverview (חשוב: פונקציה אחת שעובדת לשני הכיוונים)
     // await this.fundsOverviewService.adjustLoan(diff);
-    await this.fundsOverviewByYearService.recordFixLoan(year, diff);
+    // await this.fundsOverviewByYearService.recordFixLoan(year, diff);
 
     // עדכון משתמש
     await this.userFinancialsService.adjustLoan(loan.user, diff);

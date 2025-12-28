@@ -10,13 +10,13 @@ export class FundsOverviewByYearController {
   async getFundsOverviewByYear() {
     return await this.fundsOverviewByYearService.getAllFundsOverview();
   }
-  @Patch('/update-fund-details')
-  async updateFundDetails(
-    @Body() body: { year: number; fundName: string; amount: number },
-  ) {
-    return await this.fundsOverviewByYearService.recordSpecialFundWithdrawalByName(
-      body.year,
-      body.amount,
-    );
-  }
+  // @Patch('/update-fund-details')
+  // async updateFundDetails(
+  //   @Body() body: { year: number; fundName: string; amount: number },
+  // ) {
+  //   return await this.fundsOverviewByYearService.recordSpecialFundWithdrawalByName(
+  //     body.year,
+  //     body.amount,
+  //   );
+  // }
 }

@@ -3,9 +3,10 @@ import { FundsOverviewByYearController } from './funds-overview-by-year.controll
 import { FundsOverviewByYearService } from './funds-overview-by-year.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FundsOverviewByYearEntity } from './Entity/funds-overview-by-year.entity';
+import { FundsOverviewByYearViewEntity } from './Entity/funds-overview-by-year.view.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([FundsOverviewByYearEntity]),
+  imports: [TypeOrmModule.forFeature([FundsOverviewByYearEntity,FundsOverviewByYearViewEntity ]),
   
 ],
   controllers: [FundsOverviewByYearController],

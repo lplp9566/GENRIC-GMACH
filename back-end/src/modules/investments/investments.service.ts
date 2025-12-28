@@ -28,7 +28,7 @@ export class InvestmentsService {
       const { investment_name, amount, start_date ,company_name,investment_by,investment_portfolio_number} = dto;
       // await this.fundsOverviewService.addInvestment(Number (amount));
       const year = getYearFromDate(start_date);
-      await this.fundsOverviewByYearService.recordInvestmentOut(year, Number(amount));
+      // await this.fundsOverviewByYearService.recordInvestmentOut(year, Number(amount));
       const investment = this.investmentRepo.create({
         investment_name,
         total_principal_invested: amount,
@@ -61,7 +61,7 @@ export class InvestmentsService {
       const investment = await this.findActiveInvestment(id);
       // await this.fundsOverviewService.addInvestment(amount);
       const year = getYearFromDate(date);
-      await this.fundsOverviewByYearService.recordInvestmentOut(year, amount);
+      // await this.fundsOverviewByYearService.recordInvestmentOut(year, amount);
       investment.total_principal_invested =
         +investment.total_principal_invested + amount;
       investment.principal_remaining = +investment.principal_remaining + amount;
@@ -156,10 +156,10 @@ export class InvestmentsService {
       //   profitWithdrawn,
       // );
       const year = getYearFromDate(date);
-      await this.fundsOverviewByYearService.recordInvestmentIn(
-        year,
-        principalWithdrawal+profitWithdrawn,
-      );
+      // await this.fundsOverviewByYearService.recordInvestmentIn(
+      //   year,
+      //   principalWithdrawal+profitWithdrawn,
+      // );
 
       return {
         investment,

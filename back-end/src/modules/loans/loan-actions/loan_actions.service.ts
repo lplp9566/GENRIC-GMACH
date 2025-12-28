@@ -114,7 +114,7 @@ export class LoanActionsService {
         this.userFinByYear.recordLoanRepaid(loan.user, year, dto.value),
         this.userFin.recordLoanRepaid(loan.user, dto.value),
         // this.fundsOverview.repayLoan(dto.value),
-        this.fundsOverviewByYearService.recordLoanRepaid(year, dto.value),
+        // this.fundsOverviewByYearService.recordLoanRepaid(year, dto.value),
       ]);
       await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
 

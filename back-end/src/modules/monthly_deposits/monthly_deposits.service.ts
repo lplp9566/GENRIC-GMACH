@@ -92,7 +92,7 @@ export class MonthlyDepositsService {
         this.userFinancialsService.recordMonthlyDeposit(user, payment_details.amount),
         // this.fundsOverviewService.addMonthlyDeposit(payment_details.amount),
 
-        this.fundsOverviewByYearService.recordMonthlyDeposit(year, payment_details.amount),
+        // this.fundsOverviewByYearService.recordMonthlyDeposit(year, payment_details.amount),
       ]);
       await this.usersService.updateUserMonthlyBalance(user);
 
@@ -141,14 +141,14 @@ export class MonthlyDepositsService {
       // await this.fundsOverviewService.addMonthlyDeposit(deltaAmount);
 
       if (newYear === oldYear) {
-        await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, deltaAmount);
+        // await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, deltaAmount);
         await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, deltaAmount);
       } else {
         await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
-        await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
+        // await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
 
         await this.userFinancialByYearService.recordMonthlyDeposit(user, newYear, newAmount);
-        await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, newAmount);
+        // await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, newAmount);
       }
 
       // שומרים בתוך הטרנזקציה
@@ -186,7 +186,7 @@ async deleteMonthlyDeposit(id: number) {
 
       await this.userFinancialsService.recordMonthlyDeposit(user, -oldAmount);
       // await this.fundsOverviewService.addMonthlyDeposit(-oldAmount);
-      await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
+      // await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
       await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
 
       await manager.delete(MonthlyDepositsEntity, { id });

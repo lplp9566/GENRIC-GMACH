@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FundsOverviewEntity } from './entity/funds-overview.entity';
 import { Repository } from 'typeorm';
 import { CashHoldingsTypesRecordType } from '../cash-holdings/cash-holdings-dto';
-import { FundsOverviewViewEntity } from './funds-overview.view.entity';
+import { FundsOverviewViewEntity } from './entity/funds-overview.view.entity';
 
 @Injectable()
 export class FundsOverviewService {

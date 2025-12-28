@@ -19,7 +19,7 @@ export class ExpensesService {
     const expense = this.expensesRepository.create(expenseData);
     // await this.fundsOverviewService.addExpense(expense.amount);
     const year = getYearFromDate(expense.expenseDate) 
-    await this.fundsOverviewByYearService.recordExpense(year, expense.amount);
+    // await this.fundsOverviewByYearService.recordExpense(year, expense.amount);
     return this.expensesRepository.save(expense);
   }
 

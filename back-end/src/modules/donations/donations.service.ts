@@ -57,10 +57,10 @@ export class DonationsService {
       donation.amount,
     );
     // await this.fundsOverviewService.adjustDonation(donation.amount);
-    await this.fundsOvirewviewServiceByYear.adjustEquityDonation(
-      year,
-      donation.amount,
-    );
+    // await this.fundsOvirewviewServiceByYear.adjustEquityDonation(
+    //   year,
+    //   donation.amount,
+    // );
     const saved = await this.donationsRepository.save(donation);
     const withUser = await this.donationsRepository.findOne({
       where: { id: saved.id },
@@ -94,7 +94,7 @@ export class DonationsService {
       // שמירת donation
       const saved = await manager.save(DonationsEntity, donation);
       // await this.fundsOverviewService.adjustSpecialFund(donation.amount);
-      await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(year, donation.amount);
+      // await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(year, donation.amount);
       await this.userFinancialsService.adjustSpecialFundDonation( donation.user, donation.amount);
       await this.userFinancialsyYearService.adjustSpecialFundDonation(donation.user, year, donation.amount);
       return manager.findOne(DonationsEntity, {
@@ -155,7 +155,7 @@ export class DonationsService {
 
       const saved = await manager.save(DonationsEntity, donation);
       // await this.fundsOverviewService.reduceFundAmount( donation.amount);
-      await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(year, donation.amount);
+      // await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(year, donation.amount);
       return manager.findOne(DonationsEntity, {
         where: { id: saved.id },
         relations: { user: true },
@@ -329,13 +329,13 @@ async updateDonation(id: number, dto: UpdateDonationDto) {
       // לפי שנה
       if (oldYear === newYear) {
         await this.userFinancialsyYearService.adjustEquityDonation(user, oldYear, deltaAmount);
-        await this.fundsOvirewviewServiceByYear.adjustEquityDonation(oldYear, deltaAmount);
+        // await this.fundsOvirewviewServiceByYear.adjustEquityDonation(oldYear, deltaAmount);
       } else {
         await this.userFinancialsyYearService.adjustEquityDonation(user, oldYear, -oldAmount);
         await this.userFinancialsyYearService.adjustEquityDonation(user, newYear, +newAmount);
 
-        await this.fundsOvirewviewServiceByYear.adjustEquityDonation(oldYear, -oldAmount);
-        await this.fundsOvirewviewServiceByYear.adjustEquityDonation(newYear, +newAmount);
+        // await this.fundsOvirewviewServiceByYear.adjustEquityDonation(oldYear, -oldAmount);
+        // await this.fundsOvirewviewServiceByYear.adjustEquityDonation(newYear, +newAmount);
       }
     }
 
@@ -351,13 +351,13 @@ async updateDonation(id: number, dto: UpdateDonationDto) {
       // לפי שנה
       if (oldYear === newYear) {
         await this.userFinancialsyYearService.adjustSpecialFundDonation(user, oldYear, deltaAmount);
-        await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(oldYear, deltaAmount);
+        // await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(oldYear, deltaAmount);
       } else {
         await this.userFinancialsyYearService.adjustSpecialFundDonation(user, oldYear, -oldAmount);
         await this.userFinancialsyYearService.adjustSpecialFundDonation(user, newYear, +newAmount);
 
-        await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(oldYear, -oldAmount);
-        await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(newYear, +newAmount);
+        // await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(oldYear, -oldAmount);
+        // await this.fundsOvirewviewServiceByYear.adjustSpecialFundDonationByName(newYear, +newAmount);
       }
     }
 
@@ -372,10 +372,10 @@ async updateDonation(id: number, dto: UpdateDonationDto) {
 
       // לפי שנה
       if (oldYear === newYear) {
-        await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(oldYear, deltaAmount);
+        // await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(oldYear, deltaAmount);
       } else {
-        await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(oldYear, -oldAmount);
-        await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(newYear, +newAmount);
+        // await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(oldYear, -oldAmount);
+        // await this.fundsOvirewviewServiceByYear.recordSpecialFundWithdrawalByName(newYear, +newAmount);
       }
     }
 
