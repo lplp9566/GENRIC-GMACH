@@ -77,13 +77,13 @@ const hendeleSave = async () => {
     setError("");
   }, [initialDate, initialValue, open]);
 
-  const validate = () => {
-    if (!action) return "לא נבחרה פעולה לעריכה";
-    if (!date) return "חובה לבחור תאריך";
-    if (!Number.isFinite(value) || value <= 0) return "הסכום חייב להיות גדול מ-0";
-    if (!isPayment) return "כרגע ניתן לערוך רק פעולת תשלום";
-    return "";
-  };
+//   const validate = () => {
+//     if (!action) return "לא נבחרה פעולה לעריכה";
+//     if (!date) return "חובה לבחור תאריך";
+//     if (!Number.isFinite(value) || value <= 0) return "הסכום חייב להיות גדול מ-0";
+//     if (!isPayment) return "כרגע ניתן לערוך רק פעולת תשלום";
+//     return "";
+//   };
 
 
   return (
