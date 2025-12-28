@@ -26,7 +26,7 @@ import { MatomoTracker } from "./MatomoTracker";
 export default function App() {
   return (
     <BrowserRouter>
-          <MatomoTracker />
+      <MatomoTracker />
       <Routes>
         {/* Public */}
         <Route element={<PublicLayout />}>
@@ -37,12 +37,15 @@ export default function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route element={<PrivateLayout />}>
-                      <Route path="/home" element={<HomePage />} />
+            <Route path="/home" element={<HomePage />} />
             <Route path="/loans" element={<LoansPage />} />
             <Route path="/loans/new" element={<NewLoan />} />
             <Route path="/loans/:id" element={<LoanDetailsPage />} />
             <Route path="/funds" element={<FundsOverviewDashboard />} />
-            <Route path="/FundsOverviewByYear" element={<FundsOverviewByYearPage />} />
+            <Route
+              path="/FundsOverviewByYear"
+              element={<FundsOverviewByYearPage />}
+            />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/paymentsPage" element={<PaymentsPage />} />
             <Route path="/rankPage" element={<RankPage />} />
@@ -52,7 +55,10 @@ export default function App() {
             <Route path="/deposits" element={<DepositsPage />} />
             <Route path="/deposit/:id" element={<DepositDetailsPage />} />
             <Route path="/investments" element={<Investments />} />
-            < Route path="/investments/:id" element={<InvestmentDetailsPage />} />
+            <Route
+              path="/investments/:id"
+              element={<InvestmentDetailsPage />}
+            />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
