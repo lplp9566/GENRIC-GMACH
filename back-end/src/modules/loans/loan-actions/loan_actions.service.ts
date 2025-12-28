@@ -210,9 +210,7 @@ export class LoanActionsService {
         : 0;
 
     await this.loansRepo.save(loan);
-    await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
-    console.log(action);
-    
+    await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);    
     return action;
   } catch (error) {
     console.error('❌ Error in editPayment:', error.message);
