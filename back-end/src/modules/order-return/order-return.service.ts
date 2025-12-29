@@ -42,5 +42,13 @@ export class OrderReturnService {
     // await this.fundsOverviewByYearService.recordStandingOrderReturnPayment(year, orderReturn.amount);
     return await this.orderReturnRepository.save(orderReturn);
   }
-  
+  async deleteOrderReturn(id: number): Promise<void> {
+    await this.orderReturnRepository.delete(id);
+  }
+  async editorderReturn(id: number, updateData: Partial<OrderReturnEntity>): Promise<OrderReturnEntity> { 
+    const orderReturn = await this.orderReturnRepository.findOne({ where: { id } });
+    if (!orderReturn) throw new BadRequestException('Order return not found');
+    Object.assign(orderReturn, updateData);
+    return await this.orderReturnRepository.save(orderReturn);
+  }
 }
