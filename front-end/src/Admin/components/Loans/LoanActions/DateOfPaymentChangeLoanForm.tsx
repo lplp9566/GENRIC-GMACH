@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { Box, TextField, Button } from "@mui/material";
 import { ICreateLoanAction, LoanPaymentActionType } from "../LoanDto";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../../store/store";
 
 interface Props {
   loanId: number;
@@ -11,9 +9,9 @@ interface Props {
 }
 
 const DateOfPaymentChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
-  const loanDetails = useSelector(
-    (s: RootState) => s.AdminLoansSlice.loanDetails
-  );
+  // const loanDetails = useSelector(
+  //   (s: RootState) => s.AdminLoansSlice.loanDetails
+  // );
 
   const [date, setDate] = useState<string>("");
   const [day, setDay] = useState<number | string>("");
@@ -25,12 +23,6 @@ const DateOfPaymentChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
     setDay(value);
   };
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedDate = new Date(e.target.value);
-    const loanDate = new Date(loanDetails?.loan_date!);
-    if (selectedDate < loanDate) {
-      toast.error("תאריך הפעולה לא יכול להיות לפני תאריך תחילת ההלוואה");
-      return;
-    }
     setDate(e.target.value);
   };
   const isValid = day !== "" && date !== "";

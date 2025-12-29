@@ -42,9 +42,9 @@ export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit,max}) => 
             sx={{ backgroundColor: "#FFF", borderRadius: 1 }}
           >
             <MenuItem value={LoanPaymentActionType.PAYMENT}>תשלום הלוואה</MenuItem>
-            {/* <MenuItem value={LoanPaymentActionType.AMOUNT_CHANGE}>
+            <MenuItem value={LoanPaymentActionType.AMOUNT_CHANGE}>
               שינוי סכום הלוואה
-            </MenuItem> */}
+            </MenuItem>
             <MenuItem value={LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE}>
               עדכון תשלום חודשי
             </MenuItem>

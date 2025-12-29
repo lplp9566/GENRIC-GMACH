@@ -195,21 +195,14 @@ qb.setParameter("todayDay", new Date().getDate());
       loan.remaining_balance += dto.value;
       (loan.total_installments = loan.remaining_balance / loan.monthly_payment),
         await this.loansRepository.save(loan);
-      const year = getYearFromDate(dto.date);
-      await Promise.all([
-        // this.userFinancialsByYearService.recordLoanTaken(loan.user, year, diff),
-        // this.userFinancialsService.recordLoanTaken(loan.user, diff),
-        // this.fundsOverviewService.addLoan(diff),
-        // this.fundsOverviewByYearService.recordAddToLoan(year, diff),
-      ]);
       const result = await this.paymentsRepository.save({
         loan,
         date: dto.date,
         value: diff,
         action_type: LoanPaymentActionType.AMOUNT_CHANGE,
-        // note: dto.note || `שינוי סכום הלוואה ל-${dto.amount}`,
+        note: dto.note || `שינוי סכום הלוואה ל-${dto.value}`,
       })
-      await this.LoanActionBalanceService.computeLoanNetBalance(result.id);
+      await this.LoanActionBalanceService.computeLoanNetBalance(dto.loanId);
       return result;
       }
     catch (error) {

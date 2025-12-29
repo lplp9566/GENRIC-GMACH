@@ -79,6 +79,7 @@ export const  AdminStandingOrderReturnSlice = createSlice({
         )
         .addCase(payOrderReturn.fulfilled, (state, payload) => {
         state.payOrderReturnStatus = "fulfilled";
+        state.allOrdersReturn[state.allOrdersReturn.findIndex(orderReturn=>orderReturn.id===payload.payload.id)] = payload.payload;
         }
         )
         .addCase(payOrderReturn.rejected, (state, action) => {

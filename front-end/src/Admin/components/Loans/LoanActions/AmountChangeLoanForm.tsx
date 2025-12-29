@@ -16,7 +16,7 @@ interface Props {
   onSubmit: (dto: ICreateLoanAction) => void;
 }
 
-const AmountChangeLoanForm: React.FC<Props> = ({ loanId }) => {
+const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [newAmount, setNewAmount] = useState<number | "">("");
   const [date, setDate] = useState<string>("");
@@ -63,7 +63,7 @@ const AmountChangeLoanForm: React.FC<Props> = ({ loanId }) => {
           loan={newLoan}
           type="update"
          dto={dto}
-         onSubmit={()=>{}}
+         onSubmit={() => onSubmit(dto)}
         />
       )}
       <Box
