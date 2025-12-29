@@ -48,7 +48,8 @@ export class LoanEntity {
 
   @Column({ type: 'int' })
   initial_monthly_payment: number;
-
+  @Column({ type: 'date', default: null, nullable: true })
+  first_payment_date: Date | null;
   @Column({ type: 'float', default: 0 })
   balance: number;
 
