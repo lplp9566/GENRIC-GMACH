@@ -26,16 +26,14 @@ funds_donations_net AS (
 
 -- ✅ סך כל התרומות ברוטו (רגילות + קרן)
 donations_total_gross AS (
-  SELECT
-    COALESCE(SUM(amount), 0) AS value
+  SELECT COALESCE(SUM(amount), 0) AS value
   FROM public.donations
   WHERE action = 'donation'
 ),
 
 -- ✅ תרומות רגילות בלבד ברוטו
 regular_donations_gross AS (
-  SELECT
-    COALESCE(SUM(amount), 0) AS value
+  SELECT COALESCE(SUM(amount), 0) AS value
   FROM public.donations
   WHERE action = 'donation' AND "fundId" IS NULL
 ),
@@ -53,11 +51,11 @@ active_deposits AS (
   WHERE "isActive" = true
 ),
 
--- החזרי הור"ק ששולמו
-standing_order_return_sum AS (
+-- ✅ החזרי הור"ק פתוחים (לא שולמו) = מורידים מהנזילות בלבד
+standing_order_return AS (
   SELECT COALESCE(SUM(amount), 0) AS value
   FROM public."order-return"
-  WHERE paid = true
+  WHERE paid = false
 ),
 
 -- הלוואות פעילות
@@ -97,13 +95,12 @@ funds_json AS (
 SELECT
   1 AS id,
 
-  -- הון עצמי (לפי ההגדרה שלך, בלי cash)
+  -- ✅ הון עצמי — לא נוגע בהחזרי הור"ק
   (
     membership_fees.value
     + investments_sum.realized_profit
     + regular_donations_net.value
     + funds_donations_net.value
-    + standing_order_return_sum.value
     + active_deposits.value
   )::float AS own_equity,
 
@@ -121,31 +118,31 @@ SELECT
   special_funds_sum.value::float AS special_funds,
   membership_fees.value::float AS monthly_deposits,
 
-  -- ✅ סך כל התרומות (רגילות + קרן) ברוטו
   donations_total_gross.value::float AS total_donations,
-
-  -- ✅ תרומות רגילות בלבד (ברוטו) – משתמשים בשדה שקיים בסכימה
   regular_donations_gross.value::float AS total_equity_donations,
 
-  -- כסף נזיל
+  -- ✅ כסף נזיל: הון עצמי - הלוואות - השקעות נעולות - החזרי הור"ק פתוחים
   (
     (
       membership_fees.value
       + investments_sum.realized_profit
       + regular_donations_net.value
       + funds_donations_net.value
-      + standing_order_return_sum.value
       + active_deposits.value
     )
     - loans_sum.value
     - investments_sum.total_invested_now
+    - standing_order_return.value
   )::float AS available_funds,
 
   cash_sum.value::float AS cash_holdings,
   active_deposits.value::float AS total_user_deposits,
 
   0::float AS total_expenses,
-  standing_order_return_sum.value::float AS standing_order_return,
+
+  -- לתצוגה: כמה שמור כרגע להחזרי הור"ק פתוחים
+  standing_order_return.value::float AS standing_order_return_reserved,
+
   funds_json.fund_details::json AS fund_details
 
 FROM
@@ -155,7 +152,7 @@ FROM
   CROSS JOIN regular_donations_gross
   CROSS JOIN membership_fees
   CROSS JOIN active_deposits
-  CROSS JOIN standing_order_return_sum
+  CROSS JOIN standing_order_return
   CROSS JOIN loans_sum
   CROSS JOIN investments_sum
   CROSS JOIN cash_sum
