@@ -19,6 +19,7 @@ import NewDepositModal from "../Deposits/newDeposit/newDeposit";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import SavingsIcon from "@mui/icons-material/Savings";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+
 const formatILS = (value?: number | string | null) => {
   const n = typeof value === "string" ? Number(value) : value ?? 0;
   if (!Number.isFinite(n)) return "₪0.00";
@@ -46,7 +47,7 @@ const HomePage: React.FC = () => {
   const { fundsOverview, status } = useSelector(
     (s: RootState) => s.AdminFundsOverviewReducer
   );
-
+  
   const quickActions = [
     {
       label: "תשלום דמי חבר",
@@ -76,7 +77,7 @@ const HomePage: React.FC = () => {
       onclick: () => navigate("/loans/new"),
     },
   ];
- const stats = [
+const stats = [
   {
     label: "סכום זמין",
     value: formatILS(fundsOverview?.available_funds),
@@ -96,6 +97,7 @@ const HomePage: React.FC = () => {
     bgColor: "#2563eb", // כחול
   },
 ];
+
 
 
   return (
@@ -137,11 +139,7 @@ const HomePage: React.FC = () => {
                     <Box fontSize={40}>{s.icon}</Box>
                     <Box>
                       <Typography variant="body1">{s.label}</Typography>
-                      <Typography
-                        variant="h4"
-                        fontWeight={800}
-                        sx={{ letterSpacing: 0.5 }}
-                      >
+                      <Typography variant="h5" fontWeight={700}>
                         {s.value}
                       </Typography>
                     </Box>
@@ -150,7 +148,7 @@ const HomePage: React.FC = () => {
               </Grid>
             ))}
           </Grid>
-          {paymentModal && <AddPaymentModal cape={false} />}
+          {paymentModal && <AddPaymentModal cape ={false} />}
           {depositModal && <NewDepositModal />}
           <Box mt={10}>
             <Typography variant="h5" fontWeight={700} mb={2} textAlign="center">
