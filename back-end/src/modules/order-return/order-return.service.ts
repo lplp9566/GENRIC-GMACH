@@ -46,10 +46,7 @@ export class OrderReturnService {
     const orderReturn =  await this.orderReturnRepository.findOne({where: { id }, relations: ['user']});
     if (!orderReturn) throw new BadRequestException('Order return not found');    ;
     orderReturn.paid = true;
-    // await this.userFinancialsyYearService.recordStandingOrderReturnPayment(user, year, orderReturn.amount);
-    // await this.userFinancialsService.recordStandingOrderReturnPayment(user, orderReturn.amount);
-    // await this.fundsOverviewService.recordStandingOrderReturnPayment(orderReturn.amount);
-    // await this.fundsOverviewByYearService.recordStandingOrderReturnPayment(year, orderReturn.amount);
+    orderReturn.paid_at = paid_at;
     return await this.orderReturnRepository.save(orderReturn);
   }
   async deleteOrderReturn(id: number): Promise<void> {

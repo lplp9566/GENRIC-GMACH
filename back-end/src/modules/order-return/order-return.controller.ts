@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { OrderReturnService } from './order-return.service';
 import { OrderReturnEntity } from './Entity/order-return.entity';
 
@@ -12,5 +12,12 @@ export class OrderReturnController {
   @Post()
   async createOrderReturn(@Body() orderReturn: Partial<OrderReturnEntity>) {
     return await this.orderReturnService.createOrderReturn(orderReturn);
+  }
+  @Post(':id/pay')
+  async payOrderReturn(
+    @Body() payData: { paid_at: Date},
+    @Param('id') id: number,
+  ) {
+    return await this.orderReturnService.payOrderReturn(id, payData.paid_at);
   }
 }
