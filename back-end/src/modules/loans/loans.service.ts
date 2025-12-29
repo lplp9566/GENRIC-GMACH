@@ -202,14 +202,17 @@ qb.setParameter("todayDay", new Date().getDate());
         // this.fundsOverviewService.addLoan(diff),
         // this.fundsOverviewByYearService.recordAddToLoan(year, diff),
       ]);
-      return await this.paymentsRepository.save({
+      const result = await this.paymentsRepository.save({
         loan,
         date: dto.date,
         value: diff,
         action_type: LoanPaymentActionType.AMOUNT_CHANGE,
         // note: dto.note || `שינוי סכום הלוואה ל-${dto.amount}`,
-      });
-    } catch (error) {
+      })
+      await this.LoanActionBalanceService.computeLoanNetBalance(result.id);
+      return result;
+      }
+    catch (error) {
       console.error('❌ Error in editLoin:', error.message);
       throw new Error(error.message);
     }
@@ -226,13 +229,16 @@ qb.setParameter("todayDay", new Date().getDate());
       loan.monthly_payment = dto.value;
       (loan.total_installments = loan.remaining_balance / loan.monthly_payment),
         await this.loansRepository.save(loan);
-      return await this.paymentsRepository.save({
+      const result  =  await this.paymentsRepository.save({
         loan,
         date: dto.date,
         value: dto.value,
         action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
         // note: dto.note || `שינוי תשלום חודשי ל-${dto.value}`,
+
       });
+        await this.LoanActionBalanceService.computeLoanNetBalance(result.id)
+      return result;
     } catch (error) {
       throw new Error(error.message);
     }
@@ -251,13 +257,15 @@ qb.setParameter("todayDay", new Date().getDate());
       }
       loan.payment_date = dto.value;
       await this.loansRepository.save(loan);
-      return await this.paymentsRepository.save({
+      const result = await this.paymentsRepository.save({
         loan,
         date: dto.date,
         value: dto.value,
         action_type: LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
         // note: dto.note || `שינוי תאריך תשלום ל-${dto.value}`,
-      });
+      })
+      await this.LoanActionBalanceService.computeLoanNetBalance(result.id)
+      return result;
     } catch (error) {
       console.error('❌ Error in editDateOfPyment:', error.message);
       throw new Error(error.message);
