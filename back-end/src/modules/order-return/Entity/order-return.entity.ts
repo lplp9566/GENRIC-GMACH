@@ -17,8 +17,8 @@ export class OrderReturnEntity {
   @Column({ type: 'boolean' })
   paid: boolean;
 
-  @Column({type:"date"})
-  paid_at: Date;
+  @Column({type:"date" , nullable: true})
+  paid_at: Date | null;
 
   @Column({ type: 'text', nullable  : true })
   note: string;

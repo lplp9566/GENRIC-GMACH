@@ -26,9 +26,6 @@ const Investments = () => {
   }
   )
   
-console.log(fixidInvestments);
-
-  
   return (
     <>
       <Box sx={{ bgcolor: "#F8F8F8", minHeight: "100vh", py: 4 }}>

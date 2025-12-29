@@ -22,6 +22,7 @@ import ProtectedRoute from "./Auth/ProtectedRoute";
 import Investments from "./Admin/pages/InvestmentsPage";
 import InvestmentDetailsPage from "./Admin/components/Investments/InvestmentDetails/InvestmentDetailsPage";
 import { MatomoTracker } from "./MatomoTracker";
+import StandingOrdersReturnPage from "./Admin/pages/StandingOrdersReturnPage";
 
 export default function App() {
   return (
@@ -55,6 +56,7 @@ export default function App() {
             <Route path="/deposits" element={<DepositsPage />} />
             <Route path="/deposit/:id" element={<DepositDetailsPage />} />
             <Route path="/investments" element={<Investments />} />
+            <Route path="/standing-orders" element={<StandingOrdersReturnPage />} />
             <Route
               path="/investments/:id"
               element={<InvestmentDetailsPage />}

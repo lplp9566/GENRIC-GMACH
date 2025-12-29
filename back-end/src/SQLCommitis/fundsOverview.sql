@@ -141,7 +141,7 @@ SELECT
   0::float AS total_expenses,
 
   -- לתצוגה: כמה שמור כרגע להחזרי הור"ק פתוחים
-  standing_order_return.value::float AS standing_order_return_reserved,
+  standing_order_return.value::float AS standing_order_return,
 
   funds_json.fund_details::json AS fund_details
 
