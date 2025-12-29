@@ -16,6 +16,20 @@ import GemachRegulationsModal from "./GemachRegulationsModal";
 import { AddPaymentModal } from "../MonthlyPayments/AddMonthlyPayment/AddMonthlyPayment";
 import { setMonthlyPaymentModalMode } from "../../../store/features/Main/AppMode";
 import NewDepositModal from "../Deposits/newDeposit/newDeposit";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import SavingsIcon from "@mui/icons-material/Savings";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+const formatILS = (value?: number | string | null) => {
+  const n = typeof value === "string" ? Number(value) : value ?? 0;
+  if (!Number.isFinite(n)) return "₪0.00";
+  return new Intl.NumberFormat("he-IL", {
+    style: "currency",
+    currency: "ILS",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n);
+};
+
 const HomePage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
@@ -32,7 +46,7 @@ const HomePage: React.FC = () => {
   const { fundsOverview, status } = useSelector(
     (s: RootState) => s.AdminFundsOverviewReducer
   );
-  
+
   const quickActions = [
     {
       label: "תשלום דמי חבר",
@@ -62,26 +76,27 @@ const HomePage: React.FC = () => {
       onclick: () => navigate("/loans/new"),
     },
   ];
-  const stats = [
-    {
-      label: "סכום זמין",
-      value: fundsOverview?.available_funds,
-      icon: <Group />,
-      bgColor: "#a44fe4",
-    },
-    {
-      label: "קרן הגמח ",
-      value: fundsOverview?.fund_principal,
-      icon: <AccountBalanceWallet />,
-      bgColor: "#1db954",
-    },
-    {
-      label: "הון עצמי ",
-      value: `${fundsOverview?.own_equity}` ,
-      icon: <MonetizationOn />,
-      bgColor: "#2563eb",
-    },
-  ];
+ const stats = [
+  {
+    label: "סכום זמין",
+    value: formatILS(fundsOverview?.available_funds),
+    icon: <AccountBalanceWalletIcon sx={{ fontSize: 40 }} />,
+    bgColor: "#7c3aed", // סגול עמוק
+  },
+  {
+    label: "קרן הגמ\"ח",
+    value: formatILS(fundsOverview?.fund_principal),
+    icon: <SavingsIcon sx={{ fontSize: 40 }} />,
+    bgColor: "#16a34a", // ירוק
+  },
+  {
+    label: "הון עצמי",
+    value: formatILS(fundsOverview?.own_equity),
+    icon: <TrendingUpIcon sx={{ fontSize: 40 }} />,
+    bgColor: "#2563eb", // כחול
+  },
+];
+
 
   return (
     <Box p={4} bgcolor="#e8f5e9">
@@ -122,7 +137,11 @@ const HomePage: React.FC = () => {
                     <Box fontSize={40}>{s.icon}</Box>
                     <Box>
                       <Typography variant="body1">{s.label}</Typography>
-                      <Typography variant="h5" fontWeight={700}>
+                      <Typography
+                        variant="h4"
+                        fontWeight={800}
+                        sx={{ letterSpacing: 0.5 }}
+                      >
                         {s.value}
                       </Typography>
                     </Box>
@@ -131,7 +150,7 @@ const HomePage: React.FC = () => {
               </Grid>
             ))}
           </Grid>
-          {paymentModal && <AddPaymentModal cape ={false} />}
+          {paymentModal && <AddPaymentModal cape={false} />}
           {depositModal && <NewDepositModal />}
           <Box mt={10}>
             <Typography variant="h5" fontWeight={700} mb={2} textAlign="center">
