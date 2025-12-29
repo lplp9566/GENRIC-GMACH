@@ -84,7 +84,7 @@ const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
       >
         <TextField
           fullWidth
-          label="תאריך תשלום"
+          label="תאריך הפעולה"
           type="date"
           value={date}
           onChange={handleDateChange}
