@@ -23,6 +23,7 @@ import CheckLoanModal from "../CheckLoanModal";
 import { toast } from "react-toastify";
 import { editLoan, getAllLoans } from "../../../../store/features/admin/adminLoanSlice";
 import { ICreateLoan, IEditLoan } from "../LoanDto";
+import { StatusGeneric } from "../../../../common/indexTypes";
 
 // type UserOption = { id: number; first_name: string; last_name: string };
 
@@ -200,7 +201,7 @@ const EditLoanModal: React.FC<EditLoanModalProps> = ({
     );
 
     // 👉 רק אחרי הצלחה
-    dispatch(getAllLoans({ page: 1, limit: 20 }));
+    dispatch(getAllLoans({ page: 1, limit: 20 ,status:StatusGeneric.ACTIVE}));
     onClose();
 
   } catch (err) {
