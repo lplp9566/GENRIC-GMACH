@@ -26,7 +26,9 @@ const LoansDashboard: React.FC<LoanProps> = ({ loansData, total }) => {
   const totalAmount = loansData
     .reduce((sum, loan) => sum + loan.loan_amount, 0)
     .toLocaleString("he-IL");
-
+const totalRepaid = loansData
+    .reduce((sum, loan) => sum + ( loan.remaining_balance), 0)
+    .toLocaleString("he-IL");
   return (
     <Box sx={{ bgcolor: "#F5F5F5", py: 6, direction: "rtl" }}>
       <Container maxWidth="lg">
@@ -48,6 +50,9 @@ const LoansDashboard: React.FC<LoanProps> = ({ loansData, total }) => {
             </Grid>
             <Grid item xs={12} sm={isSm ? 6 : 3}>
               <SummaryCard label="סה״כ הלוואות" value={`₪${totalAmount}`} />
+            </Grid>
+            <Grid item xs={12} sm={isSm ? 6 : 3}>
+              <SummaryCard label="יתרה לסילוק" value={`₪${totalRepaid}`} />
             </Grid>
           </Grid>
 
