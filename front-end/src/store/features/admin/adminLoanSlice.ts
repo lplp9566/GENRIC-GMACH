@@ -79,7 +79,6 @@ export const createLoanAction = createAsyncThunk(
   "admin/createLoanAction",
   async (loanAction:ICreateLoanAction ) => {
     console.log(loanAction);
-    
     const response = await axios.post<ICreateLoanAction>(
       `${BASE_URL}/loan-actions`,
       loanAction
@@ -108,6 +107,8 @@ export const editLoan = createAsyncThunk (
   "admin/editLoan",
   async (loan: IEditLoan) => {
     const response = await axios.patch(`${BASE_URL}/loans/${loan.loan}`, loan);
+
+  // if (response.status === 200){ await thunkAPI.dispatch (getAllLoans({page:1,limit:20}));}
     return response.data;
   }
 );
@@ -118,7 +119,7 @@ export const editLoanAction = createAsyncThunk(
       `${BASE_URL}/loan-actions/${loanAction.id}`,
       loanAction
     );
-    await thunkAPI.dispatch(getLoanDetails(loanAction.loanId));
+      await thunkAPI.dispatch(getLoanDetails(loanAction.loanId));
     return response.data; 
   }
 );
@@ -223,15 +224,8 @@ export const AdminLoansSlice = createSlice({
 })
 .addCase(editLoan.fulfilled, (state, action) => {
   state.editLoanStatus = "fulfilled";
-  state.loanDetails = action.payload; // אם זה אותו מבנה
+  state.loanDetails = action.payload;
   state.error = null;
-
-  // ✅ לעדכן את הרשימה כדי שהטבלה תשתנה מיד
-  const updated = action.payload; // נניח שהוא ILoanWithUser (או לפחות כולל id)
-  const idx = state.allLoans.findIndex(l => l.id === updated.id);
-  if (idx !== -1) {
-    state.allLoans[idx] = updated;
-  }
 })
 .addCase(editLoan.rejected, (state, action) => {
   state.editLoanStatus = "rejected";

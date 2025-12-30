@@ -1,14 +1,11 @@
-// src/components/Loans/NewLoanForm.tsx
 import React from "react";
 import { Box, Card, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import CheckLoanModal from "../CheckLoanModal";
-
 import StepperNavigation from "../../StepperNavigation/StepperNavigation";
 import StepBasicDetails from "./StepBasicDetails";
 import StepGuarantors from "./StepGuarantors";
 import StepSummary from "./StepSummary";
-
 import {
   useNewLoanForm,
   NEW_LOAN_STEPS,

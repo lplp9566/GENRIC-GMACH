@@ -22,8 +22,6 @@ export class LoansService {
     private loansRepository: Repository<LoanEntity>,
     @InjectRepository(LoanActionEntity)
     private paymentsRepository: Repository<LoanActionEntity>,
-    private readonly userFinancialsService: UserFinancialService,
-    private readonly userFinancialsByYearService: UserFinancialByYearService,
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly usersService: UsersService,
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
@@ -98,8 +96,6 @@ qb.addOrderBy(
 );
 
 qb.setParameter("todayDay", new Date().getDate());
-
-
     const [data, total] = await qb.getManyAndCount();
     const pageCount = Math.ceil(total / limit);
 
@@ -140,20 +136,6 @@ qb.setParameter("todayDay", new Date().getDate());
         loanRecord.guarantor2 = loanData.guarantor2;
       }
      const result = await this.loansRepository.save(loanRecord);
-      // await this.userFinancialsService.recordLoanTaken(
-      //   user,
-      //   loanRecord.loan_amount,
-      // );
-      // await this.fundsOverviewService.addLoan(loanData.loan_amount!);
-      // await this.fundsOverviewByYearService.recordLoanTaken(
-      //   year,
-      //   loanData.loan_amount!,
-      // );
-      // await this.userFinancialsByYearService.recordLoanTaken(
-      //   user,
-      //   year,
-      //   loanRecord.loan_amount,
-      // );
             await this.LoanActionBalanceService.computeLoanNetBalance(result.id);
 
       return result;
@@ -277,6 +259,8 @@ qb.setParameter("todayDay", new Date().getDate());
     }
   }
  async editLoanSimple(loanId: number, dto: EditLoanDto) {
+  console.log(dto);
+  
     const toDate = (v: string | Date | undefined): Date | undefined => {
   if (!v) return undefined;
   const d = v instanceof Date ? v : new Date(v);
@@ -289,14 +273,11 @@ qb.setParameter("todayDay", new Date().getDate());
 
   if (!loan) throw new BadRequestException('Loan not found');
   if (!loan.isActive) throw new BadRequestException('Loan not active');
-
-  const year = getYearFromDate(loan.loan_date);
-
   // שינוי סכום הלוואה
   if (dto.loan_amount !== undefined && dto.loan_amount !== loan.loan_amount) {
     const oldAmount = Number(loan.loan_amount);
     const newAmount = Number(dto.loan_amount);
-    const diff = newAmount - oldAmount; // + מגדיל, - מקטין
+    const diff = newAmount - oldAmount; 
 
     // אם מגדילים – חייבים כסף פנוי
     if (diff > 0) {
@@ -309,19 +290,10 @@ qb.setParameter("todayDay", new Date().getDate());
     // עדכון הלוואה
     loan.loan_amount = newAmount;
     loan.remaining_balance = Number(loan.remaining_balance) + diff;
-
-
-    // עדכון FundsOverview (חשוב: פונקציה אחת שעובדת לשני הכיוונים)
-    // await this.fundsOverviewService.adjustLoan(diff);
-    // await this.fundsOverviewByYearService.recordFixLoan(year, diff);
-
-    // עדכון משתמש
-    // await this.userFinancialsService.adjustLoan(loan.user, diff);
-    // await this.userFinancialsByYearService.adjustLoan(loan.user, year, diff);
   }
 
   // שינוי תשלום חודשי
-  if (dto.monthly_payment !== undefined && dto.monthly_payment !== loan.monthly_payment) {
+  if (dto.monthly_payment !== undefined && dto.monthly_payment !== loan.monthly_payment) {    
     loan.initial_monthly_payment = Number(dto.monthly_payment);
     
   }
@@ -332,15 +304,18 @@ qb.setParameter("todayDay", new Date().getDate());
   }
 
   // חישובים סופיים
+  loan.loan_date =  toDate(dto.loan_date) || loan.loan_date;
+  loan.first_payment_date = toDate(dto.first_payment_date) || loan.first_payment_date;
+  loan.purpose = dto.purpose !== undefined ? dto.purpose : loan.purpose;
+  loan.guarantor1 = dto.guarantor1 !== undefined ? dto.guarantor1 : loan.guarantor1;
+  loan.guarantor2 = dto.guarantor2 !== undefined ? dto.guarantor2 : loan.guarantor2;
   loan.total_installments =
     Number(loan.monthly_payment) > 0
       ? Number(loan.remaining_balance) / Number(loan.monthly_payment)
       : loan.total_installments;
-    loan.loan_date =  toDate(dto.loan_date) || loan.loan_date;
-
   // אם balance אצלך אמור להיות היתרה הנוכחית
   const result = await this.loansRepository.save(loan);
-  await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
+   if (result) await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
 
   return result;
 }

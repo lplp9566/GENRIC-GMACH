@@ -33,4 +33,8 @@ export class EditLoanDto {
 
     @IsOptional()
    purpose?: string;
+
+  @IsOptional()
+  @IsDateString()
+  first_payment_date?: string;  
 }

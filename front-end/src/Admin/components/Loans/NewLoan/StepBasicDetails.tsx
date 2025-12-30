@@ -12,6 +12,7 @@ interface StepBasicDetailsProps {
     loan_date: string;
     monthly_payment: number;
     payment_date: number;
+    first_payment_date: string | null;
   };
   selectedUserId: number;
   allUsers: { id: number; first_name: string; last_name: string }[];
@@ -63,6 +64,16 @@ const StepBasicDetails: React.FC<StepBasicDetailsProps> = ({
         fullWidth
         dir="rtl"
       />
+        <TextField
+          label="תאריך תשלום ראשון"
+          name="first_payment_date"
+          type="date"
+          value={newLoan.first_payment_date}
+          onChange={onFieldChange}
+          InputLabelProps={{ shrink: true }}
+          fullWidth
+          dir="rtl"
+        />
       <TextField
         label="תשלום חודשי"
         name="monthly_payment"

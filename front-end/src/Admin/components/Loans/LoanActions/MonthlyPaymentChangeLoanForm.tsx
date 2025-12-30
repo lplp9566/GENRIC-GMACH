@@ -35,6 +35,7 @@ const MonthlyPaymentChangeLoanForm: React.FC<Props> = ({
     monthly_payment: Number(monthly),
     payment_date: Loan.payment_date,
     user: Loan.user.id,
+    first_payment_date: Loan.first_payment_date,
   }
   const dto: ICreateLoanAction = {
     action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,

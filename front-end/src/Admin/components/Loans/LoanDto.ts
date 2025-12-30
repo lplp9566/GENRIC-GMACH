@@ -14,6 +14,7 @@ export interface ILoanWithUser {
   remaining_balance: number;
   initial_monthly_payment: number;
   total_installments: number;
+  first_payment_date: string  | null;
   total_remaining_payments: number;
   balance: number;
   guarantor1: string | null;
@@ -39,13 +40,14 @@ export interface ICreateLoan {
   purpose: string;
   monthly_payment: number;
   payment_date: number;
+  first_payment_date: string | null;
   guarantor1?: string | null;
   guarantor2?: string | null;
 }
 export interface ILoanCheckResponse {
   ok: boolean;
   error: string;
-  butten: boolean; // Indicates if the button should be enabled or not
+  butten: boolean; 
 }
 export enum LoanPaymentActionType {
   PAYMENT = "PAYMENT",
@@ -89,7 +91,8 @@ export interface IEditLoan{
   monthly_payment?: number;
   payment_date?: number;
   loan_date?: string;
-  guarantor1?: string | null; // ✅ שם מלא
-  guarantor2?: string | null; // ✅ שם מלא
+  guarantor1?: string | null; 
+  guarantor2?: string | null; 
   purpose?: string;
+  first_payment_date?: string | null;
 }

@@ -1,5 +1,5 @@
 // EditLoanModal.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -21,9 +21,8 @@ import { AppDispatch, RootState } from "../../../../store/store";
 import { setLoanModalMode } from "../../../../store/features/Main/AppMode";
 import CheckLoanModal from "../CheckLoanModal";
 import { toast } from "react-toastify";
-import { editLoan } from "../../../../store/features/admin/adminLoanSlice";
+import { editLoan, getAllLoans } from "../../../../store/features/admin/adminLoanSlice";
 import { ICreateLoan, IEditLoan } from "../LoanDto";
-import { useNavigate } from "react-router-dom";
 
 // type UserOption = { id: number; first_name: string; last_name: string };
 
@@ -39,12 +38,11 @@ interface EditLoanModalProps {
     purpose?: string;
     guarantor1?: string | null; // ✅ שם מלא
     guarantor2?: string | null; // ✅ שם מלא
+    first_payment_date: string | null;
   };
 }
-const toDateInput = (dateStr?: string) =>
-  dateStr
-    ? String(dateStr).slice(0, 10)
-    : new Date().toISOString().slice(0, 10);
+const toDateInput = (dateStr?: string | null) =>
+  dateStr ? String(dateStr).slice(0, 10) : "";
 
 const numOr = (v: any, fallback: number) => {
   const n = Number(v);
@@ -65,38 +63,35 @@ const EditLoanModal: React.FC<EditLoanModalProps> = ({
     payment_date: loan.payment_date,
     guarantor1: loan.guarantor1 ?? null,
     guarantor2: loan.guarantor2 ?? null,
-    
+    first_payment_date: loan.first_payment_date ?? null,
   });
   const { LoanModalMode } = useSelector(
     (state: RootState) => state.mapModeSlice
   );
   const allUsers = useSelector((state: RootState) => state.AdminUsers.allUsers);
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
-
-
   const [guarantorIds, setGuarantorIds] = useState<[number, number]>([0, 0]);
 
-  useEffect(() => {
-    if (!open) return;
-    const g1Id =
-      allUsers.find(
-        (u) => `${u.first_name} ${u.last_name}` === (loan.guarantor1 ?? "")
-      )?.id ?? 0;
+  // useEffect(() => {
+  //   if (!open) return;
+  //   const g1Id =
+  //     allUsers.find(
+  //       (u) => `${u.first_name} ${u.last_name}` === (loan.guarantor1 ?? "")
+  //     )?.id ?? 0;
 
-    const g2Id =
-      allUsers.find(
-        (u) => `${u.first_name} ${u.last_name}` === (loan.guarantor2 ?? "")
-      )?.id ?? 0;
+  //   const g2Id =
+  //     allUsers.find(
+  //       (u) => `${u.first_name} ${u.last_name}` === (loan.guarantor2 ?? "")
+  //     )?.id ?? 0;
 
-    setGuarantorIds([g1Id, g2Id]);
+  //   setGuarantorIds([g1Id, g2Id]);
 
-    setForm((p) => ({
-      ...p,
-      guarantor1: loan.guarantor1 ?? "",
-      guarantor2: loan.guarantor2 ?? "",
-    }));
-  }, [open, loan.guarantor1, loan.guarantor2]);
+  //   setForm((p) => ({
+  //     ...p,
+  //     guarantor1: loan.guarantor1 ?? "",
+  //     guarantor2: loan.guarantor2 ?? "",
+  //   }));
+  // }, [open, loan.guarantor1, loan.guarantor2]);
 
   const onGuarantorChange = (idx: 0 | 1, userId: number) => {
     setGuarantorIds((prev) => {
@@ -152,15 +147,17 @@ const EditLoanModal: React.FC<EditLoanModalProps> = ({
 
     return e;
   }, [form, guarantorIds]);
-const checkAmount = useMemo(() => {
-  const delta = numOr(form.loan_amount, 0) - loan.loan_amount;
-  return Math.max(0, delta);
-}, [form.loan_amount, loan.loan_amount]);
-const loanForCheck = useMemo(() => ({
-  ...form,
-  loan_amount: checkAmount,
-}), [form, checkAmount]);
-
+  const checkAmount = useMemo(() => {
+    const delta = numOr(form.loan_amount, 0) - loan.loan_amount;
+    return Math.max(0, delta);
+  }, [form.loan_amount, loan.loan_amount]);
+  const loanForCheck = useMemo(
+    () => ({
+      ...form,
+      loan_amount: checkAmount,
+    }),
+    [form, checkAmount]
+  );
 
   const isDirty = useMemo(() => {
     return (
@@ -168,13 +165,14 @@ const loanForCheck = useMemo(() => ({
       numOr(form.monthly_payment, 0) !== loan.monthly_payment ||
       numOr(form.payment_date, 0) !== loan.payment_date ||
       toDateInput(form.loan_date) !== toDateInput(loan.loan_date) ||
+      toDateInput(form.first_payment_date) !== toDateInput(loan.first_payment_date) ||
       (form.purpose ?? "") !== (loan.purpose ?? "") ||
       (form.guarantor1 ?? "") !== (loan.guarantor1 ?? "") ||
       (form.guarantor2 ?? "") !== (loan.guarantor2 ?? "")
     );
   }, [form, loan]);
 
-  const canSubmit = Object.keys(errors).length === 0 && isDirty ;
+  const canSubmit = Object.keys(errors).length === 0 && isDirty;
 
   const buildEditPayload = (): IEditLoan => ({
     loan: loan.id,
@@ -185,29 +183,37 @@ const loanForCheck = useMemo(() => ({
     purpose: form.purpose?.trim() || "",
     guarantor1: (form.guarantor1 ?? "").trim() || "",
     guarantor2: (form.guarantor2 ?? "").trim() || "",
+    first_payment_date: form.first_payment_date,
   });
 
-  const doEdit = async () => {
-    const payload = buildEditPayload();
-    toast.promise(dispatch(editLoan(payload)).unwrap(), {
-      pending: "מעדכן הלוואה...",
-      success: "הלוואה עודכנה בהצלחה",
-      error: "שגיאה בעדכון הלוואה",
-    });
+ const doEdit = async () => {
+  const payload = buildEditPayload();
+
+  try {
+    await toast.promise(
+      dispatch(editLoan(payload)).unwrap(),
+      {
+        pending: "מעדכן הלוואה...",
+        success: "הלוואה עודכנה בהצלחה",
+        error: "שגיאה בעדכון הלוואה",
+      }
+    );
+
+    // 👉 רק אחרי הצלחה
+    dispatch(getAllLoans({ page: 1, limit: 20 }));
     onClose();
-    navigate("/loans");
-  };
+
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
-
-    // אם הגדלת סכום -> רק פותחים מודאל, לא שולחים עדיין
     if (numOr(form.loan_amount, 0) > loan.loan_amount) {
       dispatch(setLoanModalMode(true));
       return;
     }
-
-    // אחרת שולחים רגיל
     await doEdit();
   };
 
@@ -238,19 +244,19 @@ const loanForCheck = useMemo(() => ({
             borderTopRightRadius: 16,
           }}
         >
-         {LoanModalMode && (
-  <CheckLoanModal
-    onClose={() => dispatch(setLoanModalMode(false))}
-    loan={loanForCheck}
-    type="update"
-    onSubmit={async () => {
-        console.log("hgh");
-        
-      dispatch(setLoanModalMode(false));
-      await doEdit(); 
-    }}
-  />
-)}
+          {LoanModalMode && (
+            <CheckLoanModal
+              onClose={() => dispatch(setLoanModalMode(false))}
+              loan={loanForCheck}
+              type="update"
+              onSubmit={async () => {
+                console.log("hgh");
+
+                dispatch(setLoanModalMode(false));
+                await doEdit();
+              }}
+            />
+          )}
           <Typography variant="h6" sx={{ fontWeight: 800, m: 0 }}>
             עריכת הלוואה #{loan.id}
           </Typography>
@@ -265,15 +271,14 @@ const loanForCheck = useMemo(() => ({
               mb: 2.5,
               p: 2,
               borderRadius: 3,
-              border: "1px solid #c8e6c9",
-              bgcolor: "rgba(255,255,255,0.45)",
+
             }}
           >
-            <Typography
+            {/* <Typography
               sx={{ fontSize: 13, fontWeight: 700, color: "text.secondary" }}
             >
               שדות חובה: סכום, תשלום חודשי, יום תשלום, תאריך
-            </Typography>
+            </Typography> */}
           </Box>
 
           <Grid container spacing={2.2}>
@@ -350,7 +355,24 @@ const loanForCheck = useMemo(() => ({
               />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="תאריך תחילת תשלום"
+                type="date"
+                fullWidth
+                color="success"
+                InputLabelProps={{ shrink: true }}
+                value={toDateInput(form.first_payment_date)}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    first_payment_date: e.target.value || null,
+                  }))
+                }
+              />
+              </Grid>
+            <Grid item xs={12} sm={6}>
+
               <TextField
                 label="מטרה"
                 fullWidth
@@ -406,9 +428,7 @@ const loanForCheck = useMemo(() => ({
             justifyContent: "space-between",
           }}
         >
-          <Button onClick={onClose} >
-            ביטול
-          </Button>
+          <Button onClick={onClose}>ביטול</Button>
 
           <Button
             variant="contained"

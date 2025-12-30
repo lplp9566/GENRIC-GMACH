@@ -30,7 +30,9 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan }) => {
       color: "#007BFF",
     },
     { label: "תאריך הלוואה", value: fmtDate(loan.loan_date), color: "text.primary" },
+    { label: "תאריך תחילת התשלום", value:  fmtDate(loan.first_payment_date) , color: "text.primary",condition: loan.first_payment_date !== null },
     { label: "מטרה", value: loan.purpose, color: "text.primary" },
+
     {
       label: "תשלום חודשי",
       value: `₪${loan.monthly_payment.toLocaleString()}`,

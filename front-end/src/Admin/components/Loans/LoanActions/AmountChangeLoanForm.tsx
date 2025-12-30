@@ -36,6 +36,7 @@ const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
     monthly_payment: Loan.monthly_payment,
     payment_date: Loan.payment_date,
     user: Loan.user.id,
+    first_payment_date: Loan.first_payment_date,
   };
   const dto: ICreateLoanAction = {
     action_type: LoanPaymentActionType.AMOUNT_CHANGE,

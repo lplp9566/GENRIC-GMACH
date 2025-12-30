@@ -29,6 +29,7 @@ export function useNewLoanForm() {
     loan_date: today,
     monthly_payment: 0,
     payment_date: 1,
+    first_payment_date: null,
   });
   const [guarantors, setGuarantors] = useState<
     { id: number; firstName: string; lastName: string }[]
@@ -41,7 +42,7 @@ export function useNewLoanForm() {
     setNewLoan((prev) => ({
       ...prev,
       [name]:
-        name === "purpose" || name === "loan_date"
+        name === "purpose" || name === "loan_date" || name === "first_payment_date"
           ? value
           : Number(value),
     }));

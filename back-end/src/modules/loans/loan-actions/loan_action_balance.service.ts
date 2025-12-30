@@ -35,7 +35,7 @@ export class LoanActionBalanceService {
     if (!loan) throw new Error('Loan not found');
 
     const principal = loan.loan_amount; // קרן
-    const startDate = new Date(loan.loan_date); // תאריך התחלה
+    const startDate = new Date(loan.first_payment_date ?? loan.loan_date); // תאריך התחלה
     const firstMonthlyInstallment = loan.initial_monthly_payment; // תעריף התשלום החודשי ההתחלתי
     const paymentDay = loan.payment_date; // יום בחודש לתשלום (1–28)
     const today = new Date();
@@ -58,15 +58,18 @@ export class LoanActionBalanceService {
     // 4. בניית לוח התאריכים הצפוי לתשלום חודשי (מתחילים מהחודש הבא)
     const dueDates: Date[] = [];
     let year = startDate.getFullYear();
-    let month = startDate.getMonth() + 1; // חודש הבא
+const firstPaymentDate =
+  loan.first_payment_date ? new Date(loan.first_payment_date as any) : null;
+
+let month = firstPaymentDate
+  ? firstPaymentDate.getMonth() + 1
+  : startDate.getMonth() + 1;
     while (true) {
       // חשב יום בתור מינימום בין paymentDay לבין מספר הימים בחודש
       const daysInThisMonth = getDaysInMonth(new Date(year, month, 1));
       const day = Math.min(paymentDay, daysInThisMonth);
-
       const nextDue = new Date(year, month, day);
       if (nextDue > today) break;
-
       dueDates.push(nextDue);
 
       // מעבר לחודש הבא
