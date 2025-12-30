@@ -26,4 +26,7 @@ export class DonationsEntity {
 
   @Column({ type: 'int', nullable: true })
   fundId?: number;
+
+  @Column({ type: 'text', nullable: true })
+  note?: string;
 }

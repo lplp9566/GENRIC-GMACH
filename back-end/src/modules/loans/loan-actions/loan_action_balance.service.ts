@@ -62,7 +62,7 @@ const firstPaymentDate =
   loan.first_payment_date ? new Date(loan.first_payment_date as any) : null;
 
 let month = firstPaymentDate
-  ? firstPaymentDate.getMonth() + 1
+  ? firstPaymentDate.getMonth() 
   : startDate.getMonth() + 1;
     while (true) {
       // חשב יום בתור מינימום בין paymentDay לבין מספר הימים בחודש
