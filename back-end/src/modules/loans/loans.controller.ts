@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, ParseIntPipe, Query, DefaultValuePipe, BadRequestException, ParseEnumPipe, ParseBoolPipe, Patch } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe, Query, DefaultValuePipe, BadRequestException, ParseEnumPipe, ParseBoolPipe, Patch, Delete } from '@nestjs/common';
 import { LoansService } from './loans.service';
 import { LoanEntity } from './Entity/loans.entity';
 import { LoanActionEntity } from './loan-actions/Entity/loan_actions.entity';
@@ -71,6 +71,10 @@ export class LoansController {
   @Patch(":id")
   editLoan(@Param("id") id: string, @Body() dto: EditLoanDto) {
     return this.loansService.editLoanSimple(Number(id), dto);
+  }
+  @Delete(":id")
+  deleteLoan(@Param("id") id: number) {
+    return this.loansService.deleteLoanSimple(Number(id));
   }
 }
 

@@ -1,8 +1,20 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
-import { FindOptionsGeneric, PaginatedResult } from "../../../common/indexTypes";
-import { ICreateLoan, ICreateLoanAction, IEditLoan, ILoanAction, ILoanCheckResponse, ILoanWithPayment, ILoanWithUser } from "../../../Admin/components/Loans/LoanDto";
+import {
+  FindOptionsGeneric,
+  PaginatedResult,
+  StatusGeneric,
+} from "../../../common/indexTypes";
+import {
+  ICreateLoan,
+  ICreateLoanAction,
+  IEditLoan,
+  ILoanAction,
+  ILoanCheckResponse,
+  ILoanWithPayment,
+  ILoanWithUser,
+} from "../../../Admin/components/Loans/LoanDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
 
 interface AdminLoanType {
@@ -13,7 +25,7 @@ interface AdminLoanType {
   createLoanStatus: Status;
   loanDeleteStatus: Status;
   createLoanActionStatus: Status;
-  editLoanStatus:Status
+  editLoanStatus: Status;
   error: string | null;
   page: number;
   pageCount: number;
@@ -21,8 +33,7 @@ interface AdminLoanType {
   loanDetails: ILoanWithPayment | null;
   checkLoanResponse: ILoanCheckResponse;
   editLoanActionStatus: Status;
-
-
+  deleteLoanStatus: Status;
 }
 const initialState: AdminLoanType = {
   allLoans: [],
@@ -33,16 +44,17 @@ const initialState: AdminLoanType = {
   createLoanStatus: "idle",
   loanDeleteStatus: "idle",
   createLoanActionStatus: "idle",
-  editLoanActionStatus:"idle",
+  editLoanActionStatus: "idle",
+  deleteLoanStatus: "idle",
   pageCount: 1,
   page: 1,
   total: 0,
   loanDetails: null,
-  editLoanStatus:"idle",
+  editLoanStatus: "idle",
   checkLoanResponse: {
     ok: false,
     error: "",
-    butten: false, 
+    butten: false,
   },
 };
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -51,7 +63,6 @@ export const getAllLoans = createAsyncThunk<
   PaginatedResult<ILoanWithUser>,
   FindOptionsGeneric
 >("admin/getAllLoans", async (opts) => {
-
   const response = await axios.get<PaginatedResult<ILoanWithUser>>(
     `${BASE_URL}/loans`,
     { params: opts }
@@ -77,7 +88,7 @@ export const createLoan = createAsyncThunk(
 );
 export const createLoanAction = createAsyncThunk(
   "admin/createLoanAction",
-  async (loanAction:ICreateLoanAction ) => {
+  async (loanAction: ICreateLoanAction) => {
     console.log(loanAction);
     const response = await axios.post<ICreateLoanAction>(
       `${BASE_URL}/loan-actions`,
@@ -85,7 +96,7 @@ export const createLoanAction = createAsyncThunk(
     );
     return response.data;
   }
-)
+);
 export const getAllLoanActions = createAsyncThunk(
   "admin/getAllLoanActions",
   async () => {
@@ -96,31 +107,45 @@ export const getAllLoanActions = createAsyncThunk(
 export const getLoanDetails = createAsyncThunk(
   "admin/getLoanDetails",
   async (id: number) => {
-    const response = await axios.get(
-      `${BASE_URL}/loans/id`,
-      { params: { id } } 
-    );
+    const response = await axios.get(`${BASE_URL}/loans/id`, {
+      params: { id },
+    });
     return response.data;
   }
 );
-export const editLoan = createAsyncThunk (
+export const editLoan = createAsyncThunk(
   "admin/editLoan",
   async (loan: IEditLoan) => {
     const response = await axios.patch(`${BASE_URL}/loans/${loan.loan}`, loan);
 
-  // if (response.status === 200){ await thunkAPI.dispatch (getAllLoans({page:1,limit:20}));}
+    // if (response.status === 200){ await thunkAPI.dispatch (getAllLoans({page:1,limit:20}));}
     return response.data;
   }
 );
 export const editLoanAction = createAsyncThunk(
   "admin/editLoanAction",
-  async (loanAction: { id: number; loanId: number; date?: Date; value?: number }, thunkAPI) => {
+  async (
+    loanAction: { id: number; loanId: number; date?: Date; value?: number },
+    thunkAPI
+  ) => {
     const response = await axios.patch(
       `${BASE_URL}/loan-actions/${loanAction.id}`,
       loanAction
     );
-      await thunkAPI.dispatch(getLoanDetails(loanAction.loanId));
-    return response.data; 
+    await thunkAPI.dispatch(getLoanDetails(loanAction.loanId));
+    return response.data;
+  }
+);
+export const deleteLoan = createAsyncThunk(
+  "admin/deleteLoan",
+  async (id: number, thunkAPI) => {
+    console.log(id);
+    
+    const response = await axios.delete(`${BASE_URL}/loans/${id}`);
+    await thunkAPI.dispatch(
+      getAllLoans({ page: 1, limit: 20, status: StatusGeneric.ACTIVE })
+    );
+    return response.data;
   }
 );
 export const AdminLoansSlice = createSlice({
@@ -135,7 +160,7 @@ export const AdminLoansSlice = createSlice({
     },
     setLoanActionStatus(state, action: PayloadAction<Status>) {
       state.createLoanActionStatus = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -147,7 +172,8 @@ export const AdminLoansSlice = createSlice({
           (state.page = action.payload.page),
           (state.pageCount = action.payload.pageCount),
           (state.total = action.payload.total),
-        (state.status = "fulfilled"), (state.error = null);
+          (state.status = "fulfilled"),
+          (state.error = null);
       })
       .addCase(getAllLoans.rejected, (state, action) => {
         (state.allLoans = []),
@@ -178,7 +204,11 @@ export const AdminLoansSlice = createSlice({
       })
       .addCase(checkLoan.rejected, (state, action) => {
         state.checkLoanStatus = "rejected";
-        state.checkLoanResponse = { ok: false, error: action.error.message || "", butten: false };
+        state.checkLoanResponse = {
+          ok: false,
+          error: action.error.message || "",
+          butten: false,
+        };
       })
       .addCase(createLoan.pending, (state) => {
         state.createLoanStatus = "pending";
@@ -191,7 +221,7 @@ export const AdminLoansSlice = createSlice({
       })
       .addCase(createLoan.rejected, (state, action) => {
         state.createLoanStatus = "rejected";
-        state.error = action.error.message! ;
+        state.error = action.error.message!;
       })
       .addCase(getLoanDetails.pending, (state) => {
         state.loanDetails = null;
@@ -216,42 +246,55 @@ export const AdminLoansSlice = createSlice({
       })
       .addCase(createLoanAction.rejected, (state, action) => {
         state.createLoanActionStatus = "rejected";
-        state.error = action.error.message! ;
+        state.error = action.error.message!;
       })
-   .addCase(editLoan.pending, (state) => {
-  state.editLoanStatus = "pending";
-  state.error = null;
-})
-.addCase(editLoan.fulfilled, (state, action) => {
-  state.editLoanStatus = "fulfilled";
-  state.loanDetails = action.payload;
-  state.error = null;
-})
-.addCase(editLoan.rejected, (state, action) => {
-  state.editLoanStatus = "rejected";
-  state.error = action.error.message ?? null;
-})
-.addCase(editLoanAction.pending, (state) => {
-  state.editLoanActionStatus = "pending";
-  state.error = null;
-})
-.addCase(editLoanAction.fulfilled, (state, { payload }) => {
-  state.editLoanActionStatus = "fulfilled";
+      .addCase(editLoan.pending, (state) => {
+        state.editLoanStatus = "pending";
+        state.error = null;
+      })
+      .addCase(editLoan.fulfilled, (state, action) => {
+        state.editLoanStatus = "fulfilled";
+        state.loanDetails = action.payload;
+        state.error = null;
+      })
+      .addCase(editLoan.rejected, (state, action) => {
+        state.editLoanStatus = "rejected";
+        state.error = action.error.message ?? null;
+      })
+      .addCase(editLoanAction.pending, (state) => {
+        state.editLoanActionStatus = "pending";
+        state.error = null;
+      })
+      .addCase(editLoanAction.fulfilled, (state, { payload }) => {
+        state.editLoanActionStatus = "fulfilled";
 
-  const idx = state.loanDetails?.actions?.findIndex(
-    (x) => Number(x.id) === Number(payload.id)
-  );
-  
-  if (idx !== undefined && idx !== -1 && state.loanDetails?.actions) {
-    state.loanDetails.actions[idx] = payload;
-  }
-  state.error = null;
-})
-.addCase(editLoanAction.rejected, (state, action) => {
-  state.editLoanActionStatus = "rejected";
-  state.error = action.error.message ?? null;  
-});
+        const idx = state.loanDetails?.actions?.findIndex(
+          (x) => Number(x.id) === Number(payload.id)
+        );
+
+        if (idx !== undefined && idx !== -1 && state.loanDetails?.actions) {
+          state.loanDetails.actions[idx] = payload;
+        }
+        state.error = null;
+      })
+      .addCase(editLoanAction.rejected, (state, action) => {
+        state.editLoanActionStatus = "rejected";
+        state.error = action.error.message ?? null;
+      })
+      .addCase(deleteLoan.pending, (state) => {
+        state.deleteLoanStatus = "pending";
+        state.error = null;
+      })
+      .addCase(deleteLoan.fulfilled, (state) => {
+        state.deleteLoanStatus = "fulfilled";
+        state.error = null;
+      })
+      .addCase(deleteLoan.rejected, (state, action) => {
+        state.deleteLoanStatus = "rejected";
+        state.error = action.error.message ?? null;
+      });
   },
 });
-export const { setPage, setCheckLoanStatus ,setLoanActionStatus} = AdminLoansSlice.actions;
+export const { setPage, setCheckLoanStatus, setLoanActionStatus } =
+  AdminLoansSlice.actions;
 export default AdminLoansSlice.reducer;

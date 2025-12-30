@@ -14,6 +14,7 @@ import { LoanEntity } from './Entity/loans.entity';
 import { FindOpts, LoanStatus, PaginatedResult } from '../../common/index';
 import { EditLoanDto } from './loan-dto/editLoanDto';
 import { LoanActionBalanceService } from './loan-actions/loan_action_balance.service';
+import { LoanActionsService } from './loan-actions/loan_actions.service';
 
 @Injectable()
 export class LoansService {
@@ -26,11 +27,13 @@ export class LoansService {
     private readonly usersService: UsersService,
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
     private readonly fundsFlowService: FundsFlowService,
+        @Inject(forwardRef(() => LoanActionsService))
+    private readonly LoanActionsService: LoanActionsService,
       @Inject(forwardRef(() => LoanActionBalanceService))
           private readonly LoanActionBalanceService: LoanActionBalanceService,
-        ) {}
-
-
+        )
+        
+         {}
   async checkLoan(
     loanData: Partial<LoanEntity>,
   ): Promise<{ ok: boolean; error: string; butten: boolean }> {
@@ -278,7 +281,6 @@ qb.setParameter("todayDay", new Date().getDate());
     const oldAmount = Number(loan.loan_amount);
     const newAmount = Number(dto.loan_amount);
     const diff = newAmount - oldAmount; 
-
     // אם מגדילים – חייבים כסף פנוי
     if (diff > 0) {
       const fund = await this.fundsOverviewService.getFundDetails();
@@ -286,8 +288,6 @@ qb.setParameter("todayDay", new Date().getDate());
         throw new BadRequestException(`אין מספיק כסף להגדלת ההלוואה ב־${diff} ₪`);
       }
     }
-
-    // עדכון הלוואה
     loan.loan_amount = newAmount;
     loan.remaining_balance = Number(loan.remaining_balance) + diff;
   }
@@ -297,12 +297,9 @@ qb.setParameter("todayDay", new Date().getDate());
     loan.initial_monthly_payment = Number(dto.monthly_payment);
     
   }
-
-  // שינוי תאריך חיוב
   if (dto.payment_date !== undefined && dto.payment_date !== loan.payment_date) {
     loan.payment_date = dto.payment_date;
   }
-
   // חישובים סופיים
   loan.loan_date =  toDate(dto.loan_date) || loan.loan_date;
   loan.first_payment_date = toDate(dto.first_payment_date) || loan.first_payment_date;
@@ -319,5 +316,8 @@ qb.setParameter("todayDay", new Date().getDate());
 
   return result;
 }
-
+  async deleteLoanSimple(loanId: number) {
+    await this.LoanActionsService.deleteAllPaymentsForLoan(loanId);
+    return this.loansRepository.delete(loanId);
+  }
 }

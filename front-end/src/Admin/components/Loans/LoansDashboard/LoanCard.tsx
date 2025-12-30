@@ -8,7 +8,7 @@ import {
   Typography,
   Chip,
   Grid,
-  Button,
+  IconButton,
 } from "@mui/material";
 import {
   AttachMoney as AttachMoneyIcon,
@@ -20,6 +20,13 @@ import {
 } from "@mui/icons-material";
 import { ILoanWithUser } from "../LoanDto";
 import EditLoanModal from "./EtitLoanModal";
+import ConfirmModal from "../../genricComponents/confirmModal";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../../store/store";
+import { deleteLoan } from "../../../../store/features/admin/adminLoanSlice";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 
 interface LoanCardProps {
   loan: ILoanWithUser;
@@ -27,9 +34,16 @@ interface LoanCardProps {
 }
 
 const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const balancePositive = (loan.balance ?? 0) >= 0;
   const [editOpen, setEditOpen] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState<ILoanWithUser | null>(null);
+  const [deleteMode, setDeleteMode] = useState<boolean>(false);
+  const onDelete = () => {
+    dispatch(deleteLoan(Number(loan.id)));
+    setDeleteMode(false);
+  };
   return (
     <Card
       sx={{
@@ -79,18 +93,29 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
                 fontSize: "0.8rem",
               }}
             />
-            <Button
-              variant="contained"
+            <IconButton
               size="small"
-              sx={{}}
+              color="primary"
               onClick={(e) => {
-                e.stopPropagation(); 
+                e.stopPropagation();
                 setSelectedLoan(loan);
                 setEditOpen(true);
               }}
             >
-              ערוך
-            </Button>
+              <EditIcon />
+            </IconButton>
+
+            <IconButton
+              size="small"
+              color="error"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedLoan(loan);
+                setDeleteMode(true);
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
           </Box>
           <Grid container spacing={1} mb={2}>
             <Grid item xs={6}>
@@ -203,7 +228,14 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
           open={editOpen}
           onClose={() => setEditOpen(false)}
           loan={selectedLoan}
-          
+        />
+      )}
+      {deleteMode && selectedLoan && (
+        <ConfirmModal
+          open={deleteMode}
+          onClose={() => setDeleteMode(false)}
+          onSubmit={onDelete}
+          text="האם אתה בטוח שברצונך למחוק את הלוואה?"
         />
       )}
     </Card>

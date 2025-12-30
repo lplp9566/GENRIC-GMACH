@@ -23,6 +23,7 @@ import { UsersService } from '../../users/users.service';
 import { FundsOverviewByYearService } from '../../funds-overview-by-year/funds-overview-by-year.service';
 import { LoanActionBalanceService } from './loan_action_balance.service';
 import { PaymentDetailsService } from '../../users/payment-details/payment-details.service';
+import { log } from 'console';
 
 // cSpell:ignore Financials
 
@@ -111,10 +112,6 @@ export class LoanActionsService {
 
       const year = getYearFromDate(dto.date);
       await Promise.all([
-        // this.userFinByYear.recordLoanRepaid(loan.user, year, dto.value),
-        // this.userFin.recordLoanRepaid(loan.user, dto.value),
-        // this.fundsOverview.repayLoan(dto.value),
-        // this.fundsOverviewByYearService.recordLoanRepaid(year, dto.value),
       ]);
       await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
 
@@ -259,6 +256,18 @@ async deletePayment(actionId: number): Promise<{ deleted: true }> {
     throw new BadRequestException(error.message);
   }
 }
-
-
+async deleteAllPaymentsForLoan(loanId: number): Promise<{ deleted: true }> {
+  try {
+    const loan = await this.loansRepo.findOne({
+      where: { id: loanId } ,relations: ['user'],
+    });
+    if (!loan) throw new BadRequestException('Loan not found');    
+    await this.paymentsRepo.delete({ loan: loan });
+    await this.paymentDetailsService.deleteLoanBalance(loan.id, loan.user.id);
+    return { deleted: true };
+  } catch (error) {
+    console.error('❌ Error in deleteAllPaymentsForLoan:', error.message);
+    throw new BadRequestException(error.message);
+  }
+}
 }
