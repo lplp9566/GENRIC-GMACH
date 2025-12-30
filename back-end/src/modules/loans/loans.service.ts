@@ -15,6 +15,7 @@ import { FindOpts, LoanStatus, PaginatedResult } from '../../common/index';
 import { EditLoanDto } from './loan-dto/editLoanDto';
 import { LoanActionBalanceService } from './loan-actions/loan_action_balance.service';
 import { LoanActionsService } from './loan-actions/loan_actions.service';
+import { log } from 'console';
 
 @Injectable()
 export class LoansService {
@@ -196,8 +197,10 @@ qb.setParameter("todayDay", new Date().getDate());
     }
   }
   async changeMonthlyPayment(dto: LoanActionDto) {
+    log('Changing monthly payment:', dto);
+    const loanId = Number(dto.loanId);
     const loan = await this.loansRepository.findOne({
-      where: { id: dto.loanId },
+      where: { id: loanId },
     });
     if (!loan) throw new BadRequestException('Loan not found');
     if (!loan.isActive) {
@@ -215,7 +218,7 @@ qb.setParameter("todayDay", new Date().getDate());
         // note: dto.note || `שינוי תשלום חודשי ל-${dto.value}`,
 
       });
-        await this.LoanActionBalanceService.computeLoanNetBalance(result.id)
+        await this.LoanActionBalanceService.computeLoanNetBalance(loanId)
       return result;
     } catch (error) {
       throw new Error(error.message);
