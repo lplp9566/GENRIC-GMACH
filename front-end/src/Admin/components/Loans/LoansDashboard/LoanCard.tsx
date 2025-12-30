@@ -26,6 +26,7 @@ import { AppDispatch } from "../../../../store/store";
 import { deleteLoan } from "../../../../store/features/admin/adminLoanSlice";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { toast } from "react-toastify";
 
 
 interface LoanCardProps {
@@ -41,7 +42,14 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
   const [selectedLoan, setSelectedLoan] = useState<ILoanWithUser | null>(null);
   const [deleteMode, setDeleteMode] = useState<boolean>(false);
   const onDelete = () => {
-    dispatch(deleteLoan(Number(loan.id)));
+    toast.promise(
+      dispatch(deleteLoan(Number(loan.id))).unwrap(),
+      {
+        pending: "מחיקת הלוואה...",
+        success: "הלוואה נמחקה בהצלחה! 🎉",
+        error: "שגיאה במחיקת הלוואה. נסה שוב. ❌",
+      }
+    );
     setDeleteMode(false);
   };
   return (
