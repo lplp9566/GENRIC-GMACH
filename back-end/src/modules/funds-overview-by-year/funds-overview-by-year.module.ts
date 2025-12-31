@@ -8,6 +8,7 @@ import { FundsOverviewByYearViewEntity } from './Entity/funds-overview-by-year.v
 @Module({
   imports: [TypeOrmModule.forFeature([FundsOverviewByYearEntity,FundsOverviewByYearViewEntity ]),
   
+  
 ],
   controllers: [FundsOverviewByYearController],
   providers: [FundsOverviewByYearService],

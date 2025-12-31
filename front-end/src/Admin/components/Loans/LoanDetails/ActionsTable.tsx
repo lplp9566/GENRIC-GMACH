@@ -17,6 +17,11 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditLoanActionModal from "./EditLoanActionModal";
+import { toast } from "react-toastify";
+import { AppDispatch } from "../../../../store/store";
+import { useDispatch } from "react-redux";
+import { deleteLoanAction } from "../../../../store/features/admin/adminLoanSlice";
+import ConfirmModal from "../../genricComponents/confirmModal";
 type SortField = "date" | "action_type" | "amount";
 type SortDirection = "asc" | "desc";
 
@@ -26,9 +31,12 @@ interface ActionsTableProps {
 }
 
 export const ActionsTable: React.FC<ActionsTableProps> = ({ actions, loanId }) => {
+        const dispatch = useDispatch<AppDispatch>();
+
   const [currentSortField, setCurrentSortField] = useState<SortField>("date");
   const [editModal, setEditModal] = useState<boolean>(false);
   const [selected, setSelected] = useState<ILoanAction | null>(null);
+  const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const [currentSortDirection, setCurrentSortDirection] =
     useState<SortDirection>("asc");
 
@@ -47,6 +55,17 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({ actions, loanId }) =
     LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
     LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
   ];
+  const delateAction = () => {
+    toast.promise(
+      dispatch(deleteLoanAction({id:selected!.id,loanId:loanId})), {
+        pending: "מוחק פעולה...",
+        success: "הפעולה נמחקה בהצלחה!",
+        error: "שגיאה במחיקת הפעולה", }
+    );
+    setDeleteModal(false
+    )
+
+  }
 
   const sortedActions = useMemo(() => {
     const copy = [...actions];
@@ -190,8 +209,8 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({ actions, loanId }) =
                       <span>
                         <IconButton
                           size="small"
-                          onClick={() => {}}
-                          // disabled={!onDelete}
+                          onClick={() => {setDeleteModal(true); setSelected(action);}}
+                          disabled={action.action_type != LoanPaymentActionType.PAYMENT}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
@@ -212,6 +231,15 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({ actions, loanId }) =
     loanId={loanId}
   />
 )}
+{deleteModal && (
+  <ConfirmModal
+    open={deleteModal}
+    text="מחק פעולה"
+    onSubmit={delateAction}
+    onClose={() => setDeleteModal(false)}
+  />
+)}
+
     </Paper>
   );
 };

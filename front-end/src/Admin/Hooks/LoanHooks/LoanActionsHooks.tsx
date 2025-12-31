@@ -6,9 +6,7 @@ import { ICreateLoanAction } from "../../components/Loans/LoanDto";
 import { createLoanAction, getLoanDetails } from "../../../store/features/admin/adminLoanSlice";
 
 
-const useLoanSubmit =(loanId: number) =>{
-  console.log("hjkl;");
-  
+const useLoanSubmit =(loanId: number) =>{  
   const dispatch = useDispatch<AppDispatch>();
 
   const handleSubmit = useCallback(

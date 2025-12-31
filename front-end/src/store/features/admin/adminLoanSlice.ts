@@ -136,6 +136,18 @@ export const editLoanAction = createAsyncThunk(
     return response.data;
   }
 );
+interface deleteLoanAction {
+  id: number;
+  loanId: number;
+}
+export const deleteLoanAction = createAsyncThunk(
+  "admin/deleteLoanAction",
+  async (deleteLoanAction: deleteLoanAction, thunkAPI) => {
+    const response = await axios.delete(`${BASE_URL}/loan-actions/${deleteLoanAction.id}`);
+    await thunkAPI.dispatch(getLoanDetails(deleteLoanAction.loanId));
+    return response.data;
+  }
+);
 export const deleteLoan = createAsyncThunk(
   "admin/deleteLoan",
   async (id: number, thunkAPI) => {
@@ -291,6 +303,19 @@ export const AdminLoansSlice = createSlice({
       })
       .addCase(deleteLoan.rejected, (state, action) => {
         state.deleteLoanStatus = "rejected";
+        state.error = action.error.message ?? null;
+      })
+      .addCase(deleteLoanAction.pending, (state) => {
+        state.editLoanActionStatus = "pending";
+        state.error = null;
+      })
+      .addCase(deleteLoanAction.fulfilled, (state, { payload }) => {
+        state.editLoanActionStatus = "fulfilled";
+        state.loanActions = state.loanActions.filter((x => Number(x.id) !== Number(payload.id)))
+        state.error = null;
+      })
+      .addCase(deleteLoanAction.rejected, (state, action) => {
+        state.editLoanActionStatus = "rejected";
         state.error = action.error.message ?? null;
       });
   },
