@@ -51,7 +51,6 @@ const DepositCard: FC<DepositCardProps> = ({ deposit, onClick }) => {
               label={deposit.isActive ? "פעיל" : "סגור"}
               size="small"
               sx={{
-                backgroundColor: deposit.isActive ? "#D2F7E1" : "#F0F0F0",
                 color: deposit.isActive ? "#28A960" : "#6B6B6B",
                 fontWeight: 600,
                 fontSize: "0.8rem",

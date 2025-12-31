@@ -11,14 +11,14 @@ const FundCard:FC<FundCardProps> = ({ label, amount, selected, onClick }) => {
     sx={{
       borderRadius: 3,
       boxShadow: selected ? 4 : 1,
-      bgcolor: selected ? "#dceee9" : "white",
+      bgcolor: selected ? "success.main" : "background.paper",
       transition: "0.2s",
       "&:hover": { boxShadow: 4 },
     }}
   >
     <CardActionArea onClick={onClick} sx={{ borderRadius: 3, p: 0.5 }}>
       <CardContent>
-        <Typography variant="overline" color="#1c3c3c">
+        <Typography variant="overline">
           {label}
         </Typography>
         <Typography variant="h5" fontWeight={800}>

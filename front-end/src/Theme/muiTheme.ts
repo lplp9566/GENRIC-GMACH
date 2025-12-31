@@ -1,83 +1,92 @@
-// src/theme/muiTheme.ts
-import { alpha, createTheme, ThemeOptions } from "@mui/material/styles";
+import { alpha, createTheme } from "@mui/material/styles";
 
 export type AppMode = "light" | "dark";
 
-/**
- * MUI theme "full colors" for light/dark + component style overrides
- * Works best when you use MUI components (Typography/Box/etc.) instead of raw <p>/<div> with hard-coded colors.
- */
+const TOKENS = {
+  light: {
+    bg: "#F6F7FB",
+    paper: "#FFFFFF",
+    paper2: "#F9FAFB",
+    text: "#111827",
+    text2: "#374151",
+    muted: "#6B7280",
+    border: "#E5E7EB",
+    primary: "#2563EB",
+    secondary: "#7C3AED",
+    success: "#16A34A",
+    warning: "#D97706",
+    error: "#DC2626",
+    info: "#0891B2",
+  },
+  dark: {
+    bg: "#0B1220",
+    paper: "#0F172A",
+    paper2: "#111A2E",
+    text: "#E5E7EB",
+    text2: "#C7CDD6",
+    muted: "#9CA3AF",
+    border: "#243044",
+    primary: "#60A5FA",
+    secondary: "#A78BFA",
+    success: "#34D399",
+    warning: "#FBBF24",
+    error: "#F87171",
+    info: "#22D3EE",
+  },
+} as const;
+
 export const getMuiTheme = (mode: AppMode) => {
+  const t = TOKENS[mode];
   const isDark = mode === "dark";
 
-  // --- Core color tokens (edit freely) ---
-  const tokens = {
-    bg: isDark ? "#0B1220" : "#F7F8FA",
-    paper: isDark ? "#0F172A" : "#FFFFFF",
-    paper2: isDark ? "#111A2E" : "#FFFFFF",
-    border: isDark ? "#26324A" : "#E6E8EE",
-
-    text: isDark ? "#E5E7EB" : "#111827",
-    text2: isDark ? "#C7CDD6" : "#374151",
-    muted: isDark ? "#9CA3AF" : "#6B7280",
-
-    primary: isDark ? "#60A5FA" : "#2563EB",
-    secondary: isDark ? "#A78BFA" : "#7C3AED",
-
-    success: isDark ? "#34D399" : "#16A34A",
-    warning: isDark ? "#FBBF24" : "#D97706",
-    error: isDark ? "#F87171" : "#DC2626",
-    info: isDark ? "#22D3EE" : "#0891B2",
-  };
-
-  const base: ThemeOptions = {
+  const theme = createTheme({
     palette: {
       mode,
-      primary: { main: tokens.primary },
-      secondary: { main: tokens.secondary },
-      success: { main: tokens.success },
-      warning: { main: tokens.warning },
-      error: { main: tokens.error },
-      info: { main: tokens.info },
+      primary: { main: t.primary },
+      secondary: { main: t.secondary },
+      success: { main: t.success },
+      warning: { main: t.warning },
+      error: { main: t.error },
+      info: { main: t.info },
 
       background: {
-        default: tokens.bg,
-        paper: tokens.paper,
+        default: t.bg,
+        paper: t.paper,
       },
-
       text: {
-        primary: tokens.text,
-        secondary: tokens.text2,
+        primary: t.text,
+        secondary: t.text2,
       },
-
-      divider: tokens.border,
+      divider: t.border,
     },
 
-    shape: { borderRadius: 12 },
+    shape: { borderRadius: 16 },
 
     typography: {
-      fontFamily: `system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"`,
-      button: { textTransform: "none", fontWeight: 700 },
+      fontFamily:
+        `system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, ` +
+        `"Apple Color Emoji","Segoe UI Emoji"`,
+      h1: { fontWeight: 800 },
+      h2: { fontWeight: 800 },
+      h3: { fontWeight: 800 },
+      h4: { fontWeight: 800 },
+      button: { textTransform: "none", fontWeight: 800 },
     },
 
+    shadows: [
+      "none",
+      "0px 2px 10px rgba(0,0,0,0.08)",
+      "0px 6px 18px rgba(0,0,0,0.10)",
+      "0px 10px 28px rgba(0,0,0,0.12)",
+      ...Array(21).fill("0px 10px 28px rgba(0,0,0,0.12)"),
+    ] as any,
+
     components: {
-      // Global baseline for ALL pages
       MuiCssBaseline: {
         styleOverrides: {
-          "html, body": {
-            backgroundColor: tokens.bg,
-            color: tokens.text,
-          },
-          "*": {
-            // smoother theme switching
-            transition: "background-color .15s ease, color .15s ease, border-color .15s ease",
-          },
-          a: {
-            color: tokens.primary,
-          },
-          // If you have some non-MUI text elements, this helps them inherit theme text.
-          "p, span, div, li, td, th, label, small": {
-            color: "inherit",
+          body: {
+            backgroundColor: t.bg,
+            color: t.text,
           },
         },
       },
@@ -87,7 +96,7 @@ export const getMuiTheme = (mode: AppMode) => {
         styleOverrides: {
           root: {
             backgroundImage: "none",
-            border: `1px solid ${alpha(tokens.border, isDark ? 0.9 : 1)}`,
+            border: `1px solid ${alpha(t.border, isDark ? 0.7 : 1)}`,
           },
         },
       },
@@ -95,114 +104,24 @@ export const getMuiTheme = (mode: AppMode) => {
         styleOverrides: {
           root: {
             backgroundImage: "none",
-            border: `1px solid ${alpha(tokens.border, isDark ? 0.9 : 1)}`,
+            border: `1px solid ${alpha(t.border, isDark ? 0.7 : 1)}`,
+            boxShadow: isDark
+              ? "0px 12px 30px rgba(0,0,0,0.35)"
+              : "0px 12px 30px rgba(0,0,0,0.10)",
           },
         },
       },
 
-      // Buttons
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            borderRadius: 12,
-            fontWeight: 700,
-          },
-          contained: {
-            boxShadow: "none",
-            "&:hover": { boxShadow: "none" },
-          },
-          outlined: {
-            borderColor: alpha(tokens.border, 1),
-            "&:hover": {
-              borderColor: alpha(tokens.primary, 0.6),
-              backgroundColor: alpha(tokens.primary, isDark ? 0.12 : 0.08),
-            },
-          },
-          text: {
-            "&:hover": {
-              backgroundColor: alpha(tokens.primary, isDark ? 0.12 : 0.08),
-            },
-          },
-        },
-      },
-
-      // Inputs / Forms
-      MuiTextField: { defaultProps: { variant: "outlined" } },
-      MuiOutlinedInput: {
-        styleOverrides: {
-          root: {
-            backgroundColor: alpha(tokens.paper2, isDark ? 0.6 : 1),
-            "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: alpha(tokens.border, 1),
-            },
-            "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: alpha(tokens.primary, 0.6),
-            },
-            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: tokens.primary,
-              borderWidth: 2,
-            },
-          },
-          input: {
-            color: tokens.text,
-            "::placeholder": { color: tokens.muted, opacity: 1 },
-          },
-        },
-      },
-      MuiInputLabel: {
-        styleOverrides: {
-          root: {
-            color: tokens.text2,
-            "&.Mui-focused": { color: tokens.primary },
-          },
-        },
-      },
-      MuiFormHelperText: {
-        styleOverrides: {
-          root: { color: tokens.muted },
-        },
-      },
-
-      // Selection controls
-      MuiCheckbox: {
-        styleOverrides: {
-          root: {
-            color: alpha(tokens.text2, 0.8),
-            "&.Mui-checked": { color: tokens.primary },
-          },
-        },
-      },
-      MuiRadio: {
-        styleOverrides: {
-          root: {
-            color: alpha(tokens.text2, 0.8),
-            "&.Mui-checked": { color: tokens.primary },
-          },
-        },
-      },
-      MuiSwitch: {
-        styleOverrides: {
-          switchBase: {
-            "&.Mui-checked": { color: tokens.primary },
-            "&.Mui-checked + .MuiSwitch-track": {
-              backgroundColor: alpha(tokens.primary, 0.5),
-            },
-          },
-          track: {
-            backgroundColor: alpha(tokens.muted, 0.4),
-          },
-        },
-      },
-
-      // Navigation
+      // AppBar / Drawer
       MuiAppBar: {
         styleOverrides: {
           root: {
             backgroundImage: "none",
-            backgroundColor: alpha(tokens.paper, isDark ? 0.92 : 0.96),
-            color: tokens.text,
-            borderBottom: `1px solid ${tokens.border}`,
+            backgroundColor: alpha(t.paper, isDark ? 0.92 : 0.95),
+            color: t.text,
+            borderBottom: `1px solid ${alpha(t.border, isDark ? 0.6 : 1)}`,
             boxShadow: "none",
+            backdropFilter: "blur(10px)",
           },
         },
       },
@@ -210,57 +129,105 @@ export const getMuiTheme = (mode: AppMode) => {
         styleOverrides: {
           paper: {
             backgroundImage: "none",
-            backgroundColor: tokens.paper,
-            borderRight: `1px solid ${tokens.border}`,
+            backgroundColor: t.paper,
+            borderRight: `1px solid ${alpha(t.border, isDark ? 0.6 : 1)}`,
           },
         },
       },
-      MuiListItemButton: {
+
+      // Buttons
+      MuiButton: {
         styleOverrides: {
-          root: {
-            borderRadius: 10,
+          root: { borderRadius: 14, fontWeight: 800 },
+          contained: {
+            boxShadow: "none",
+            "&:hover": { boxShadow: "none" },
+          },
+          outlined: {
+            borderColor: alpha(t.border, 1),
             "&:hover": {
-              backgroundColor: alpha(tokens.primary, isDark ? 0.14 : 0.08),
+              borderColor: alpha(t.primary, 0.6),
+              backgroundColor: alpha(t.primary, isDark ? 0.16 : 0.08),
             },
-            "&.Mui-selected": {
-              backgroundColor: alpha(tokens.primary, isDark ? 0.22 : 0.12),
-              "&:hover": {
-                backgroundColor: alpha(tokens.primary, isDark ? 0.28 : 0.16),
-              },
+          },
+          text: {
+            "&:hover": {
+              backgroundColor: alpha(t.primary, isDark ? 0.16 : 0.08),
             },
           },
         },
       },
 
-      // Chips
-      MuiChip: {
+      // Inputs
+      MuiOutlinedInput: {
         styleOverrides: {
           root: {
-            borderRadius: 999,
-            border: `1px solid ${alpha(tokens.border, 1)}`,
-            backgroundColor: alpha(tokens.paper2, isDark ? 0.6 : 1),
+            backgroundColor: alpha(t.paper2, isDark ? 0.75 : 1),
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: alpha(t.border, isDark ? 0.7 : 1),
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: alpha(t.primary, 0.65),
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: t.primary,
+              borderWidth: 2,
+            },
+          },
+          input: {
+            color: t.text,
+            "::placeholder": { color: t.muted, opacity: 1 },
+          },
+        },
+      },
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            color: t.text2,
+            "&.Mui-focused": { color: t.primary },
           },
         },
       },
 
-      // Tables
+      // Table
       MuiTableContainer: {
         styleOverrides: {
           root: {
-            border: `1px solid ${tokens.border}`,
-            borderRadius: 16,
+            border: `1px solid ${alpha(t.border, isDark ? 0.6 : 1)}`,
+            borderRadius: 18,
+            overflow: "hidden",
           },
         },
       },
       MuiTableCell: {
         styleOverrides: {
-          root: {
-            borderBottom: `1px solid ${alpha(tokens.border, 1)}`,
-          },
           head: {
-            fontWeight: 800,
-            color: tokens.text,
-            backgroundColor: alpha(tokens.paper2, isDark ? 0.65 : 1),
+            fontWeight: 900,
+            color: t.text,
+            backgroundColor: alpha(t.paper2, isDark ? 0.85 : 1),
+          },
+          root: {
+            borderBottom: `1px solid ${alpha(t.border, isDark ? 0.5 : 1)}`,
+          },
+        },
+      },
+
+      // Menus / Popovers
+      MuiMenu: {
+        styleOverrides: {
+          paper: {
+            borderRadius: 16,
+            border: `1px solid ${alpha(t.border, isDark ? 0.6 : 1)}`,
+            backgroundImage: "none",
+          },
+        },
+      },
+      MuiPopover: {
+        styleOverrides: {
+          paper: {
+            borderRadius: 16,
+            border: `1px solid ${alpha(t.border, isDark ? 0.6 : 1)}`,
+            backgroundImage: "none",
           },
         },
       },
@@ -269,55 +236,13 @@ export const getMuiTheme = (mode: AppMode) => {
       MuiTooltip: {
         styleOverrides: {
           tooltip: {
-            backgroundColor: alpha("#111827", isDark ? 0.92 : 0.92),
-            color: "#F9FAFB",
-            border: `1px solid ${alpha("#FFFFFF", 0.08)}`,
-          },
-          arrow: {
-            color: alpha("#111827", 0.92),
-          },
-        },
-      },
-
-      // Dialog
-      MuiDialog: {
-        styleOverrides: {
-          paper: {
-            backgroundImage: "none",
-            border: `1px solid ${tokens.border}`,
-          },
-        },
-      },
-
-      // Tabs
-      MuiTabs: {
-        styleOverrides: {
-          indicator: { height: 3, borderRadius: 3 },
-        },
-      },
-
-      // Snackbar / Alerts
-      MuiAlert: {
-        styleOverrides: {
-          root: {
-            borderRadius: 14,
-            border: `1px solid ${alpha(tokens.border, 1)}`,
-          },
-        },
-      },
-
-      // Accordion
-      MuiAccordion: {
-        styleOverrides: {
-          root: {
-            backgroundImage: "none",
-            border: `1px solid ${tokens.border}`,
-            "&:before": { display: "none" },
+            backgroundColor: isDark ? alpha("#0B1220", 0.95) : alpha("#111827", 0.92),
+            border: `1px solid ${alpha("#FFFFFF", isDark ? 0.08 : 0.12)}`,
           },
         },
       },
     },
-  };
+  });
 
-  return createTheme(base);
+  return theme;
 };

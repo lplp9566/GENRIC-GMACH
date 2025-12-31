@@ -26,7 +26,7 @@ const [addFundModal, setaddFundModal] = useState(false)
         p: 3,
         mb: 4,
         borderRadius: 2,
-        bgcolor: "#FFFFFF",
+        // bgcolor: "#FFFFFF",
         width: "40%",
         mx: "auto",
         dir: "rtl",
@@ -65,8 +65,8 @@ const [addFundModal, setaddFundModal] = useState(false)
 }}
 
             sx={{
-              backgroundColor: "green",
-              color: "#ffffff",
+              // backgroundColor: "green",
+              // color: "#ffffff",
               "&:hover": {
                 backgroundColor: "rgb(26, 29, 27)",
               },
@@ -77,14 +77,14 @@ const [addFundModal, setaddFundModal] = useState(false)
           <Button
             onClick={() => dispatch(setWithdrawDonationModal(true))}
             variant="outlined"
-            sx={{
-              borderColor: "#2a8c82",
-              color: "#2a8c82",
-              "&:hover": {
-                borderColor: "#1b5e20",
-                color: "#1b5e20",
-              },
-            }}
+            // sx={{
+            //   borderColor: "#2a8c82",
+            //   color: "#2a8c82",
+            //   "&:hover": {
+            //     borderColor: "#1b5e20",
+            //     color: "#1b5e20",
+            //   },
+            // }}
           >
             משיכה מקרן{" "}
           </Button>

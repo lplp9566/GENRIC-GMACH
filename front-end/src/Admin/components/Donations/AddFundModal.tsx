@@ -38,14 +38,13 @@ const AddFundModal:FC<AddFundModalProps> = ({open, onClose}) => {
         //   component: Paper,
           sx: {
             borderRadius: 3,
-            bgcolor: "#e6f9ec",
           },
         }}
       >
         <DialogTitle
           sx={{
             bgcolor: "#2a8c82",
-            color: "#fff",
+            // color: "#fff",
             textAlign: "center",
             py: 2,
             // position: "relative",
@@ -61,7 +60,7 @@ const AddFundModal:FC<AddFundModalProps> = ({open, onClose}) => {
               position: "absolute",
               left: 8,
               top: 8,
-              color: "#fff",
+              // color: "#fff",
             }}
           >
             {/* <CloseIcon /> */}

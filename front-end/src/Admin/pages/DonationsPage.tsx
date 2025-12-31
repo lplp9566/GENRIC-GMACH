@@ -375,7 +375,6 @@ const right = useMemo(() => {
       sx={{
         py: 4,
         direction: "rtl",
-        bgcolor: "#F9FBFC",
         fontFamily: "Heebo, Arial, sans-serif",
         minHeight: "100vh",
       }}

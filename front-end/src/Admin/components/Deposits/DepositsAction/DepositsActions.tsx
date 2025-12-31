@@ -36,7 +36,7 @@ const DepositsActions: FC<IDepositsActionsProps> = ({
       <RtlProvider>
         <Paper
           elevation={2}
-          sx={{ p: 2, borderRadius: 2, backgroundColor: "#FEFEFE" }}
+          sx={{ p: 2, borderRadius: 2 }}
         >
           <Typography
             variant="h6"

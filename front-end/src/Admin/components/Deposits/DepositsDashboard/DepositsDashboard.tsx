@@ -18,7 +18,7 @@ const totalAmount = depositsData!
   .reduce((sum, deposit) => sum + (deposit.isActive ? deposit.current_balance : 0), 0)
 
   return (
-    <Box sx={{ bgcolor: "#F5F5F5", py: 6, direction: "rtl" }}>
+    <Box sx={{ py: 6, direction: "rtl" }}>
       <Container maxWidth="lg">
         {/* מסגרת לבנה לכל התוכן */}
         <Paper
@@ -26,7 +26,6 @@ const totalAmount = depositsData!
           sx={{
             p: { xs: 2, md: 4 },
             mb: 6,
-            bgcolor: "#fff",
             border: "1px solid rgba(0,0,0,0.08)",
             borderRadius: 2,
           }}

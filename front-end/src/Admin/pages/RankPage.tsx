@@ -35,7 +35,7 @@ const RanksManagementPage: React.FC = () => {
       sx={{
         py: 4,
         direction: "rtl",
-        bgcolor: "#F9FBFC",
+        // bgcolor: "#F9FBFC",
         fontFamily: "Heebo, Arial, sans-serif",
       }}
     >
@@ -48,7 +48,7 @@ const RanksManagementPage: React.FC = () => {
         <Button
           variant="outlined"
           onClick={() => navigate(-1)}
-          sx={{ color: "#5f7d7b", borderColor: "#5f7d7b" }}
+          // sx={{ color: "#5f7d7b", borderColor: "#5f7d7b" }}
         >
           {"< חזרה"}
         </Button>
@@ -60,7 +60,7 @@ const RanksManagementPage: React.FC = () => {
 
       <FramedContainer>
         <Box mb={3} textAlign="center">
-          <Typography variant="h5" fontWeight={600} color="#2e2e2e">
+          <Typography variant="h5" fontWeight={600}>
             דרגות במערכת
           </Typography>
         </Box>

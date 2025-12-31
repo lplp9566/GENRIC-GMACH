@@ -58,7 +58,7 @@ const DepositsPage: FC = () => {
     (state: RootState) => state.mapModeSlice.AddDepositModal
   );
   return (
-    <Box sx={{ bgcolor: "#F8F8F8", minHeight: "100vh", py: 4 }}>
+    <Box sx={{minHeight: "100vh", py: 4 }}>
       {depositModal && <NewDepositModal />}
 
       <Container maxWidth="lg">
@@ -69,7 +69,7 @@ const DepositsPage: FC = () => {
             p: 3,
             mb: 4,
             borderRadius: 2,
-            bgcolor: "#FFFFFF",
+            // bgcolor: "#FFFFFF",
             width: {
               xs: "100%",
               sm: "90%",
@@ -181,7 +181,7 @@ const DepositsPage: FC = () => {
             sx={{
               p: 2,
               borderRadius: 2,
-              bgcolor: "#FFFFFF",
+              // bgcolor: "#FFFFFF",
               overflowX: "auto",
             }}
           ></Box>
@@ -199,7 +199,7 @@ const DepositsPage: FC = () => {
                   color: "#424242",
                   "&.Mui-selected": {
                     bgcolor: "#2a8c82",
-                    color: "#ffffff",
+                    // color: "#ffffff",
                     "&:hover": { bgcolor: "#1f645f" },
                   },
                   "&:hover:not(.Mui-selected)": {

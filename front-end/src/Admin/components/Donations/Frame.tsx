@@ -36,10 +36,10 @@ const Frame: FC<FrameProps> = ({
           justifyContent: "space-between",
         }}
       >
-        <Typography variant="subtitle1" fontWeight={700} color="#1c3c3c">
+        <Typography variant="subtitle1" fontWeight={700} >
           {title}
         </Typography>
-        <IconButton onClick={onToggle} size="small" sx={{ color: "#1c3c3c" }}>
+        <IconButton onClick={onToggle} size="small">
           {expanded ? <FullscreenExitIcon /> : <FullscreenIcon />}
         </IconButton>
       </Box>
