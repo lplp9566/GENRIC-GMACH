@@ -7,11 +7,10 @@ import {
 } from 'typeorm';
 import { UserEntity } from '../user.entity';
 
-@Entity('user_financial_by_year')
+@Entity({ name: 'user_financial_by_year', synchronize: false })
 export class UserFinancialByYearEntity {
   @PrimaryGeneratedColumn()
   id: number;
-
   @ManyToOne(() => UserEntity, (user) => user.financialHistoryByYear, {
     eager: true,
     onDelete: 'CASCADE',

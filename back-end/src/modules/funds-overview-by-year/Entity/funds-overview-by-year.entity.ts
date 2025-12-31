@@ -1,6 +1,6 @@
 import { AfterLoad, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('funds_overview_by_year')
+@Entity({ name: 'funds_overview_by_year', synchronize: false })
 export class FundsOverviewByYearEntity {
   @PrimaryGeneratedColumn()
   id: number;

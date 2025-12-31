@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity('funds_overview')
+@Entity({ name: 'funds_overview', synchronize: false })
 export class FundsOverviewEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -10,6 +10,7 @@ export class FundsOverviewEntity {
 
   @Column({ type: 'float' })
   fund_principal: number;
+  
 
   @Column({ type: 'float' })
   total_loaned_out: number; // ✅ סכום הכסף שנמצא כרגע בהלוואות
