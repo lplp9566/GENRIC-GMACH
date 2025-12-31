@@ -31,7 +31,7 @@ useEffect(() => {
       maxWidth="lg"
       sx={{
         py: 4,
-        bgcolor: "background.default",
+        // bgcolor: "background.default",
         direction: "rtl",
         fontFamily: "Heebo, Arial, sans-serif",
       }}

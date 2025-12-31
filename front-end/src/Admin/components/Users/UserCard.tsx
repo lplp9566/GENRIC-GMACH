@@ -148,7 +148,7 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
         </CardActions>
 
         <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <CardContent sx={{ bgcolor: "grey.50" }}>
+          <CardContent >
             {user.membership_type === MembershipType.MEMBER && (
               <>
                 <Typography variant="subtitle2" gutterBottom>

@@ -31,7 +31,7 @@ const UsersHeader: FC<UsersHeaderProps> = ({ filter, setFilter }) => {
         p: 3,
         mb: 4,
         borderRadius: 2,
-        bgcolor: "#FFFFFF",
+        // bgcolor: "#FFFFFF",
         width: {
           xs: "100%",
           sm: "80%",
