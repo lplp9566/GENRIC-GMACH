@@ -6,7 +6,6 @@ import { AppDispatch, RootState } from "../../../../store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoanModalMode } from "../../../../store/features/Main/AppMode";
 import CheckLoanModal from "../CheckLoanModal";
-import { toast } from "react-toastify";
 
 interface Props {
   loanId: number;
@@ -46,14 +45,6 @@ const MonthlyPaymentChangeLoanForm: React.FC<Props> = ({
     const handleDateChange = (
       e: React.ChangeEvent<HTMLInputElement>
     ) => {
-      const selectedDate = new Date(e.target.value);
-      const loanDate = new Date(loanDetails?.loan_date!);
-      if (selectedDate < loanDate) {
-        toast.error(
-          "תאריך הפעולה לא יכול להיות לפני תאריך תחילת ההלוואה"
-        );
-        return;
-      }
       setDate(e.target.value);
     };
   const handle = () => {
@@ -66,7 +57,7 @@ const MonthlyPaymentChangeLoanForm: React.FC<Props> = ({
             {LoanModalMode && (
         <CheckLoanModal
           onClose={() => dispatch(setLoanModalMode(false))}
-          loan={newLoan}
+          loan={{... newLoan ,loan_amount: 0}}
           type="update"
          dto={dto}
          onSubmit={() => onSubmit(dto)}

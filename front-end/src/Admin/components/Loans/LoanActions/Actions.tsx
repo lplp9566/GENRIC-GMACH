@@ -48,9 +48,9 @@ export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit,max}) => 
             <MenuItem value={LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE}>
               עדכון תשלום חודשי
             </MenuItem>
-            {/* <MenuItem value={LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE}>
+            <MenuItem value={LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE}>
               שינוי יום תשלום
-            </MenuItem> */}
+            </MenuItem>
           </Select>
         </FormControl>
 
