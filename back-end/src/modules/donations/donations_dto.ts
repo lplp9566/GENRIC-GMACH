@@ -4,6 +4,7 @@ export interface IWindowDonations {
     date : Date;
     userId ? : number
     actionType : DonationActionType;
+    note ? : string;
 }
 
 export enum DonationActionType {

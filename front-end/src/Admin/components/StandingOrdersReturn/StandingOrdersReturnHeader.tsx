@@ -1,7 +1,10 @@
 import { Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, Stack, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { RtlProvider } from '../../../Theme/rtl'
+import { useState } from 'react';
+import { AddStandingOrderRefundModal } from './NewOrderReturn';
 
 const StandingOrdersReturnHeader = () => {
+  const [newOrderOpen, setNewOrderOpen] =useState(false);
     const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   return (
@@ -55,7 +58,7 @@ const StandingOrdersReturnHeader = () => {
         >
           <Button
             variant="contained"
-            onClick={() => {}}
+            onClick={() => setNewOrderOpen(true)}
             fullWidth={isSm}
             sx={{
               bgcolor: "#2a8c82",
@@ -110,6 +113,9 @@ const StandingOrdersReturnHeader = () => {
           </RtlProvider>
         </Box>
       </Stack>
+      {newOrderOpen && (
+        <AddStandingOrderRefundModal open={newOrderOpen} onClose={() => setNewOrderOpen(false)} />
+      )}
     </Paper>
   )
 }

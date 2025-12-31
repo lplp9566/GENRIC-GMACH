@@ -46,8 +46,6 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
     }
   }, [modalOpen]);
   const onDelete = async () => {
-    console.log(selectedPayment);
-
     const promise = dispatch(
       deleteMonthlyPayment(Number(selectedPayment!.id))
     ).unwrap();

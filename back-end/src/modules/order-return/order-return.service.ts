@@ -8,6 +8,8 @@ import { UserFinancialService } from '../users/user-financials/user-financials.s
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { getYearFromDate } from '../../services/services';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
+import { log } from 'console';
+import { CreateOrdersReturnDto } from './new-order-return-dto';
 
 @Injectable()
 export class OrderReturnService {
@@ -23,22 +25,25 @@ export class OrderReturnService {
   async getOrderReturns() {
     return await this.orderReturnRepository.find({relations: ['user']});
   }
- async createOrderReturn(orderReturn: any): Promise<OrderReturnEntity> {
-  const year = getYearFromDate(orderReturn.date);
+ async createOrderReturn(orderReturn: CreateOrdersReturnDto): Promise<OrderReturnEntity> {
+  const year = getYearFromDate( new Date(orderReturn.date) ?? orderReturn.date);
 
-  const userId = orderReturn.userId ?? orderReturn.user?.id ?? orderReturn.user;
+  const userId = orderReturn.userId;
   const user = await this.usersService.getUserById(Number(userId));
   if (!user) throw new BadRequestException("User not found");
-
+  log('Creating order return for user:', user.id, 'in year:', year);
+  console.log(orderReturn);
+  
   const newOrderReturn = this.orderReturnRepository.create({
     amount: orderReturn.amount,
     date: orderReturn.date,
-    user,
-    note: orderReturn.note,
+    user ,
+    note: orderReturn.note?? '',
     paid: false,
     paid_at: null,
   });
 
+  
   return this.orderReturnRepository.save(newOrderReturn);
 }
 

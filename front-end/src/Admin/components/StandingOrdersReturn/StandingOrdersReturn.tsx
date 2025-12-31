@@ -1,5 +1,6 @@
-import { Box } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import StandingOrdersReturnHeader from "./StandingOrdersReturnHeader"
+import SummaryCard from "../Loans/LoansDashboard/SummaryCard"
 
 const StandingOrdersReturn = () => {
 
@@ -22,10 +23,11 @@ const StandingOrdersReturn = () => {
                 padding: { xs: 2, md: 3 }, 
                 borderRadius: 2, 
                 mb: 4,
-    
               }}
             >
-                
+              <SummaryCard label="סה״כ החזרי הוראות קבע" value="0" />
+              <SummaryCard label="מספר הוראות קבע ששולמו " value="₪0" />
+              <SummaryCard label="מספר החזרי הוראות קבע שלא שולמו " value="₪0" />
               <Box
                 sx={{
                   mb: 4,
@@ -35,8 +37,11 @@ const StandingOrdersReturn = () => {
                   boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
                 }}
               >
-            
               </Box>
+                <Typography variant="h6" gutterBottom>  
+                  רשימת החזרי הוראות קבע
+                </Typography>
+            
             </Box>
             </Box>
     </div>

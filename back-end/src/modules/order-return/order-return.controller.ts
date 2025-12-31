@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { OrderReturnService } from './order-return.service';
 import { OrderReturnEntity } from './Entity/order-return.entity';
+import { CreateOrdersReturnDto } from './new-order-return-dto';
 
 @Controller('order-return')
 export class OrderReturnController {
@@ -10,7 +11,7 @@ export class OrderReturnController {
     return await this.orderReturnService.getOrderReturns();
   }
   @Post()
-  async createOrderReturn(@Body() orderReturn: Partial<OrderReturnEntity>) {
+  async createOrderReturn(@Body() orderReturn: CreateOrdersReturnDto) {
     return await this.orderReturnService.createOrderReturn(orderReturn);
   }
   @Post(':id/pay')
