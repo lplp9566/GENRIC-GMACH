@@ -29,7 +29,7 @@ const Frame: FC<FrameProps> = ({
         sx={{
           px: 2,
           py: 1.5,
-          bgcolor: "#f5f7fa",
+          // bgcolor: "#f5f7fa",
           borderBottom: "1px solid #e6e9ef",
           display: "flex",
           alignItems: "center",

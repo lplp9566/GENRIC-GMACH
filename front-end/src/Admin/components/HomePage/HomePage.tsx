@@ -101,7 +101,7 @@ const stats = [
 
 
   return (
-    <Box p={4} bgcolor="#e8f5e9">
+    <Box p={4} >
       {status === "pending" && <LoadingIndicator />}
       {open && (
         <GemachRegulationsModal open={open} onClose={() => setOpen(false)} />
@@ -111,14 +111,13 @@ const stats = [
           <Box
             textAlign="center"
             py={6}
-            bgcolor="linear-gradient(to right, #2563eb, #1db954)"
+            // bgcolor="linear-gradient(to right, #2563eb, #1db954)"
             color="#fff"
           >
             <Typography
               variant="h3"
               fontWeight={700}
               gutterBottom
-              color="black"
             >
               מערכת ניהול גמ"ח אהבת חסד של משפחת פסיקוב
             </Typography>
@@ -129,8 +128,6 @@ const stats = [
               <Grid item xs={12} sm={6} md={4} key={index}>
                 <Paper
                   sx={{
-                    backgroundColor: s.bgColor,
-                    color: "white",
                     p: 3,
                     borderRadius: 4,
                   }}
@@ -164,13 +161,13 @@ const stats = [
                     <Typography variant="h6" fontWeight={700}>
                       {action.label}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" mb={2}>
+                    <Typography variant="body2"  mb={2}>
                       {action.description}
                     </Typography>
                     <Button
                       variant="contained"
                       fullWidth
-                      sx={{ background: action.color }}
+                      // sx={{ background: action.color }}
                       onClick={action.onclick}
                     >
                       כניסה
@@ -185,12 +182,12 @@ const stats = [
             <Typography variant="h5" fontWeight={700} gutterBottom>
               תקנון הגמ"ח
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1">
               קרא את תקנון הגמ"ח המלא כדי להכיר את כל הכללים והתנאים
             </Typography>
             <Button
               variant="contained"
-              color="primary"
+              // color="primary"
               sx={{ mt: 2 }}
               onClick={() => setOpen(true)}
             >

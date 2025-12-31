@@ -13,8 +13,8 @@ import {
 import { RtlProvider } from "../../../../Theme/rtl";
 
 const GREEN_MAIN = "#0b5e29";
-const GREEN_LIGHT = "#e8f5e9";
-const GREEN_DARK = "#094a20";
+// const GREEN_LIGHT = "#e8f5e9";
+// const GREEN_DARK = "#094a20";
 
 const NewLoanForm: React.FC = () => {
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ const NewLoanForm: React.FC = () => {
         <Box
           sx={{
             minHeight: "100vh",
-            bgcolor: GREEN_LIGHT,
+            // bgcolor: GREEN_LIGHT,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -61,7 +61,7 @@ const NewLoanForm: React.FC = () => {
               p: 4,
               borderRadius: 4,
               boxShadow: 6,
-              bgcolor: "#fff",
+              // bgcolor: "#fff",
             }}
           >
             <Typography
@@ -114,8 +114,8 @@ const NewLoanForm: React.FC = () => {
                 type="submit"
                 sx={{
                   textTransform: "none",
-                  bgcolor: GREEN_MAIN,
-                  "&:hover": { bgcolor: GREEN_DARK },
+                  // bgcolor: GREEN_MAIN,
+                  // "&:hover": { bgcolor: GREEN_DARK },
                 }}
               >
                 {activeStep === NEW_LOAN_STEPS.length - 1

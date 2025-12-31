@@ -14,7 +14,7 @@ const MonthlyPaymentHeader = () => {
             p: 3,
             mb: 4,
             borderRadius: 2,
-            bgcolor: "#FFFFFF",
+            // bgcolor: "#FFFFFF",
             width: "40%",
             mx: "auto",
             dir: "rtl",
