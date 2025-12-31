@@ -58,7 +58,7 @@ export const LoansPage: React.FC = () => {
 
   return (
     <>
-      <Box sx={{ bgcolor: "#F8F8F8", minHeight: "100vh", py: 4 }}>
+      <Box sx={{ minHeight: "100vh", py: 4 }}>
         <Container maxWidth="lg">
           {/* HEADER */}
           <Paper
@@ -67,7 +67,7 @@ export const LoansPage: React.FC = () => {
               p: 3,
               mb: 4,
               borderRadius: 2,
-              bgcolor: "#FFFFFF",
+              // bgcolor: "#FFFFFF",
               width: {
                 xs: "100%",
                 sm: "90%",
@@ -115,7 +115,7 @@ export const LoansPage: React.FC = () => {
                   fullWidth={isSm}
                   sx={{
                     bgcolor: "#2a8c82",
-                    color: "#fff",
+                    // color: "#fff",
                     "&:hover": { bgcolor: "#1f645f" },
                   }}
                 >
@@ -132,7 +132,7 @@ export const LoansPage: React.FC = () => {
                     <InputLabel
                       id="filter-status-label"
                       sx={{
-                        color: "#424242",
+                        // color: "#424242",
                         fontWeight: 500,
                         "&.Mui-focused": { color: "#2a8c82" },
                       }}
@@ -140,23 +140,12 @@ export const LoansPage: React.FC = () => {
                       מצב הלוואה
                     </InputLabel>
                     <Select
+                    sx={{bgcolor:"white"}}
                       labelId="filter-status-label"
                       value={filter}
                       label="מצב הלוואה"
                       onChange={handleFilterChange}
-                      sx={{
-                        borderRadius: 1,
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#B0B0B0",
-                        },
-                        "&:hover .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#2a8c82",
-                        },
-                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#2a8c82",
-                          borderWidth: 1.5,
-                        },
-                      }}
+                   
                     >
                       <MenuItem value={StatusGeneric.ALL}>הכל</MenuItem>
                       <MenuItem value={StatusGeneric.ACTIVE}>פעילות</MenuItem>
@@ -181,7 +170,7 @@ export const LoansPage: React.FC = () => {
               sx={{
                 p: 2,
                 borderRadius: 2,
-                bgcolor: "#FFFFFF",
+                // bgcolor: "#FFFFFF",
                 overflowX: "auto",
               }}
             >
