@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Grid, Typography, Button, Paper } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import {
   Group,
   MonetizationOn,
@@ -8,9 +9,8 @@ import {
   AccountBalanceWallet,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../../store/store";
+import { AppDispatch, RootState } from "../../../store/store";
 import { getFundsOverview } from "../../../store/features/admin/adminFundsOverviewSlice";
-import { RootState } from "../../../store/store";
 import LoadingIndicator from "../StatusComponents/LoadingIndicator";
 import GemachRegulationsModal from "./GemachRegulationsModal";
 import { AddPaymentModal } from "../MonthlyPayments/AddMonthlyPayment/AddMonthlyPayment";
@@ -36,107 +36,173 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     dispatch(getFundsOverview());
   }, [dispatch]);
+
   const paymentModal = useSelector(
     (state: RootState) => state.mapModeSlice.MonthlyPaymentModalMode
   );
   const depositModal = useSelector(
     (state: RootState) => state.mapModeSlice.AddDepositModal
   );
+
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+
   const { fundsOverview, status } = useSelector(
     (s: RootState) => s.AdminFundsOverviewReducer
   );
-  
+
   const quickActions = [
     {
       label: "תשלום דמי חבר",
       description: "רישום תשלום דמי חבר",
       icon: <AccountBalanceWallet />,
-      color: "linear-gradient(to right, #2563eb, #1db954)",
       onclick: () => dispatch(setMonthlyPaymentModalMode(true)),
     },
     {
       label: "משתמש",
       description: "הוספת משתמש חדש",
       icon: <Group />,
-      color: "linear-gradient(to right, #00b4db, #0083b0)",
       onclick: () => navigate("/users/new"),
     },
     {
       label: "תרומה",
       description: "רישום תרומה חדשה",
       icon: <VolunteerActivism />,
-      color: "linear-gradient(to right, #1db954, #00c853)",
     },
     {
       label: "הלוואה",
       description: "יצירת הלוואה חדשה",
       icon: <MonetizationOn />,
-      color: "linear-gradient(to right, #2563eb, #4facfe)",
       onclick: () => navigate("/loans/new"),
     },
   ];
-const stats = [
-  {
-    label: "סכום זמין",
-    value: formatILS(fundsOverview?.available_funds),
-    icon: <AccountBalanceWalletIcon sx={{ fontSize: 40 }} />,
-    bgColor: "#7c3aed", // סגול עמוק
-  },
-  {
-    label: "קרן הגמ\"ח",
-    value: formatILS(fundsOverview?.fund_principal),
-    icon: <SavingsIcon sx={{ fontSize: 40 }} />,
-    bgColor: "#16a34a", // ירוק
-  },
-  {
-    label: "הון עצמי",
-    value: formatILS(fundsOverview?.own_equity),
-    icon: <TrendingUpIcon sx={{ fontSize: 40 }} />,
-    bgColor: "#2563eb", // כחול
-  },
-];
 
-
+  const stats = [
+    {
+      label: "סכום זמין",
+      value: formatILS(fundsOverview?.available_funds),
+      icon: <AccountBalanceWalletIcon sx={{ fontSize: 40 }} />,
+      colorKey: "secondary" as const,
+    },
+    {
+      label: 'קרן הגמ"ח',
+      value: formatILS(fundsOverview?.fund_principal),
+      icon: <SavingsIcon sx={{ fontSize: 40 }} />,
+      colorKey: "success" as const,
+    },
+    {
+      label: "הון עצמי",
+      value: formatILS(fundsOverview?.own_equity),
+      icon: <TrendingUpIcon sx={{ fontSize: 40 }} />,
+      colorKey: "primary" as const,
+    },
+  ];
 
   return (
-    <Box p={4} >
+    <Box
+      p={4}
+      sx={(theme) => ({
+        minHeight: "100vh",
+        background:
+          theme.palette.mode === "dark"
+            ? `radial-gradient(1200px 600px at 50% -100px, ${alpha(
+                theme.palette.primary.main,
+                0.18
+              )}, transparent 60%), ${theme.palette.background.default}`
+            : theme.palette.background.default,
+      })}
+    >
       {status === "pending" && <LoadingIndicator />}
+
       {open && (
         <GemachRegulationsModal open={open} onClose={() => setOpen(false)} />
       )}
+
       {status === "fulfilled" && (
         <>
+          {/* HERO */}
           <Box
             textAlign="center"
             py={6}
-            // bgcolor="linear-gradient(to right, #2563eb, #1db954)"
-            color="#fff"
+            sx={(theme) => ({
+              borderRadius: 4,
+              color: theme.palette.primary.contrastText,
+              background:
+                theme.palette.mode === "dark"
+                  ? `linear-gradient(135deg,
+                      ${alpha(theme.palette.primary.main, 0.35)},
+                      ${alpha(theme.palette.success.main, 0.25)})`
+                  : `linear-gradient(135deg,
+                      ${theme.palette.primary.main},
+                      ${theme.palette.success.main})`,
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 18px 40px rgba(0,0,0,0.35)"
+                  : "0 18px 40px rgba(0,0,0,0.10)",
+            })}
           >
-            <Typography
-              variant="h3"
-              fontWeight={700}
-              gutterBottom
-            >
+            <Typography variant="h3" fontWeight={800} gutterBottom>
               מערכת ניהול גמ"ח אהבת חסד של משפחת פסיקוב
             </Typography>
           </Box>
 
+          {/* STATS */}
           <Grid container spacing={4} mt={-6} justifyContent="center">
             {stats.map((s, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
                 <Paper
-                  sx={{
-                    p: 3,
-                    borderRadius: 4,
+                  elevation={0}
+                  sx={(theme) => {
+                    const main = theme.palette[s.colorKey].main;
+                    return {
+                      p: 3,
+                      borderRadius: 4,
+                      border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
+                      backgroundColor: theme.palette.background.paper,
+                      overflow: "hidden",
+                      position: "relative",
+                      boxShadow:
+                        theme.palette.mode === "dark"
+                          ? "0 12px 30px rgba(0,0,0,0.35)"
+                          : "0 12px 30px rgba(0,0,0,0.08)",
+                      "&:before": {
+                        content: '""',
+                        position: "absolute",
+                        inset: 0,
+                        background: `radial-gradient(600px 200px at 0% 0%,
+                          ${alpha(main, theme.palette.mode === "dark" ? 0.22 : 0.14)},
+                          transparent 60%)`,
+                        pointerEvents: "none",
+                      },
+                    };
                   }}
                 >
-                  <Box display="flex" alignItems="center" gap={2}>
-                    <Box fontSize={40}>{s.icon}</Box>
+                  <Box display="flex" alignItems="center" gap={2} sx={{ position: "relative" }}>
+                    <Box
+                      sx={(theme) => {
+                        const main = theme.palette[s.colorKey].main;
+                        return {
+                          width: 56,
+                          height: 56,
+                          borderRadius: 3,
+                          display: "grid",
+                          placeItems: "center",
+                          backgroundColor: alpha(
+                            main,
+                            theme.palette.mode === "dark" ? 0.18 : 0.12
+                          ),
+                          color: main,
+                        };
+                      }}
+                    >
+                      {s.icon}
+                    </Box>
+
                     <Box>
-                      <Typography variant="body1">{s.label}</Typography>
-                      <Typography variant="h5" fontWeight={700}>
+                      <Typography variant="body2" color="text.secondary">
+                        {s.label}
+                      </Typography>
+                      <Typography variant="h5" fontWeight={900}>
                         {s.value}
                       </Typography>
                     </Box>
@@ -145,30 +211,78 @@ const stats = [
               </Grid>
             ))}
           </Grid>
-          {paymentModal && <AddPaymentModal cape ={false} />}
+
+          {paymentModal && <AddPaymentModal cape={false} />}
           {depositModal && <NewDepositModal />}
+
+          {/* QUICK ACTIONS */}
           <Box mt={10}>
-            <Typography variant="h5" fontWeight={700} mb={2} textAlign="center">
+            <Typography variant="h5" fontWeight={900} mb={2} textAlign="center">
               פעולות מהירות
             </Typography>
+
             <Grid container spacing={3} justifyContent="center">
               {quickActions.map((action, i) => (
                 <Grid item xs={12} sm={6} md={3} key={i}>
-                  <Paper sx={{ p: 3, textAlign: "center", borderRadius: 4 }}>
-                    <Box fontSize={40} mb={2}>
+                  <Paper
+                    elevation={0}
+                    sx={(theme) => ({
+                      p: 3,
+                      textAlign: "center",
+                      borderRadius: 4,
+                      border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
+                      backgroundColor: theme.palette.background.paper,
+                      boxShadow:
+                        theme.palette.mode === "dark"
+                          ? "0 12px 30px rgba(0,0,0,0.35)"
+                          : "0 12px 30px rgba(0,0,0,0.08)",
+                    })}
+                  >
+                    <Box
+                      sx={(theme) => ({
+                        width: 56,
+                        height: 56,
+                        borderRadius: 3,
+                        display: "grid",
+                        placeItems: "center",
+                        mx: "auto",
+                        mb: 2,
+                        backgroundColor: alpha(
+                          theme.palette.primary.main,
+                          theme.palette.mode === "dark" ? 0.14 : 0.10
+                        ),
+                        color: theme.palette.primary.main,
+                      })}
+                    >
                       {action.icon}
                     </Box>
-                    <Typography variant="h6" fontWeight={700}>
+
+                    <Typography variant="h6" fontWeight={900}>
                       {action.label}
                     </Typography>
-                    <Typography variant="body2"  mb={2}>
+
+                    <Typography variant="body2" color="text.secondary" mb={2}>
                       {action.description}
                     </Typography>
+
                     <Button
                       variant="contained"
                       fullWidth
-                      // sx={{ background: action.color }}
                       onClick={action.onclick}
+                      sx={(theme) => ({
+                        borderRadius: 3,
+                        fontWeight: 900,
+                        boxShadow: "none",
+                        background:
+                          theme.palette.mode === "dark"
+                            ? `linear-gradient(135deg,
+                                ${alpha(theme.palette.primary.main, 0.85)},
+                                ${alpha(theme.palette.success.main, 0.75)})`
+                            : `linear-gradient(135deg,
+                                ${theme.palette.primary.main},
+                                ${theme.palette.success.main})`,
+                        "&:hover": { boxShadow: "none" },
+                      })}
                     >
                       כניסה
                     </Button>
@@ -178,17 +292,31 @@ const stats = [
             </Grid>
           </Box>
 
-          <Box mt={10} textAlign="center">
-            <Typography variant="h5" fontWeight={700} gutterBottom>
+          {/* REGULATIONS */}
+          <Box
+            mt={10}
+            textAlign="center"
+            sx={(theme) => ({
+              p: 4,
+              borderRadius: 4,
+              border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
+              backgroundColor: theme.palette.background.paper,
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 12px 30px rgba(0,0,0,0.35)"
+                  : "0 12px 30px rgba(0,0,0,0.08)",
+            })}
+          >
+            <Typography variant="h5" fontWeight={900} gutterBottom>
               תקנון הגמ"ח
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" color="text.secondary">
               קרא את תקנון הגמ"ח המלא כדי להכיר את כל הכללים והתנאים
             </Typography>
+
             <Button
               variant="contained"
-              // color="primary"
-              sx={{ mt: 2 }}
+              sx={{ mt: 2, borderRadius: 3, fontWeight: 900 }}
               onClick={() => setOpen(true)}
             >
               צפיה בתקנון
