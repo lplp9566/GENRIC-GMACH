@@ -1,4 +1,3 @@
-// src/components/LoanActions/MonthlyPaymentChangeForm.tsx
 import React, { useState } from "react";
 import { Box, TextField, Button } from "@mui/material";
 import { ICreateLoan, ICreateLoanAction, LoanPaymentActionType } from "../LoanDto";

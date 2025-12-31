@@ -38,7 +38,7 @@ export const AddStandingOrderRefundModal: React.FC<
     userId: 0,
     amount: 0,
     date: today,
-    notes: "",
+    note: "",
   });
 
   const handleSubmit = () => {
@@ -151,11 +151,11 @@ export const AddStandingOrderRefundModal: React.FC<
               multiline
               minRows={3}
               color="success"
-              value={form.notes}
+              value={form.note}
               onChange={(e) =>
                 setForm((p) => ({
                   ...p,
-                  notes: e.target.value,
+                  note: e.target.value,
                 }))
               }
             />

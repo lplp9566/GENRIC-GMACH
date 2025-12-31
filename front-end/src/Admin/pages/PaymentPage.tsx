@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import MonthlyPaymentHeader from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentHeader";
 import MonthlyPaymentsSummaryCard from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentsSummaryCard";
 import MonthlyPaymentTable from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentTable";
-import MonthlyPaymentFiltering from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentFiltering";
+import MonthlyAndYearFiltering from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentFiltering";
 import { AddPaymentModal } from "../components/MonthlyPayments/AddMonthlyPayment/AddMonthlyPayment";
 import { AppDispatch, RootState } from "../../store/store";
 import { gatAllMonthlyPayments, getMonthlyPaymentsByUserId } from "../../store/features/admin/adminMonthlyPayments";
@@ -128,7 +128,7 @@ const paymentsThisYear = useMemo(
               boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
             }}
           >
-            <MonthlyPaymentFiltering
+            <MonthlyAndYearFiltering
               selectedYear={selectedYear}
               setSelectedYear={setSelectedYear}
               selectedMonth={selectedMonth}

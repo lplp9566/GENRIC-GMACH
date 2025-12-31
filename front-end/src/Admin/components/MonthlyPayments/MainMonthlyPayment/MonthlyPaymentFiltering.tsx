@@ -15,7 +15,7 @@ interface MonthlyPaymentFilteringProps {
   years: number[];
   months?: number[];
 }
-const MonthlyPaymentFiltering = ({
+const MonthlyAndYearFiltering = ({
   selectedYear,
   setSelectedYear,
   selectedMonth,
@@ -73,4 +73,4 @@ const MonthlyPaymentFiltering = ({
   );
 };
 
-export default MonthlyPaymentFiltering;
+export default MonthlyAndYearFiltering;

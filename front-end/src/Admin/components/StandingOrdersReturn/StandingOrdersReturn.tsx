@@ -1,51 +1,153 @@
-import { Box, Typography } from "@mui/material"
-import StandingOrdersReturnHeader from "./StandingOrdersReturnHeader"
-import SummaryCard from "../Loans/LoansDashboard/SummaryCard"
+import { Box, Container } from "@mui/material";
+import StandingOrdersReturnHeader from "./StandingOrdersReturnHeader";
+import SummaryCard from "../Loans/LoansDashboard/SummaryCard";
+import MonthlyAndYearFiltering from "../MonthlyPayments/MainMonthlyPayment/MonthlyPaymentFiltering";
+import { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../store/store";
+import { getMonthFromDate, getYearFromDate } from "../../Hooks/genricFunction";
+import {
+  getAllOrdersReturn,
+  getOrdersReturnByUserId,
+} from "../../../store/features/admin/adminStandingOrderReturt";
+import StandingOrderReturnTable from "./StandingOrderReturnTable";
 
 const StandingOrdersReturn = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const selectedUser = useSelector(
+    (state: RootState) => state.AdminUsers.selectedUser
+  );
+  const orderReturn =
+    useSelector(
+      (s: RootState) => s.AdminStandingOrderReturnSlice.allOrdersReturn
+    ) ?? [];
+
+  useEffect(() => {
+    if (selectedUser) {
+      dispatch(getOrdersReturnByUserId(selectedUser.id));
+    } else {
+      dispatch(getAllOrdersReturn());
+    }
+  }, [dispatch, selectedUser]);
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
+  const years = useMemo(
+    () =>
+      Array.from(new Set(orderReturn.map((p) => getYearFromDate(p.date)))).sort(
+        (a, b) => b - a
+      ),
+    [orderReturn]
+  );
+  const [selectedYear, setSelectedYear] = useState<number>(
+    years.includes(currentYear) ? currentYear : years[0] ?? currentYear
+  );
+  const paymentsThisYear = useMemo(
+    () =>
+      orderReturn.filter(
+        (p) => selectedYear === 0 || getYearFromDate(p.date) === selectedYear
+      ),
+    [orderReturn, selectedYear]
+  );
+
+  const months = useMemo(
+    () =>
+      Array.from(
+        new Set(paymentsThisYear.map((p) => getMonthFromDate(p.date)))
+      ).sort((a, b) => a - b),
+    [paymentsThisYear]
+  );
+  const [selectedMonth, setSelectedMonth] = useState<number>(
+    months.includes(currentMonth) ? currentMonth : 0
+  );
+
+  useEffect(() => {
+    if (selectedMonth !== 0 && !months.includes(selectedMonth)) {
+      setSelectedMonth(0);
+    }
+  }, [months, selectedMonth]);
+  useEffect(() => {
+    if (!years.length) return;
+
+    setSelectedYear((prev) => {
+      if (prev && years.includes(prev)) return prev;
+      return years.includes(currentYear) ? currentYear : years[0];
+    });
+  }, [years, currentYear]);
+
+  const paymentsThisMonth = useMemo(
+    () =>
+      selectedMonth === 0
+        ? paymentsThisYear
+        : paymentsThisYear.filter(
+            (p) => getMonthFromDate(p.date) === selectedMonth
+          ),
+    [paymentsThisYear, selectedMonth]
+  );
+  const sumMonthPaid = paymentsThisMonth
+    .filter((p) => p.paid)
+    .reduce((sum, p) => sum + p.amount, 0);
+  const sumMonthNotPaid = paymentsThisMonth
+    .filter((p) => !p.paid)
+    .reduce((sum, p) => sum + p.amount, 0);
+
+  const countMonth = paymentsThisMonth.length;
 
   return (
-    <div><StandingOrdersReturnHeader />
+    <Container>
+      <StandingOrdersReturnHeader />
       <Box
-            sx={{
-              backgroundColor: "#FFFFFF",
-              minHeight: "100vh", 
-              pt: 4, 
-              direction: "rtl",
-              borderRadius: 3, 
-              boxShadow: "0 8px 25px rgba(0,0,0,0.08)", 
-              mt: 4, 
-            }}
-          >
-            <Box
-              sx={{
-                bgcolor: "#FBFDFE", 
-                padding: { xs: 2, md: 3 }, 
-                borderRadius: 2, 
-                mb: 4,
-              }}
-            >
-              <SummaryCard label="סה״כ החזרי הוראות קבע" value="0" />
-              <SummaryCard label="מספר הוראות קבע ששולמו " value="₪0" />
-              <SummaryCard label="מספר החזרי הוראות קבע שלא שולמו " value="₪0" />
-              <Box
-                sx={{
-                  mb: 4,
-                  p: { xs: 2, md: 3 }, 
-                  bgcolor: "#FFFFFF", 
-                  borderRadius: 2, 
-                  boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-                }}
-              >
-              </Box>
-                <Typography variant="h6" gutterBottom>  
-                  רשימת החזרי הוראות קבע
-                </Typography>
+        sx={{
+          backgroundColor: "#FFFFFF",
+          minHeight: "100vh",
+          pt: 4,
+          direction: "rtl",
+          borderRadius: 3,
+          boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
+          mt: 4,
+        }}
+      >
+        <Box
+          sx={{
+            bgcolor: "#FBFDFE",
+            padding: { xs: 2, md: 3 },
+            borderRadius: 2,
+            mb: 4,
             
-            </Box>
-            </Box>
-    </div>
-  )
-}
+          }}
+        >
+                    <Box display="flex" justifyContent="center" gap={3} mb={4} flexWrap="wrap">
 
-export default StandingOrdersReturn
+          <SummaryCard label="סה״כ החזרי הוראות קבע" value={countMonth} />
+          <SummaryCard
+            label="מספר הוראות קבע ששולמו "
+            value={`₪ ${sumMonthPaid.toLocaleString()}`}
+          />
+          <SummaryCard label="מספר החזרי הוראות קבע שלא שולמו " value={`₪ ${sumMonthNotPaid.toLocaleString()}`} />
+        </Box>
+          <Box
+            sx={{
+              mb: 4,
+              p: { xs: 2, md: 3 },
+              bgcolor: "#FFFFFF",
+              borderRadius: 2,
+              boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+            }}
+          ></Box>
+          <MonthlyAndYearFiltering
+            selectedMonth={selectedMonth}
+            setSelectedMonth={setSelectedMonth}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
+            years={years}
+            months={months}
+          />
+          <StandingOrderReturnTable payments={paymentsThisMonth} />
+        </Box>
+      </Box>
+    </Container>
+  );
+};
+
+export default StandingOrdersReturn;

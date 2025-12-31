@@ -1,6 +1,6 @@
 import { IUser } from "../Users/UsersDto";
 
-export interface OrdersReturnDto {
+export interface IOrdersReturnDto {
   id?: number;
   user: IUser;
   date: string;

@@ -10,6 +10,10 @@ export class OrderReturnController {
   async getOrderReturns() {
     return await this.orderReturnService.getOrderReturns();
   }
+  @Get('user/:userId')
+  async getOrderReturnByUserId(@Param('userId') userId: number) {
+    return await this.orderReturnService.getOrderReturnByUserId(userId);
+  }
   @Post()
   async createOrderReturn(@Body() orderReturn: CreateOrdersReturnDto) {
     return await this.orderReturnService.createOrderReturn(orderReturn);

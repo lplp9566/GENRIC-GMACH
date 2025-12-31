@@ -25,25 +25,29 @@ export class OrderReturnService {
   async getOrderReturns() {
     return await this.orderReturnRepository.find({relations: ['user']});
   }
+  async getOrderReturnByUserId(userId: number) {
+    return await this.orderReturnRepository.find({
+      where: { user: { id: userId } },
+      relations: ['user'],
+    });
+  }
  async createOrderReturn(orderReturn: CreateOrdersReturnDto): Promise<OrderReturnEntity> {
   const year = getYearFromDate( new Date(orderReturn.date) ?? orderReturn.date);
 
   const userId = orderReturn.userId;
   const user = await this.usersService.getUserById(Number(userId));
   if (!user) throw new BadRequestException("User not found");
-  log('Creating order return for user:', user.id, 'in year:', year);
-  console.log(orderReturn);
   
   const newOrderReturn = this.orderReturnRepository.create({
     amount: orderReturn.amount,
     date: orderReturn.date,
     user ,
-    note: orderReturn.note?? '',
+    note: orderReturn.note?? orderReturn.note ?? '',
     paid: false,
     paid_at: null,
   });
 
-  
+
   return this.orderReturnRepository.save(newOrderReturn);
 }
 

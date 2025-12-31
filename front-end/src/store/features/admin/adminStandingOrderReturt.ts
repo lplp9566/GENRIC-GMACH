@@ -1,94 +1,120 @@
 import axios from "axios";
-import { CreateOrdersReturnDto, OrdersReturnDto, PayOrdersReturnDto } from "../../../Admin/components/StandingOrdersReturn/ordersReturnDto";
+import {
+  CreateOrdersReturnDto,
+  IOrdersReturnDto,
+  PayOrdersReturnDto,
+} from "../../../Admin/components/StandingOrdersReturn/ordersReturnDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 interface AdminStandingOrderReturnType {
-  allOrdersReturn: OrdersReturnDto[];
+  allOrdersReturn: IOrdersReturnDto[] | [];
   status: Status;
   createOrderReturnStatus: Status;
   payOrderReturnStatus: Status;
   error: string | null;
-
 }
 const initialState: AdminStandingOrderReturnType = {
   allOrdersReturn: [],
   error: null,
-    status: "idle",
-    createOrderReturnStatus: "idle",
-    payOrderReturnStatus: "idle",
+  status: "idle",
+  createOrderReturnStatus: "idle",
+  payOrderReturnStatus: "idle",
 };
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const getAllOrdersReturn = createAsyncThunk(
-    "admin/getAllOrdersReturn",
-    async () => {
-        const response = await axios.get(`${BASE_URL}/order-return`);
-        return response.data;
-    }
-)
+  "admin/getAllOrdersReturn",
+  async () => {
+    const response = await axios.get(`${BASE_URL}/order-return`);
+    return response.data;
+  }
+);
+export const getOrdersReturnByUserId = createAsyncThunk(
+  "admin/getOrdersReturnByUserId",
+  async (userId: number) => {
+    const response = await axios.get<IOrdersReturnDto[]>(
+      `${BASE_URL}/order-return/user/${userId}`,
+    );
+    return response.data;
+  }
+);
 export const createOrderReturn = createAsyncThunk(
   "admin/createOrderReturn",
   async (orderReturn: CreateOrdersReturnDto) => {
     console.log(orderReturn);
-    
-    const response = await axios.post<OrdersReturnDto>(
+
+    const response = await axios.post<IOrdersReturnDto>(
       `${BASE_URL}/order-return`,
       orderReturn
     );
     return response.data;
   }
-)
+);
 export const payOrderReturn = createAsyncThunk(
   "admin/payOrderReturn",
-  async (payData:PayOrdersReturnDto) => {
-    const response = await axios.post(`${BASE_URL}/order-return/${payData.id}/pay`,payData);
+  async (payData: PayOrdersReturnDto) => {
+    const response = await axios.post(
+      `${BASE_URL}/order-return/${payData.id}/pay`,
+      payData
+    );
     return response.data;
   }
-)
-export const  AdminStandingOrderReturnSlice = createSlice({
+);
+export const AdminStandingOrderReturnSlice = createSlice({
   name: "adminStandingOrderReturn",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(getAllOrdersReturn.pending, (state) => {
-        state.status = "idle";    
+        state.status = "idle";
       })
       .addCase(getAllOrdersReturn.fulfilled, (state, action) => {
         state.status = "fulfilled";
-        state.allOrdersReturn = action.payload; 
+        state.allOrdersReturn = action.payload;
       })
-        .addCase(getAllOrdersReturn.rejected, (state, action) => {      
+      .addCase(getAllOrdersReturn.rejected, (state, action) => {
         state.status = "rejected";
-        state.error = action.error.message || "Something went wrong";     
+        state.error = action.error.message || "Something went wrong";
+      })
+      .addCase(getOrdersReturnByUserId.pending, (state) => {
+        state.status = "idle";
+      })
+      .addCase(getOrdersReturnByUserId.fulfilled, (state, action) => {
+        state.status = "fulfilled";
+        state.allOrdersReturn = action.payload;
+      })
+      .addCase(getOrdersReturnByUserId.rejected, (state, action) => {
+        state.status = "rejected";
+        state.error = action.error.message || "Something went wrong";
       })
       .addCase(createOrderReturn.pending, (state) => {
         state.createOrderReturnStatus = "idle";
-        })
-        .addCase(createOrderReturn.fulfilled, (state, {payload}) => {
+      })
+      .addCase(createOrderReturn.fulfilled, (state, { payload }) => {
         state.createOrderReturnStatus = "fulfilled";
-        state.allOrdersReturn.push(payload);
-        }
-        )
-        .addCase(createOrderReturn.rejected, (state, action) => {
+              // state.allOrdersReturn.push(payload);
+        state.allOrdersReturn = [...state.allOrdersReturn, payload];
+      })
+      .addCase(createOrderReturn.rejected, (state, action) => {
         state.createOrderReturnStatus = "rejected";
-        state.error = action.error.message || "Something went wrong";     
-        }
-        )
-        .addCase(payOrderReturn.pending, (state) => {
+        state.error = action.error.message || "Something went wrong";
+      })
+      .addCase(payOrderReturn.pending, (state) => {
         state.payOrderReturnStatus = "idle";
-        }
-        )
-        .addCase(payOrderReturn.fulfilled, (state, payload) => {
+      })
+      .addCase(payOrderReturn.fulfilled, (state, payload) => {
         state.payOrderReturnStatus = "fulfilled";
-        state.allOrdersReturn[state.allOrdersReturn.findIndex(orderReturn=>orderReturn.id===payload.payload.id)] = payload.payload;
-        }
-        )
-        .addCase(payOrderReturn.rejected, (state, action) => {
+        state.allOrdersReturn[
+          state.allOrdersReturn.findIndex(
+            (orderReturn) => orderReturn.id === payload.payload.id
+          )
+        ] = payload.payload;
+      })
+      .addCase(payOrderReturn.rejected, (state, action) => {
         state.payOrderReturnStatus = "rejected";
-        state.error = action.error.message || "Something went wrong";     
-        }
-        );
+        state.error = action.error.message || "Something went wrong";
+      });
   },
 });
 export default AdminStandingOrderReturnSlice.reducer;
