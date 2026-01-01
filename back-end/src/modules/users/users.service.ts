@@ -210,9 +210,13 @@ async onApplicationBootstrap() {
 
   // 5. נקודת הסיום – תחילת החודש הבא (UTC) אבל כ-EXCLUSIVE (לא נכלל בלולאה)
   const today = new Date();
-  const endExclusive = new Date(
-    Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 1),
-  );
+   const chargeDay = user.payment_details.charge_date; 
+     const todayDay = today.getUTCDate();
+  const startOfThisMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
+  const startOfNextMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 1));
+
+   const endExclusive = (todayDay < chargeDay) ? startOfThisMonth : startOfNextMonth;
+
 
   let totalDue = 0;
 

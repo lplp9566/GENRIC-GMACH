@@ -45,7 +45,7 @@ const NewUserForm: React.FC = () => {
       <Box
         sx={{
           minHeight: "100vh",
-          bgcolor: GREEN_LIGHT,
+          // bgcolor: GREEN_LIGHT,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
