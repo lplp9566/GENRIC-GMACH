@@ -9,8 +9,8 @@ export class Expense {
   @Column({type: 'float'})
   amount: number;
 
-  @Column({ type: 'text' })
-  reason: string;
+  @Column({ type: 'text' , nullable: true })
+  note?: string;
 
   @Column({ type: 'date' })
   expenseDate: Date;

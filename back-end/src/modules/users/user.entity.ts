@@ -53,6 +53,9 @@ export class UserEntity {
   @Column({ type: 'text' })
   phone_number: string;
 
+  @Column({ type: 'boolean', default: false, nullable: true })
+  is_member: boolean | null;
+
   @Column({ type: 'boolean', default: false })
   is_admin: boolean;
   @OneToOne(
