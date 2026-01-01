@@ -30,7 +30,7 @@ const StandingOrderReturnTable: FC<StandingOrderReturnTableProps> = ({
   const [deleteMode, setDeleteMode] = useState<boolean>(false);
   const [copyMode, setcopyMode] = useState(false);
   const [payModalMode, setPayModalMode] = useState<boolean>(false);
-  console.log(editMode,copyMode);
+  console.log({copyMode},{editMode});
   
   const onDelete = async () => {
     // const promise = dispatch(
@@ -50,7 +50,7 @@ const StandingOrderReturnTable: FC<StandingOrderReturnTableProps> = ({
         sx={{ borderRadius: 2, overflow: "auto", padding: 2, boxShadow: 1 }}
       >
         <Table size="small" sx={{ minWidth: 650 }}>
-          <TableHead sx={{ bgcolor: "grey.100" }}>
+          <TableHead >
             <TableRow>
               <TableCell align="right">משתמש</TableCell>
               <TableCell align="right">סכום</TableCell>

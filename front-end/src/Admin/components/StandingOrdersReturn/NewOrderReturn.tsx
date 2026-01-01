@@ -11,11 +11,12 @@ import {
   Box,
 } from "@mui/material";
 import SelectAllUsers from "../SelectUsers/SelectAllUsers";
-import { RtlProvider } from "../../../Theme/rtl";
+// import { RtlProvider } from "../../../Theme/rtl";
 import { toast } from "react-toastify";
 import { AppDispatch } from "../../../store/store";
 import { useDispatch } from "react-redux";
 import { createOrderReturn } from "../../../store/features/admin/adminStandingOrderReturt";
+import { RtlThemeProvider } from "../../../Theme/rtl";
 
 interface AddStandingOrderRefundModalProps {
   open: boolean;
@@ -66,7 +67,8 @@ export const AddStandingOrderRefundModal: React.FC<
   const isDisabled = form.userId === 0 || form.amount <= 0;
 
   return (
-    <RtlProvider>
+              <RtlThemeProvider>
+
       <Dialog
         open={open}
         onClose={onClose}
@@ -77,7 +79,7 @@ export const AddStandingOrderRefundModal: React.FC<
           sx: {
             borderRadius: 4,
             boxShadow: "0 12px 30px rgba(0,0,0,0.16)",
-            bgcolor: "#e8f5e9",
+            // bgcolor: "#e8f5e9",
           },
         }}
       >
@@ -100,8 +102,8 @@ export const AddStandingOrderRefundModal: React.FC<
         <DialogContent sx={{ px: 4, pt: 3 }}>
           <Box display="flex" flexDirection="column" gap={3} sx={{
                 p: 2,
-                borderRadius: 3,
-                border: "1px solid #c8e6c9",
+                // borderRadius: 3,
+                // border: "1px solid #c8e6c9",
               }}>
             {/* משתמש */}
           
@@ -187,6 +189,8 @@ export const AddStandingOrderRefundModal: React.FC<
           <Button onClick={onClose}>ביטול</Button>
         </DialogActions>
       </Dialog>
-    </RtlProvider>
+                </RtlThemeProvider>
+
+    // </RtlProvider>
   );
 };

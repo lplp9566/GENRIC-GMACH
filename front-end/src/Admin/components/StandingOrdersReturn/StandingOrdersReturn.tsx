@@ -95,11 +95,17 @@ const StandingOrdersReturn = () => {
   const countMonth = paymentsThisMonth.length;
 
   return (
-    <Container>
-      <StandingOrdersReturnHeader />
+    <Container
+      sx={{
+        py: 4,
+        direction: "rtl",
+        // bgcolor: "#F9FBFC",
+        fontFamily: "Heebo, Arial, sans-serif",
+      }}
+    >      <StandingOrdersReturnHeader />
       <Box
         sx={{
-          backgroundColor: "#FFFFFF",
+          // backgroundColor: "#FFFFFF",
           minHeight: "100vh",
           pt: 4,
           direction: "rtl",
@@ -110,31 +116,30 @@ const StandingOrdersReturn = () => {
       >
         <Box
           sx={{
-            bgcolor: "#FBFDFE",
+            // bgcolor: "#FBFDFE",
             padding: { xs: 2, md: 3 },
             borderRadius: 2,
             mb: 4,
-            
           }}
         >
-                    <Box display="flex" justifyContent="center" gap={3} mb={4} flexWrap="wrap">
-
-          <SummaryCard label="סה״כ החזרי הוראות קבע" value={countMonth} />
-          <SummaryCard
-            label="מספר הוראות קבע ששולמו "
-            value={`₪ ${sumMonthPaid.toLocaleString()}`}
-          />
-          <SummaryCard label="מספר החזרי הוראות קבע שלא שולמו " value={`₪ ${sumMonthNotPaid.toLocaleString()}`} />
-        </Box>
           <Box
-            sx={{
-              mb: 4,
-              p: { xs: 2, md: 3 },
-              bgcolor: "#FFFFFF",
-              borderRadius: 2,
-              boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-            }}
-          ></Box>
+            display="flex"
+            justifyContent="center"
+            gap={3}
+            mb={4}
+            flexWrap="wrap"
+          >
+            <SummaryCard label="סה״כ החזרי הוראות קבע" value={countMonth} />
+            <SummaryCard
+              label="מספר הוראות קבע ששולמו "
+              value={`₪ ${sumMonthPaid.toLocaleString()}`}
+            />
+            <SummaryCard
+              label="מספר החזרי הוראות קבע שלא שולמו "
+              value={`₪ ${sumMonthNotPaid.toLocaleString()}`}
+            />
+          </Box>
+
           <MonthlyAndYearFiltering
             selectedMonth={selectedMonth}
             setSelectedMonth={setSelectedMonth}

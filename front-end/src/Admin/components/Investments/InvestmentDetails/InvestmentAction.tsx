@@ -108,7 +108,7 @@ const InvestmentAction: React.FC<InvestmentActionProps> = ({
     <Box dir="rtl">
       <Paper
         elevation={2}
-        sx={{ p: 2, borderRadius: 2, backgroundColor: "#FEFEFE" }}
+        sx={{ p: 2, borderRadius: 2 }}
       >
         <Typography variant="h6" sx={{ textAlign: "center", paddingBottom: 2 }}>
           פעולות להשקעה
@@ -120,7 +120,7 @@ const InvestmentAction: React.FC<InvestmentActionProps> = ({
             value={mode}
             label="בחר פעולה"
             onChange={handleModeChange}
-            sx={{ backgroundColor: "#FFF", borderRadius: 1 }}
+            sx={{  borderRadius: 1 }}
           >
             <MenuItem value="add-to-investment">הוספה להשקעה</MenuItem>
             <MenuItem value={"withdraw"}>משיכה מהשקעה</MenuItem>

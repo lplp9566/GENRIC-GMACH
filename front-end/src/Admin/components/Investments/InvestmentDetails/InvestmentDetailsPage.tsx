@@ -41,7 +41,7 @@ const InvestmentDetailsPage = () => {
         pb: 5,
         minHeight: "100vh",
         direction: "rtl",
-        backgroundColor: "#F5F7FA",
+        // backgroundColor: "#F5F7FA",
       }}
     >
       <Button

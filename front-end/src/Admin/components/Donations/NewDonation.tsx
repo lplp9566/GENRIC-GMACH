@@ -13,7 +13,7 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import { RtlProvider } from "../../../Theme/rtl";
+// import { RtlProvider } from "../../../Theme/rtl";
 import SelectAllUsers from "../SelectUsers/SelectAllUsers";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
@@ -28,6 +28,7 @@ import {
 } from "../../../store/features/admin/adminDonationsSlice";
 import { DonationActionType, ICreateDonation } from "./DonationDto";
 import { toast } from "react-toastify";
+import { RtlThemeProvider } from "../../../Theme/rtl";
 
 type DonationKind = "regular" | "fund";
 
@@ -130,7 +131,7 @@ const AddDonationModal: React.FC = () => {
   };
 
   return (
-    <RtlProvider>
+      <RtlThemeProvider>
       <Dialog
         open={!!open}
         onClose={handleClose}
@@ -141,7 +142,6 @@ const AddDonationModal: React.FC = () => {
           sx: {
             borderRadius: 3,
             boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-            bgcolor: "#e8f5e9",
           },
         }}
       >
@@ -165,7 +165,7 @@ const AddDonationModal: React.FC = () => {
             color="text.secondary"
             sx={{ mb: 3, textAlign: "center" }}
           >
-            אנא מלא/י את השדות הנדרשים
+
           </Typography>
 
           <Box
@@ -187,10 +187,10 @@ const AddDonationModal: React.FC = () => {
             <FormControl fullWidth size="small">
               <InputLabel
                 id="kind-label"
-                sx={{
-                  color: "success.main",
-                  "&.Mui-focused": { color: "success.dark" },
-                }}
+                // sx={{
+                //   color: "success.main",
+                //   "&.Mui-focused": { color: "success.dark" },
+                // }}
               >
                 סוג תרומה*
               </InputLabel>
@@ -212,10 +212,10 @@ const AddDonationModal: React.FC = () => {
               <FormControl fullWidth size="small">
                 <InputLabel
                   id="fund-label"
-                  sx={{
-                    color: "success.main",
-                    "&.Mui-focused": { color: "success.dark" },
-                  }}
+                  // sx={{
+                  //   color: "success.main",
+                  //   "&.Mui-focused": { color: "success.dark" },
+                  // }}
                 >
                   קרן*
                 </InputLabel>
@@ -304,7 +304,7 @@ const AddDonationModal: React.FC = () => {
           <Button onClick={handleClose}>ביטול</Button>
         </DialogActions>
       </Dialog>
-    </RtlProvider>
+    </RtlThemeProvider>
   );
 };
 

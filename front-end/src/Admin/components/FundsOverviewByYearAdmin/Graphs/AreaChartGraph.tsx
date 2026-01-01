@@ -3,6 +3,7 @@ import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, X
 import { AdminYearlyFinancialItems, UserAdminFinancialItems } from '../items'
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../store/store';
+import { ChartTooltip } from './LineChartGraph';
 interface AreaChartGraphProps {
   data: any[];
   selectedFields: string[];
@@ -24,7 +25,7 @@ const AreaChartGraph: React.FC<AreaChartGraphProps> = ({data, selectedFields, CO
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="year" />
             <YAxis tickCount={7} />
-            <Tooltip formatter={(value) => `₪${Number(value).toLocaleString()}`} />
+        <Tooltip content={<ChartTooltip />} />
             <Legend />
             {selectedFields.map((key, idx) => (
               <Area

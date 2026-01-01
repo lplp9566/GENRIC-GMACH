@@ -49,7 +49,6 @@ const LoanDetailsPage: React.FC = () => {
         pb: 5,
         minHeight: "100vh",
         direction: "rtl",
-        backgroundColor: "#F5F7FA",
       }}
     >
       <Button

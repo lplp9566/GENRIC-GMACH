@@ -1,7 +1,7 @@
 import { Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, Stack, Typography, useMediaQuery, useTheme } from '@mui/material'
-import { RtlProvider } from '../../../Theme/rtl'
 import { useState } from 'react';
 import { AddStandingOrderRefundModal } from './NewOrderReturn';
+import { RtlThemeProvider } from '../../../Theme/rtl';
 
 const StandingOrdersReturnHeader = () => {
   const [newOrderOpen, setNewOrderOpen] =useState(false);
@@ -9,12 +9,11 @@ const StandingOrdersReturnHeader = () => {
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   return (
     <Paper
-      elevation={3}
-      sx={{
-        p: 3,
-        mb: 4,
+    elevation={3}
+    sx={{
+      p: 3,
+      mb: 4,
         borderRadius: 2,
-        bgcolor: "#FFFFFF",
         width: {
           xs: "100%",
           sm: "90%",
@@ -24,7 +23,7 @@ const StandingOrdersReturnHeader = () => {
         mx: "auto",
         dir: "rtl",
       }}
-    >
+      >
       <Stack spacing={2}>
         {/* כותרת ואייקון */}
         <Box
@@ -45,6 +44,7 @@ const StandingOrdersReturnHeader = () => {
             ניהול החזרים מהוראות קבע
           </Typography>
         </Box>
+
 
         {/* כפתור + פילטר */}
         <Box
@@ -68,7 +68,8 @@ const StandingOrdersReturnHeader = () => {
           >
            הוסף החזר הוראת קבע 
           </Button>
-          <RtlProvider>
+          {/* <RtlProvider> */}
+          <RtlThemeProvider>
             <FormControl
               size="small"
               fullWidth={isSm}
@@ -93,16 +94,7 @@ const StandingOrdersReturnHeader = () => {
                 onChange={() => {}}
                 sx={{
                   borderRadius: 1,
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#B0B0B0",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#2a8c82",
-                  },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#2a8c82",
-                    borderWidth: 1.5,
-                  },
+              
                 }}
               >
                 <MenuItem >הכל</MenuItem>
@@ -110,7 +102,8 @@ const StandingOrdersReturnHeader = () => {
                 <MenuItem >לא שולם</MenuItem>
               </Select>
             </FormControl>
-          </RtlProvider>
+      </RtlThemeProvider>
+
         </Box>
       </Stack>
       {newOrderOpen && (

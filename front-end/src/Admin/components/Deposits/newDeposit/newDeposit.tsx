@@ -1,8 +1,13 @@
 import { FC, useState } from "react";
-import { RtlProvider } from "../../../../Theme/rtl";
 import {
-  Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
-  TextField, Typography,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Typography,
 } from "@mui/material";
 import SelectAllUsers from "../../SelectUsers/SelectAllUsers";
 import { AppDispatch, RootState } from "../../../../store/store";
@@ -13,6 +18,7 @@ import { setAddDepositModal } from "../../../../store/features/Main/AppMode";
 import { toast } from "react-toastify";
 import { createDeposit } from "../../../../store/features/admin/adminDepositsSlice";
 import { trackEvent } from "../../../trackEvent";
+import { RtlThemeProvider } from "../../../../Theme/rtl";
 
 const NewDepositModal: FC = () => {
   const open = useSelector((s: RootState) => s.mapModeSlice.AddDepositModal);
@@ -58,26 +64,48 @@ const NewDepositModal: FC = () => {
       .then(() => {
         trackEvent("הפקדות", "הוספה", "הפקדה", newDeposit.initialDeposit);
         handleClose();
-        navigate("/deposits"); 
+        navigate("/deposits");
       })
       .catch(() => {});
   };
 
   return (
-    <RtlProvider>
-      <Dialog open={!!open} onClose={handleClose} fullWidth maxWidth="sm" dir="rtl"
-        PaperProps={{ sx: { borderRadius: 3, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", bgcolor: "#e8f5e9" } }}>
-        <DialogTitle component="div" sx={{ bgcolor: "green", color: "#fff", py: 2, textAlign: "center" }}>
+    <RtlThemeProvider>
+      <Dialog
+        open={!!open}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="sm"
+        dir="rtl"
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+          },
+        }}
+      >
+        <DialogTitle
+          component="div"
+          sx={{ bgcolor: "green", color: "#fff", py: 2, textAlign: "center" }}
+        >
           <Typography variant="h6" sx={{ fontWeight: 700, m: 0 }}>
             הוספת הפקדה חדשה
           </Typography>
         </DialogTitle>
 
         <DialogContent sx={{ px: 4, pt: 3, pb: 2 }}>
-          <Box component="form" noValidate autoComplete="off"
-               sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <Box
+            component="form"
+            noValidate
+            autoComplete="off"
+            sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+          >
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 700 }}
+            ></Typography>
             <SelectAllUsers
-            filter="all"
+              filter="all"
               value={newDeposit.user}
               onChange={(id) => setNewDeposit((p) => ({ ...p, user: id }))}
               label="בחר משתמש*"
@@ -91,10 +119,12 @@ const NewDepositModal: FC = () => {
               fullWidth
               inputMode="numeric"
               value={newDeposit.initialDeposit}
-              onChange={(e) => setNewDeposit((p) => ({
-                ...p,
-                initialDeposit: Number(e.target.value) || 0,
-              }))}
+              onChange={(e) =>
+                setNewDeposit((p) => ({
+                  ...p,
+                  initialDeposit: Number(e.target.value) || 0,
+                }))
+              }
             />
 
             <TextField
@@ -105,7 +135,9 @@ const NewDepositModal: FC = () => {
               color="success"
               InputLabelProps={{ shrink: true }}
               value={newDeposit.start_date}
-              onChange={(e) => setNewDeposit((p) => ({ ...p, start_date: e.target.value }))}
+              onChange={(e) =>
+                setNewDeposit((p) => ({ ...p, start_date: e.target.value }))
+              }
             />
 
             <TextField
@@ -116,24 +148,40 @@ const NewDepositModal: FC = () => {
               color="success"
               InputLabelProps={{ shrink: true }}
               value={newDeposit.end_date}
-              onChange={(e) => setNewDeposit((p) => ({ ...p, end_date: e.target.value }))}
+              onChange={(e) =>
+                setNewDeposit((p) => ({ ...p, end_date: e.target.value }))
+              }
             />
           </Box>
         </DialogContent>
 
-        <DialogActions sx={{ px: 4, pb: 3, display: "flex", justifyContent: "space-between" }}>
+        <DialogActions
+          sx={{
+            px: 4,
+            pb: 3,
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
           <Button
             variant="contained"
             onClick={handleSubmit}
             disabled={!isValid}
-            sx={{ bgcolor: "green", color: "#fff", px: 3, py: 1, borderRadius: 2, "&:hover": { bgcolor: "#115293" } }}
+            sx={{
+              bgcolor: "green",
+              color: "#fff",
+              px: 3,
+              py: 1,
+              borderRadius: 2,
+              "&:hover": { bgcolor: "#115293" },
+            }}
           >
             הוסף הפקדה
           </Button>
           <Button onClick={handleClose}>ביטול</Button>
         </DialogActions>
       </Dialog>
-    </RtlProvider>
+    </RtlThemeProvider>
   );
 };
 

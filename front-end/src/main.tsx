@@ -9,9 +9,10 @@ import { ThemeProvider } from "./Theme/ThemeProvider.tsx";
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <ToastContainer />
-        <ThemeProvider>
-        
-    <App />
-        </ThemeProvider>
-  </Provider>
+    <ThemeProvider>
+      {/* <RtlThemeProvider> */}
+      <App />
+     {/* </RtlThemeProvider> */}
+    </ThemeProvider>
+      </Provider>
 );

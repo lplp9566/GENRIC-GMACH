@@ -1,10 +1,10 @@
 import { FC, useState } from 'react'
-import { RtlProvider } from '../../../Theme/rtl'
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField, Typography } from '@mui/material'
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material'
 import { AppDispatch } from '../../../store/store';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { createFundDonation } from '../../../store/features/admin/adminDonationsSlice';
+import { RtlThemeProvider } from '../../../Theme/rtl';
 interface AddFundModalProps {
     open: boolean;
     onClose: () => void;
@@ -27,7 +27,8 @@ const AddFundModal:FC<AddFundModalProps> = ({open, onClose}) => {
         onClose();
     }
   return (
-<RtlProvider>
+          <RtlThemeProvider>
+
       <Dialog
         open={open}
         onClose={onClose}
@@ -42,29 +43,12 @@ const AddFundModal:FC<AddFundModalProps> = ({open, onClose}) => {
         }}
       >
         <DialogTitle
-          sx={{
-            bgcolor: "#2a8c82",
-            // color: "#fff",
-            textAlign: "center",
-            py: 2,
-            // position: "relative",
-          }}
+          component="div"
+          sx={{ bgcolor: "green", color: "#fff", py: 2, textAlign: "center" }}
         >
-          <Typography variant="h6" sx={{ m: 0, fontWeight: 700 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, m: 0 }}>
             הוספת קרן חדשה
           </Typography>
-          <IconButton
-            aria-label="close"
-            onClick={onClose}
-            sx={{
-              position: "absolute",
-              left: 8,
-              top: 8,
-              // color: "#fff",
-            }}
-          >
-            {/* <CloseIcon /> */}
-          </IconButton>
         </DialogTitle>
 
         <DialogContent sx={{ px: 4, pt: 3, pb: 2 }} dir="rtl">
@@ -119,7 +103,7 @@ const AddFundModal:FC<AddFundModalProps> = ({open, onClose}) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </RtlProvider>
+          </RtlThemeProvider>
   )
 }
 

@@ -10,11 +10,11 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { RtlProvider } from "../../../Theme/rtl";
 import { AppDispatch } from "../../../store/store";
 import { useDispatch } from "react-redux";
 import { editUser, getAllUsers } from "../../../store/features/admin/adminUsersSlice";
 import { toast } from "react-toastify";
+import { RtlThemeProvider } from "../../../Theme/rtl";
 
 interface EditUserProps {
   open: boolean;
@@ -27,9 +27,6 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
 
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<IUser>(() => user);
-
-  console.log(user);
-
   const handleChange =
     (field: keyof IUser | keyof IPaymentDetails
 ) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +42,7 @@ const handlePaymentChange =
       ...prev,
       payment_details: {
         ...prev.payment_details,
-        [field]: event.target.value, // או Number(event.target.value) במספרים
+        [field]: event.target.value,
       },
     }));
   };
@@ -79,7 +76,9 @@ const handlePaymentChange =
   };
 
   return (
-    <RtlProvider>
+    // <RtlProvider>
+          <RtlThemeProvider>
+    
       <Modal open={open} onClose={handleClose}>
         <Box
           sx={{
@@ -219,7 +218,8 @@ const handlePaymentChange =
           </Stack>
         </Box>
       </Modal>
-    </RtlProvider>
+      </RtlThemeProvider>
+
   );
 };
 

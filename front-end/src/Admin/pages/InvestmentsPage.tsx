@@ -28,7 +28,7 @@ const Investments = () => {
   
   return (
     <>
-      <Box sx={{ bgcolor: "#F8F8F8", minHeight: "100vh", py: 4 }}>
+      <Box sx={{  minHeight: "100vh", py: 4 }}>
         <Container maxWidth="lg">
           {/* HEADER */}
      <InvestmentsHeader filter={filter} handleFilterChange={handleFilterChange}  />
@@ -42,7 +42,7 @@ const Investments = () => {
               sx={{
                 p: 2,
                 borderRadius: 2,
-                bgcolor: "#FFFFFF",
+                // bgcolor: "#FFFFFF",
                 overflowX: "auto",
               }}
             >

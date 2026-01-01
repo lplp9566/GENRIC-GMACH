@@ -2,7 +2,6 @@
 import React from "react";
 import { Box, Card, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { RtlProvider } from "../../../../Theme/rtl";
 import StepBankDetails from "./StepBankDetails";
 import StepSummary from "./StepSummary";
 import useNewUserForm from "../../../Hooks/UsersHooks/NewUserForm";
@@ -11,6 +10,7 @@ import StepUserDetails from "./StepUserDetails";
 import StepperNavigation from "../../StepperNavigation/StepperNavigation";
 import StepMembershipType from "./StepMembershipType";
 import { MembershipType } from "../UsersDto";
+import { RtlThemeProvider } from "../../../../Theme/rtl";
 const GREEN_MAIN = "#0b5e29";
 const GREEN_LIGHT = "#e8f5e9";
 const MEMBER_STEPS = [
@@ -40,7 +40,8 @@ const NewUserForm: React.FC = () => {
   const steps = isFriend ? FRIEND_STEPS : MEMBER_STEPS;
 
   return (
-    <RtlProvider>
+          <RtlThemeProvider>
+
       <Box
         sx={{
           minHeight: "100vh",
@@ -59,7 +60,6 @@ const NewUserForm: React.FC = () => {
             p: 4,
             borderRadius: 4,
             boxShadow: 6,
-            bgcolor: "#fff",
           }}
         >
           <Typography
@@ -124,7 +124,8 @@ const NewUserForm: React.FC = () => {
           </Box>
         </Card>
       </Box>
-    </RtlProvider>
+            </RtlThemeProvider>
+
   );
 };
 

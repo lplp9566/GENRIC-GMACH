@@ -4,7 +4,7 @@ import { Container } from '@mui/material'
 
 const StandingOrdersReturnPage = () => {
   return (
-       <Box sx={{ bgcolor: "#F8F8F8", minHeight: "100vh", py: 4 }}>
+       <Box sx={{ minHeight: "100vh", py: 4 }}>
         <Container maxWidth="lg">
           <StandingOrdersReturn />
           </Container>

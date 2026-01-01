@@ -12,7 +12,7 @@ import {
   Box,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { RtlProvider } from "../../../Theme/rtl";
+// import { RtlProvider } from "../../../Theme/rtl";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store/store";
 import { createMembershipRank, getAllMonthlyRanks } from "../../../store/features/admin/adminRankSlice";
@@ -44,7 +44,7 @@ const AddRankModal: React.FC<AddRankModalProps> = ({ open, onClose }) => {
     });
   };
   return (
-    <RtlProvider>
+    // <RtlProvider>
       <Dialog
         open={open}
         onClose={onClose}
@@ -137,7 +137,7 @@ const AddRankModal: React.FC<AddRankModalProps> = ({ open, onClose }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </RtlProvider>
+    // </RtlProvider>
   );
 };
 

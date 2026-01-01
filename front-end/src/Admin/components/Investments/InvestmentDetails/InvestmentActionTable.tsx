@@ -98,7 +98,6 @@ const sortedActions = useMemo(() => {
             <TableRow
               sx={{
                 "& th": {
-                  background: "#E9F0F7",
                   fontWeight: 700,
                   cursor: "pointer",
                 },

@@ -1,4 +1,3 @@
-// src/components/AddPaymentModal.tsx
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -31,8 +30,8 @@ import {
 } from "../../../../store/features/admin/adminMonthlyPayments";
 import { payment_method_enum } from "../../Users/UsersDto";
 import { toast } from "react-toastify";
-import { RtlProvider } from "../../../../Theme/rtl";
 import { trackEvent } from "../../../trackEvent";
+import { RtlThemeProvider } from "../../../../Theme/rtl";
 interface AddPaymentModalProps {
   cape: boolean;
   userDto?: {
@@ -43,7 +42,10 @@ interface AddPaymentModalProps {
     description?: string;
   };
 }
-export const AddPaymentModal: React.FC<AddPaymentModalProps> = ({cape,userDto}) => {
+export const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
+  cape,
+  userDto,
+}) => {
   const open = useSelector(
     (s: RootState) => s.mapModeSlice.MonthlyPaymentModalMode
   );
@@ -66,37 +68,37 @@ export const AddPaymentModal: React.FC<AddPaymentModalProps> = ({cape,userDto}) 
     method: paymentMethod[0].value as payment_method_enum,
     description: "",
   });
-useEffect(() => {
-  // מצב "עריכה/השלמה" (cape)
-  if (cape && userDto) {
-    setIsMultiUser(false);
-    setSelectedUsers([]);
-    setTempMultiUserId(null);
+  useEffect(() => {
+    // מצב "עריכה/השלמה" (cape)
+    if (cape && userDto) {
+      setIsMultiUser(false);
+      setSelectedUsers([]);
+      setTempMultiUserId(null);
 
+      setNewPayment({
+        userId: userDto.userid ?? 0,
+        amount: Number(userDto.amount ?? 0),
+        depositDate: userDto.depositDate
+          ? userDto.depositDate.slice(0, 10) // אם הגיע ISO
+          : today,
+        method:
+          (userDto.method as payment_method_enum) ??
+          (paymentMethod[0].value as payment_method_enum),
+        description: userDto.description ?? "",
+      });
+
+      return;
+    }
+
+    // מצב "הוספה חדשה"
     setNewPayment({
-      userId: userDto.userid ?? 0,
-      amount: Number(userDto.amount ?? 0),
-      depositDate: userDto.depositDate
-        ? userDto.depositDate.slice(0, 10) // אם הגיע ISO
-        : today,
-      method:
-        (userDto.method as payment_method_enum) ??
-        (paymentMethod[0].value as payment_method_enum),
-      description: userDto.description ?? "",
+      userId: 0,
+      amount: 0,
+      depositDate: today,
+      method: paymentMethod[0].value as payment_method_enum,
+      description: "",
     });
-
-    return;
-  }
-
-  // מצב "הוספה חדשה"
-  setNewPayment({
-    userId: 0,
-    amount: 0,
-    depositDate: today,
-    method: paymentMethod[0].value as payment_method_enum,
-    description: "",
-  });
-}, [cape, userDto, today]);
+  }, [cape, userDto, today]);
 
   const handleClose = () => {
     dispatch(setMonthlyPaymentModalMode(false));
@@ -173,7 +175,7 @@ useEffect(() => {
     (isMultiUser && selectedUsers.length === 0);
 
   return (
-    <RtlProvider>
+    <RtlThemeProvider>
       <Dialog
         open={!!open}
         onClose={handleClose}
@@ -184,7 +186,7 @@ useEffect(() => {
           sx: {
             borderRadius: 4,
             boxShadow: "0 12px 30px rgba(0,0,0,0.16)",
-            bgcolor: "#e8f5e9",
+            // bgcolor: "#e8f5e9",
           },
         }}
       >
@@ -192,7 +194,7 @@ useEffect(() => {
           component="div"
           sx={{
             bgcolor: "green",
-            color: "#fff",
+            // color: "#fff",
             py: 2.5,
             textAlign: "center",
             borderTopLeftRadius: 16,
@@ -209,8 +211,8 @@ useEffect(() => {
             sx={{
               mb: 2.5,
               p: 2,
-              borderRadius: 3,
-              border: "1px solid #c8e6c9",
+              // borderRadius: 3,
+              // border: "1px solid #c8e6c9",
             }}
           >
             <FormControlLabel
@@ -252,13 +254,13 @@ useEffect(() => {
             <Box
               sx={{
                 p: 2,
-                borderRadius: 3,
-                border: "1px solid #c8e6c9",
+                // borderRadius: 3,
+                // border: "1px solid #c8e6c9",
               }}
             >
               <Typography
                 variant="subtitle2"
-                sx={{ mb: 1, fontWeight: 600, color: "text.secondary" }}
+                sx={{ mb: 1, fontWeight: 600, paddingBottom: 2, color: "text.secondary", justifySelf: "center" }}
               >
                 בחירת משתמשים
               </Typography>
@@ -336,7 +338,7 @@ useEffect(() => {
               type="number"
               inputProps={{ min: 0 }}
               value={newPayment.amount}
-                 sx={{
+              sx={{
                 "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
                   {
                     WebkitAppearance: "none",
@@ -374,10 +376,10 @@ useEffect(() => {
             <FormControl fullWidth size="medium">
               <InputLabel
                 id="method-label"
-                sx={{
-                  color: "success.main",
-                  "&.Mui-focused": { color: "success.dark" },
-                }}
+                // sx={{
+                //   color: "success.main",
+                //   "&.Mui-focused": { color: "success.dark" },
+                // }}
               >
                 אמצעי תשלום*
               </InputLabel>
@@ -446,6 +448,6 @@ useEffect(() => {
           <Button onClick={handleClose}>ביטול</Button>
         </DialogActions>
       </Dialog>
-    </RtlProvider>
+    </RtlThemeProvider>
   );
 };

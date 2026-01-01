@@ -13,7 +13,7 @@ import {
 import DepositAmountChange from "./DepositAmountChange";
 import DepositDateChange from "./DepositDateChange";
 import DepositAmountRemove from "./DepositAmountRemove";
-import { RtlProvider } from "../../../../Theme/rtl";
+import { RtlThemeProvider } from "../../../../Theme/rtl";
 interface IDepositsActionsProps {
   depositId: number;
   max: number;
@@ -33,7 +33,7 @@ const DepositsActions: FC<IDepositsActionsProps> = ({
 
   return (
     <Box dir="rtl">
-      <RtlProvider>
+      <RtlThemeProvider>
         <Paper
           elevation={2}
           sx={{ p: 2, borderRadius: 2 }}
@@ -44,6 +44,7 @@ const DepositsActions: FC<IDepositsActionsProps> = ({
           >
             פעולות על הפקדה
           </Typography>
+
           <FormControl fullWidth size="small">
             <InputLabel id="action-select-label">בחר פעולה</InputLabel>
             <Select
@@ -51,7 +52,7 @@ const DepositsActions: FC<IDepositsActionsProps> = ({
               value={mode}
               label="בחר פעולה"
               onChange={handleModeChange}
-              sx={{ backgroundColor: "#FFF", borderRadius: 1 }}
+              sx={{ borderRadius: 1 }}
             >
               <MenuItem value={DepositActionsType.AddToDeposit}>
                 הוספה להפקדה{" "}
@@ -65,27 +66,28 @@ const DepositsActions: FC<IDepositsActionsProps> = ({
             </Select>
           </FormControl>
 
+
           {mode === DepositActionsType.AddToDeposit && (
             <DepositAmountChange
-              depositId={depositId}
-              handleSubmit={handleSubmit}
+            depositId={depositId}
+            handleSubmit={handleSubmit}
             />
           )}
           {mode === DepositActionsType.ChangeReturnDate && (
             <DepositDateChange
-              depositId={depositId}
-              handleSubmit={handleSubmit}
+            depositId={depositId}
+            handleSubmit={handleSubmit}
             />
           )}
           {mode === DepositActionsType.RemoveFromDeposit && (
             <DepositAmountRemove
-              depositId={depositId}
-              max={max}
-              handleSubmit={handleSubmit}
+            depositId={depositId}
+            max={max}
+            handleSubmit={handleSubmit}
             />
           )}
         </Paper>
-      </RtlProvider>
+          </RtlThemeProvider>
     </Box>
   );
 };

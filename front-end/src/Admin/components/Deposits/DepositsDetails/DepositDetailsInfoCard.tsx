@@ -1,14 +1,16 @@
-import React from 'react'
-import { IDeposit } from '../depositsDto'
-import { Box, Card, CardContent, Grid, Typography } from '@mui/material'
+import React from "react";
+import { IDeposit } from "../depositsDto";
+import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
 interface DepositDetailsInfoCardProps {
-    deposit :IDeposit
+  deposit: IDeposit;
 }
-const DepositDetailsInfoCard: React.FC<DepositDetailsInfoCardProps> = ({ deposit }) => {
+const DepositDetailsInfoCard: React.FC<DepositDetailsInfoCardProps> = ({
+  deposit,
+}) => {
   console.log("DepositDetailsInfoCard", deposit);
-  
-    const items =[
-        {
+
+  const items = [
+    {
       label: "סכום הפקדה ראשוני",
       value: `₪${deposit.initialDeposit.toLocaleString()}`,
       color: "#006CF0",
@@ -18,24 +20,38 @@ const DepositDetailsInfoCard: React.FC<DepositDetailsInfoCardProps> = ({ deposit
       value: `₪${deposit.current_balance.toLocaleString()}`,
       color: "#007BFF",
     },
-    { label: "תאריך הפקדה", value: deposit.start_date ? new Date(deposit.start_date).toLocaleDateString() : '', color: "text.primary" },
+    {
+      label: "תאריך הפקדה",
+      value: deposit.start_date
+        ? new Date(deposit.start_date).toLocaleDateString()
+        : "",
+      color: "text.primary",
+    },
 
-    { label: "תאריך החזרה", value: deposit.end_date ? new Date(deposit.end_date).toLocaleDateString() : '', color: "text.primary" },
+    {
+      label: "תאריך החזרה",
+      value: deposit.end_date
+        ? new Date(deposit.end_date).toLocaleDateString()
+        : "",
+      color: "text.primary",
+    },
     {
       label: "סטטוס",
       value: (
-        <span style={{ color: deposit.isActive ? 'green' : 'red' }}>
-          {deposit.isActive ? 'פעיל' : 'סגור'}
+        <span style={{ color: deposit.isActive ? "green" : "red" }}>
+          {deposit.isActive ? "פעיל" : "סגור"}
         </span>
       ),
       color: "",
     },
-
-  ]
+  ];
   return (
-<Card sx={{ borderRadius: 2, boxShadow: 3, p: 3 }}>
+    <Card sx={{ borderRadius: 2, boxShadow: 3, p: 3 }}>
       <CardContent>
-        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3,textAlign:"center" }}>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 600, mb: 3, textAlign: "center" }}
+        >
           פרטי הפקדה כלליים
         </Typography>
 
@@ -78,7 +94,8 @@ const DepositDetailsInfoCard: React.FC<DepositDetailsInfoCardProps> = ({ deposit
           ))}
         </Grid>
       </CardContent>
-    </Card>  )
-}
+    </Card>
+  );
+};
 
-export default DepositDetailsInfoCard
+export default DepositDetailsInfoCard;

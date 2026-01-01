@@ -100,7 +100,6 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan }) => {
               <Box
                 sx={{
                   p: 1.5,
-                  backgroundColor: "#F8F9FA",
                   borderRadius: 1,
                   borderLeft: `4px solid ${
                     it.color === "text.primary" || !it.color ? "#CCC" : it.color

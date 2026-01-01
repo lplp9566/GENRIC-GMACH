@@ -10,12 +10,13 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import { RtlProvider } from "../../../Theme/rtl";
+// import { RtlProvider } from "../../../Theme/rtl";
 import { IOrdersReturnDto } from "./ordersReturnDto";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store/store";
 import { toast } from "react-toastify";
 import { payOrderReturn } from "../../../store/features/admin/adminStandingOrderReturt";
+import { RtlThemeProvider } from "../../../Theme/rtl";
 
 
 interface AddPaymentDateModalProps {
@@ -58,7 +59,8 @@ export const AddPaymentDateModal: React.FC<AddPaymentDateModalProps> = ({
   const isDisabled = !date;
 
   return (
-    <RtlProvider>
+    // <RtlProvider>
+              <RtlThemeProvider>
       <Dialog
         open={open}
         onClose={onClose}
@@ -69,7 +71,7 @@ export const AddPaymentDateModal: React.FC<AddPaymentDateModalProps> = ({
           sx: {
             borderRadius: 4,
             boxShadow: "0 12px 30px rgba(0,0,0,0.16)",
-            bgcolor: "#e8f5e9",
+            // bgcolor: "#e8f5e9",
           },
         }}
       >
@@ -130,6 +132,7 @@ export const AddPaymentDateModal: React.FC<AddPaymentDateModalProps> = ({
           <Button onClick={onClose}>ביטול</Button>
         </DialogActions>
       </Dialog>
-    </RtlProvider>
+              </RtlThemeProvider>
+
   );
 };

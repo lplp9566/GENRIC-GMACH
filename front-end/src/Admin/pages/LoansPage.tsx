@@ -9,7 +9,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  
+
   SelectChangeEvent,
   Button,
   Stack,
@@ -26,7 +26,6 @@ import Loans from "../components/Loans/LoansDashboard/LoansDashboard";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
 import { useNavigate } from "react-router-dom";
 import { StatusGeneric } from "../../common/indexTypes";
-import { RtlProvider } from "../../Theme/rtl";
 
 export const LoansPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -122,7 +121,7 @@ export const LoansPage: React.FC = () => {
                 >
                   הוסף הלוואה
                 </Button>
-                <RtlProvider>
+                {/* <RtlProvider> */}
                   <FormControl
                     size="small"
                     fullWidth={isSm}
@@ -141,7 +140,6 @@ export const LoansPage: React.FC = () => {
                       מצב הלוואה
                     </InputLabel>
                     <Select
-                    sx={{bgcolor:"white"}}
                       labelId="filter-status-label"
                       value={filter}
                       label="מצב הלוואה"
@@ -155,7 +153,7 @@ export const LoansPage: React.FC = () => {
                       </MenuItem>
                     </Select>
                   </FormControl>
-                </RtlProvider>
+                {/* </RtlProvider> */}
               </Box>
             </Stack>
           </Paper>

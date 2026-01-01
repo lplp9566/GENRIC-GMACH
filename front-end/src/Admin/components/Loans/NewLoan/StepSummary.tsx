@@ -25,7 +25,6 @@ const StepSummary: React.FC<StepSummaryProps> = ({
     sx={{
       p: 3,
       mb: 2,
-      background: "#e8f5e9", 
       borderColor: "#0b5e29", 
       boxShadow: 2,
       textAlign:'center'

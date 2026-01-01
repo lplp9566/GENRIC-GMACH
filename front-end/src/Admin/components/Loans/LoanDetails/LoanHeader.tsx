@@ -39,7 +39,7 @@ const LoanHeader: React.FC<LoanHeaderProps> = ({
       {/* לווה */}
       <Paper
         elevation={3}
-        sx={{ p: 2, flex: "1 1 23%", textAlign: "center", bgcolor: "white" }}
+        sx={{ p: 2, flex: "1 1 23%", textAlign: "center" }}
       >
         <Typography variant="subtitle2" color="textSecondary">
           לווה
@@ -105,7 +105,7 @@ const LoanHeader: React.FC<LoanHeaderProps> = ({
       {/* מטרה */}
       <Paper
         elevation={3}
-        sx={{ p: 2, flex: "1 1 30%", textAlign: "center", bgcolor: "white" }}
+        sx={{ p: 2, flex: "1 1 30%", textAlign: "center"}}
       >
         <Typography variant="subtitle2" color="textSecondary">
           מטרה

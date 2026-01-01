@@ -82,6 +82,20 @@ export const getMuiTheme = (mode: AppMode) => {
     ] as any,
 
     components: {
+        MuiDialogContent: {
+    styleOverrides: {
+      root: {
+        overflowY: "auto",
+
+        // ✅ מסתיר scrollbar בכל הדפדפנים
+        scrollbarWidth: "none",     // Firefox
+        msOverflowStyle: "none",    // Edge ישן
+        "&::-webkit-scrollbar": {   // Chrome/Safari
+          display: "none",
+        },
+      },
+    },
+  },
       MuiCssBaseline: {
         styleOverrides: {
           body: {
@@ -162,7 +176,7 @@ export const getMuiTheme = (mode: AppMode) => {
       MuiOutlinedInput: {
         styleOverrides: {
           root: {
-            backgroundColor: alpha(t.paper2, isDark ? 0.75 : 1),
+            backgroundColor: alpha(t.paper2, isDark ? 0.75 : 2),
             "& .MuiOutlinedInput-notchedOutline": {
               borderColor: alpha(t.border, isDark ? 0.7 : 1),
             },
@@ -171,7 +185,7 @@ export const getMuiTheme = (mode: AppMode) => {
             },
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
               borderColor: t.primary,
-              borderWidth: 2,
+              borderWidth: 3,
             },
           },
           input: {
@@ -183,11 +197,13 @@ export const getMuiTheme = (mode: AppMode) => {
       MuiInputLabel: {
         styleOverrides: {
           root: {
+            direction: "rtl",
             color: t.text2,
             "&.Mui-focused": { color: t.primary },
           },
         },
       },
+      
 
       // Table
       MuiTableContainer: {
@@ -233,16 +249,47 @@ export const getMuiTheme = (mode: AppMode) => {
       },
 
       // Tooltip
-      MuiTooltip: {
-        styleOverrides: {
-          tooltip: {
-            backgroundColor: isDark ? alpha("#0B1220", 0.95) : alpha("#111827", 0.92),
-            border: `1px solid ${alpha("#FFFFFF", isDark ? 0.08 : 0.12)}`,
-          },
-        },
-      },
+// Tooltip (Global)
+MuiTooltip: {
+  defaultProps: {
+    arrow: true,
+    placement: "top",
+    enterDelay: 400,
+    leaveDelay: 100,
+  },
+  styleOverrides: {
+    tooltip: {
+      fontSize: "0.85rem",
+      fontWeight: 600,
+      padding: "8px 12px",
+      borderRadius: 10,
+      lineHeight: 1.4,
+
+      backgroundColor: isDark
+        ? alpha("#020617", 0.95)   // כהה עמוק, לא שחור
+        : alpha("#111827", 0.92), // כהה עדין ל-Light
+
+      color: "#F9FAFB",
+      border: `1px solid ${alpha(
+        isDark ? "#FFFFFF" : "#000000",
+        isDark ? 0.08 : 0.12
+      )}`,
+
+      boxShadow: isDark
+        ? "0px 12px 30px rgba(0,0,0,0.6)"
+        : "0px 8px 24px rgba(0,0,0,0.25)",
+    },
+
+    arrow: {
+      color: isDark
+        ? alpha("#020617", 0.95)
+        : alpha("#111827", 0.92),
+    },
+  },
+},
     },
   });
 
+  
   return theme;
 };

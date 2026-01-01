@@ -21,7 +21,7 @@ import {
   getAllMonthlyRanks,
 } from "../../../store/features/admin/adminRankSlice";
 import { toast } from "react-toastify";
-import { RtlProvider } from "../../../Theme/rtl";
+// import { RtlProvider } from "../../../Theme/rtl";
 import { inputProps } from "../../../common/styles/inpotstels";
 interface IManageRankModalProps {
   openManage: boolean;
@@ -53,7 +53,7 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
   };
 
   return (
-    <RtlProvider>
+    // <RtlProvider>
       <Dialog
         open={openManage}
         onClose={() => {
@@ -168,7 +168,7 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </RtlProvider>
+    // </RtlProvider>
   );
 };
 

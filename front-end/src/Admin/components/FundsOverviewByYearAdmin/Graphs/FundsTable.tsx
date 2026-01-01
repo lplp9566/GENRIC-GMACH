@@ -29,7 +29,9 @@ const FundsTable = ({ data, selectedFields }: Props) => {
 
   const TableContent = (
     <Table size="small">
-      <TableHead sx={{ backgroundColor: "#e8eef3" }}>
+      <TableHead 
+      // sx={{ backgroundColor: "red" }}
+      >
         <TableRow>
           <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>שנה</TableCell>
           {selectedFields.map((key) => (
@@ -44,7 +46,7 @@ const FundsTable = ({ data, selectedFields }: Props) => {
           <TableRow
             key={row.year}
             hover
-            sx={{ '&:nth-of-type(odd)': { bgcolor: '#f9f9f9' }, cursor: 'pointer' }}
+            // sx={{ '&:nth-of-type(odd)': { bgcolor: '#f9f9f9' }, cursor: 'pointer' }}
           >
             <TableCell sx={{ py: 1.2, px: 2, fontSize: '0.875rem', fontWeight: 'bold' }}>
               {row.year}
@@ -68,7 +70,7 @@ const FundsTable = ({ data, selectedFields }: Props) => {
           maxWidth: "100%",
           maxHeight: 350,
           overflow: "auto",
-          bgcolor: "#ffffffc0",
+          // bgcolor: "#ffffffc0",
           borderRadius: 2,
           boxShadow: 1,
           position: "relative",

@@ -3,6 +3,7 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import { AdminYearlyFinancialItems, UserAdminFinancialItems } from '../items';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../store/store';
+import { ChartTooltip } from './LineChartGraph';
 interface BarChartGraphProps {
   data: any[];
   selectedFields: string[];
@@ -16,7 +17,7 @@ const {selectedUser} = useSelector((state: RootState) => state.AdminUsers);
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="year" />
                 <YAxis tickCount={7} />
-                <Tooltip formatter={(value) => `₪${Number(value).toLocaleString()}`} />
+        <Tooltip content={<ChartTooltip />} />
                 <Legend />
                 {selectedFields.map((key, idx) => (
                   <Bar

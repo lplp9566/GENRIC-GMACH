@@ -10,7 +10,7 @@ import {
   useNewLoanForm,
   NEW_LOAN_STEPS,
 } from "../../../Hooks/LoanHooks/useNewLoanForm";
-import { RtlProvider } from "../../../../Theme/rtl";
+import { RtlThemeProvider } from "../../../../Theme/rtl";
 
 const GREEN_MAIN = "#0b5e29";
 // const GREEN_LIGHT = "#e8f5e9";
@@ -42,7 +42,8 @@ const NewLoanForm: React.FC = () => {
       {openModal && (
         <CheckLoanModal onClose={closeModal} loan={modalLoan} type="create" onSubmit={()=>{}} />
       )}
-      <RtlProvider>
+            <RtlThemeProvider>
+
         <Box
           sx={{
             minHeight: "100vh",
@@ -133,7 +134,7 @@ const NewLoanForm: React.FC = () => {
             </Box>
           </Card>
         </Box>
-      </RtlProvider>
+            </RtlThemeProvider>
     </>
   );
 };

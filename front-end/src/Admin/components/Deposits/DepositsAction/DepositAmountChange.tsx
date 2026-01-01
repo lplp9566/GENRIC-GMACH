@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 import { toast } from "react-toastify";
 import { IDepositActionCreate, DepositActionsType } from "../depositsDto";
 
@@ -70,9 +70,7 @@ const DepositAmountChange: FC<IDepositAmountChangeProps> = ({
         InputLabelProps={{ shrink: true }}
       />
 
-      <Typography color="green" variant="subtitle2">
-        אנא הכנס את הסכום שברצונך להוסיף להפקדה
-      </Typography>
+
 
       <TextField
         label="סכום"

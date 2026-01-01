@@ -1,28 +1,33 @@
-import React from 'react';
-import { CacheProvider } from '@emotion/react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import createCache from '@emotion/cache';
-import stylisPluginRtl from 'stylis-plugin-rtl';
+import React from "react";
+import { CacheProvider } from "@emotion/react";
+import createCache from "@emotion/cache";
+import stylisPluginRtl from "stylis-plugin-rtl";
+import { ThemeProvider as MuiThemeProvider, CssBaseline } from "@mui/material";
+import { getMuiTheme } from "./muiTheme";
+import { useAppTheme } from "./ThemeProvider";
 
-// Create RTL cache for Emotion to flip all styles automatically
+
+// RTL cache for Emotion
 const cacheRtl = createCache({
-  key: 'mui-rtl',
+  key: "mui-rtl",
   stylisPlugins: [stylisPluginRtl],
 });
 
-// Create a theme configured for RTL direction globally
-const themeRtl = createTheme({
-  direction: 'rtl',
-});
+export const RtlThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { mode } = useAppTheme(); // "light" | "dark"
 
-type RtlProviderProps = { children: React.ReactNode };
+  // בונים את ה-theme הרגיל שלך + מוסיפים direction
+  const theme = React.useMemo(() => {
+    const base = getMuiTheme(mode);
+    return { ...base, direction: "rtl" as const };
+  }, [mode]);
 
-export const RtlProvider: React.FC<RtlProviderProps> = ({ children }) => (
-  <CacheProvider value={cacheRtl}>
-    <ThemeProvider theme={themeRtl}>
-      <CssBaseline />
-      {children}
-    </ThemeProvider>
-  </CacheProvider>
-);
+  return (
+    <CacheProvider value={cacheRtl}>
+      <MuiThemeProvider theme={theme}>
+        <CssBaseline />
+        {children}
+      </MuiThemeProvider>
+    </CacheProvider>
+  );
+};

@@ -12,7 +12,7 @@ import {
   Grid,
   Divider,
 } from "@mui/material";
-import { RtlProvider } from "../../../../Theme/rtl";
+// import { RtlProvider } from "../../../../Theme/rtl";
 
 // ✅ תעדכן נתיב אם צריך
 import SelectAllUsers from "../../SelectUsers/SelectAllUsers";
@@ -24,6 +24,7 @@ import { toast } from "react-toastify";
 import { editLoan, getAllLoans } from "../../../../store/features/admin/adminLoanSlice";
 import { ICreateLoan, IEditLoan } from "../LoanDto";
 import { StatusGeneric } from "../../../../common/indexTypes";
+import { RtlThemeProvider } from "../../../../Theme/rtl";
 
 // type UserOption = { id: number; first_name: string; last_name: string };
 
@@ -219,7 +220,9 @@ const EditLoanModal: React.FC<EditLoanModalProps> = ({
   };
 
   return (
-    <RtlProvider>
+    // <RtlProvider>
+          <RtlThemeProvider>
+    
       <Dialog
         open={open}
         onClose={onClose}
@@ -230,7 +233,7 @@ const EditLoanModal: React.FC<EditLoanModalProps> = ({
           sx: {
             borderRadius: 4,
             boxShadow: "0 12px 30px rgba(0,0,0,0.16)",
-            bgcolor: "#e8f5e9",
+            // bgcolor: "#e8f5e9",
           },
         }}
       >
@@ -448,7 +451,7 @@ const EditLoanModal: React.FC<EditLoanModalProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </RtlProvider>
+          </RtlThemeProvider>
   );
 };
 

@@ -12,9 +12,10 @@ import {
   useTheme,
 } from "@mui/material";
 import { StatusGeneric } from "../../../common/indexTypes";
-import { RtlProvider } from "../../../Theme/rtl";
+// import { RtlProvider } from "../../../Theme/rtl";
 import { useState } from "react";
 import NewInvestment from "./NewInvestment";
+import { RtlThemeProvider } from "../../../Theme/rtl";
 interface InvestmentsHeaderProps {
   filter: StatusGeneric;
   handleFilterChange: (e: any) => void;
@@ -31,7 +32,6 @@ const InvestmentsHeader = ({ filter, handleFilterChange }: InvestmentsHeaderProp
         p: 3,
         mb: 4,
         borderRadius: 2,
-        bgcolor: "#FFFFFF",
         width: {
           xs: "100%",
           sm: "90%",
@@ -85,7 +85,9 @@ const InvestmentsHeader = ({ filter, handleFilterChange }: InvestmentsHeaderProp
           >
             הוסף השקעה
           </Button>
-          <RtlProvider>
+                    <RtlThemeProvider>
+
+          {/* <RtlProvider> */}
             <FormControl
               size="small"
               fullWidth={isSm}
@@ -96,9 +98,7 @@ const InvestmentsHeader = ({ filter, handleFilterChange }: InvestmentsHeaderProp
               <InputLabel
                 id="filter-status-label"
                 sx={{
-                  color: "#424242",
                   fontWeight: 500,
-                  "&.Mui-focused": { color: "#2a8c82" },
                 }}
               >
                 מצב השקעה
@@ -108,26 +108,16 @@ const InvestmentsHeader = ({ filter, handleFilterChange }: InvestmentsHeaderProp
                 value={filter}
                 label="מצב השקעה"
                 onChange={handleFilterChange}
-                sx={{
-                  borderRadius: 1,
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#B0B0B0",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#2a8c82",
-                  },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#2a8c82",
-                    borderWidth: 1.5,
-                  },
-                }}
+
               >
                 <MenuItem value={StatusGeneric.ALL}>הכל</MenuItem>
                 <MenuItem value={StatusGeneric.ACTIVE}>פעילות</MenuItem>
                 <MenuItem value={StatusGeneric.INACTIVE}>לא פעילות</MenuItem>
               </Select>
             </FormControl>
-          </RtlProvider>
+                      </RtlThemeProvider>
+
+          {/* </RtlProvider> */}
         </Box>
       </Stack>
       <NewInvestment open={NewInvestmentOpen} onClose={() => setNewInvestmentOpen(false)} />

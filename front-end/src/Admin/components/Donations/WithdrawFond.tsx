@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
-import { RtlProvider } from "../../../Theme/rtl";
+// import { RtlProvider } from "../../../Theme/rtl";
 import {
   withdrawDonation,
   getAllFunds, // ✅ חדש
@@ -25,6 +25,7 @@ import { DonationActionType, ICreateDonation } from "./DonationDto";
 import { useNavigate } from "react-router-dom";
 import { setWithdrawDonationModal } from "../../../store/features/Main/AppMode";
 import { toast } from "react-toastify";
+import { RtlThemeProvider } from "../../../Theme/rtl";
 
 const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
@@ -90,7 +91,9 @@ const WithdrawFundModal: React.FC = () => {
   };
 
   return (
-    <RtlProvider>
+    // <RtlProvider>
+          <RtlThemeProvider>
+
       <Dialog
         open={!!open}
         onClose={onClose}
@@ -101,7 +104,6 @@ const WithdrawFundModal: React.FC = () => {
           sx: {
             borderRadius: 3,
             boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-            bgcolor: "#e8f5e9",
           },
         }}
       >
@@ -133,10 +135,10 @@ const WithdrawFundModal: React.FC = () => {
             <FormControl fullWidth size="small">
               <InputLabel
                 id="fund-label"
-                sx={{
-                  color: "success.main",
-                  "&.Mui-focused": { color: "success.dark" },
-                }}
+                // sx={{
+                //   color: "success.main",
+                //   "&.Mui-focused": { color: "success.dark" },
+                // }}
               >
                 קרן*
               </InputLabel>
@@ -210,8 +212,7 @@ const WithdrawFundModal: React.FC = () => {
           <Button onClick={onClose}>ביטול</Button>
         </DialogActions>
       </Dialog>
-    </RtlProvider>
-  );
+          </RtlThemeProvider>);
 };
 
 export default WithdrawFundModal;

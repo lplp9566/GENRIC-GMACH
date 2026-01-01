@@ -71,7 +71,7 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
       ) : (
         <Table size="small" sx={{ borderSpacing: "0 6px" }}>
           <TableHead>
-            <TableRow sx={{ "& th": { background: "#E9F0F7", fontWeight: 700, cursor: "pointer" } }}>
+            <TableRow sx={{ "& th": {  fontWeight: 700, cursor: "pointer" } }}>
               <TableCell align="right" onClick={() => handleHeaderClick("date")}>
                 תאריך{renderSortIndicator("date")}
               </TableCell>

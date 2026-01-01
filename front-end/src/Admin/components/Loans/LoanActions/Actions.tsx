@@ -30,7 +30,7 @@ export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit,max}) => 
     setMode(e.target.value as LoanPaymentActionType);
   return (
     <Box dir="rtl">
-      <Paper elevation={2} sx={{ p: 2, borderRadius: 2, backgroundColor: "#FEFEFE"}}>
+      <Paper elevation={2} sx={{ p: 2, borderRadius: 2}}>
         <Typography variant="h6" sx={{textAlign:"center", paddingBottom:2}}>פעולות להלוואה</Typography>
         <FormControl fullWidth size="small">
           <InputLabel id="action-select-label">בחר פעולה</InputLabel>
@@ -39,7 +39,7 @@ export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit,max}) => 
             value={mode}
             label="בחר פעולה"
             onChange={handleModeChange}
-            sx={{ backgroundColor: "#FFF", borderRadius: 1 }}
+            sx={{  borderRadius: 1 }}
           >
             <MenuItem value={LoanPaymentActionType.PAYMENT}>תשלום הלוואה</MenuItem>
             <MenuItem value={LoanPaymentActionType.AMOUNT_CHANGE}>

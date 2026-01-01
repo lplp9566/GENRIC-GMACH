@@ -110,7 +110,6 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({ actions, loanId }) =
             <TableRow
               sx={{
                 "& th": {
-                  background: "#E9F0F7",
                   fontWeight: 700,
                   cursor: "pointer",
                 },
