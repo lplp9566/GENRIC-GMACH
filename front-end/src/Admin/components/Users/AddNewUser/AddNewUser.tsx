@@ -12,7 +12,6 @@ import StepMembershipType from "./StepMembershipType";
 import { MembershipType } from "../UsersDto";
 import { RtlThemeProvider } from "../../../../Theme/rtl";
 const GREEN_MAIN = "#0b5e29";
-const GREEN_LIGHT = "#e8f5e9";
 const MEMBER_STEPS = [
   "סוג משתמש",
   "פרטים אישיים",
