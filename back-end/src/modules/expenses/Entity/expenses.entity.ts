@@ -1,6 +1,5 @@
-import { ExpensesCategory } from 'src/modules/expenses-category/entities/expenses-category.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, JoinColumn } from 'typeorm';
-
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {ExpensesCategory} from "../../expenses-category/entities/expenses-category.entity"
 
 @Entity("expenses")
 export class Expense {
@@ -16,7 +15,7 @@ export class Expense {
   @Column({ type: 'date' })
   expenseDate: Date;
   @ManyToOne(() => ExpensesCategory, (category) => category.expenses, {
-    eager: true,       // טוען אוטומטית את הקטגוריה
+    eager: true,      
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'category_id' })
