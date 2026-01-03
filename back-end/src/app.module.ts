@@ -7,8 +7,6 @@ import { FundsOverviewModule } from './modules/funds-overview/funds-overview.mod
 import { LoanActionsModule } from './modules/loans/loan-actions/loan-actions.module';
 import { LoansModule } from './modules/loans/loans.module';
 import { UserFinancialByYearModule } from './modules/users/user-financials-by-year/user-financial-by-year.module';
-import { ExpensesService } from './modules/expenses/expenses.service';
-import { ExpensesModule } from './modules/expenses/expenses.module';
 import { PaymentDetailsModule } from './modules/users/payment-details/payment-details.module';
 import { MonthlyDepositsModule } from './modules/monthly_deposits/monthly_deposits.module';
 import { DonationsModule } from './modules/donations/donations.module';
@@ -33,6 +31,7 @@ import { UserRoleHistoryModule } from './modules/user_role_history/user_role_his
 
 import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
 import { FundsModule } from './modules/funds/funds.module';
+import { ExpensesModule } from './modules/expenses/expenses.module';
 import { ExpensesCategoryModule } from './modules/expenses-category/expenses-category.module';
 
 
@@ -85,7 +84,7 @@ import { ExpensesCategoryModule } from './modules/expenses-category/expenses-cat
     FundsModule,
     ExpensesCategoryModule,
   ],
-  providers: [ExpensesService, UserRoleHistoryService],
+  providers: [ UserRoleHistoryService],
   controllers: [UserRoleHistoryController,],
 
 
