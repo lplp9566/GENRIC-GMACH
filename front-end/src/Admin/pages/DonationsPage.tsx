@@ -22,8 +22,8 @@ import DonationHeader from "../components/Donations/DonationHeader";
 import NewDonation from "../components/Donations/NewDonation";
 import WithdrawFundModal from "../components/Donations/WithdrawFond";
 
-type ViewMode = "split" | "left" | "right";
-const MONTHS = [
+ export type ViewMode = "split" | "left" | "right";
+ export const MONTHS = [
   "ינואר",
   "פברואר",
   "מרץ",

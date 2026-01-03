@@ -5,6 +5,7 @@ import { Expense } from './Entity/expenses.entity';
 import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { getYearFromDate } from '../../services/services';
+import { CreateExpenseDto } from './create-expense.dto';
 
 @Injectable()
 export class ExpensesService {
@@ -15,16 +16,19 @@ export class ExpensesService {
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
   ) {}
 
-  async create(expenseData: Partial<Expense>): Promise<Expense> {
-    const expense = this.expensesRepository.create(expenseData);
-    // await this.fundsOverviewService.addExpense(expense.amount);
-    const year = getYearFromDate(expense.expenseDate) 
-    // await this.fundsOverviewByYearService.recordExpense(year, expense.amount);
-    return this.expensesRepository.save(expense);
-  }
+async create(expenseData: CreateExpenseDto): Promise<Expense> {
+  const { category_id, ...rest } = expenseData;
+
+  const expense = this.expensesRepository.create({
+    ...rest,
+    category: category_id ? ({ id: category_id } as any) : null,
+  });
+
+  return this.expensesRepository.save(expense);
+}
 
   async findAll(): Promise<Expense[]> {
-    return this.expensesRepository.find({ relations: ['member'] });
+    return this.expensesRepository.find({});
   }
 
   async findOne(id: number): Promise<Expense> {

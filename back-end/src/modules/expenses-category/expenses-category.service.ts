@@ -16,7 +16,7 @@ export class ExpensesCategoryService {
   }
 
   findAll() {
-    return `This action returns all expensesCategory`;
+    return  this.expensesCategoryRepository.find();
   }
 
   findOne(id: number) {

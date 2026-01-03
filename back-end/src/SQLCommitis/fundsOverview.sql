@@ -58,6 +58,12 @@ standing_order_return AS (
   WHERE paid = false
 ),
 
+-- ✅ סך כל ההוצאות (מוריד מההון העצמי ומהנזילות)
+expenses_sum AS (
+  SELECT COALESCE(SUM(amount), 0) AS value
+  FROM public.expenses
+),
+
 -- הלוואות פעילות
 loans_sum AS (
   SELECT COALESCE(SUM(remaining_balance), 0) AS value
@@ -95,20 +101,22 @@ funds_json AS (
 SELECT
   1 AS id,
 
-  -- ✅ הון עצמי — לא נוגע בהחזרי הור"ק
+  -- ✅ הון עצמי — כולל הפחתת הוצאות; לא נוגע בהחזרי הור"ק
   (
     membership_fees.value
     + investments_sum.realized_profit
     + regular_donations_net.value
     + funds_donations_net.value
     + active_deposits.value
+    - expenses_sum.value
   )::float AS own_equity,
 
-  -- קרן הגמ"ח: דמי חבר + תרומות רגילות נטו + רווח ממומש
+  -- ✅ קרן הגמ"ח: דמי חבר + תרומות רגילות נטו + רווח ממומש - הוצאות
   (
     membership_fees.value
     + regular_donations_net.value
     + investments_sum.realized_profit
+    - expenses_sum.value
   )::float AS fund_principal,
 
   loans_sum.value::float AS total_loaned_out,
@@ -121,7 +129,7 @@ SELECT
   donations_total_gross.value::float AS total_donations,
   regular_donations_gross.value::float AS total_equity_donations,
 
-  -- ✅ כסף נזיל: הון עצמי - הלוואות - השקעות נעולות - החזרי הור"ק פתוחים
+  -- ✅ כסף נזיל: הון עצמי (כולל הוצאות) - הלוואות - השקעות נעולות - החזרי הור"ק פתוחים
   (
     (
       membership_fees.value
@@ -129,6 +137,7 @@ SELECT
       + regular_donations_net.value
       + funds_donations_net.value
       + active_deposits.value
+      - expenses_sum.value
     )
     - loans_sum.value
     - investments_sum.total_invested_now
@@ -138,7 +147,8 @@ SELECT
   cash_sum.value::float AS cash_holdings,
   active_deposits.value::float AS total_user_deposits,
 
-  0::float AS total_expenses,
+  -- ✅ סך הוצאות אמיתי (במקום 0)
+  expenses_sum.value::float AS total_expenses,
 
   -- לתצוגה: כמה שמור כרגע להחזרי הור"ק פתוחים
   standing_order_return.value::float AS standing_order_return,
@@ -153,6 +163,7 @@ FROM
   CROSS JOIN membership_fees
   CROSS JOIN active_deposits
   CROSS JOIN standing_order_return
+  CROSS JOIN expenses_sum
   CROSS JOIN loans_sum
   CROSS JOIN investments_sum
   CROSS JOIN cash_sum

@@ -11,6 +11,7 @@ import { Authslice } from "./features/auth/authSlice";
 import { AdminDonationsSlice } from "./features/admin/adminDonationsSlice";
 import { AdminInvestmentsSlice } from "./features/admin/adminInvestmentsSlice";
 import { AdminStandingOrderReturnSlice } from "./features/admin/adminStandingOrderReturt";
+import { AdminExpensesSlice } from "./features/admin/adminExpensesSlice";
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ export const store = configureStore({
     AdminDonationsSlice: AdminDonationsSlice.reducer,
     AdminInvestmentsSlice: AdminInvestmentsSlice.reducer,
     AdminStandingOrderReturnSlice: AdminStandingOrderReturnSlice.reducer,
+    AdminExpensesSlice:AdminExpensesSlice.reducer
   },
 });
 
