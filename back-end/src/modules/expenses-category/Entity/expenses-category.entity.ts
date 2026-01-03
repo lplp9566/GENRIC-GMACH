@@ -1,6 +1,5 @@
-import { Expense } from 'src/modules/expenses/Entity/expenses.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-
+import {Expense} from "../../expenses/Entity/expenses.entity"
 @Entity('expenses_category')
 export class ExpensesCategory {
   @PrimaryGeneratedColumn()
