@@ -17,9 +17,9 @@ import EditExpenseModal from "./EditExpenseModal";
 export type ExpenseRow = {
   id: string | number;
   amount: number;
-  date: string;     
-  category: string;  
-  categoryId?: number | null; // אם יש לך
+  date: string;
+  category: string;
+  categoryId?: number | null;
   note?: string;
 };
 
@@ -32,6 +32,7 @@ interface ExpensesTableProps {
   sortBy: SortBy;
   sortDir: SortDir;
   onSortClick: (key: SortBy) => void;
+  onDuplicate: (row: ExpenseRow) => void; // ✅ חדש
 }
 
 const ExpensesTable: FC<ExpensesTableProps> = ({
@@ -40,25 +41,32 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
   sortBy,
   sortDir,
   onSortClick,
+  onDuplicate,
 }) => {
-
   if (isLoading) {
     return (
-      <Box display="flex" alignItems="center" justifyContent="center" height={300}>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        height={300}
+      >
         <CircularProgress />
       </Box>
     );
   }
 
   const [editMode, setEditMode] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState<ExpenseRow | null>(null);
+  const [selectedExpense, setSelectedExpense] = useState<ExpenseRow | null>(
+    null
+  );
 
   const ddmmyyyyToInputDate = (s: string) => {
     if (!s) return "";
     const match = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
     if (!match) return "";
     const [, dd, mm, yyyy] = match;
-    return `${yyyy}-${mm}-${dd}`; // YYYY-MM-DD
+    return `${yyyy}-${mm}-${dd}`;
   };
 
   const onClickEdit = (row: ExpenseRow) => {
@@ -67,22 +75,6 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
       date: ddmmyyyyToInputDate(row.date),
     });
     setEditMode(true);
-  };
-
-  const onClickDuplicate = (row: ExpenseRow) => {
-    console.log(row);
-    
-    // dispatch(
-    //   setAddExpenseDraft({
-    //     categoryId: row.categoryId ?? null, // אם אין לך categoryId - אפשר לשלוח categoryName במקום
-    //     categoryName: row.category,         // אפשר להשאיר גם וגם
-    //     amount: row.amount,
-    //     expenseDate: ddmmyyyyToInputDate(row.date),
-    //     note: row.note ?? "",
-    //   })
-    // );
-
-    // dispatch(setAddExpenseModal(true));
   };
 
   return (
@@ -156,7 +148,7 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
                       size="small"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onClickDuplicate(row);
+                        onDuplicate(row); // ✅ כאן השכפול
                       }}
                     >
                       <ContentCopyIcon fontSize="small" />

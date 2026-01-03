@@ -1,3 +1,4 @@
+// AddExpenseModal.tsx
 import { FC, useEffect, useMemo, useState } from "react";
 import {
   Dialog,
@@ -18,22 +19,28 @@ import { toast } from "react-toastify";
 
 import { AppDispatch, RootState } from "../../../store/store";
 import { RtlThemeProvider } from "../../../Theme/rtl";
-
-// ✅ thunks מהסלייס שלך
 import {
   createExpense,
   getAllExpenses,
   getAllExpensesCategory,
 } from "../../../store/features/admin/adminExpensesSlice";
 
-const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+const today = new Date().toISOString().slice(0, 10);
+
+export type AddExpenseDraft = {
+  categoryId?: number | null;
+  amount?: number;
+  expenseDate?: string; // YYYY-MM-DD
+  note?: string;
+};
 
 interface AddExpenseModalProps {
   open: boolean;
   onClose: () => void;
+  draft?: AddExpenseDraft | null; // ✅ חדש
 }
 
-const AddExpenseModal: FC<AddExpenseModalProps> = ({ open, onClose }) => {
+const AddExpenseModal: FC<AddExpenseModalProps> = ({ open, onClose, draft }) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const allExpensesCategory = useSelector(
@@ -50,18 +57,35 @@ const AddExpenseModal: FC<AddExpenseModalProps> = ({ open, onClose }) => {
   const [expenseDate, setExpenseDate] = useState<string>(today);
   const [note, setNote] = useState<string>("");
 
-  // טעינה/איפוס בעת פתיחה
+  // ✅ בעת פתיחה: טוען קטגוריות + ממלא לפי draft אם קיים
   useEffect(() => {
     if (!open) return;
 
     dispatch(getAllExpensesCategory());
 
-    // איפוס
-    setCategoryId("");
-    setAmount(0);
-    setExpenseDate(today);
-    setNote("");
-  }, [open, dispatch]);
+    if (draft) {
+      setCategoryId(draft.categoryId ?? "");
+      setAmount(draft.amount ?? 0);
+      setExpenseDate(draft.expenseDate ?? today);
+      setNote(draft.note ?? "");
+    } else {
+      setCategoryId("");
+      setAmount(0);
+      setExpenseDate(today);
+      setNote("");
+    }
+  }, [open, draft, dispatch]);
+
+  // ✅ אם draft כולל categoryId אבל הקטגוריות נטענות מאוחר יותר
+  // ונגמר במצב שה-id לא קיים ברשימה - ננקה כדי שלא יישאר ערך "תקוע"
+  useEffect(() => {
+    if (!open) return;
+    if (!categoryId) return;
+    if (!categories.length) return;
+
+    const exists = categories.some((c: any) => Number(c?.id) === Number(categoryId));
+    if (!exists) setCategoryId("");
+  }, [open, categoryId, categories]);
 
   const isValid = useMemo(() => {
     if (!categoryId) return false;
@@ -71,13 +95,11 @@ const AddExpenseModal: FC<AddExpenseModalProps> = ({ open, onClose }) => {
   }, [categoryId, expenseDate, amount]);
 
   const handleSubmit = async () => {
-    // בהתאם ל-Entity שלך: Expense.category הוא Relation.
-    // הכי נכון לשלוח category_id כדי שהשרת יקשר לקטגוריה.
     const payload = {
       amount,
-      expenseDate,         // "YYYY-MM-DD"
+      expenseDate,
       note: note?.trim() || null,
-      category_id: Number(categoryId), // ✅ מומלץ בצד שרת לקבל category_id
+      category_id: Number(categoryId),
     };
 
     try {
@@ -87,12 +109,10 @@ const AddExpenseModal: FC<AddExpenseModalProps> = ({ open, onClose }) => {
         error: "אירעה שגיאה בעת הוספת ההוצאה.",
       });
 
-      // רענון רשימה (לא חובה, אבל שימושי)
       dispatch(getAllExpenses());
-
       onClose();
     } catch {
-      // toast כבר מציג error
+      // toast כבר מציג
     }
   };
 
@@ -124,7 +144,7 @@ const AddExpenseModal: FC<AddExpenseModalProps> = ({ open, onClose }) => {
             autoComplete="off"
             sx={{ display: "flex", flexDirection: "column", gap: 3 }}
           >
-            {/* קטגוריה */}
+            <Typography></Typography>
             <FormControl fullWidth size="small">
               <InputLabel id="cat-label">קטגוריה*</InputLabel>
               <Select
@@ -143,7 +163,6 @@ const AddExpenseModal: FC<AddExpenseModalProps> = ({ open, onClose }) => {
               </Select>
             </FormControl>
 
-            {/* תאריך */}
             <TextField
               label="תאריך*"
               type="date"
@@ -154,7 +173,6 @@ const AddExpenseModal: FC<AddExpenseModalProps> = ({ open, onClose }) => {
               onChange={(e) => setExpenseDate(e.target.value)}
             />
 
-            {/* סכום */}
             <TextField
               label="סכום (₪)*"
               type="number"
@@ -172,7 +190,6 @@ const AddExpenseModal: FC<AddExpenseModalProps> = ({ open, onClose }) => {
               }}
             />
 
-            {/* הערה */}
             <TextField
               label="הערה"
               size="medium"
