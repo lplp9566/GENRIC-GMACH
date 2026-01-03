@@ -16,6 +16,7 @@ const navItems = [
   { label: "נתונים כללים", path: "/funds" },
   { label: "סטטיסטיקה", path: "/FundsOverviewByYear" },
   { label: "דמי חבר ", path: "/paymentsPage" },
+  { label: "הוצאות", path: "/expenses" },
   
 ];
 
