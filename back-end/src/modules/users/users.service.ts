@@ -45,6 +45,7 @@ export class UsersService {
   ): Promise<PaymentDetailsEntity | null> {
     return this.paymentDetailsRepository.findOne({
       where: { user: { id: userId, is_admin: false , membership_type: MembershipType.MEMBER} },
+      
     });
   }
   async getAllMembersAndFriends(): Promise<UserEntity[]> {
@@ -52,17 +53,68 @@ export class UsersService {
       where: { is_admin: false },
     });
   }
- async findUsers(filters: { membershipType?: MembershipType; isAdmin?: boolean }) {
-  const where: any = {};
+async findUsers(filters: { membershipType?: MembershipType; isAdmin?: boolean }) {
+  const qb = this.usersRepository
+    .createQueryBuilder('u')
+    .leftJoinAndSelect('u.payment_details', 'pd')
+    .leftJoinAndSelect('u.current_role', 'cr');
 
-  if (filters.isAdmin !== undefined) where.is_admin = filters.isAdmin;
-  if (filters.membershipType) where.membership_type = filters.membershipType;
+  if (filters.isAdmin !== undefined) qb.andWhere('u.is_admin = :isAdmin', { isAdmin: filters.isAdmin });
+  if (filters.membershipType) qb.andWhere('u.membership_type = :mt', { mt: filters.membershipType });
 
-  return this.usersRepository.find({
-    where,
-    relations: ['payment_details', 'current_role'],
-  });
-} 
+  // 1) חברים לפני ידידים (תתאים את הערך ל-ENUM שלך)
+  qb.addOrderBy(`CASE WHEN u.membership_type = :member THEN 0 ELSE 1 END`, 'ASC')
+    .setParameter('member', MembershipType.MEMBER);
+
+  // 2) קודם מי שההחזר החודשי שלו במינוס
+  qb.addOrderBy(`CASE WHEN COALESCE(pd.monthly_balance, 0) < 0 THEN 0 ELSE 1 END`, 'ASC');
+
+  // 3) אחר כך מי שיש לו הלוואה במינוס (balance שלילי באחד האיברים)
+  qb.addOrderBy(
+    `
+    CASE WHEN EXISTS (
+      SELECT 1
+      FROM jsonb_array_elements(COALESCE(pd.loan_balances::jsonb, '[]'::jsonb)) elem
+      WHERE (elem->>'balance')::numeric < 0
+    )
+    THEN 0 ELSE 1 END
+    `,
+    'ASC',
+  );
+
+  // 4) ואז "תאריך חיוב הקרוב להיום" לפי יום בחודש (charge_date = 1..31)
+  // מחשבים "next_charge_date": אם יום החיוב עוד לא עבר החודש => החודש, אחרת => חודש הבא
+  qb.addOrderBy(
+    `
+    CASE
+      WHEN pd.charge_date IS NULL THEN 1
+      ELSE 0
+    END
+    `,
+    'ASC',
+  );
+
+  qb.addOrderBy(
+    `
+    (
+      CASE
+        WHEN pd.charge_date IS NULL THEN (CURRENT_DATE + INTERVAL '100 years')
+        ELSE
+          CASE
+            WHEN make_date(EXTRACT(YEAR FROM CURRENT_DATE)::int, EXTRACT(MONTH FROM CURRENT_DATE)::int, pd.charge_date) >= CURRENT_DATE
+              THEN make_date(EXTRACT(YEAR FROM CURRENT_DATE)::int, EXTRACT(MONTH FROM CURRENT_DATE)::int, pd.charge_date)
+            ELSE
+              (make_date(EXTRACT(YEAR FROM CURRENT_DATE)::int, EXTRACT(MONTH FROM CURRENT_DATE)::int, pd.charge_date) + INTERVAL '1 month')
+          END
+      END
+    )
+    `,
+    'ASC',
+  );
+
+  return qb.getMany();
+}
+
 async onApplicationBootstrap() {
     if (this.config.get('SEED_ADMIN') !== 'true') return;
 
