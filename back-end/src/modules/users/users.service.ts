@@ -62,17 +62,28 @@ async findUsers(filters: { membershipType?: MembershipType; isAdmin?: boolean })
   if (filters.isAdmin !== undefined) qb.andWhere('u.is_admin = :isAdmin', { isAdmin: filters.isAdmin });
   if (filters.membershipType) qb.andWhere('u.membership_type = :mt', { mt: filters.membershipType });
 
-  // 1) חברים לפני ידידים (תתאים את הערך ל-ENUM שלך)
+  const MEMBER = MembershipType.MEMBER; // תעדכן לערך האמיתי אצלך
+
+  // 1) חברים לפני ידידים
   qb.addOrderBy(`CASE WHEN u.membership_type = :member THEN 0 ELSE 1 END`, 'ASC')
-    .setParameter('member', MembershipType.MEMBER);
+    .setParameter('member', MEMBER);
 
-  // 2) קודם מי שההחזר החודשי שלו במינוס
-  qb.addOrderBy(`CASE WHEN COALESCE(pd.monthly_balance, 0) < 0 THEN 0 ELSE 1 END`, 'ASC');
+  // 2) קודם "מינוס חודשי" - אבל רק לחבר
+  qb.addOrderBy(
+    `CASE WHEN u.membership_type = :member AND COALESCE(pd.monthly_balance, 0) < 0 THEN 0 ELSE 1 END`,
+    'ASC',
+  );
 
-  // 3) אחר כך מי שיש לו הלוואה במינוס (balance שלילי באחד האיברים)
+  // בתוך קבוצת המינוס החודשי: הכי שלילי קודם (-1900 לפני -400 לפני -40)
+  qb.addOrderBy(
+    `CASE WHEN u.membership_type = :member AND COALESCE(pd.monthly_balance, 0) < 0 THEN COALESCE(pd.monthly_balance, 0) ELSE 0 END`,
+    'ASC',
+  );
+
+  // 3) אחר כך "הלוואה במינוס" - אבל רק לחבר
   qb.addOrderBy(
     `
-    CASE WHEN EXISTS (
+    CASE WHEN u.membership_type = :member AND EXISTS (
       SELECT 1
       FROM jsonb_array_elements(COALESCE(pd.loan_balances::jsonb, '[]'::jsonb)) elem
       WHERE (elem->>'balance')::numeric < 0
@@ -82,38 +93,26 @@ async findUsers(filters: { membershipType?: MembershipType; isAdmin?: boolean })
     'ASC',
   );
 
-  // 4) ואז "תאריך חיוב הקרוב להיום" לפי יום בחודש (charge_date = 1..31)
-  // מחשבים "next_charge_date": אם יום החיוב עוד לא עבר החודש => החודש, אחרת => חודש הבא
+  // 4) תאריך חיוב הקרוב (charge_date = יום בחודש)
   qb.addOrderBy(
     `
     CASE
-      WHEN pd.charge_date IS NULL THEN 1
-      ELSE 0
+      WHEN pd.charge_date IS NULL THEN (CURRENT_DATE + INTERVAL '100 years')
+      ELSE
+        CASE
+          WHEN make_date(EXTRACT(YEAR FROM CURRENT_DATE)::int, EXTRACT(MONTH FROM CURRENT_DATE)::int, pd.charge_date) >= CURRENT_DATE
+            THEN make_date(EXTRACT(YEAR FROM CURRENT_DATE)::int, EXTRACT(MONTH FROM CURRENT_DATE)::int, pd.charge_date)
+          ELSE
+            (make_date(EXTRACT(YEAR FROM CURRENT_DATE)::int, EXTRACT(MONTH FROM CURRENT_DATE)::int, pd.charge_date) + INTERVAL '1 month')
+        END
     END
-    `,
-    'ASC',
-  );
-
-  qb.addOrderBy(
-    `
-    (
-      CASE
-        WHEN pd.charge_date IS NULL THEN (CURRENT_DATE + INTERVAL '100 years')
-        ELSE
-          CASE
-            WHEN make_date(EXTRACT(YEAR FROM CURRENT_DATE)::int, EXTRACT(MONTH FROM CURRENT_DATE)::int, pd.charge_date) >= CURRENT_DATE
-              THEN make_date(EXTRACT(YEAR FROM CURRENT_DATE)::int, EXTRACT(MONTH FROM CURRENT_DATE)::int, pd.charge_date)
-            ELSE
-              (make_date(EXTRACT(YEAR FROM CURRENT_DATE)::int, EXTRACT(MONTH FROM CURRENT_DATE)::int, pd.charge_date) + INTERVAL '1 month')
-          END
-      END
-    )
     `,
     'ASC',
   );
 
   return qb.getMany();
 }
+
 
 async onApplicationBootstrap() {
     if (this.config.get('SEED_ADMIN') !== 'true') return;
