@@ -8,6 +8,7 @@ export class Expense {
 
   @Column({type: 'float'})
   amount: number;
+  
 
   @Column({ type: 'text' , nullable: true })
   note?: string;
