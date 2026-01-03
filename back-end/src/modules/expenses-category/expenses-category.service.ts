@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateExpensesCategoryDto } from './dto/create-expenses-category.dto';
 import { UpdateExpensesCategoryDto } from './dto/update-expenses-category.dto';
-import { ExpensesCategory } from './entities/expenses-category.entity';
+import { ExpensesCategory } from './Entity/expenses-category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 

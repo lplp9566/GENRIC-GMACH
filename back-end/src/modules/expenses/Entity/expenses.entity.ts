@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import {ExpensesCategory} from "../../expenses-category/entities/expenses-category.entity"
+import {ExpensesCategory} from "../../expenses-category/Entity/expenses-category.entity"
 
 @Entity("expenses")
 export class Expense {
@@ -8,7 +8,7 @@ export class Expense {
 
   @Column({type: 'float'})
   amount: number;
-  
+
 
   @Column({ type: 'text' , nullable: true })
   note?: string;
