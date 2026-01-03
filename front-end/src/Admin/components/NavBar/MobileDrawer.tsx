@@ -24,19 +24,25 @@ const navItems = [
   open,
   onClose,
 }) => (
-  <Drawer
-    anchor="right"
-    open={open}
-    onClose={onClose}
-    sx={{
-      "& .MuiDrawer-paper": {
-        top: 64,
-        background: NAV_BG,
-        color: NAV_TXT,
-        width: 250,
-      },
-    }}
-  >
+<Drawer
+  anchor="right"
+  open={open}
+  onClose={onClose}
+  sx={{
+    "& .MuiDrawer-paper": {
+      top: 64,
+      background: NAV_BG,
+      color: NAV_TXT,
+      width: 250,
+
+      // ✅ במובייל: גובה מוגדר + גלילה
+      height: { xs: "calc(100dvh - 64px)", md: "auto" },
+      overflowY: { xs: "auto", md: "visible" },
+      WebkitOverflowScrolling: "touch",
+    },
+  }}
+>
+
     <Box sx={{ p: 2, textAlign: "center" }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
         תפריט ניווט
