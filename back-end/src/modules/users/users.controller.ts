@@ -54,6 +54,11 @@ async getAllUsers(
       monthly_balance: paymentDetails?.monthly_balance || 0,
     };
   }
+   @Post("create_Year_Summary")
+  async createYearSummary(
+  ){
+    return this.usersService.createYearSummary(2025)
+  }
  @Patch(':id')
   async updateUserAndPayment(
     @Param('id', ParseIntPipe) id: number,
@@ -62,4 +67,5 @@ async getAllUsers(
     const { userData, paymentData } = dto ?? {};
     return this.usersService.updateUserAndPaymentInfo(id, userData, paymentData);
   }
+ 
 }

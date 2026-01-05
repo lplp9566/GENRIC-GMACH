@@ -23,9 +23,12 @@ constructor(
 ) {}
 
 async getOrCreateUserFinancials(user: UserEntity) {
-  let record = await this.userFinancialsViewRepository.findOne({
-    where: { user: { id: user.id } },   // ← חיפוש רק לפי id
-  });
+  console.log("lll");
+  
+let record = await this.userFinancialsViewRepository.findOne({
+  where: { userId: user.id },
+});
+
 
   // if (!record) {
   //   record = this.userFinancialsRepository.create({

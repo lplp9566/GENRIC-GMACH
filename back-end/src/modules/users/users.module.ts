@@ -15,6 +15,8 @@ import { MembershipRolesModule } from '../membership_roles/membership_roles.modu
 import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates.module';
 import { WhatsappModule } from '../whatsapp/whatsapp.module';
 import { RoleMonthlyRateEntity } from '../role_monthly_rates/Entity/role_monthly_rates.entity';
+import { MailModule } from '../mail/mail.module';
+import { UserFinancialByYearModule } from './user-financials-by-year/user-financial-by-year.module';
 
 @Module({
   imports: [
@@ -30,10 +32,10 @@ TypeOrmModule.forFeature([
     forwardRef(() => MembershipRolesModule),
     forwardRef(() => WhatsappModule),
     forwardRef(() => RoleMonthlyRatesModule),
-
+    MailModule,
     PaymentDetailsModule,
     UserFinancialsModule,
-
+    UserFinancialByYearModule
   ],
   controllers: [UsersController],
   providers: [UsersService, UserBalanceCronService],

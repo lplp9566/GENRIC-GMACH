@@ -18,6 +18,10 @@ import { RoleMonthlyRateEntity } from '../role_monthly_rates/Entity/role_monthly
 import { ConfigService } from '@nestjs/config';
 import { MembershipType, payment_method } from './userTypes';
 import { log } from 'console';
+import { UserFinancialService } from './user-financials/user-financials.service';
+import { UserFinancialByYearService } from './user-financials-by-year/user-financial-by-year.service';
+import { MailService } from '../mail/mail.service';
+import { YearSummaryPdfStyleData } from '../mail/dto';
 
 @Injectable()
 export class UsersService {
@@ -38,6 +42,10 @@ export class UsersService {
     private readonly userRoleHistoryService: UserRoleHistoryService,
     private readonly dataSource: DataSource,
     private readonly config: ConfigService, 
+    private readonly userFinancialService: UserFinancialService,
+    private readonly userFinancialByYear :UserFinancialByYearService,
+    private readonly mailService:MailService
+
   ) {}
  
   async getAllMemberUserPaymentDetails(
@@ -442,6 +450,44 @@ async onApplicationBootstrap() {
       .orderBy('user.first_name', 'ASC')
       .limit(limit)
       .getMany();
+  }
+  async createYearSummary (year:number){
+    const users = await this.getAllUsers()
+    const memberUsers = users.filter((user)=> user.membership_type == MembershipType.MEMBER)
+    const friendUsers = users.filter((user)=>user.membership_type == MembershipType.FRIEND)
+  for (const user of memberUsers){
+    const financialDetails = await this.userFinancialService.getOrCreateUserFinancials(user)
+    const yearDetails = await this.userFinancialByYear.getOrCreateFinancialRecord(user,year)
+    const data:YearSummaryPdfStyleData = {
+      year ,
+      activeLoansTotal:financialDetails?.total_loans_taken_amount! - financialDetails?.total_loans_repaid!, 
+      cashboxTotal:financialDetails?.total_cash_holdings ?? 0,
+      depositedAllTime :financialDetails?.total_fixed_deposits_deposited! - financialDetails?.total_fixed_deposits_withdrawn!,
+      depositedThisYear: yearDetails?.total_fixed_deposits_added!,
+      donatedAllTime:financialDetails?.total_donations! ,
+      donatedThisYear :yearDetails?.total_donations! ,
+      expensesCommissions :0 ,
+      expensesInvestments:0,
+      expensesLoansActivity:0 ,
+      expensesTotal:0 ,
+      gemachDonationsTotal:0,
+      gemachMainFund:0,
+      gemachMemberFeesTotal:0,
+      memberName:`${user.first_name} ${user.last_name}`,
+      reportDate:"2026/01/01",
+      gemachOwnCapital:0,
+      joinedAt:user.join_date?.toDateString()!,
+      memberFeeDebt:user.payment_details.monthly_balance!,
+      memberFeePaidAllTime:financialDetails?.total_monthly_deposits!,
+      memberFeePaidThisYear:yearDetails?.total_monthly_deposits! ,
+      
+
+
+    }
+      await this.mailService.sendYearSummaryPdfStyle("lplp9566@gmail.com", data);
+
+  }
+    return  "dfd"
   }
 
 }

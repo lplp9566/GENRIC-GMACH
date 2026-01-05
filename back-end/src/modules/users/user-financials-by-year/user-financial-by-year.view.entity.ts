@@ -12,7 +12,6 @@ export class UserFinancialByYearViewEntity {
 
   // אם אתה רוצה לקבל גם את המשתמש עצמו כמו ב-Entity הישן (eager: true)
   @ManyToOne(() => UserEntity, (user) => user.financialHistoryByYear, {
-    eager: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })

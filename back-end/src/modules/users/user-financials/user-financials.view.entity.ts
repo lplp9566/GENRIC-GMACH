@@ -9,12 +9,12 @@ export class UserFinancialViewEntity {
   @ViewColumn({ name: 'user_id' })
   userId: number;
 
-  @OneToOne(() => UserEntity, {
-    eager: true,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'user_id' })
-  user: UserEntity;
+@OneToOne(() => UserEntity, (user) => user.userFinancials, {
+  onDelete: 'CASCADE',
+})
+@JoinColumn({ name: 'user_id' })
+user: UserEntity;
+
 
   @ViewColumn()
   total_donations: number;

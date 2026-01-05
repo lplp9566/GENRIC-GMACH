@@ -39,33 +39,34 @@ async getUserFinancialsByYear() {
     return this.userFinancialsByYearViewRepository.find({order: {year: 'ASC'}});
   }
 
-  // async getOrCreateFinancialRecord(
-  //   user: UserEntity,
-  //   year: number,
-  // ): Promise<UserFinancialByYearEntity> {
-  //   let record = await this.userFinancialsByYearRepository.findOne({
-  //     where: { user: { id: user.id }, year }, // ← id בלבד
-  //   });
+  async getOrCreateFinancialRecord(
+    user: UserEntity,
+    year: number,
+  ) {
+    const record = await this.userFinancialsByYearViewRepository.findOne({
+      where: { id: user.id , year }, 
+    });
 
-  //   if (!record) {
-  //     record = this.userFinancialsByYearRepository.create({
-  //       user,
-  //       year,
-  //       total_monthly_deposits: 0,
-  //       total_equity_donations: 0,
-  //       special_fund_donations: 0,
-  //       total_loans_taken: 0,
-  //       total_loans_repaid: 0,
-  //       total_fixed_deposits_added: 0,
-  //       total_fixed_deposits_withdrawn: 0,
-  //       total_standing_order_return: 0,
-  //       total_donations: 0,
+    return record;
+    
+    // if (!record) {
+      // record = this.userFinancialsByYearRepository.create({
+      //   user,
+      //   year,
+      //   total_monthly_deposits: 0,
+      //   total_equity_donations: 0,
+      //   special_fund_donations: 0,
+      //   total_loans_taken: 0,
+      //   total_loans_repaid: 0,
+      //   total_fixed_deposits_added: 0,
+      //   total_fixed_deposits_withdrawn: 0,
+      //   total_standing_order_return: 0,
+      //   total_donations: 0,
         
-  //     });
-  //     await this.userFinancialsByYearRepository.save(record);
-  //   }
-  //   return record;
-  // }
+      // });
+      // await this.userFinancialsByYearRepository.save(record);
+    // }
+  }
 
   // async recordMonthlyDeposit(user: UserEntity, year: number, amount: number) {
   //   const record = await this.getOrCreateFinancialRecord(user, year);
