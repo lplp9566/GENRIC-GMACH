@@ -482,10 +482,9 @@ activeLoansTotal:
       memberFeeDebt:user.payment_details.monthly_balance ?? 0,
       memberFeePaidAllTime:financialDetails?.total_monthly_deposits ?? 0,
       memberFeePaidThisYear:yearDetails?.total_monthly_deposits ?? 0 ,
-
-
-
     }
+    console.log(yearDetails?.total_monthly_deposits);
+    
       await this.mailService.sendYearSummaryPdfStyle("lplp9566@gmail.com", data);
 
   }
