@@ -22,7 +22,7 @@ export class MailService {
     subject: string,
     html: string,
     text?: string,
-    // attachments?: nodemailer.Attachment[],
+    attachments?: nodemailer.Attachment[],
   ) {
     const mailOptions: nodemailer.SendMailOptions = {
       from: process.env.EMAIL_ADDRESS,
@@ -30,7 +30,7 @@ export class MailService {
       subject,
       html,
       text,
-      // attachments,
+      attachments,
     };
 
     const info = await this.transporter.sendMail(mailOptions);
@@ -47,15 +47,15 @@ export class MailService {
 
     // ✅ לוגו קבוע מאותה תיקיה: src/modules/.../mail/logo.png
     const logoCid = 'gemach-logo';
-  // const logoPath = path.join(process.cwd(), 'dist', 'assets', 'logo.png');
+const logoPath = path.join(process.cwd(), 'public', 'logo.png');
 
-  //   const attachments: nodemailer.Attachment[] = [
-  //     {
-  //       filename: 'logo.png',
-  //       path: logoPath,
-  //       cid: logoCid,
-  //     },
-  //   ];
+    const attachments: nodemailer.Attachment[] = [
+      {
+        filename: 'logo.png',
+        path: logoPath,
+        cid: logoCid,
+      },
+    ];
 
     const html = `
     <div style="direction:rtl; text-align:right; background:#f2f2f2; padding:24px; font-family: Arial, sans-serif;">
@@ -159,9 +159,7 @@ export class MailService {
 ${orgName}
 `;
 
-    return this.sendMail(to, subject, html, text, 
-      // attachments
-    );
+    return this.sendMail(to, subject, html, text, attachments);
 
     function sectionBox(title: string, innerRows: string[]) {
       return `

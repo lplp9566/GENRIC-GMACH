@@ -460,12 +460,14 @@ async onApplicationBootstrap() {
     const yearDetails = await this.userFinancialByYear.getOrCreateFinancialRecord(user,year)
     const data:YearSummaryPdfStyleData = {
       year ,
-      activeLoansTotal:financialDetails?.total_loans_taken_amount! - financialDetails?.total_loans_repaid!, 
+activeLoansTotal:
+  (financialDetails?.total_loans_taken_amount ?? 0) -
+  (financialDetails?.total_loans_repaid ?? 0),
       cashboxTotal:financialDetails?.total_cash_holdings ?? 0,
-      depositedAllTime :financialDetails?.total_fixed_deposits_deposited! - financialDetails?.total_fixed_deposits_withdrawn!,
-      depositedThisYear: yearDetails?.total_fixed_deposits_added!,
-      donatedAllTime:financialDetails?.total_donations! ,
-      donatedThisYear :yearDetails?.total_donations! ,
+      depositedAllTime :(financialDetails?.total_fixed_deposits_deposited ?? 0) - (financialDetails?.total_fixed_deposits_withdrawn ?? 0),
+      depositedThisYear: yearDetails?.total_fixed_deposits_added ?? 0,
+      donatedAllTime:financialDetails?.total_donations ?? 0 ,
+      donatedThisYear :yearDetails?.total_donations ?? 0 ,
       expensesCommissions :0 ,
       expensesInvestments:0,
       expensesLoansActivity:0 ,
@@ -477,10 +479,10 @@ async onApplicationBootstrap() {
       reportDate:"2026/01/01",
       gemachOwnCapital:0,
       joinedAt:user.join_date?.toDateString()!,
-      memberFeeDebt:user.payment_details.monthly_balance!,
-      memberFeePaidAllTime:financialDetails?.total_monthly_deposits!,
-      memberFeePaidThisYear:yearDetails?.total_monthly_deposits! ,
-      
+      memberFeeDebt:user.payment_details.monthly_balance ?? 0,
+      memberFeePaidAllTime:financialDetails?.total_monthly_deposits ?? 0,
+      memberFeePaidThisYear:yearDetails?.total_monthly_deposits ?? 0 ,
+
 
 
     }
