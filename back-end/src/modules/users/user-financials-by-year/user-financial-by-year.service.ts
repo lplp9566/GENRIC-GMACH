@@ -44,7 +44,7 @@ async getUserFinancialsByYear() {
     year: number,
   ) {
     const record = await this.userFinancialsByYearViewRepository.findOne({
-      where: { id: user.id , year }, 
+      where: { userId: user.id , year }, 
     });
 
     return record;

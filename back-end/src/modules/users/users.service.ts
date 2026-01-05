@@ -456,11 +456,14 @@ async onApplicationBootstrap() {
     const memberUsers = users.filter((user)=> user.membership_type == MembershipType.MEMBER)
     const friendUsers = users.filter((user)=>user.membership_type == MembershipType.FRIEND)
   for (const user of memberUsers){
+    console.log(user.id);
+    
     const financialDetails = await this.userFinancialService.getOrCreateUserFinancials(user)
     const yearDetails = await this.userFinancialByYear.getOrCreateFinancialRecord(user,year)
+    
     const data:YearSummaryPdfStyleData = {
       year ,
-activeLoansTotal:
+   activeLoansTotal:
   (financialDetails?.total_loans_taken_amount ?? 0) -
   (financialDetails?.total_loans_repaid ?? 0),
       cashboxTotal:financialDetails?.total_cash_holdings ?? 0,
@@ -482,9 +485,7 @@ activeLoansTotal:
       memberFeeDebt:user.payment_details.monthly_balance ?? 0,
       memberFeePaidAllTime:financialDetails?.total_monthly_deposits ?? 0,
       memberFeePaidThisYear:yearDetails?.total_monthly_deposits ?? 0 ,
-    }
-    console.log(yearDetails?.total_monthly_deposits);
-    
+    }    
       await this.mailService.sendYearSummaryPdfStyle("lplp9566@gmail.com", data);
 
   }

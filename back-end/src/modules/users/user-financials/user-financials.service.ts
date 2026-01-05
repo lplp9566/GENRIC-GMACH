@@ -23,8 +23,6 @@ constructor(
 ) {}
 
 async getOrCreateUserFinancials(user: UserEntity) {
-  console.log("lll");
-  
 let record = await this.userFinancialsViewRepository.findOne({
   where: { userId: user.id },
 });
