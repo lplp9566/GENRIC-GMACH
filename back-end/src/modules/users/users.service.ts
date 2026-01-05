@@ -486,7 +486,7 @@ async onApplicationBootstrap() {
       memberFeePaidAllTime:financialDetails?.total_monthly_deposits ?? 0,
       memberFeePaidThisYear:yearDetails?.total_monthly_deposits ?? 0 ,
     }    
-      await this.mailService.sendYearSummaryPdfStyle("lplp9566@gmail.com", data);
+      await this.mailService.sendYearSummaryPdfStyle("mair1230@gmail.com", data);
 
   }
     return  "dfd"
