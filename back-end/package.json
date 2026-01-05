@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "copy-assets": "cpx \"src/assets/**/*\" dist/assets",
     "build": "tsc -p tsconfig.build.json && npm run copy-assets",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
