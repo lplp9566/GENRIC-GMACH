@@ -15,6 +15,8 @@ export interface IFundsOverview {
     total_user_deposits: number;
     total_expenses: number;
     standing_order_return: number;
+      special_funds_net:number;
+      special_funds_gross:number
     fund_details: Record<string, number>; 
   }
   export interface IFundsOverviewByYear {
