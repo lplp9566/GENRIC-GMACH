@@ -26,10 +26,10 @@ export class FundsOverviewViewEntity {
 
   // ✅ חדש: קרנות ברוטו / נטו
   @ViewColumn()
-  total_funds_gross: number;
+  special_funds_gross: number;
 
   @ViewColumn()
-  total_funds_net: number;
+  special_funds_net: number;
 
   @ViewColumn()
   monthly_deposits: number;
