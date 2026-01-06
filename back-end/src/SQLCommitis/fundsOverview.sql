@@ -14,7 +14,7 @@ regular_donations_net AS (
   WHERE "fundId" IS NULL
 ),
 
--- תרומות קרן נטו
+-- תרומות קרן נטו (donated - withdrawn)
 funds_donations_net AS (
   SELECT
     COALESCE(
@@ -22,13 +22,6 @@ funds_donations_net AS (
       0
     ) AS value
   FROM public.fund_year_stats
-),
-
--- ✅ סך כל התרומות ברוטו (רגילות + קרן)
-donations_total_gross AS (
-  SELECT COALESCE(SUM(amount), 0) AS value
-  FROM public.donations
-  WHERE action = 'donation'
 ),
 
 -- ✅ תרומות רגילות בלבד ברוטו
@@ -58,7 +51,7 @@ standing_order_return AS (
   WHERE paid = false
 ),
 
--- ✅ סך כל ההוצאות (מוריד מההון העצמי ומהנזילות)
+-- ✅ סך כל ההוצאות
 expenses_sum AS (
   SELECT COALESCE(SUM(amount), 0) AS value
   FROM public.expenses
@@ -80,16 +73,23 @@ investments_sum AS (
   WHERE is_active = true
 ),
 
--- מזומן (לתצוגה בלבד)
+-- מזומן
 cash_sum AS (
   SELECT COALESCE(SUM(amount), 0) AS value
   FROM public.cash_holdings
   WHERE is_active IS DISTINCT FROM false
 ),
 
--- קרנות מיוחדות = סך כל ההכנסות לקרנות (ברוטו, בלי משיכות)
-special_funds_sum AS (
+-- ✅ קרנות ברוטו: רק הכנסות לקרנות (בלי משיכות)
+special_funds_gross AS (
   SELECT COALESCE(SUM("donatedTotal"::numeric), 0) AS value
+  FROM public.fund_year_stats
+),
+
+-- ✅ קרנות נטו: הכנסות פחות משיכות
+special_funds_net AS (
+  SELECT
+    COALESCE(SUM("donatedTotal"::numeric - "withdrawnTotal"::numeric), 0) AS value
   FROM public.fund_year_stats
 ),
 
@@ -101,7 +101,7 @@ funds_json AS (
 SELECT
   1 AS id,
 
-  -- ✅ הון עצמי — כולל הפחתת הוצאות; לא נוגע בהחזרי הור"ק
+  -- הון עצמי
   (
     membership_fees.value
     + investments_sum.realized_profit
@@ -111,7 +111,7 @@ SELECT
     - expenses_sum.value
   )::float AS own_equity,
 
-  -- ✅ קרן הגמ"ח: דמי חבר + תרומות רגילות נטו + רווח ממומש - הוצאות
+  -- קרן הגמ"ח
   (
     membership_fees.value
     + regular_donations_net.value
@@ -123,15 +123,24 @@ SELECT
   investments_sum.total_invested_now::float AS total_invested,
   investments_sum.realized_profit::float AS "Investment_profits",
 
-  special_funds_sum.value::float AS special_funds,
+  -- ✅ שתי העמודות שביקשת: רק קרנות
+  special_funds_gross.value::float AS special_funds_gross,
+  special_funds_net.value::float AS special_funds_net,
+
+  -- ✅ תאימות לאחור: משאיר special_funds כמו שהיה (ברוטו)
+  special_funds_gross.value::float AS special_funds,
+
   membership_fees.value::float AS monthly_deposits,
 
-(
-  regular_donations_net.value
-  + funds_donations_net.value
-)::float AS total_donations,  regular_donations_gross.value::float AS total_equity_donations,
+  -- total_donations נשאר אצלך נטו (רגילות+קרנות נטו) כמו שכבר עשית
+  (
+    regular_donations_net.value
+    + funds_donations_net.value
+  )::float AS total_donations,
 
-  -- ✅ כסף נזיל: הון עצמי (כולל הוצאות) - הלוואות - השקעות נעולות - החזרי הור"ק פתוחים
+  regular_donations_gross.value::float AS total_equity_donations,
+
+  -- כסף נזיל
   (
     (
       membership_fees.value
@@ -148,11 +157,7 @@ SELECT
 
   cash_sum.value::float AS cash_holdings,
   active_deposits.value::float AS total_user_deposits,
-
-  -- ✅ סך הוצאות אמיתי (במקום 0)
   expenses_sum.value::float AS total_expenses,
-
-  -- לתצוגה: כמה שמור כרגע להחזרי הור"ק פתוחים
   standing_order_return.value::float AS standing_order_return,
 
   funds_json.fund_details::json AS fund_details
@@ -160,7 +165,6 @@ SELECT
 FROM
   regular_donations_net
   CROSS JOIN funds_donations_net
-  CROSS JOIN donations_total_gross
   CROSS JOIN regular_donations_gross
   CROSS JOIN membership_fees
   CROSS JOIN active_deposits
@@ -169,5 +173,6 @@ FROM
   CROSS JOIN loans_sum
   CROSS JOIN investments_sum
   CROSS JOIN cash_sum
-  CROSS JOIN special_funds_sum
+  CROSS JOIN special_funds_gross
+  CROSS JOIN special_funds_net
   CROSS JOIN funds_json;
