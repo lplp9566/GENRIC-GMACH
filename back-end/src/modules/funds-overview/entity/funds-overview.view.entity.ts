@@ -20,8 +20,16 @@ export class FundsOverviewViewEntity {
   @ViewColumn({ name: 'Investment_profits' })
   Investment_profits: number;
 
+  // קיים אצלך (אפשר להשאיר לתאימות)
   @ViewColumn()
   special_funds: number;
+
+  // ✅ חדש: קרנות ברוטו / נטו
+  @ViewColumn()
+  total_funds_gross: number;
+
+  @ViewColumn()
+  total_funds_net: number;
 
   @ViewColumn()
   monthly_deposits: number;

@@ -126,8 +126,10 @@ SELECT
   special_funds_sum.value::float AS special_funds,
   membership_fees.value::float AS monthly_deposits,
 
-  donations_total_gross.value::float AS total_donations,
-  regular_donations_gross.value::float AS total_equity_donations,
+(
+  regular_donations_net.value
+  + funds_donations_net.value
+)::float AS total_donations,  regular_donations_gross.value::float AS total_equity_donations,
 
   -- ✅ כסף נזיל: הון עצמי (כולל הוצאות) - הלוואות - השקעות נעולות - החזרי הור"ק פתוחים
   (

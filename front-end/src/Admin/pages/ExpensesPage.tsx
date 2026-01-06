@@ -269,6 +269,7 @@ const ExpensesHomePage: FC = () => {
         direction: "rtl",
         fontFamily: "Heebo, Arial, sans-serif",
         minHeight: "100vh",
+        width:"100%"
       }}
     >
       <ExpensesHeader />
@@ -283,12 +284,12 @@ const ExpensesHomePage: FC = () => {
         }}
       />
 
-      <Box mt={4}>
+      <Box mt={6}>
         {isError && (
           <Alert severity="error">{error || "אירעה שגיאה בטעינת הוצאות"}</Alert>
         )}
 
-        <Grid container spacing={3}>
+        <Grid container spacing={1}>
           <Grid
             item
             xs={12}
