@@ -9,13 +9,14 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 
-// import { useDispatch } from "react-redux";
-// import { AppDispatch } from "../../../store/store";
-// import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../store/store";
+import { toast } from "react-toastify";
 
 // TODO: החלף ל-slice/action האמיתי אצלך
 
 import { ExpenseRow } from "./ExpensesTable";
+import { updateExpenseById } from "../../../store/features/admin/adminExpensesSlice";
 
 interface EditExpenseModalProps {
   expense: ExpenseRow;
@@ -24,32 +25,32 @@ interface EditExpenseModalProps {
 }
 
 const EditExpenseModal = ({ expense, open, onClose }: EditExpenseModalProps) => {
-  // const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
 
-  const { amount, date, note } = expense;
+  const { amount, date, note,id } = expense;
 
   // state עבור העריכה
   const [newAmount, setNewAmount] = useState<number>(Number(amount) || 0);
-  const [newDate, setNewDate] = useState<string>(date); // אצלך זה כבר YYYY-MM-DD (כי אנחנו ממירים לפני פתיחת המודאל)
+  const [newDate, setNewDate] = useState<string>(date); 
   const [newNote, setNewNote] = useState<string>(note ?? "");
 
   const handleSubmit = async () => {
     try {
-      // toast.promise(
-      //   dispatch(
-      //     updateExpenseById({
-      //       id: Number(id),
-      //       amount: newAmount,
-      //       expenseDate: newDate, // חשוב: השם כמו בשרת
-      //       note: newNote,
-      //     })
-      //   ).unwrap(),
-      //   {
-      //     pending: "מעדכן הוצאה...",
-      //     success: "ההוצאה עודכנה בהצלחה! 👌",
-      //     error: "שגיאה בעדכון ההוצאה 💥",
-      //   }
-      // );
+      toast.promise(
+        dispatch(
+          updateExpenseById({
+            id: Number(id),
+            amount: newAmount,
+            expenseDate: newDate,
+            note: newNote,
+          })
+        ).unwrap(),
+        {
+          pending: "מעדכן הוצאה...",
+          success: "ההוצאה עודכנה בהצלחה! 👌",
+          error: "שגיאה בעדכון ההוצאה 💥",
+        }
+      );
 
       onClose();
     } catch (err: any) {

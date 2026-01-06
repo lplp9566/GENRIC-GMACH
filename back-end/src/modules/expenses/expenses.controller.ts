@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Patch } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { Expense } from './Entity/expenses.entity';
 import { CreateExpenseDto } from './create-expense.dto';
+import { UpdateExpensesDto } from './dto/update-expenses.dto';
 
 @Controller('expenses')
 export class ExpensesController {
@@ -21,6 +22,11 @@ async create(@Body() dto: CreateExpenseDto): Promise<Expense> {
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<Expense> {
     return this.expensesService.findOne(id);
+  }
+  @Patch(`:id`)
+  async update(@Param(`id`)id:number, @Body()dto:UpdateExpensesDto){
+    return this.expensesService.update(id,dto)
+
   }
 
   @Delete(':id')

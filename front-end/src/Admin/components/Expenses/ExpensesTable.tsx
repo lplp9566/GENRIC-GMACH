@@ -13,6 +13,14 @@ import {
 import { FC, useState } from "react";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditExpenseModal from "./EditExpenseModal";
+import { ddmmyyyyToInputDate } from "../Donations/DonationsTable";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditIcon from "@mui/icons-material/Edit";
+import ConfirmModal from "../genricComponents/confirmModal";
+import { toast } from "react-toastify";
+import { AppDispatch } from "../../../store/store";
+import { useDispatch } from "react-redux";
+import { deleteExpenseById } from "../../../store/features/admin/adminExpensesSlice";
 
 export type ExpenseRow = {
   id: string | number;
@@ -55,19 +63,38 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
       </Box>
     );
   }
+  const dispatch = useDispatch<AppDispatch>();
 
   const [editMode, setEditMode] = useState(false);
+  const [delateMode, setDelateMode] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseRow | null>(
     null
   );
 
-  const ddmmyyyyToInputDate = (s: string) => {
-    if (!s) return "";
-    const match = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    if (!match) return "";
-    const [, dd, mm, yyyy] = match;
-    return `${yyyy}-${mm}-${dd}`;
+  const openEdit = (row: ExpenseRow) => {
+    setSelectedExpense({
+      ...row,
+      date: ddmmyyyyToInputDate(row.date),
+    });
+    setEditMode(true);
   };
+  const handelDelete=()=>{
+    try {
+      toast.promise(
+           dispatch(
+             deleteExpenseById(Number(selectedExpense?.id!))
+           ).unwrap(),
+           {
+             pending: "מוחק הוצאה...",
+             success: "ההוצאה נמחקה בהצלחה! 👌",
+             error: "שגיאה במחיקת  ההוצאה 💥",
+           }
+         );
+         setDelateMode(false)
+    } catch (error) {
+        
+    }
+  }
 
   const onClickEdit = (row: ExpenseRow) => {
     setSelectedExpense({
@@ -111,7 +138,8 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
             </TableCell>
 
             <TableCell align="right">הערה</TableCell>
-            <TableCell align="right">שכפל</TableCell>
+  <TableCell align="right">פעולות</TableCell>
+
           </TableRow>
         </TableHead>
 
@@ -148,10 +176,32 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
                       size="small"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onDuplicate(row); // ✅ כאן השכפול
+                        onDuplicate(row);
                       }}
                     >
                       <ContentCopyIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="עריכה הוצאה">
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEdit(row);
+                      }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="עריכה הוצאה">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        setSelectedExpense(row)
+                    setDelateMode(true)
+                      }}
+                    >
+                      <DeleteOutlineIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 </TableCell>
@@ -166,6 +216,14 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
               expense={selectedExpense!}
             />
           )}
+          {delateMode && 
+          <ConfirmModal
+          open={delateMode}
+          onClose={()=>setDelateMode(false)}
+            onSubmit={handelDelete}
+            text="האם אתה בטוח שברצונך לממחוק את ההוצאה"
+
+          />}
         </TableBody>
       </Table>
     </Box>

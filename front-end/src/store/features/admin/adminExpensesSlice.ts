@@ -78,13 +78,13 @@ export const deleteExpenseById = createAsyncThunk<number, number>(
  * PATCH /expenses/:id
  * אם תוסיף אותו – תפתח את זה ותשתמש במודאל עריכה.
  */
-// export const updateExpenseById = createAsyncThunk<IExpenses, Partial<IExpenses> & { id: number }>(
-//   "admin/updateExpenseById",
-//   async (expense) => {
-//     const { data } = await axios.patch<IExpenses>(`${BASE_URL}/expenses/${expense.id}`, expense);
-//     return data;
-//   }
-// );
+export const updateExpenseById = createAsyncThunk<IExpenses, Partial<IExpenses> & { id: number }>(
+  "admin/updateExpenseById",
+  async (expense) => {
+    const { data } = await axios.patch<IExpenses>(`${BASE_URL}/expenses/${expense.id}`, expense);
+    return data;
+  }
+);
 
 /* =========================
    Expenses Categories
@@ -202,32 +202,31 @@ export const AdminExpensesSlice = createSlice({
       // אם תרצה להכניס getExpenseById ל-state (לא חובה לרשימות)
       .addCase(getExpenseById.rejected, (state, action) => {
         state.error = action.error.message ?? "Failed to fetch expense";
-      });
+      })
 
     /**
      * ⚠️ updateExpenseById – רק אם תוסיף PATCH בשרת
      */
     // builder
-    //   .addCase(updateExpenseById.pending, (state) => {
-    //     state.updateExpensesStatus = "pending";
-    //     state.error = null;
-    //   })
-    //   .addCase(updateExpenseById.fulfilled, (state, action) => {
-    //     state.updateExpensesStatus = "fulfilled";
-    //     const updated = action.payload;
-    //     const index = (state.allExpenses as IExpenses[]).findIndex(
-    //       (e: any) => e.id === (updated as any).id
-    //     );
-    //     if (index !== -1) {
-    //       (state.allExpenses as IExpenses[])[index] = updated;
-    //     }
-    //   })
-    //   .addCase(updateExpenseById.rejected, (state, action) => {
-    //     state.updateExpensesStatus = "rejected";
-    //     state.error = action.error.message ?? "Failed to update expense";
-    //   });
+      .addCase(updateExpenseById.pending, (state) => {
+        state.updateExpensesStatus = "pending";
+        state.error = null;
+      })
+      .addCase(updateExpenseById.fulfilled, (state, action) => {
+        state.updateExpensesStatus = "fulfilled";
+        const updated = action.payload;
+        const index = (state.allExpenses as IExpenses[]).findIndex(
+          (e: any) => e.id === (updated as any).id
+        );
+        if (index !== -1) {
+          (state.allExpenses as IExpenses[])[index] = updated;
+        }
+      })
+      .addCase(updateExpenseById.rejected, (state, action) => {
+        state.updateExpensesStatus = "rejected";
+        state.error = action.error.message ?? "Failed to update expense";
+      })
 
-    builder
       /* -------- Categories -------- */
       .addCase(getAllExpensesCategory.pending, (state) => {
         state.getAllExpensesCategoryStatus = "pending";

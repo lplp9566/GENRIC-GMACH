@@ -15,7 +15,10 @@ import EditDonationModal from "./EditDonationModal";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store/store";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { setAddDonationDraft, setAddDonationModal } from "../../../store/features/Main/AppMode";
+import {
+  setAddDonationDraft,
+  setAddDonationModal,
+} from "../../../store/features/Main/AppMode";
 export type DonationRow = {
   id: string | number;
   userName: string;
@@ -34,6 +37,15 @@ interface DonationsTableProps {
   sortDir: SortDir;
   onSortClick: (key: SortBy) => void;
 }
+export const ddmmyyyyToInputDate = (s: string) => {
+  if (!s) return "";
+
+  const match = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return "";
+
+  const [, dd, mm, yyyy] = match;
+  return `${yyyy}-${mm}-${dd}`; // YYYY-MM-DD
+};
 const DonationsTable: FC<DonationsTableProps> = ({
   isLoading,
   rows,
@@ -54,40 +66,35 @@ const DonationsTable: FC<DonationsTableProps> = ({
     );
   }
   const [editMode, setEditMode] = useState<boolean>(false);
-  const [selectedDonation, setSelectedDonation] = useState< DonationRow| null>(null);
-  const ddmmyyyyToInputDate = (s: string) => {
-  if (!s) return "";
+  const [selectedDonation, setSelectedDonation] = useState<DonationRow | null>(
+    null
+  );
 
-  const match = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (!match) return "";
+  const onClickEdit = (donation: DonationRow) => {
+    setSelectedDonation({
+      ...donation,
+      date: ddmmyyyyToInputDate(donation.date),
+    });
+    setEditMode(true);
+  };
+  const dispatch = useDispatch<AppDispatch>();
 
-  const [, dd, mm, yyyy] = match;
-  return `${yyyy}-${mm}-${dd}`; // YYYY-MM-DD
-};
+  const onClickDuplicate = (row: DonationRow) => {
+    const reason = String(row.donation_reason ?? "").trim();
+    const kind = reason.toLowerCase() === "equity" ? "regular" : "fund";
 
-const onClickEdit = (donation: DonationRow) => {
-  setSelectedDonation({
-    ...donation,
-    date: ddmmyyyyToInputDate(donation.date),
-  });
-  setEditMode(true);
-};
-const dispatch = useDispatch<AppDispatch>();
+    dispatch(
+      setAddDonationDraft({
+        userId: row.userId,
+        kind,
+        fundName: kind === "fund" ? reason : "",
+        amount: row.amount,
+        date: ddmmyyyyToInputDate(row.date), // או לשים היום אם רוצים
+      })
+    );
 
-const onClickDuplicate = (row: DonationRow) => {
-  const reason = String(row.donation_reason ?? "").trim();
-  const kind = reason.toLowerCase() === "equity" ? "regular" : "fund";
-
-  dispatch(setAddDonationDraft({
-    userId: row.userId,
-    kind,
-    fundName: kind === "fund" ? reason : "",
-    amount: row.amount,
-    date: ddmmyyyyToInputDate(row.date), // או לשים היום אם רוצים
-  }));
-
-  dispatch(setAddDonationModal(true));
-};
+    dispatch(setAddDonationModal(true));
+  };
 
   return (
     <Box sx={{ overflow: "auto" }}>
@@ -112,8 +119,6 @@ const onClickDuplicate = (row: DonationRow) => {
               align="right"
               sortDirection={sortBy === "date" ? sortDir : (false as any)}
             >
-  
-
               <TableSortLabel
                 active={sortBy === "date"}
                 direction={sortBy === "date" ? sortDir : "asc"}
@@ -124,7 +129,7 @@ const onClickDuplicate = (row: DonationRow) => {
             </TableCell>
             <TableCell align="right"> פעולה</TableCell>
             <TableCell align="right">קרן/תרומה רגילה</TableCell>
-                        <TableCell align="right">שכפל</TableCell>
+            <TableCell align="right">שכפל</TableCell>
           </TableRow>
         </TableHead>
 
@@ -137,7 +142,12 @@ const onClickDuplicate = (row: DonationRow) => {
             </TableRow>
           ) : (
             rows.map((donationRow) => (
-              <TableRow key={donationRow.id} hover onClick={() => onClickEdit(donationRow)} sx={{cursor: 'pointer'}}>
+              <TableRow
+                key={donationRow.id}
+                hover
+                onClick={() => onClickEdit(donationRow)}
+                sx={{ cursor: "pointer" }}
+              >
                 <TableCell align="right">{donationRow.userName}</TableCell>
                 <TableCell
                   align="right"
@@ -158,19 +168,18 @@ const onClickDuplicate = (row: DonationRow) => {
                     : ` קרן ${donationRow.donation_reason}`}
                 </TableCell>
                 <TableCell align="right" onClick={(e) => e.stopPropagation()}>
-  <Tooltip title="שכפל תרומה">
-    <IconButton
-      size="small"
-      onClick={(e) => {
-        e.stopPropagation(); // שלא יפעיל edit על שורה
-        onClickDuplicate(donationRow);
-      }}
-    >
-      <ContentCopyIcon fontSize="small" />
-    </IconButton>
-  </Tooltip>
-</TableCell>
-
+                  <Tooltip title="שכפל תרומה">
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation(); // שלא יפעיל edit על שורה
+                        onClickDuplicate(donationRow);
+                      }}
+                    >
+                      <ContentCopyIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
               </TableRow>
             ))
           )}
@@ -181,10 +190,8 @@ const onClickDuplicate = (row: DonationRow) => {
               donation={selectedDonation!}
             />
           )}
-
         </TableBody>
       </Table>
- 
     </Box>
   );
 };
