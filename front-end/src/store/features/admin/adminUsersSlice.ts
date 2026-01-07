@@ -112,11 +112,19 @@ export const AdminUsersSlice = createSlice({
       .addCase(editUser.pending, (state) => {
         state.createUserStatus = "pending";
       })
-      .addCase(editUser.fulfilled, (state,action) => {
-        state.createUserStatus = "fulfilled";
-        (state.allUsers as IUser[]).unshift(action.payload);
-        
-      })
+.addCase(editUser.fulfilled, (state, action) => {
+  state.createUserStatus = "fulfilled";
+
+  const updated = action.payload as IUser;
+  const idx = (state.allUsers as IUser[]).findIndex(u => u.id === updated.id);
+
+  if (idx !== -1) {
+    (state.allUsers as IUser[])[idx] = updated; // עדכון במקום
+  } else {
+    (state.allUsers as IUser[]).unshift(updated); // fallback אם לא נמצא
+  }
+})
+
       .addCase(editUser.rejected, (state, action) => {
         state.createUserStatus = "rejected";
         state.error = action.error.message || null;

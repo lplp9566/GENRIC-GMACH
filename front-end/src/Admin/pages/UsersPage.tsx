@@ -1,30 +1,25 @@
 // src/pages/UsersPage.tsx
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
 import { getAllUsers } from "../../store/features/admin/adminUsersSlice";
-import {
-  Box,
-  Container,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Box, Container, Grid, Typography } from "@mui/material";
 import UsersHeader from "../components/Users/UsersHeader";
 import UserCard from "../components/Users/UserCard";
 
 export default function UsersPage() {
   const dispatch = useDispatch<AppDispatch>();
   const usersSelcter = useSelector((s: RootState) => s.AdminUsers.allUsers);
-const [filter, setFilter] = useState<"all" | "members" | "friends">("all");
-useEffect(() => {
-  if (filter === "all") {
-    dispatch(getAllUsers({ isAdmin: false }));
-  } else if (filter === "members") {
-    dispatch(getAllUsers({ isAdmin: false, membershipType: "MEMBER" }));
-  } else {
-    dispatch(getAllUsers({ isAdmin: false, membershipType: "FRIEND" }));
-  }
-}, [dispatch, filter]);
+  const [filter, setFilter] = useState<"all" | "members" | "friends">("all");
+  useEffect(() => {
+    if (filter === "all") {
+      dispatch(getAllUsers({ isAdmin: false }));
+    } else if (filter === "members") {
+      dispatch(getAllUsers({ isAdmin: false, membershipType: "MEMBER" }));
+    } else {
+      dispatch(getAllUsers({ isAdmin: false, membershipType: "FRIEND" }));
+    }
+  }, [dispatch, filter]);
 
   return (
     <Container
@@ -51,7 +46,10 @@ useEffect(() => {
           <Grid container spacing={3}>
             {usersSelcter.map((u) => (
               <Grid key={u.id} item xs={12} sm={6} md={4} lg={3}>
-                <UserCard user={u} />
+                <UserCard
+                  key={`${u.id}-${u.payment_details?.bank_branch ?? "pd"}`}
+                  user={u}
+                />
               </Grid>
             ))}
           </Grid>
@@ -64,5 +62,3 @@ useEffect(() => {
     </Container>
   );
 }
-
-
