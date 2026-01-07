@@ -9,12 +9,18 @@ import {
   Button,
   Stack,
   Typography,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { AppDispatch } from "../../../store/store";
 import { useDispatch } from "react-redux";
-import { editUser, getAllUsers } from "../../../store/features/admin/adminUsersSlice";
+import {
+  editUser,
+  getAllUsers,
+} from "../../../store/features/admin/adminUsersSlice";
 import { toast } from "react-toastify";
 import { RtlThemeProvider } from "../../../Theme/rtl";
+import { SelectChangeEvent } from "@mui/material";
 
 interface EditUserProps {
   open: boolean;
@@ -23,29 +29,36 @@ interface EditUserProps {
 }
 
 const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
-      const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<IUser>(() => user);
   const handleChange =
-    (field: keyof IUser | keyof IPaymentDetails
-) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof IUser | keyof IPaymentDetails) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       setFormData((prev) => ({
         ...prev,
         [field]: event.target.value,
       }));
     };
-const handlePaymentChange =
-  (field: keyof IPaymentDetails) =>
-  (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePaymentChange =
+    (field: keyof IPaymentDetails) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData((prev) => ({
+        ...prev,
+        payment_details: {
+          ...prev.payment_details,
+          [field]: event.target.value,
+        },
+      }));
+    };
+  const handleMemberChange = (event: SelectChangeEvent<string>) => {
     setFormData((prev) => ({
       ...prev,
-      payment_details: {
-        ...prev.payment_details,
-        [field]: event.target.value,
-      },
+      is_member: event.target.value === "true",
     }));
   };
+
   const handleNext = () => {
     if (activeStep < 2) setActiveStep((prev) => prev + 1);
   };
@@ -55,17 +68,16 @@ const handlePaymentChange =
   };
 
   const handleSave = async () => {
-    const promise = dispatch(editUser({ userId: user.id!, userData: formData })) as unknown as Promise<any>;
-    toast.promise(
-      promise,
-      {
-        pending: "מעדכן...",
-        success: "המשתמש עודכן בהצלחה! 👌",
-        error: "אירעה שגיאה בעדכון המשתמש 💥",
-      }
-    );
+    const promise = dispatch(
+      editUser({ userId: user.id!, userData: formData })
+    ) as unknown as Promise<any>;
+    toast.promise(promise, {
+      pending: "מעדכן...",
+      success: "המשתמש עודכן בהצלחה! 👌",
+      error: "אירעה שגיאה בעדכון המשתמש 💥",
+    });
     await promise;
-    await dispatch(getAllUsers( {isAdmin: false}));
+    await dispatch(getAllUsers({ isAdmin: false }));
 
     onClose();
   };
@@ -77,8 +89,7 @@ const handlePaymentChange =
 
   return (
     // <RtlProvider>
-          <RtlThemeProvider>
-    
+    <RtlThemeProvider>
       <Modal open={open} onClose={handleClose}>
         <Box
           sx={{
@@ -120,8 +131,15 @@ const handlePaymentChange =
                     onChange={handleChange("first_name")}
                     sx={{ width: "49.5%" }}
                   />
-                </Box>
-
+                  <Select
+                    dir="rtl"
+                    value={String(!!formData.is_member)}
+                    onChange={handleMemberChange}
+                  sx={{ width: "49.5%", marginLeft: "2px",marginTop:2 }}
+                  >
+                    <MenuItem value="true">חבר גמ"ח</MenuItem>
+                    <MenuItem value="false">לא חבר גמ"ח</MenuItem>
+                  </Select>
                 <TextField
                   label="אימייל"
                   type="email"
@@ -129,13 +147,16 @@ const handlePaymentChange =
                   value={formData.email_address ?? ""}
                   onChange={handleChange("email_address")}
                   fullWidth
+                  sx={{ width: "49.5%", marginLeft: "2px",marginTop:2 }}
                 />
+
                 <TextField
                   label="טלפון"
                   dir="rtl"
                   value={formData.phone_number ?? ""}
                   onChange={handleChange("phone_number")}
                   fullWidth
+                  sx={{ width: "49.5%", marginLeft: "2px",marginTop:2 }}
                 />
                 <TextField
                   label="תעודת זהות "
@@ -143,13 +164,19 @@ const handlePaymentChange =
                   value={formData.id_number ?? ""}
                   onChange={handleChange("id_number")}
                   fullWidth
+                  sx={{ width: "49.5%", marginLeft: "2px",marginTop:2 }}
                 />
+                              </Box>
               </Stack>
+
             )}
 
             {activeStep === 1 && (
               <Stack spacing={2}>
-                <Typography variant="h6" textAlign={"center"}> פרטי חשבון בנק </Typography>
+                <Typography variant="h6" textAlign={"center"}>
+                  {" "}
+                  פרטי חשבון בנק{" "}
+                </Typography>
                 <TextField
                   label="מספר בנק"
                   dir="rtl"
@@ -158,27 +185,26 @@ const handlePaymentChange =
                   fullWidth
                 />
                 <TextField
-                    label="סניף"
-                    dir="rtl"
-                    value={formData.payment_details.bank_branch ?? ""}
-                    onChange={handlePaymentChange("bank_branch")}
-                    fullWidth
-                    />
+                  label="סניף"
+                  dir="rtl"
+                  value={formData.payment_details.bank_branch ?? ""}
+                  onChange={handlePaymentChange("bank_branch")}
+                  fullWidth
+                />
                 <TextField
                   label="מספר חשבון"
                   dir="rtl"
-                    value={formData.payment_details.bank_account_number ?? ""}
-                    onChange={handlePaymentChange("bank_account_number")}
-                    fullWidth
-                    />
+                  value={formData.payment_details.bank_account_number ?? ""}
+                  onChange={handlePaymentChange("bank_account_number")}
+                  fullWidth
+                />
                 <TextField
-                    label="תאריך חיוב"
-                    dir="rtl"       
-                    value={formData.payment_details.charge_date ?? ""}
-                    onChange={handlePaymentChange("charge_date")}
-                    fullWidth
-                    />
-                    
+                  label="תאריך חיוב"
+                  dir="rtl"
+                  value={formData.payment_details.charge_date ?? ""}
+                  onChange={handlePaymentChange("charge_date")}
+                  fullWidth
+                />
               </Stack>
             )}
 
@@ -218,8 +244,7 @@ const handlePaymentChange =
           </Stack>
         </Box>
       </Modal>
-      </RtlThemeProvider>
-
+    </RtlThemeProvider>
   );
 };
 

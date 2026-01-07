@@ -53,6 +53,7 @@ export const editUser = createAsyncThunk(
         id_number: data.userData.id_number,
         phone_number: data.userData.phone_number,
         email_address: data.userData.email_address,
+        is_member:data.userData.is_member
       },
       paymentData: {
         bank_number: data.userData.payment_details?.bank_number,

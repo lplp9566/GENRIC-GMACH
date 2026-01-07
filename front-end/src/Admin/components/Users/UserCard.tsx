@@ -27,6 +27,7 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import SavingsIcon from "@mui/icons-material/Savings";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import EditUser from "./editUser";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"; // כתר/גביע כזה
 
 const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
   const [expanded, setExpanded] = useState(false);
@@ -75,7 +76,21 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
   }));
   return (
     <>
-      <StyledCard onClick={() => toggleExpand()}>
+      <StyledCard onClick={() => toggleExpand()} sx={{ position: "relative" }}>
+        {user.is_member && (
+          <EmojiEventsIcon
+            titleAccess="חבר גמ״ח"
+            sx={{
+              position: "absolute",
+              top: 10,
+              left: 10,
+              zIndex: 2,
+              fontSize: 18,
+              color: "warning.main",
+              filter: "drop-shadow(0 6px 10px rgba(0,0,0,0.35))",
+            }}
+          />
+        )}
         <CardHeader
           avatar={
             <Avatar sx={{ bgcolor: "primary.main" }}>
@@ -148,7 +163,7 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
         </CardActions>
 
         <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <CardContent >
+          <CardContent>
             {user.membership_type === MembershipType.MEMBER && (
               <>
                 <Typography variant="subtitle2" gutterBottom>

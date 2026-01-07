@@ -8,6 +8,7 @@ export interface IUser {
   phone_number: string;
   email_address: string;
   iS_admin: boolean;
+  is_member:boolean ;
   payment_details: IPaymentDetails;
   current_role: ICurrentRole;
   membership_type: MembershipType
