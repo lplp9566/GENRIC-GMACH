@@ -19,8 +19,9 @@ import NewDepositModal from "../Deposits/newDeposit/newDeposit";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import SavingsIcon from "@mui/icons-material/Savings";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import DebtCards from "./DebtCards";
 
-const formatILS = (value?: number | string | null) => {
+export const formatILS = (value?: number | string | null) => {
   const n = typeof value === "string" ? Number(value) : value ?? 0;
   if (!Number.isFinite(n)) return "₪0.00";
   return new Intl.NumberFormat("he-IL", {
@@ -43,7 +44,7 @@ const HomePage: React.FC = () => {
   const depositModal = useSelector(
     (state: RootState) => state.mapModeSlice.AddDepositModal
   );
-    const { fundsOverview, status } = useSelector(
+  const { fundsOverview, status } = useSelector(
     (s: RootState) => s.AdminFundsOverviewReducer
   );
   // const allLoans = useSelector((state:RootState)=> state.AdminLoansSlice.allLoans)
@@ -53,27 +54,23 @@ const HomePage: React.FC = () => {
   const totalNegativeBalance = useMemo(() => {
     return allUsers
       .filter((u) => u.payment_details.monthly_balance < 0)
-      .reduce((sum, u) => sum +Math.abs( u.payment_details.monthly_balance), 0);
+      .reduce((sum, u) => sum + Math.abs(u.payment_details.monthly_balance), 0);
   }, [allUsers]);
 
   const totalLoansDebt = useMemo(() => {
-  return allUsers.reduce((usersSum, user) => {
-    const loans = user.payment_details?.loan_balances ?? [];
+    return allUsers.reduce((usersSum, user) => {
+      const loans = user.payment_details?.loan_balances ?? [];
 
-    const userDebt = loans
-      .filter((loan) => loan.balance < 0)
-      .reduce((sum, loan) => sum + Math.abs(loan.balance), 0);
+      const userDebt = loans
+        .filter((loan) => loan.balance < 0)
+        .reduce((sum, loan) => sum + Math.abs(loan.balance), 0);
 
-    return usersSum + userDebt;
-  }, 0);
-}, [allUsers]);
-
-
-  
+      return usersSum + userDebt;
+    }, 0);
+  }, [allUsers]);
 
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-
 
   const quickActions = [
     {
@@ -252,9 +249,12 @@ const HomePage: React.FC = () => {
             <Typography variant="h5" fontWeight={900} mb={2} textAlign="center">
               פעולות מהירות
             </Typography>
-            <Typography>{totalNegativeBalance}</Typography>
-            <Typography>{totalLoansDebt}</Typography>
-            <Grid container spacing={3} justifyContent="center">
+            <DebtCards
+              monthlyDebt={totalNegativeBalance}
+              loansDebt={totalLoansDebt}
+            />
+
+            {/* <Grid container spacing={3} justifyContent="center">
               {quickActions.map((action, i) => (
                 <Grid item xs={12} sm={6} md={3} key={i}>
                   <Paper
@@ -322,7 +322,7 @@ const HomePage: React.FC = () => {
                   </Paper>
                 </Grid>
               ))}
-            </Grid>
+            </Grid> */}
           </Box>
 
           {/* REGULATIONS */}
