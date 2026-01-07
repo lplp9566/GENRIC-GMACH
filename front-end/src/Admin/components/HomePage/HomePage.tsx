@@ -97,6 +97,8 @@ const HomePage: React.FC = () => {
       onclick: () => navigate("/loans/new"),
     },
   ];
+  console.log(quickActions);
+  
 
   const stats = [
     {

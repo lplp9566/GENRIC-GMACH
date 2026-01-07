@@ -99,7 +99,7 @@ export const AdminUsersSlice = createSlice({
       .addCase(createUser.pending, (state) => {
         state.createUserStatus = "pending";
       })
-      .addCase(createUser.fulfilled, (state,action) => {
+      .addCase(createUser.fulfilled, (state) => {
         state.createUserStatus = "fulfilled";
             
 
