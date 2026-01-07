@@ -1,5 +1,4 @@
-// src/components/SelectUsers/SelectAllUsers.tsx
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { getAllUsers } from "../../../store/features/admin/adminUsersSlice";
@@ -24,55 +23,57 @@ const SelectAllUsers: React.FC<Props> = ({
   label = "בחר משתמש",
   value,
   color,
-  filter
+  filter,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
+
   const allUsers = useSelector(
     (state: RootState) => state.AdminUsers.allUsers
-  );  
-useEffect(() => {
-  console.log({filter});
-  if (filter === "all") {
-    console.log(value);
-    
-    
+  ) ?? [];
+
+  // מביאים פעם אחת בלבד אם אין עדיין משתמשים
+  useEffect(() => {
+    if (allUsers.length > 0) return;
     dispatch(getAllUsers({ isAdmin: false }));
-  } else if (filter === "members") {
-    dispatch(getAllUsers({ isAdmin: false, membershipType: "MEMBER" }));
-  } else {
-    dispatch(getAllUsers({ isAdmin: false, membershipType: "FRIEND" }));
-  }
-}, [dispatch, filter]);
+  }, [dispatch, allUsers.length]);
+
+  // פילטר בפרונט
+  const filteredUsers = useMemo(() => {
+    if (filter === "members") {
+      return allUsers.filter((u) => u.membership_type === "MEMBER");
+    }
+    if (filter === "friends") {
+      return allUsers.filter((u) => u.membership_type === "FRIEND");
+    }
+    return allUsers;
+  }, [allUsers, filter]);
+
   const handleChange = (event: SelectChangeEvent<string>) => {
     onChange(Number(event.target.value));
   };
 
   return (
     <FormControl fullWidth size="small">
-      <InputLabel id="select-user-label" sx={{ color: color }}>{label}</InputLabel>
+      <InputLabel id="select-user-label" sx={{ color }}>
+        {label}
+      </InputLabel>
+
       <Select
         labelId="select-user-label"
         label={label}
-                        dir="rtl"
-
-        color={color ?? "primary"} // אם לא הועבר צבע, נשתמש בצבע ברירת מחדל
-        // אם קיבלנו value, נהפוך אותו למחרוזת, אחרת נעביר מחרוזת ריקה
+        dir="rtl"
+        color={color ?? "primary"}
         value={value != null ? value.toString() : ""}
         onChange={handleChange}
         sx={{ height: 55, minHeight: 55 }}
         inputProps={{ sx: { borderRadius: 2 } }}
         renderValue={(selected) => {
-          if (!selected) {
-            return <em>{label}</em>;
-          }
-          const user = allUsers.find((u) => u.id === Number(selected));
-          return user
-            ? `${user.first_name} ${user.last_name}`
-            : <em>משתמש לא נמצא</em>;
+          if (!selected) return <em>{label}</em>;
+          const user = filteredUsers.find((u) => u.id === Number(selected));
+          return user ? `${user.first_name} ${user.last_name}` : <em>משתמש לא נמצא</em>;
         }}
       >
-        {allUsers.map((user) => (
-          // כאן חשוב שה-value של כל MenuItem יתאים ל-type של value ומחרוזת
+        {filteredUsers.map((user) => (
           <MenuItem key={user.id} value={user.id.toString()} dir="rtl">
             {user.first_name} {user.last_name}
           </MenuItem>

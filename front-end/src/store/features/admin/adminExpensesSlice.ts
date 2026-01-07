@@ -86,11 +86,6 @@ export const updateExpenseById = createAsyncThunk<IExpenses, Partial<IExpenses> 
   }
 );
 
-/* =========================
-   Expenses Categories
-   ========================= */
-
-// POST /expenses-category
 export const CreateExpensesCategory = createAsyncThunk<
   IExpensesCategory,
   Partial<IExpensesCategory>

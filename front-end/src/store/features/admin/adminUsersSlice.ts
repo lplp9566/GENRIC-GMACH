@@ -99,8 +99,10 @@ export const AdminUsersSlice = createSlice({
       .addCase(createUser.pending, (state) => {
         state.createUserStatus = "pending";
       })
-      .addCase(createUser.fulfilled, (state) => {
+      .addCase(createUser.fulfilled, (state,action) => {
         state.createUserStatus = "fulfilled";
+            
+
       })
       .addCase(createUser.rejected, (state, action) => {
         state.createUserStatus = "rejected";
@@ -109,8 +111,10 @@ export const AdminUsersSlice = createSlice({
       .addCase(editUser.pending, (state) => {
         state.createUserStatus = "pending";
       })
-      .addCase(editUser.fulfilled, (state) => {
+      .addCase(editUser.fulfilled, (state,action) => {
         state.createUserStatus = "fulfilled";
+        (state.allUsers as IUser[]).unshift(action.payload);
+        
       })
       .addCase(editUser.rejected, (state, action) => {
         state.createUserStatus = "rejected";
