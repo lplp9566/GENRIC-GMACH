@@ -31,12 +31,12 @@ const SelectAllUsers: React.FC<Props> = ({
     (state: RootState) => state.AdminUsers.allUsers
   ) ?? [];
 
-  // מביאים פעם אחת בלבד אם אין עדיין משתמשים
+
   useEffect(() => {
     if (allUsers.length > 0) return;
     dispatch(getAllUsers({ isAdmin: false }));
   }, [dispatch, allUsers.length]);
-  
+
   const filteredUsers = useMemo(() => {
     if (filter === "members") {
       return allUsers.filter((u) => u.membership_type === "MEMBER");
