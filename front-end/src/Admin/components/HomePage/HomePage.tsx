@@ -20,6 +20,7 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import SavingsIcon from "@mui/icons-material/Savings";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import DebtCards from "./DebtCards";
+import { getAllUsers } from "../../../store/features/admin/adminUsersSlice";
 
 export const formatILS = (value?: number | string | null) => {
   const n = typeof value === "string" ? Number(value) : value ?? 0;
@@ -36,6 +37,7 @@ const HomePage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     dispatch(getFundsOverview());
+    dispatch(getAllUsers({isAdmin:false}))
   }, [dispatch]);
 
   const paymentModal = useSelector(
