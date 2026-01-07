@@ -68,6 +68,8 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
   };
 
   const handleSave = async () => {
+        onClose();
+
     const promise = dispatch(
       editUser({ userId: user.id!, userData: formData })
     ) as unknown as Promise<any>;
@@ -79,7 +81,6 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
     await promise;
     await dispatch(getAllUsers({ isAdmin: false }));
 
-    onClose();
   };
 
   const handleClose = () => {
