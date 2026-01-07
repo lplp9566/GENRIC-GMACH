@@ -36,8 +36,7 @@ const SelectAllUsers: React.FC<Props> = ({
     if (allUsers.length > 0) return;
     dispatch(getAllUsers({ isAdmin: false }));
   }, [dispatch, allUsers.length]);
-
-  // פילטר בפרונט
+  
   const filteredUsers = useMemo(() => {
     if (filter === "members") {
       return allUsers.filter((u) => u.membership_type === "MEMBER");
