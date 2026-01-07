@@ -75,7 +75,6 @@ const GemachRegulationsModal: React.FC<{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: '#f5f5f5',
           borderBottom: '1px solid #ddd',
       
           px: 3,
@@ -90,7 +89,7 @@ const GemachRegulationsModal: React.FC<{
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ backgroundColor: '#fafafa', px: 4, py: 3 }}>
+      <DialogContent sx={{  px: 4, py: 3 }}>
         <Box display="flex" flexDirection="column" gap={2} mb={2}>
           {editing && (
             <TextField
