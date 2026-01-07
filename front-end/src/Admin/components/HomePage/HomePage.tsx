@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Grid, Typography, Button, Paper } from "@mui/material";
 import { alpha } from "@mui/material/styles";
@@ -43,13 +43,37 @@ const HomePage: React.FC = () => {
   const depositModal = useSelector(
     (state: RootState) => state.mapModeSlice.AddDepositModal
   );
+    const { fundsOverview, status } = useSelector(
+    (s: RootState) => s.AdminFundsOverviewReducer
+  );
+  // const allLoans = useSelector((state:RootState)=> state.AdminLoansSlice.allLoans)
+  const allUsers =
+    useSelector((state: RootState) => state.AdminUsers.allUsers) ?? [];
+
+  const totalNegativeBalance = useMemo(() => {
+    return allUsers
+      .filter((u) => u.payment_details.monthly_balance < 0)
+      .reduce((sum, u) => sum +Math.abs( u.payment_details.monthly_balance), 0);
+  }, [allUsers]);
+
+  const totalLoansDebt = useMemo(() => {
+  return allUsers.reduce((usersSum, user) => {
+    const loans = user.payment_details?.loan_balances ?? [];
+
+    const userDebt = loans
+      .filter((loan) => loan.balance < 0)
+      .reduce((sum, loan) => sum + Math.abs(loan.balance), 0);
+
+    return usersSum + userDebt;
+  }, 0);
+}, [allUsers]);
+
+
+  
 
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
-  const { fundsOverview, status } = useSelector(
-    (s: RootState) => s.AdminFundsOverviewReducer
-  );
 
   const quickActions = [
     {
@@ -170,14 +194,22 @@ const HomePage: React.FC = () => {
                         position: "absolute",
                         inset: 0,
                         background: `radial-gradient(600px 200px at 0% 0%,
-                          ${alpha(main, theme.palette.mode === "dark" ? 0.22 : 0.14)},
+                          ${alpha(
+                            main,
+                            theme.palette.mode === "dark" ? 0.22 : 0.14
+                          )},
                           transparent 60%)`,
                         pointerEvents: "none",
                       },
                     };
                   }}
                 >
-                  <Box display="flex" alignItems="center" gap={2} sx={{ position: "relative" }}>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    gap={2}
+                    sx={{ position: "relative" }}
+                  >
                     <Box
                       sx={(theme) => {
                         const main = theme.palette[s.colorKey].main;
@@ -220,7 +252,8 @@ const HomePage: React.FC = () => {
             <Typography variant="h5" fontWeight={900} mb={2} textAlign="center">
               פעולות מהירות
             </Typography>
-
+            <Typography>{totalNegativeBalance}</Typography>
+            <Typography>{totalLoansDebt}</Typography>
             <Grid container spacing={3} justifyContent="center">
               {quickActions.map((action, i) => (
                 <Grid item xs={12} sm={6} md={3} key={i}>
@@ -249,7 +282,7 @@ const HomePage: React.FC = () => {
                         mb: 2,
                         backgroundColor: alpha(
                           theme.palette.primary.main,
-                          theme.palette.mode === "dark" ? 0.14 : 0.10
+                          theme.palette.mode === "dark" ? 0.14 : 0.1
                         ),
                         color: theme.palette.primary.main,
                       })}
