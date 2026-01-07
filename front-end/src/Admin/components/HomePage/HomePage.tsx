@@ -248,9 +248,9 @@ const HomePage: React.FC = () => {
 
           {/* QUICK ACTIONS */}
           <Box mt={10}>
-            <Typography variant="h5" fontWeight={900} mb={2} textAlign="center">
+            {/* <Typography variant="h5" fontWeight={900} mb={2} textAlign="center">
               פעולות מהירות
-            </Typography>
+            </Typography> */}
             <DebtCards
               monthlyDebt={totalNegativeBalance}
               loansDebt={totalLoansDebt}
