@@ -23,6 +23,10 @@ years AS (
   JOIN deposits dep ON dep.id = da."depositId"
 
   UNION
+  SELECT dep."userId", EXTRACT(YEAR FROM dep.start_date)::int
+  FROM deposits dep
+
+  UNION
   SELECT orr."userId", EXTRACT(YEAR FROM orr."date")::int
   FROM "order-return" orr
 ),
@@ -46,7 +50,6 @@ donations_y AS (
   GROUP BY 1,2
 ),
 
--- ✅ גם כמות וגם סכום
 loans_taken_y AS (
   SELECT
     l."userId" AS user_id,
@@ -67,15 +70,29 @@ loans_repaid_y AS (
   GROUP BY 1,2
 ),
 
-fixed_deposits_added_y AS (
+/* ✅ פקדונות קבועים – הפקדה ראשונית (לפי שנת start_date) */
+fixed_deposits_initial_y AS (
   SELECT
     d."userId" AS user_id,
     EXTRACT(YEAR FROM d.start_date)::int AS year,
-    SUM(d."initialDeposit")::float AS total_fixed_deposits_added
+    SUM(COALESCE(d."initialDeposit",0))::float AS total_fixed_deposits_initial
   FROM deposits d
   GROUP BY 1,2
 ),
 
+/* ✅ פקדונות קבועים – הוספות (AddToDeposit) לפי שנת הפעולה */
+fixed_deposits_add_actions_y AS (
+  SELECT
+    dep."userId" AS user_id,
+    EXTRACT(YEAR FROM da."date")::int AS year,
+    SUM(CASE WHEN da.action_type = 'AddToDeposit' THEN da.amount ELSE 0 END)::float
+      AS total_fixed_deposits_added_actions
+  FROM deposits_actions da
+  JOIN deposits dep ON dep.id = da."depositId"
+  GROUP BY 1,2
+),
+
+/* משיכות (RemoveFromDeposit) */
 fixed_deposits_withdrawn_y AS (
   SELECT
     dep."userId" AS user_id,
@@ -105,13 +122,17 @@ SELECT
   COALESCE(d.total_equity_donations,0) AS total_equity_donations,
   COALESCE(d.special_fund_donations,0) AS special_fund_donations,
 
-  -- ✅ העמודות החדשות
   COALESCE(lt.total_loans_taken_count,0)  AS total_loans_taken_count,
   COALESCE(lt.total_loans_taken_amount,0) AS total_loans_taken_amount,
 
   COALESCE(lr.total_loans_repaid,0) AS total_loans_repaid,
 
-  COALESCE(fd.total_fixed_deposits_added,0) AS total_fixed_deposits_added,
+  /* ✅ אותו שם עמודה כמו שהיה לך, פשוט כולל גם initial וגם AddToDeposit */
+  (
+    COALESCE(fdi.total_fixed_deposits_initial,0)
+    + COALESCE(fda.total_fixed_deposits_added_actions,0)
+  )::float AS total_fixed_deposits_added,
+
   COALESCE(fw.total_fixed_deposits_withdrawn,0) AS total_fixed_deposits_withdrawn,
 
   COALESCE(so.total_standing_order_return,0) AS total_standing_order_return,
@@ -124,7 +145,8 @@ LEFT JOIN monthly_y m ON m.user_id = y.user_id AND m.year = y.year
 LEFT JOIN donations_y d ON d.user_id = y.user_id AND d.year = y.year
 LEFT JOIN loans_taken_y lt ON lt.user_id = y.user_id AND lt.year = y.year
 LEFT JOIN loans_repaid_y lr ON lr.user_id = y.user_id AND lr.year = y.year
-LEFT JOIN fixed_deposits_added_y fd ON fd.user_id = y.user_id AND fd.year = y.year
+LEFT JOIN fixed_deposits_initial_y fdi ON fdi.user_id = y.user_id AND fdi.year = y.year
+LEFT JOIN fixed_deposits_add_actions_y fda ON fda.user_id = y.user_id AND fda.year = y.year
 LEFT JOIN fixed_deposits_withdrawn_y fw ON fw.user_id = y.user_id AND fw.year = y.year
 LEFT JOIN standing_order_y so ON so.user_id = y.user_id AND so.year = y.year
 ORDER BY y.user_id, y.year;

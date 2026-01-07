@@ -10,6 +10,8 @@ years AS (
   UNION SELECT DISTINCT EXTRACT(YEAR FROM e."expenseDate")::int FROM expenses e
   UNION SELECT DISTINCT fys.year::int FROM fund_year_stats fys
   UNION SELECT DISTINCT md.year::int FROM monthly_deposits md
+  -- ✅ חשוב: גם שנת פתיחת הפקדון (initialDeposit)
+  UNION SELECT DISTINCT EXTRACT(YEAR FROM dep.start_date)::int FROM deposits dep
 ),
 
 /* ✅ תשלומים חודשיים – מקור אמת */
@@ -38,20 +40,32 @@ loans_repaid_y AS (
   GROUP BY 1
 ),
 
-/* פקדונות (לא תשלומים חודשיים) */
-deposits_actions_y AS (
+/* ✅ פקדונות – הוספות (AddToDeposit) לפי שנת הפעולה */
+fixed_deposits_add_actions_y AS (
   SELECT
     EXTRACT(YEAR FROM da."date")::int AS year,
-    SUM(CASE WHEN da.action_type = 'RemoveFromDeposit' THEN COALESCE(da.amount,0) ELSE 0 END)::float AS total_fixed_deposits_withdrawn
+    SUM(CASE WHEN da.action_type = 'AddToDeposit' THEN COALESCE(da.amount,0) ELSE 0 END)::float
+      AS total_fixed_deposits_added_actions
   FROM deposits_actions da
   GROUP BY 1
 ),
 
+/* ✅ פקדונות – משיכות (RemoveFromDeposit) לפי שנת הפעולה */
+deposits_actions_y AS (
+  SELECT
+    EXTRACT(YEAR FROM da."date")::int AS year,
+    SUM(CASE WHEN da.action_type = 'RemoveFromDeposit' THEN COALESCE(da.amount,0) ELSE 0 END)::float
+      AS total_fixed_deposits_withdrawn
+  FROM deposits_actions da
+  GROUP BY 1
+),
+
+/* ✅ פקדונות – הפקדה ראשונית (initialDeposit) לפי שנת start_date */
 fixed_deposits_initial_y AS (
   SELECT
-    EXTRACT(YEAR FROM d.start_date)::int AS year,
-    SUM(COALESCE(d."initialDeposit",0))::float AS total_fixed_deposits_added
-  FROM deposits d
+    EXTRACT(YEAR FROM dep.start_date)::int AS year,
+    SUM(COALESCE(dep."initialDeposit",0))::float AS total_fixed_deposits_initial
+  FROM deposits dep
   GROUP BY 1
 ),
 
@@ -126,9 +140,7 @@ SELECT
   ROW_NUMBER() OVER (ORDER BY y.year)::int AS id,
   y.year,
 
-  -- ✅ עכשיו זה מגיע מהטבלה הנכונה
   COALESCE(md.total_monthly_deposits, 0) AS total_monthly_deposits,
-
   COALESCE(eq.total_equity_donations, 0) AS total_equity_donations,
 
   COALESCE(sf.special_fund_donations, 0) AS special_fund_donations,
@@ -138,7 +150,12 @@ SELECT
   COALESCE(lt.total_loans_amount, 0) AS total_loans_amount,
   COALESCE(lr.total_loans_repaid, 0) AS total_loans_repaid,
 
-  COALESCE(fd0.total_fixed_deposits_added, 0) AS total_fixed_deposits_added,
+  /* ✅ אותו שם עמודה כמו קודם: initial + AddToDeposit */
+  (
+    COALESCE(fd0.total_fixed_deposits_initial, 0)
+    + COALESCE(fda.total_fixed_deposits_added_actions, 0)
+  )::float AS total_fixed_deposits_added,
+
   COALESCE(da.total_fixed_deposits_withdrawn, 0) AS total_fixed_deposits_withdrawn,
 
   COALESCE(sor.total_standing_order_return, 0) AS total_standing_order_return,
@@ -159,6 +176,7 @@ LEFT JOIN loans_taken_y lt ON lt.year = y.year
 LEFT JOIN loans_repaid_y lr ON lr.year = y.year
 LEFT JOIN deposits_actions_y da ON da.year = y.year
 LEFT JOIN fixed_deposits_initial_y fd0 ON fd0.year = y.year
+LEFT JOIN fixed_deposits_add_actions_y fda ON fda.year = y.year
 LEFT JOIN equity_donations_y eq ON eq.year = y.year
 LEFT JOIN special_funds_y sf ON sf.year = y.year
 LEFT JOIN fund_details_y fdy ON fdy.year = y.year

@@ -78,6 +78,7 @@ const DepositDetailsPage = () => {
         <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "40%" } }}>
           {deposit && <DepositDetailsInfoCard deposit={deposit} />}
         </Grid>
+        {deposit?.isActive && (
 
         <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "20%" } }}>
           <DepositsActions
@@ -86,6 +87,9 @@ const DepositDetailsPage = () => {
             handleSubmit={handleSubmit}
           />
         </Grid>
+        )
+
+        }
 
         <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "30%" } }}>
           <DepositActionTable actions={actions ?? []} />
