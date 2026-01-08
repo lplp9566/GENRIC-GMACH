@@ -125,7 +125,7 @@ const HomePage: React.FC = () => {
 
   return (
     <Box
-      p={4}
+      p={{ xs: 2, sm: 4 }}
       sx={(theme) => ({
         minHeight: "100vh",
         background:
@@ -148,7 +148,7 @@ const HomePage: React.FC = () => {
           {/* HERO */}
           <Box
             textAlign="center"
-            py={6}
+            py={{ xs: 4, sm: 6 }}
             sx={(theme) => ({
               borderRadius: 4,
               color: theme.palette.primary.contrastText,
@@ -166,13 +166,23 @@ const HomePage: React.FC = () => {
                   : "0 18px 40px rgba(0,0,0,0.10)",
             })}
           >
-            <Typography variant="h3" fontWeight={800} gutterBottom>
+            <Typography
+              variant="h3"
+              fontWeight={800}
+              gutterBottom
+              sx={{ fontSize: { xs: 22, sm: 28, md: 34 } }}
+            >
               מערכת ניהול גמ"ח אהבת חסד של משפחת פסיקוב
             </Typography>
           </Box>
 
           {/* STATS */}
-          <Grid container spacing={4} mt={-6} justifyContent="center">
+          <Grid
+            container
+            spacing={{ xs: 2, sm: 4 }}
+            mt={{ xs: 2, sm: -6 }}
+            justifyContent="center"
+          >
             {stats.map((s, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
                 <Paper
@@ -249,7 +259,7 @@ const HomePage: React.FC = () => {
           {depositModal && <NewDepositModal />}
 
           {/* QUICK ACTIONS */}
-          <Box mt={10}>
+          <Box mt={{ xs: 6, sm: 10 }}>
             {/* <Typography variant="h5" fontWeight={900} mb={2} textAlign="center">
               פעולות מהירות
             </Typography> */}
@@ -331,10 +341,10 @@ const HomePage: React.FC = () => {
 
           {/* REGULATIONS */}
           <Box
-            mt={10}
+            mt={{ xs: 6, sm: 10 }}
             textAlign="center"
             sx={(theme) => ({
-              p: 4,
+              p: { xs: 2, sm: 4 },
               borderRadius: 4,
               border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
               backgroundColor: theme.palette.background.paper,

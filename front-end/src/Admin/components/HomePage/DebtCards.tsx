@@ -24,16 +24,21 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
   ];
 
   return (
-    <Grid container spacing={3} justifyContent="center" sx={{ mt: 3 }}>
+    <Grid
+      container
+      spacing={{ xs: 2, sm: 3 }}
+      justifyContent="center"
+      sx={{ mt: { xs: 2, sm: 3 } }}
+    >
       {cards.map((c) => {
         const hasDebt = c.value > 0;
 
         return (
-          <Grid item xs={4} md={4} key={c.title}>
+          <Grid item xs={12} sm={6} md={4} key={c.title}>
             <Paper
               elevation={0}
               sx={{
-                p: 2.5,                 
+                p: { xs: 2, sm: 2.5 },
                 borderRadius: 4,         
                 background: hasDebt ? c.debtBg : c.okBg,
                 color: "#fff",
@@ -61,7 +66,7 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
               <Box
                 sx={{
                   position: "relative",
-                  minHeight: 120, // גובה נחמד לכרטיס
+                  minHeight: { xs: 96, sm: 120 }, // גובה נחמד לכרטיס
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -76,7 +81,7 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
                 <Typography
                   variant="h4"           // קטן יותר מ-h2/h3
                   fontWeight={1000}
-                  sx={{ lineHeight: 1 }}
+                  sx={{ lineHeight: 1, fontSize: { xs: 22, sm: 28 } }}
                 >
                   {hasDebt ? formatILS(c.value) : "אין חוב"}
                 </Typography>
@@ -90,3 +95,4 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
 };
 
 export default DebtCards;
+
