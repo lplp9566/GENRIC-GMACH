@@ -1,6 +1,6 @@
 // src/components/Donations/FundsPanel.tsx
 import React from "react";
-import { Grid, Stack, Typography, Divider, Tooltip } from "@mui/material";
+import { Grid, Stack, Typography, Divider } from "@mui/material";
 import FundCard from "./FundCard";
 
 export type FundCardData = { key: string; label: string; total: number };
@@ -18,7 +18,7 @@ const FundsPanel: React.FC<Props> = ({
   fundCards,
   activeKey,
   onToggleKey,
-  tipsText = "לחיצה על קובייה מסננת את הטבלה משמאל; אפשר לשלב עם סינון שנה/חודש.",
+  
 }) => {
   return (
     <Stack spacing={2}>
@@ -52,11 +52,7 @@ const FundsPanel: React.FC<Props> = ({
         )}
       </Grid>
 
-      <Tooltip title={tipsText}>
-        <Typography variant="caption" color="text.secondary">
-          טיפ: {tipsText}
-        </Typography>
-      </Tooltip>
+
     </Stack>
   );
 };

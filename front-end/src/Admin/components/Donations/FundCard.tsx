@@ -21,7 +21,7 @@ const FundCard:FC<FundCardProps> = ({ label, amount, selected, onClick }) => {
         <Typography variant="overline">
           {label}
         </Typography>
-        <Typography variant="h5" fontWeight={800}>
+        <Typography variant="h5" fontWeight={600}>
           {Number(amount || 0).toLocaleString("he-IL", {
             style: "currency",
             currency: "ILS",
