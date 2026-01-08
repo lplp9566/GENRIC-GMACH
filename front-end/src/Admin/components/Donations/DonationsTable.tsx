@@ -15,6 +15,8 @@ import EditDonationModal from "./EditDonationModal";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store/store";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import {
   setAddDonationDraft,
   setAddDonationModal,
@@ -26,6 +28,7 @@ export type DonationRow = {
   date: string;
   action: string;
   donation_reason: string;
+  note?: string;
   userId: number;
 };
 export type SortBy = "date" | "amount";
@@ -101,8 +104,7 @@ const DonationsTable: FC<DonationsTableProps> = ({
       <Table size="small" stickyHeader>
         <TableHead>
           <TableRow>
-            {/* לפי הדרישה: משתמש | סכום | תאריך | אמצעי תשלום | הערות */}
-            <TableCell align="right">משתמש</TableCell>
+            <TableCell align="right">תורם</TableCell>
             <TableCell
               align="right"
               sortDirection={sortBy === "amount" ? sortDir : (false as any)}
@@ -127,17 +129,17 @@ const DonationsTable: FC<DonationsTableProps> = ({
                 תאריך
               </TableSortLabel>
             </TableCell>
-            <TableCell align="right"> פעולה</TableCell>
+            <TableCell align="right">פעולה</TableCell>
             <TableCell align="right">קרן/תרומה רגילה</TableCell>
-            <TableCell align="right">שכפל</TableCell>
+            <TableCell align="right">הערות</TableCell>
+            <TableCell align="right">פעולות</TableCell>
           </TableRow>
         </TableHead>
-
         <TableBody>
           {rows.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} align="center">
-                אין נתונים להצגה
+              <TableCell colSpan={7} align="center">
+                אין תרומות להצגה
               </TableCell>
             </TableRow>
           ) : (
@@ -167,17 +169,34 @@ const DonationsTable: FC<DonationsTableProps> = ({
                     ? "תרומה רגילה"
                     : ` קרן ${donationRow.donation_reason}`}
                 </TableCell>
-                <TableCell align="right" onClick={(e) => e.stopPropagation()}>
-                  <Tooltip title="שכפל תרומה">
+                <TableCell align="right">{donationRow.note || "-"}</TableCell>
+                <TableCell align="right">
+                  <Tooltip title="שכפול תרומה">
                     <IconButton
-                      size="small"
                       onClick={(e) => {
-                        e.stopPropagation(); // שלא יפעיל edit על שורה
+                        e.stopPropagation();
                         onClickDuplicate(donationRow);
                       }}
                     >
-                      <ContentCopyIcon fontSize="small" />
+                      <ContentCopyIcon />
                     </IconButton>
+                  </Tooltip>
+                  <Tooltip title="עריכה">
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onClickEdit(donationRow);
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="מחיקה (בקרוב)">
+                    <span>
+                      <IconButton disabled>
+                        <DeleteOutlineIcon />
+                      </IconButton>
+                    </span>
                   </Tooltip>
                 </TableCell>
               </TableRow>

@@ -40,6 +40,7 @@ const AddDonationModal: React.FC = () => {
   const [fundName, setFundName] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
   const [date, setDate] = useState<string>(today);
+  const [note, setNote] = useState<string>("");
 
   const open = useSelector((s: RootState) => s.mapModeSlice.AddDonationModal);
   const draft = useSelector((s: RootState) => s.mapModeSlice.AddDonationDraft);
@@ -62,6 +63,7 @@ const AddDonationModal: React.FC = () => {
       setFundName(draft.fundName ?? "");
       setAmount(draft.amount ?? 0);
       setDate(draft.date ?? today);
+      setNote(draft.note ?? "");
     } else {
       // פתיחה רגילה (איפוס)
       setUserId(undefined);
@@ -69,6 +71,7 @@ const AddDonationModal: React.FC = () => {
       setFundName("");
       setAmount(0);
       setDate(today);
+      setNote("");
     }
   }, [open, draft, dispatch]);
 
@@ -97,6 +100,7 @@ const AddDonationModal: React.FC = () => {
       setFundName(draft.fundName ?? "");
       setAmount(draft.amount ?? 0);
       setDate(draft.date ?? today);
+      setNote(draft.note ?? "");
     }
   }, [open, draft]);
 
@@ -115,6 +119,7 @@ const AddDonationModal: React.FC = () => {
       date,
       action: DonationActionType.donation,
       donation_reason: kind === "regular" ? "Equity" : fundName.trim(), // ✅ תאימות
+      note: note.trim() ? note.trim() : undefined,
     };
     toast.promise(dispatch(createDonation(payload)), {
       pending: "התרומה נשלחה בהצלחה",
@@ -274,6 +279,16 @@ const AddDonationModal: React.FC = () => {
                   MozAppearance: "textfield",
                 },
               }}
+            />
+            <TextField
+              label="?ערות"
+              size="medium"
+              color="success"
+              fullWidth
+              multiline
+              minRows={2}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
             />
           </Box>
         </DialogContent>

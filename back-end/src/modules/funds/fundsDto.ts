@@ -6,4 +6,5 @@ export class CreateDonationDto {
   amount: number;
   action: DonationActionType;
   donation_reason: string;
+  note?: string;
 }

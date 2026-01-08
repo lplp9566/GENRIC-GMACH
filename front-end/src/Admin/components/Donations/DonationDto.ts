@@ -11,6 +11,7 @@ export interface IDonation{
     amount: number;
     date: string;
     donation_reason: string
+    note?: string
 }
 export interface ICreateDonation {
     user?:number
@@ -18,6 +19,7 @@ export interface ICreateDonation {
     amount:number
     action:DonationActionType
     donation_reason:string
+    note?: string
 }
 
 export interface IUpdateDonation {

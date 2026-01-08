@@ -8,11 +8,9 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { Link } from "react-router-dom";
 import { UserSelect } from "./UserSelect";
-
-const NAV_BG = "#003366";
-const NAV_TXT = "#FFFFFF";
 
 const navItems = [
   { label: "דף הבית", path: "/Home" },
@@ -31,52 +29,64 @@ const navItems = [
 const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({
   open,
   onClose,
-}) => (
-  <Drawer
-    anchor="right"
-    open={open}
-    onClose={onClose}
-    sx={{
-      "& .MuiDrawer-paper": {
-        top: 64,
-        background: NAV_BG,
-        color: NAV_TXT,
-        width: 250,
+}) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+  const NAV_BG = isDark ? "#1C1F24" : "#F3F1EA";
+  const NAV_TXT = isDark ? "#F5F4EF" : "#1C1F24";
+  const NAV_HOVER = isDark
+    ? "rgba(166,196,138,0.18)"
+    : "rgba(110,139,94,0.18)";
 
-        // ✅ במובייל: גובה מוגדר + גלילה
-        height: { xs: "calc(100dvh - 64px)", md: "auto" },
-        overflowY: { xs: "auto", md: "visible" },
-        WebkitOverflowScrolling: "touch",
-      },
-    }}
-  >
-    <Box sx={{ p: 2, textAlign: "center" }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        תפריט ניווט
-      </Typography>
+  return (
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      sx={{
+        "& .MuiDrawer-paper": {
+          top: 64,
+          background: NAV_BG,
+          color: NAV_TXT,
+          width: 250,
 
-      <UserSelect fullWidth />
+          // �?. ?`???\u0007?`?T?T??: ?'?\u0007?`?" ???\u0007?'?"?" + ?'???T???"
+          height: { xs: "calc(100dvh - 64px)", md: "auto" },
+          overflowY: { xs: "auto", md: "visible" },
+          WebkitOverflowScrolling: "touch",
+        },
+      }}
+    >
+      <Box sx={{ p: 2, textAlign: "center" }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
 
-      <List>
-        {navItems.map((it) => (
-          <ListItem key={it.path} disablePadding>
-            <ListItemButton
-              component={Link}
-              to={it.path}
-              onClick={onClose}
-              sx={{
-                color: NAV_TXT,
-                py: 1.2,
-                textAlign: "right",
-                "&:hover": { backgroundColor: "rgba(255,255,255,.1)" },
-              }}
-            >
-              <ListItemText primary={it.label} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  </Drawer>
-);
+תפריט ניווט        </Typography>
+
+        <UserSelect fullWidth />
+
+        <List>
+          {navItems.map((it) => (
+            <ListItem key={it.path} disablePadding>
+              <ListItemButton
+                component={Link}
+                to={it.path}
+                onClick={onClose}
+                sx={{
+                  color: NAV_TXT,
+                  py: 1.2,
+                  textAlign: "right",
+                  "&:hover": { backgroundColor: NAV_HOVER },
+                }}
+              >
+                <ListItemText primary={it.label} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+    </Drawer>
+  );
+};
 export default MobileDrawer;
+
+

@@ -312,6 +312,7 @@ const filteredForTable = useMemo(() => {
         date: formatDate(dt),
         action: d?.action ?? "—",
         donation_reason: d?.donation_reason ?? "—",
+        note: d?.note ?? "",
       };
     });
   }, [sorted]);
@@ -377,6 +378,7 @@ const right = useMemo(() => {
         direction: "rtl",
         fontFamily: "Heebo, Arial, sans-serif",
         minHeight: "100vh",
+        width:"100%"
       }}
     >
       {addDonationModal && <NewDonation />}
@@ -388,7 +390,7 @@ const right = useMemo(() => {
           <Alert severity="error">{error || "אירעה שגיאה בטעינת תרומות"}</Alert>
         )}
 
-        <Grid container spacing={3}>
+        <Grid container spacing={1} sx={{width:"100%"}}>
           {/* שמאל – טבלת תרומות */}
           <Grid
             item

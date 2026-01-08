@@ -1,33 +1,21 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
-import { UserFinancialByYearService } from '../users/user-financials-by-year/user-financial-by-year.service';
 import { getYearFromDate } from '../../services/services';
-import { FundsOverviewService } from '../funds-overview/funds-overview.service';
-import { UserFinancialService } from '../users/user-financials/user-financials.service';
-import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
-import { DonationActionType, IWindowDonations } from './donations_dto';
+import { DonationActionType } from './donations_dto';
 import { DonationsEntity } from './Entity/donations.entity';
 import { UpdateDonationDto } from './donations.controller';
 import { CreateDonationDto } from '../funds/fundsDto';
 import { FundsService } from '../funds/funds.service';
 import { FundYearStatsEntity } from '../funds/Entity/fund-year-stats.entity';
 import { FundEntity } from '../funds/Entity/funds.entity';
-import { addWeeks } from 'date-fns';
-import { abort } from 'process';
 
 @Injectable()
 export class DonationsService {
   constructor(
     @InjectRepository(DonationsEntity)
     private donationsRepository: Repository<DonationsEntity>,
-    @InjectRepository(FundYearStatsEntity)
     private readonly usersService: UsersService,
     private readonly fundsService: FundsService,
   ) {}
@@ -85,6 +73,7 @@ export class DonationsService {
     donation.date = new Date(dto.date);
     donation.action = dto.action;
     donation.donation_reason = dto.donation_reason;
+    donation.note = dto.note?.trim() || undefined;
 
     // אם נשלח userId – נטען משתמש
     if (dto.user != null) {

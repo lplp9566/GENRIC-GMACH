@@ -19,6 +19,7 @@ export type AddDonationDraft = {
   fundName?: string;
   amount?: number;
   date?: string;
+  note?: string;
 };
 const initialState: AppModeType = {
   LoanModalMode: false,
