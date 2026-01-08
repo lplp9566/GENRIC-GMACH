@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Box, Button, IconButton, Badge, MenuItem, Menu } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { UserSelect } from "./UserSelect";
 import { useDispatch } from "react-redux";
 import { logoutServer } from "../../../store/features/auth/authSlice";
@@ -23,10 +23,17 @@ const navItems = [
 ];
 export const DesktopLinks: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const { pathname } = useLocation();
   const [expensesAnchorEl, setExpensesAnchorEl] = useState<null | HTMLElement>(
     null
   );
   const openExpensesMenu = Boolean(expensesAnchorEl);
+  const activePath = useMemo(() => pathname.toLowerCase(), [pathname]);
+  const isActive = (path: string) => {
+    const p = path.toLowerCase();
+    if (p === "/home") return activePath === p;
+    return activePath === p || activePath.startsWith(`${p}/`);
+  };
 
   return (
     <Box
@@ -37,17 +44,18 @@ export const DesktopLinks: React.FC = () => {
           key={it.path}
           component={NavLink}
           to={it.path}
-          className={({ isActive }) => (isActive ? "active" : "")}
           sx={{
             color: NAV_TXT,
             p: "6px 6px",
             borderRadius: 2,
             textTransform: "none",
             "&:hover": { backgroundColor: "rgba(255,255,255,.15)" },
-            "&.active": {
+            ...(isActive(it.path)
+              ? {
               backgroundColor: "rgba(255,255,255,.22)",
               fontWeight: 700,
-            },
+            }
+              : {}),
           }}
         >
           {it.label}

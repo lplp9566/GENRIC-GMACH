@@ -9,7 +9,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { UserSelect } from "./UserSelect";
 
 const navItems = [
@@ -31,12 +31,17 @@ const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({
   onClose,
 }) => {
   const theme = useTheme();
+  const { pathname } = useLocation();
   const isDark = theme.palette.mode === "dark";
   const NAV_BG = isDark ? "#1C1F24" : "#F3F1EA";
   const NAV_TXT = isDark ? "#F5F4EF" : "#1C1F24";
-  const NAV_HOVER = isDark
-    ? "rgba(166,196,138,0.18)"
-    : "rgba(110,139,94,0.18)";
+  const NAV_HOVER = isDark ? "rgba(166,196,138,0.18)" : "rgba(110,139,94,0.18)";
+  const activePath = pathname.toLowerCase();
+  const isActive = (path: string) => {
+    const p = path.toLowerCase();
+    if (p === "/home") return activePath === p;
+    return activePath === p || activePath.startsWith(`${p}/`);
+  };
 
   return (
     <Drawer
@@ -59,8 +64,8 @@ const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({
     >
       <Box sx={{ p: 2, textAlign: "center" }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
-
-תפריט ניווט        </Typography>
+          תפריט ניווט{" "}
+        </Typography>
 
         <UserSelect fullWidth />
 
@@ -70,17 +75,18 @@ const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({
               <ListItemButton
                 component={NavLink}
                 to={it.path}
-                className={({ isActive }) => (isActive ? "active" : "")}
                 onClick={onClose}
                 sx={{
                   color: NAV_TXT,
                   py: 1.2,
                   textAlign: "right",
                   "&:hover": { backgroundColor: NAV_HOVER },
-                  "&.active": {
-                    backgroundColor: NAV_HOVER,
-                    fontWeight: 700,
-                  },
+                  ...(isActive(it.path)
+                    ? {
+                        backgroundColor: NAV_HOVER,
+                        fontWeight: 700,
+                      }
+                    : {}),
                 }}
               >
                 <ListItemText primary={it.label} />
@@ -93,4 +99,3 @@ const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({
   );
 };
 export default MobileDrawer;
-
