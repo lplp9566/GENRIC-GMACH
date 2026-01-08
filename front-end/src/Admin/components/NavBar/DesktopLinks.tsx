@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, IconButton, Badge, MenuItem, Menu } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { UserSelect } from "./UserSelect";
 import { useDispatch } from "react-redux";
 import { logoutServer } from "../../../store/features/auth/authSlice";
@@ -35,14 +35,19 @@ export const DesktopLinks: React.FC = () => {
       {navItems.map((it) => (
         <Button
           key={it.path}
-          component={Link}
+          component={NavLink}
           to={it.path}
+          className={({ isActive }) => (isActive ? "active" : "")}
           sx={{
             color: NAV_TXT,
             p: "6px 6px",
             borderRadius: 2,
             textTransform: "none",
             "&:hover": { backgroundColor: "rgba(255,255,255,.15)" },
+            "&.active": {
+              backgroundColor: "rgba(255,255,255,.22)",
+              fontWeight: 700,
+            },
           }}
         >
           {it.label}

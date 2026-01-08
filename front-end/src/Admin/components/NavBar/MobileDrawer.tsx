@@ -9,7 +9,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { UserSelect } from "./UserSelect";
 
 const navItems = [
@@ -68,14 +68,19 @@ const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({
           {navItems.map((it) => (
             <ListItem key={it.path} disablePadding>
               <ListItemButton
-                component={Link}
+                component={NavLink}
                 to={it.path}
+                className={({ isActive }) => (isActive ? "active" : "")}
                 onClick={onClose}
                 sx={{
                   color: NAV_TXT,
                   py: 1.2,
                   textAlign: "right",
                   "&:hover": { backgroundColor: NAV_HOVER },
+                  "&.active": {
+                    backgroundColor: NAV_HOVER,
+                    fontWeight: 700,
+                  },
                 }}
               >
                 <ListItemText primary={it.label} />
@@ -88,5 +93,4 @@ const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({
   );
 };
 export default MobileDrawer;
-
 
