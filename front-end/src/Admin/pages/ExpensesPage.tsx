@@ -264,12 +264,14 @@ const ExpensesHomePage: FC = () => {
 
   return (
     <Container
+      maxWidth={false}
+      disableGutters
       sx={{
-        py: 4,
+        px: 2,
         direction: "rtl",
         fontFamily: "Heebo, Arial, sans-serif",
         minHeight: "100vh",
-        width:"100%"
+        width: "100%",
       }}
     >
       <ExpensesHeader />
@@ -293,7 +295,7 @@ const ExpensesHomePage: FC = () => {
           <Grid
             item
             xs={12}
-            md={view === "left" ? 12 : view === "split" ? 6 : 0}
+            md={view === "left" ? 12 : view === "split" ? 7 : 0}
             sx={{ display: view === "right" ? "none" : "block" }}
           >
             <Frame
@@ -339,7 +341,7 @@ const ExpensesHomePage: FC = () => {
           <Grid
             item
             xs={12}
-            md={view === "right" ? 12 : view === "split" ? 6 : 0}
+            md={view === "right" ? 12 : view === "split" ? 5 : 0}
             sx={{ display: view === "left" ? "none" : "block" }}
           >
             <Frame
