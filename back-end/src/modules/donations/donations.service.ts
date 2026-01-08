@@ -197,9 +197,7 @@ export class DonationsService {
         });
       }
             if (dto.note) {
-        console.log(dto.note);
         existing.note = dto.note;
-        console.log(existing.note);
       }
 
       // 1) מעדכנים את רשומת התרומה עצמה
