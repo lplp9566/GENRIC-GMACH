@@ -147,13 +147,18 @@ const DonationsTable: FC<DonationsTableProps> = ({
               <TableRow
                 key={donationRow.id}
                 hover
-                onClick={() => onClickEdit(donationRow)}
                 sx={{ cursor: "pointer" }}
               >
                 <TableCell align="right">{donationRow.userName}</TableCell>
                 <TableCell
                   align="right"
-                  sx={{ color: "success.main", fontWeight: 700 }}
+                  sx={{
+                    color:
+                      donationRow.action == "withdraw"
+                        ? "error.main"
+                        : "success.main",
+                    fontWeight: 700,
+                  }}
                 >
                   {donationRow.amount.toLocaleString("he-IL", {
                     style: "currency",

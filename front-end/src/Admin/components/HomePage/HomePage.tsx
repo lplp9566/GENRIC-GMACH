@@ -172,7 +172,7 @@ const HomePage: React.FC = () => {
               gutterBottom
               sx={{ fontSize: { xs: 22, sm: 28, md: 34 } }}
             >
-              מערכת ניהול גמ"ח אהבת חסד של משפחת פסיקוב
+              מערכת ניהול גמ"ח אהבת חסד  משפחת פסיקוב
             </Typography>
           </Box>
 

@@ -22,8 +22,8 @@ import DonationHeader from "../components/Donations/DonationHeader";
 import NewDonation from "../components/Donations/NewDonation";
 import WithdrawFundModal from "../components/Donations/WithdrawFond";
 
- export type ViewMode = "split" | "left" | "right";
- export const MONTHS = [
+export type ViewMode = "split" | "left" | "right";
+export const MONTHS = [
   "ינואר",
   "פברואר",
   "מרץ",
@@ -70,7 +70,9 @@ function getDonationCategory(d: any): {
 }
 function computeRegularTotalFromDonations(donations: any[]): number {
   return (donations ?? []).reduce((sum: number, d: any) => {
-    const reason = String(d?.donation_reason ?? "").trim().toLowerCase();
+    const reason = String(d?.donation_reason ?? "")
+      .trim()
+      .toLowerCase();
     const isRegular = !reason || reason === "equity" || reason === "equality";
     if (!isRegular) return sum;
 
@@ -277,11 +279,10 @@ const DonationsHomePage: FC = () => {
     });
   }, [donationsBase, yearFilter, monthFilter, activeKey]);
 
-// ✅ בטבלה מציגים גם הפקדות וגם משיכות (גם בתצוגת קרן)
-const filteredForTable = useMemo(() => {
-  return baseFiltered;
-}, [baseFiltered]);
-
+  // ✅ בטבלה מציגים גם הפקדות וגם משיכות (גם בתצוגת קרן)
+  const filteredForTable = useMemo(() => {
+    return baseFiltered;
+  }, [baseFiltered]);
 
   // מיון לטבלה
   const sorted = useMemo(() => {
@@ -307,7 +308,7 @@ const filteredForTable = useMemo(() => {
         userName: `${d.user?.first_name ?? ""} ${
           d.user?.last_name ?? ""
         }`.trim(),
-         userId: Number(d?.user?.id ?? d?.userId ?? d?.user_id ?? 0),
+        userId: Number(d?.user?.id ?? d?.userId ?? d?.user_id ?? 0),
         amount: Number(d?.amount) || 0,
         date: formatDate(dt),
         action: d?.action ?? "—",
@@ -345,15 +346,14 @@ const filteredForTable = useMemo(() => {
 
   const actionsCount = useMemo(() => baseFiltered.length, [baseFiltered]);
   // ---------- Right panel ----------
-const right = useMemo(() => {
-  if (selectedUserId) return computeOverviewForUserNet(donationsBase);
+  const right = useMemo(() => {
+    if (selectedUserId) return computeOverviewForUserNet(donationsBase);
 
-  return {
-    regularTotal: computeRegularTotalFromDonations(donations), // ✅ פה התיקון
-    fundCards: toFundCardsFromFunds(funds),
-  };
-}, [selectedUserId, donationsBase, donations, funds]);
-
+    return {
+      regularTotal: computeRegularTotalFromDonations(donations), // ✅ פה התיקון
+      fundCards: toFundCardsFromFunds(funds),
+    };
+  }, [selectedUserId, donationsBase, donations, funds]);
 
   const fundsPanelKey = useMemo(() => {
     return selectedUserId
@@ -373,12 +373,12 @@ const right = useMemo(() => {
 
   return (
     <Container
+      maxWidth={false}
+      disableGutters
       sx={{
-        py: 4,
+        px: 2,
         direction: "rtl",
         fontFamily: "Heebo, Arial, sans-serif",
-        minHeight: "100vh",
-        width:"100%"
       }}
     >
       {addDonationModal && <NewDonation />}
@@ -390,12 +390,12 @@ const right = useMemo(() => {
           <Alert severity="error">{error || "אירעה שגיאה בטעינת תרומות"}</Alert>
         )}
 
-        <Grid container spacing={1} sx={{width:"100%"}}>
+        <Grid container spacing={1} sx={{ width: "100%" }}>
           {/* שמאל – טבלת תרומות */}
           <Grid
             item
             xs={12}
-            md={view === "left" ? 12 : view === "split" ? 6 : 0}
+            md={view === "left" ? 12 : view === "split" ? 9 : 0}
             sx={{ display: view === "right" ? "none" : "block" }}
           >
             <Frame
@@ -435,7 +435,7 @@ const right = useMemo(() => {
           <Grid
             item
             xs={12}
-            md={view === "right" ? 12 : view === "split" ? 6 : 0}
+            md={view === "right" ? 12 : view === "split" ? 3 : 0}
             sx={{ display: view === "left" ? "none" : "block" }}
           >
             <Frame

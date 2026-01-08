@@ -7,7 +7,7 @@ import {
   Button,
   Stack,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { DonationRow } from "./DonationsTable";
 import { useDispatch } from "react-redux";
@@ -27,12 +27,20 @@ const EditDonationModal = ({
   onClose,
 }: EditDonationModalProps) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { id, amount, date } = donation;
+  const { id, amount, date, note } = donation;
 console.log(donation);
 
   // state עבור העריכה
   const [newAmount, setNewAmount] = useState<number>(amount);
-const [newDate, setNewDate] = useState<string>(date);
+  const [newDate, setNewDate] = useState<string>(date);
+  const [newNote, setNewNote] = useState<string>(note ?? "");
+
+  useEffect(() => {
+    if (!open) return;
+    setNewAmount(amount);
+    setNewDate(date);
+    setNewNote(note ?? "");
+  }, [open, amount, date, note]);
 
 
   
@@ -45,6 +53,7 @@ const [newDate, setNewDate] = useState<string>(date);
             id: Number(id),
             amount: newAmount,
             date: newDate,
+            note: newNote.trim() ? newNote.trim() : undefined,
           })
         ).unwrap(),
         {
@@ -82,6 +91,15 @@ const [newDate, setNewDate] = useState<string>(date);
             value={newDate}
             onChange={(e) => setNewDate(e.target.value)}
             InputLabelProps={{ shrink: true }}
+          />
+
+          <TextField
+            label="הערות"
+            fullWidth
+            multiline
+            minRows={2}
+            value={newNote}
+            onChange={(e) => setNewNote(e.target.value)}
           />
 
           {/* סוג תרומה (קריאה בלבד) */}

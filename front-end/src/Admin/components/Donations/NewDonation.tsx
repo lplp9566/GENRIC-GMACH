@@ -281,7 +281,7 @@ const AddDonationModal: React.FC = () => {
               }}
             />
             <TextField
-              label="?ערות"
+              label="הערות"
               size="medium"
               color="success"
               fullWidth

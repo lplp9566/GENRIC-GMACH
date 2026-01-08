@@ -10,6 +10,7 @@ import { CreateDonationDto } from '../funds/fundsDto';
 import { FundsService } from '../funds/funds.service';
 import { FundYearStatsEntity } from '../funds/Entity/fund-year-stats.entity';
 import { FundEntity } from '../funds/Entity/funds.entity';
+import { log } from 'console';
 
 @Injectable()
 export class DonationsService {
@@ -160,138 +161,177 @@ export class DonationsService {
     await manager.save(row);
   }
 
-async updateDonation(id: number, dto: UpdateDonationDto) {
-  const newAmount = Number(dto.amount);
-  const newDate = new Date(dto.date);
+  async updateDonation(id: number, dto: UpdateDonationDto) {
+    const newAmount = Number(dto.amount);
+    const newDate = new Date(dto.date);
+    console.log(dto);
 
-  if (!Number.isFinite(newAmount) || newAmount <= 0) {
-    throw new BadRequestException('Amount must be greater than zero');
-  }
-  if (isNaN(newDate.getTime())) {
-    throw new BadRequestException('Invalid date');
-  }
+    if (!Number.isFinite(newAmount) || newAmount <= 0) {
+      throw new BadRequestException('Amount must be greater than zero');
+    }
+    if (isNaN(newDate.getTime())) {
+      throw new BadRequestException('Invalid date');
+    }
 
-  return this.donationsRepository.manager.transaction(async (manager) => {
-    // חשוב: טוענים גם fund כדי שנדע לעדכן balances
-    const existing = await manager.findOne(DonationsEntity, {
-      where: { id },
-      relations: { user: true, fund: true },
-    });
+    return this.donationsRepository.manager.transaction(async (manager) => {
+      // חשוב: טוענים גם fund כדי שנדע לעדכן balances
+      const existing = await manager.findOne(DonationsEntity, {
+        where: { id },
+        relations: { user: true, fund: true },
+      });
 
-    if (!existing) throw new BadRequestException('Donation not found');
+      if (!existing) throw new BadRequestException('Donation not found');
 
-    const oldAmount = Number(existing.amount);
-    const oldDate = new Date(existing.date);
-    const oldYear = getYearFromDate(oldDate);
-    const newYear = getYearFromDate(newDate);
+      const oldAmount = Number(existing.amount);
+      const oldDate = new Date(existing.date);
+      const oldYear = getYearFromDate(oldDate);
+      const newYear = getYearFromDate(newDate);
 
-    const deltaAmount = newAmount - oldAmount;
+      const deltaAmount = newAmount - oldAmount;
 
-    // אם לא השתנה כלום – מחזירים
-    if (deltaAmount === 0 && oldYear === newYear) {
+      // אם לא השתנה כלום – מחזירים
+      if (deltaAmount === 0 && oldYear === newYear && oldDate.getTime() === newDate.getTime() && existing.note === dto.note) {
+        return manager.findOne(DonationsEntity, {
+          where: { id: existing.id },
+          relations: { user: true, fund: true },
+        });
+      }
+            if (dto.note) {
+        console.log(dto.note);
+        existing.note = dto.note;
+        console.log(existing.note);
+      }
+
+      // 1) מעדכנים את רשומת התרומה עצמה
+      existing.amount = newAmount;
+      existing.date = newDate;
+
+      await manager.save(existing);
+
+      const user = existing.user ?? null;
+      const isEquity =
+        String(existing.donation_reason ?? '')
+          .trim()
+          .toLowerCase() === 'equity';
+
+      const isFund = !isEquity; // אצלך: כל מה שלא Equity נחשב “קרן מיוחדת”
+      const fundName = isFund
+        ? String(existing.donation_reason ?? '').trim()
+        : null;
+
+      // Helpers: upsert + עדכון טבלת fund_year_stats (עם סכום יכול להיות גם שלילי)
+      const bumpFundYear = async (
+        fundId: number,
+        year: number,
+        kind: 'deposit' | 'withdraw',
+        delta: number,
+      ) => {
+        let row = await manager.findOne(FundYearStatsEntity, {
+          where: { fundId, year },
+        });
+
+        if (!row) {
+          row = manager.create(FundYearStatsEntity, {
+            fundId,
+            year,
+            donatedTotal: '0',
+            withdrawnTotal: '0',
+          });
+        }
+
+        if (kind === 'deposit') {
+          row.donatedTotal = String(Number(row.donatedTotal) + delta);
+        } else {
+          row.withdrawnTotal = String(Number(row.withdrawnTotal) + delta);
+        }
+
+        await manager.save(row);
+      };
+
+      // 2) עדכוני Funds (balance + yearly) — רק אם זו קרן מיוחדת ויש fundId
+      // (אם עדיין אין fundId לנתונים ישנים, אפשר ליצור פה fund ולשייך—אבל לא נכנסתי לזה כרגע)
+      if (isFund && existing.fundId) {
+        const fundId = existing.fundId;
+
+        // action donation => "deposit" לקרן
+        // action withdraw => "withdraw" מקרן
+        const kind: 'deposit' | 'withdraw' =
+          existing.action === DonationActionType.withdraw
+            ? 'withdraw'
+            : 'deposit';
+        if (oldYear !== newYear) {
+          if (kind === 'deposit') {
+            await manager.increment(
+              FundEntity,
+              { id: fundId },
+              'balance',
+              -oldAmount,
+            );
+            await manager.increment(
+              FundEntity,
+              { id: fundId },
+              'balance',
+              +newAmount,
+            );
+
+            await bumpFundYear(fundId, oldYear, 'deposit', -oldAmount);
+            await bumpFundYear(fundId, newYear, 'deposit', +newAmount);
+          } else {
+            await manager.increment(
+              FundEntity,
+              { id: fundId },
+              'balance',
+              +oldAmount,
+            );
+            await manager.increment(
+              FundEntity,
+              { id: fundId },
+              'balance',
+              -newAmount,
+            );
+
+            await bumpFundYear(fundId, oldYear, 'withdraw', -oldAmount);
+            await bumpFundYear(fundId, newYear, 'withdraw', +newAmount);
+          }
+        } else {
+          // אותה שנה: מספיק delta אחד
+          if (kind === 'deposit') {
+            await manager.increment(
+              FundEntity,
+              { id: fundId },
+              'balance',
+              deltaAmount,
+            );
+            await bumpFundYear(fundId, oldYear, 'deposit', deltaAmount);
+          } else {
+            // withdraw: הגדלת סכום withdraw מורידה עוד כסף => balance -= delta
+            await manager.increment(
+              FundEntity,
+              { id: fundId },
+              'balance',
+              -deltaAmount,
+            );
+            await bumpFundYear(fundId, oldYear, 'withdraw', deltaAmount);
+          }
+        }
+      }
+
+      if (existing.action === DonationActionType.donation && isEquity) {
+        if (!user) throw new BadRequestException('User not found');
+      }
+
+      // Fund deposit (תרומה לקרן מיוחדת)
+      if (existing.action === DonationActionType.donation && isFund) {
+        if (!user) throw new BadRequestException('User not found');
+        if (!fundName) throw new BadRequestException('Fund name is required');
+      }
+      if (existing.action === DonationActionType.withdraw && isFund) {
+        if (!fundName) throw new BadRequestException('Fund name is required');
+      }
       return manager.findOne(DonationsEntity, {
         where: { id: existing.id },
         relations: { user: true, fund: true },
       });
-    }
-
-    // 1) מעדכנים את רשומת התרומה עצמה
-    existing.amount = newAmount;
-    existing.date = newDate;
-    await manager.save(existing);
-
-    const user = existing.user ?? null;
-    const isEquity = String(existing.donation_reason ?? '')
-      .trim()
-      .toLowerCase() === 'equity';
-
-    const isFund = !isEquity; // אצלך: כל מה שלא Equity נחשב “קרן מיוחדת”
-    const fundName = isFund ? String(existing.donation_reason ?? '').trim() : null;
-
-    // Helpers: upsert + עדכון טבלת fund_year_stats (עם סכום יכול להיות גם שלילי)
-    const bumpFundYear = async (
-      fundId: number,
-      year: number,
-      kind: 'deposit' | 'withdraw',
-      delta: number,
-    ) => {
-      let row = await manager.findOne(FundYearStatsEntity, {
-        where: { fundId, year },
-      });
-
-      if (!row) {
-        row = manager.create(FundYearStatsEntity, {
-          fundId,
-          year,
-          donatedTotal: '0',
-          withdrawnTotal: '0',
-        });
-      }
-
-      if (kind === 'deposit') {
-        row.donatedTotal = String(Number(row.donatedTotal) + delta);
-      } else {
-        row.withdrawnTotal = String(Number(row.withdrawnTotal) + delta);
-      }
-
-      await manager.save(row);
-    };
-
-    // 2) עדכוני Funds (balance + yearly) — רק אם זו קרן מיוחדת ויש fundId
-    // (אם עדיין אין fundId לנתונים ישנים, אפשר ליצור פה fund ולשייך—אבל לא נכנסתי לזה כרגע)
-    if (isFund && existing.fundId) {
-      const fundId = existing.fundId;
-
-      // action donation => "deposit" לקרן
-      // action withdraw => "withdraw" מקרן
-      const kind: 'deposit' | 'withdraw' =
-        existing.action === DonationActionType.withdraw ? 'withdraw' : 'deposit';
-      if (oldYear !== newYear) {
-        if (kind === 'deposit') {
-          await manager.increment(FundEntity, { id: fundId }, 'balance', -oldAmount);
-          await manager.increment(FundEntity, { id: fundId }, 'balance', +newAmount);
-
-          await bumpFundYear(fundId, oldYear, 'deposit', -oldAmount);
-          await bumpFundYear(fundId, newYear, 'deposit', +newAmount);
-        } else {
-          await manager.increment(FundEntity, { id: fundId }, 'balance', +oldAmount);
-          await manager.increment(FundEntity, { id: fundId }, 'balance', -newAmount);
-
-          await bumpFundYear(fundId, oldYear, 'withdraw', -oldAmount);
-          await bumpFundYear(fundId, newYear, 'withdraw', +newAmount);
-        }
-      } else {
-        // אותה שנה: מספיק delta אחד
-        if (kind === 'deposit') {
-          await manager.increment(FundEntity, { id: fundId }, 'balance', deltaAmount);
-          await bumpFundYear(fundId, oldYear, 'deposit', deltaAmount);
-        } else {
-          // withdraw: הגדלת סכום withdraw מורידה עוד כסף => balance -= delta
-          await manager.increment(FundEntity, { id: fundId }, 'balance', -deltaAmount);
-          await bumpFundYear(fundId, oldYear, 'withdraw', deltaAmount);
-        }
-      }
-    }
-
- 
-    if (existing.action === DonationActionType.donation && isEquity) {
-      if (!user) throw new BadRequestException('User not found');
-    }
-
-    // Fund deposit (תרומה לקרן מיוחדת)
-    if (existing.action === DonationActionType.donation && isFund) {
-      if (!user) throw new BadRequestException('User not found');
-      if (!fundName) throw new BadRequestException('Fund name is required')
-
-    }
-    if (existing.action === DonationActionType.withdraw && isFund) {
-      if (!fundName) throw new BadRequestException('Fund name is required');
-    }
-    return manager.findOne(DonationsEntity, {
-      where: { id: existing.id },
-      relations: { user: true, fund: true },
     });
-  });
-}
-
+  }
 }

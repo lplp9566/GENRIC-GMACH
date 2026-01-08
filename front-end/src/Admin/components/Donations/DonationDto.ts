@@ -26,6 +26,7 @@ export interface IUpdateDonation {
     id:number
     date:string
     amount:number
+    note?: string
 }
 export interface IFundDonation {
        id: number,
