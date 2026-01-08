@@ -9,15 +9,12 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
     {
       title: "חוב בדמי חבר",
       value: monthlyDebt,
-      // אדום חמוד, לא אגרסיבי
       debtBg: "linear-gradient(135deg, #ff3b5c, #ff7a59)",
-      // ירוק חמוד
       okBg: "linear-gradient(135deg, #1dbf73, #6ee7b7)",
     },
     {
       title: "חוב בהלוואות",
       value: loansDebt,
-      // אדום-סגלגל עדין
       debtBg: "linear-gradient(135deg, #ff2d55, #b5179e)",
       okBg: "linear-gradient(135deg, #1dbf73, #6ee7b7)",
     },
@@ -62,11 +59,10 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
               >
               </Box>
 
-              {/* תוכן ממורכז באמצע */}
               <Box
                 sx={{
                   position: "relative",
-                  minHeight: { xs: 96, sm: 120 }, // גובה נחמד לכרטיס
+                  minHeight: { xs: 96, sm: 120 }, 
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -79,7 +75,7 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
                 </Typography>
 
                 <Typography
-                  variant="h4"           // קטן יותר מ-h2/h3
+                  variant="h4"          
                   fontWeight={1000}
                   sx={{ lineHeight: 1, fontSize: { xs: 22, sm: 28 } }}
                 >
