@@ -1,5 +1,7 @@
 import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
 import { FC, useMemo } from "react";
+import { RootState } from "../../../store/store";
+import { useSelector } from "react-redux";
 
 interface KpiRowProps {
   view: "split" | "left" | "right";
@@ -20,7 +22,8 @@ const KpiRow: FC<KpiRowProps> = ({
 }) => {
   const money = (n: number) =>
     n.toLocaleString("he-IL", { style: "currency", currency: "ILS" });
-
+const authUser = useSelector((s: RootState) => s.authslice.user);
+  const isAdmin = Boolean(authUser?.is_admin);
   const amountSx = useMemo(
     () => ({
       fontWeight: view === "split" ? 650 : 800,
@@ -78,7 +81,7 @@ const KpiRow: FC<KpiRowProps> = ({
       </Grid>
 
       {/* סה״כ משיכות */}
-      {showWithdrawBox && (
+      {showWithdrawBox && isAdmin && (
         <Grid item xs={12} sm={4} md={4}>
           <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
             <CardContent sx={{ textAlign: "center" }}>

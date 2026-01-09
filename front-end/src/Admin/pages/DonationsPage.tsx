@@ -208,15 +208,15 @@ const DonationsHomePage: FC = () => {
     selectedUser?.id != null ? String(selectedUser.id) : null;
   const authUserId =
     authUser?.user?.id != null ? String(authUser.user.id) : null;
+  const effectiveUserId = !isAdmin ? authUserId : selectedUserId;
 
   // תרומות של המשתמש שנבחר (אם בחרו)
   const donationsBase = useMemo(() => {
-    if (!isAdmin && authUserId) {
-      return donations.filter((d: any) => getDonorId(d) === authUserId);
+    if (effectiveUserId) {
+      return donations.filter((d: any) => getDonorId(d) === effectiveUserId);
     }
-    if (!selectedUserId) return donations;
-    return donations.filter((d: any) => getDonorId(d) === selectedUserId);
-  }, [donations, selectedUserId, isAdmin, authUserId]);
+    return donations;
+  }, [donations, effectiveUserId]);
 
   // מצבי UI
   const [monthFilter, setMonthFilter] = useState<number | "all">("all");
@@ -354,21 +354,21 @@ const DonationsHomePage: FC = () => {
   const actionsCount = useMemo(() => baseFiltered.length, [baseFiltered]);
   // ---------- Right panel ----------
   const right = useMemo(() => {
-    if (selectedUserId) return computeOverviewForUserNet(donationsBase);
+  if (effectiveUserId) return computeOverviewForUserNet(donationsBase);
 
     return {
       regularTotal: computeRegularTotalFromDonations(donations), // ✅ פה התיקון
       fundCards: toFundCardsFromFunds(funds),
     };
-  }, [selectedUserId, donationsBase, donations, funds]);
+}, [effectiveUserId, donationsBase, donations, funds]);
 
   const fundsPanelKey = useMemo(() => {
-    return selectedUserId
-      ? `user-${selectedUserId}-${donationsSig}`
+    return effectiveUserId
+      ? `user-${effectiveUserId}-${donationsSig}`
       : `funds-${JSON.stringify(
           (funds ?? []).map((f: any) => ({ id: f?.id, b: f?.balance }))
         )}`;
-  }, [selectedUserId, donationsSig, funds]);
+  }, [effectiveUserId, donationsSig, funds]);
 
   function handleSortClick(key: SortBy) {
     if (sortBy === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -446,7 +446,7 @@ const DonationsHomePage: FC = () => {
             sx={{ display: view === "left" ? "none" : "block" }}
           >
             <Frame
-              title={selectedUserId ? "קרנות (למשתמש הנבחר)" : "קרנות מיוחדות"}
+              title={effectiveUserId ? "קרנות (למשתמש הנבחר)" : "קרנות מיוחדות"}
               expanded={view === "right"}
               onToggle={() => setView(view === "right" ? "split" : "right")}
             >
