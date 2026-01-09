@@ -12,8 +12,8 @@ import {
 } from "@mui/material";
 import { FC, useState } from "react";
 import EditDonationModal from "./EditDonationModal";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../store/store";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -72,6 +72,8 @@ const DonationsTable: FC<DonationsTableProps> = ({
   const [selectedDonation, setSelectedDonation] = useState<DonationRow | null>(
     null
   );
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const isAdmin = Boolean(authUser?.is_admin);
 
   const onClickEdit = (donation: DonationRow) => {
     setSelectedDonation({
@@ -132,7 +134,7 @@ const DonationsTable: FC<DonationsTableProps> = ({
             <TableCell align="right">פעולה</TableCell>
             <TableCell align="right">קרן/תרומה רגילה</TableCell>
             <TableCell align="right">הערות</TableCell>
-            <TableCell align="right">פעולות</TableCell>
+          {isAdmin && <TableCell align="right">פעולות</TableCell> }  
           </TableRow>
         </TableHead>
         <TableBody>
@@ -175,6 +177,8 @@ const DonationsTable: FC<DonationsTableProps> = ({
                     : ` קרן ${donationRow.donation_reason}`}
                 </TableCell>
                 <TableCell align="right">{donationRow.note || "-"}</TableCell>
+                { isAdmin && (
+
                 <TableCell align="right">
                   <Tooltip title="שכפול תרומה">
                     <IconButton
@@ -204,6 +208,7 @@ const DonationsTable: FC<DonationsTableProps> = ({
                     </span>
                   </Tooltip>
                 </TableCell>
+                )}
               </TableRow>
             ))
           )}

@@ -1,6 +1,6 @@
 import { Paper, Stack, Box, Typography, Button } from "@mui/material";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../store/store";
 import {
   setAddDonationDraft,
   setAddDonationModal,
@@ -12,6 +12,8 @@ import { getAllFunds } from "../../../store/features/admin/adminDonationsSlice";
 
 const DonationHeader = () => {
   const dispatch = useDispatch<AppDispatch>();
+const authUser = useSelector((s: RootState) => s.authslice.user);
+  const isAdmin = Boolean(authUser?.is_admin);
 const [addFundModal, setaddFundModal] = useState(false)
   useEffect(() => {
     
@@ -50,6 +52,10 @@ const [addFundModal, setaddFundModal] = useState(false)
             alt="loan"
           />
         </Box>
+        {
+          isAdmin && (
+            
+        
         <Box
           sx={{
             display: "flex",
@@ -90,6 +96,8 @@ const [addFundModal, setaddFundModal] = useState(false)
           </Button>
           <Button onClick={()=> setaddFundModal(true)}>הוספת קרן </Button>
         </Box>
+          )
+        }
       </Stack>
       {addFundModal && <AddFundModal open={addFundModal} onClose={() => setaddFundModal(false)} />}
     </Paper>
