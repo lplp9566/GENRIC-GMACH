@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import {  validate } from "../store/features/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
-import NotAdmin from "../User/components/Build";
 import DonationsPage from "../Admin/pages/DonationsPage";
 
 const Loader = () => (
