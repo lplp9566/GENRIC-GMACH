@@ -5,72 +5,26 @@ import { AppDispatch, RootState } from "../../store/store";
 
 import Frame from "../components/Donations/Frame";
 import FiltersBar from "../components/Donations/FiltersBar";
-
-// ⚠️ חשוב: כאן השתמש ב־SortBy/SortDir של ExpensesTable ולא של Donations
 import ExpensesTable, {
   ExpenseRow,
   SortBy,
   SortDir,
 } from "../components/Expenses/ExpensesTable";
-
 import KpiRowExpenses from "../components/Expenses/KpiRowExpenses";
 import CategoriesPanel, {
   CategoryCardData,
 } from "../components/Expenses/CategoriesPanel";
-
 import {
   getAllExpenses,
   getAllExpensesCategory,
 } from "../../store/features/admin/adminExpensesSlice";
-
 import ExpensesHeader from "../components/Expenses/ExpensesHeader";
-
-// ✅ מודאל + Draft
 import AddExpenseModal, {
   AddExpenseDraft,
 } from "../components/Expenses/AddExpenseModal";
+import { MONTHS, ViewMode } from "../Types";
+import { ddmmyyyyToInputDate, formatDate, normalizeKey, parseDate } from "../Hooks/genricFunction";
 
-export type ViewMode = "split" | "left" | "right";
-
-export const MONTHS = [
-  "ינואר",
-  "פברואר",
-  "מרץ",
-  "אפריל",
-  "מאי",
-  "יוני",
-  "יולי",
-  "אוגוסט",
-  "ספטמבר",
-  "אוקטובר",
-  "נובמבר",
-  "דצמבר",
-];
-
-// -------- Helpers --------
-function normalizeKey(s: any) {
-  return String(s ?? "").trim().toLowerCase();
-}
-function parseDate(raw: any): Date | null {
-  if (!raw) return null;
-  const d = raw instanceof Date ? raw : new Date(String(raw));
-  return isNaN(d.getTime()) ? null : d;
-}
-function formatDate(d: Date | null) {
-  if (!d) return "—";
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${day}/${m}/${y}`;
-}
-
-function ddmmyyyyToInputDate(s: string) {
-  if (!s) return "";
-  const match = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (!match) return "";
-  const [, dd, mm, yyyy] = match;
-  return `${yyyy}-${mm}-${dd}`;
-}
 
 function getExpenseCategory(exp: any): { key: string; label: string } {
   const name = exp?.category?.name ?? "ללא קטגוריה";
@@ -104,11 +58,10 @@ function toCategoryCards(categories: any[], expenses: any[]): CategoryCardData[]
   }));
 }
 
-// -------- Component --------
+
 const ExpensesHomePage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // ✅ לוקאל סטייט לפתיחת מודאל + דראפט לשכפול
   const [openAddExpense, setOpenAddExpense] = useState(false);
   const [addExpenseDraft, setAddExpenseDraft] = useState<AddExpenseDraft | null>(
     null

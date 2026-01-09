@@ -1,14 +1,11 @@
-// src/pages/DonationsHomePage.tsx
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { Box, Container, Grid, Alert } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
-
 import {
   getAllDonations,
   getAllFunds,
 } from "../../store/features/admin/adminDonationsSlice";
-
 import DonationsTable, {
   DonationRow,
   SortBy,
@@ -21,41 +18,9 @@ import KpiRow from "../components/Donations/KpiRow";
 import DonationHeader from "../components/Donations/DonationHeader";
 import NewDonation from "../components/Donations/NewDonation";
 import WithdrawFundModal from "../components/Donations/WithdrawFond";
+import { MONTHS, ViewMode } from "../Types";
+import { formatDate, normalizeKey, parseDate } from "../Hooks/genricFunction";
 
-export type ViewMode = "split" | "left" | "right";
-export const MONTHS = [
-  "ינואר",
-  "פברואר",
-  "מרץ",
-  "אפריל",
-  "מאי",
-  "יוני",
-  "יולי",
-  "אוגוסט",
-  "ספטמבר",
-  "אוקטובר",
-  "נובמבר",
-  "דצמבר",
-];
-
-// -------- Helpers --------
-function normalizeKey(s: any) {
-  return String(s ?? "")
-    .trim()
-    .toLowerCase();
-}
-function parseDate(raw: any): Date | null {
-  if (!raw) return null;
-  const d = raw instanceof Date ? raw : new Date(String(raw));
-  return isNaN(d.getTime()) ? null : d;
-}
-function formatDate(d: Date | null) {
-  if (!d) return "—";
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${day}/${m}/${y}`;
-}
 function getDonationCategory(d: any): {
   kind: "regular" | "fund";
   key: string;
@@ -95,7 +60,6 @@ function getDonorId(d: any): string | null {
   return key || null;
 }
 
-// קרנות מה־DB (funds table)
 function toFundCardsFromFunds(funds: any): FundCardData[] {
   if (!Array.isArray(funds)) return [];
   return funds

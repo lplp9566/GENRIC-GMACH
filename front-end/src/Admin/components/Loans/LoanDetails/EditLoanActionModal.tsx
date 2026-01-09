@@ -31,8 +31,7 @@ export type EditLoanActionModalProps = {
   onClose: () => void;
   loanId: number;
 
-  // מחזיר payload לעריכה (אתה תחבר לשרת)
-  // אופציונלי - להציג מצב טעינה חיצוני
+
 };
 
 export const EditLoanActionModal: React.FC<EditLoanActionModalProps> = ({

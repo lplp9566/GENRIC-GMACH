@@ -21,6 +21,7 @@ import {
   setAddDonationDraft,
   setAddDonationModal,
 } from "../../../store/features/Main/AppMode";
+import { ddmmyyyyToInputDate } from "../../Hooks/genricFunction";
 export type DonationRow = {
   id: string | number;
   userName: string;
@@ -40,15 +41,7 @@ interface DonationsTableProps {
   sortDir: SortDir;
   onSortClick: (key: SortBy) => void;
 }
-export const ddmmyyyyToInputDate = (s: string) => {
-  if (!s) return "";
 
-  const match = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (!match) return "";
-
-  const [, dd, mm, yyyy] = match;
-  return `${yyyy}-${mm}-${dd}`; // YYYY-MM-DD
-};
 const DonationsTable: FC<DonationsTableProps> = ({
   isLoading,
   rows,
