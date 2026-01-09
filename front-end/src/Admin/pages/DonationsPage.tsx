@@ -151,6 +151,7 @@ const DonationsHomePage: FC = () => {
   const withdrawDonationModal = useSelector(
     (s: RootState) => s.mapModeSlice.withdrawDonationModal
   );
+  // const isAdmin = useSelector((s: RootState) => s.authslice.user?.is_admin);
 
   const {
     allDonations,
@@ -162,7 +163,8 @@ const DonationsHomePage: FC = () => {
   );
 
   const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
-
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const isAdmin = Boolean(authUser?.is_admin);
   // טעינה ראשונית
   useEffect(() => {
     if (donationsStatus === "idle") {
@@ -204,12 +206,17 @@ const DonationsHomePage: FC = () => {
 
   const selectedUserId =
     selectedUser?.id != null ? String(selectedUser.id) : null;
+  const authUserId =
+    authUser?.user?.id != null ? String(authUser.user.id) : null;
 
   // תרומות של המשתמש שנבחר (אם בחרו)
   const donationsBase = useMemo(() => {
+    if (!isAdmin && authUserId) {
+      return donations.filter((d: any) => getDonorId(d) === authUserId);
+    }
     if (!selectedUserId) return donations;
     return donations.filter((d: any) => getDonorId(d) === selectedUserId);
-  }, [donations, selectedUserId]);
+  }, [donations, selectedUserId, isAdmin, authUserId]);
 
   // מצבי UI
   const [monthFilter, setMonthFilter] = useState<number | "all">("all");

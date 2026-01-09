@@ -13,4 +13,3 @@ export default function PrivateLayout() {
   );
 }
 
-// src/layouts/PublicLayout.tsx

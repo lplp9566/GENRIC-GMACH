@@ -6,6 +6,7 @@ import {  validate } from "../store/features/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import NotAdmin from "../User/components/Build";
+import DonationsPage from "../Admin/pages/DonationsPage";
 
 const Loader = () => (
   <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center">
@@ -29,8 +30,9 @@ export default function ProtectedRoute() {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
    if (!user.is_admin) {
-    return <NotAdmin user={user.user}/>;
+    return <DonationsPage />;
   }
+
 
   return <Outlet />;
 }
