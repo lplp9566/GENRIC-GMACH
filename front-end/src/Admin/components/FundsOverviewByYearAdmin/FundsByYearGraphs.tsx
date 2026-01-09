@@ -54,7 +54,7 @@ const FundsByYearGraphs = () => {
     if (yearlyData.length > 0) {
       setSelectedYears(yearlyData.map((y) => y.year));
     }
-  }, [fundsOverviewByYear]);
+  }, [yearlyData]);
 
   // Pie Data
   const filteredData = yearlyData.filter((y) => selectedYears.includes(y.year));
@@ -97,7 +97,7 @@ const FundsByYearGraphs = () => {
     setSelectedFields(arr);
   };
 
-  if (!fundsOverviewByYear || yearlyData.length === 0) {
+  if (yearlyData.length === 0) {
     return <LoadingIndicator />;
   }
 
