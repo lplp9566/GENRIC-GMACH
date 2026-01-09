@@ -446,7 +446,7 @@ const DonationsHomePage: FC = () => {
             sx={{ display: view === "left" ? "none" : "block" }}
           >
             <Frame
-              title={effectiveUserId ? "קרנות (למשתמש הנבחר)" : "קרנות מיוחדות"}
+              title={ "קרנות מיוחדות"}
               expanded={view === "right"}
               onToggle={() => setView(view === "right" ? "split" : "right")}
             >
