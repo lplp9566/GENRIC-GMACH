@@ -24,6 +24,12 @@ export class DonationsService {
   async getDonations() {
     return await this.donationsRepository.find({ relations: ['user'] });
   }
+  async getDonationByUserId(userId: number) {
+    return await this.donationsRepository.find({
+      where: { user: { id: userId } },
+      // relations: ['fund'],
+    });
+  }
 
   async createEquityDonation(donation: DonationsEntity) {
     const year = getYearFromDate(donation.date);

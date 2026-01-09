@@ -13,7 +13,6 @@ import {
 import { FC, useState } from "react";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditExpenseModal from "./EditExpenseModal";
-import { ddmmyyyyToInputDate } from "../Donations/DonationsTable";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import ConfirmModal from "../genricComponents/confirmModal";
@@ -21,6 +20,7 @@ import { toast } from "react-toastify";
 import { AppDispatch } from "../../../store/store";
 import { useDispatch } from "react-redux";
 import { deleteExpenseById } from "../../../store/features/admin/adminExpensesSlice";
+import { ddmmyyyyToInputDate } from "../../Hooks/genricFunction";
 
 export type ExpenseRow = {
   id: string | number;

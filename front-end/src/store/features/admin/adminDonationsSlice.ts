@@ -41,6 +41,15 @@ export const getAllDonations = createAsyncThunk<IDonation[]
   );
   return data;
 });
+export const getDonationByUserId = createAsyncThunk<IDonation[], number>(
+  "admin/getDonationByUserId",
+  async (id) => {
+    const { data } = await axios.get<IDonation[]>(
+      `${BASE_URL}/donations/user/${id}`,
+    );
+    return data;
+  }
+)
 export const createDonation = createAsyncThunk<IDonation, ICreateDonation>(
   "admin/createDonation",
   async (donation) => {
@@ -99,6 +108,18 @@ export const AdminDonationsSlice = createSlice({
         state.status = "rejected";
         state.error = action.error.message ?? "Failed to fetch donations";
       })
+      .addCase(getDonationByUserId.pending, (state) => {
+        state.status = "pending";
+        state.error = null;
+      })
+      .addCase(getDonationByUserId.fulfilled, (state, action) => {
+        state.status = "fulfilled";
+        state.allDonations = action.payload;
+      })
+      .addCase(getDonationByUserId.rejected, (state, action) => {
+        state.status = "rejected";
+        state.error = action.error.message ?? "Failed to fetch donations";
+      })
       .addCase(createDonation.pending, (state) => {
         state.CreateDonationStatus = "pending";
         state.error = null;
@@ -112,7 +133,7 @@ export const AdminDonationsSlice = createSlice({
         state.error = action.error.message ?? "Failed to create donation";
       })
       .addCase(withdrawDonation.pending, (state) => {
-        state.withdrawStatus = "idle";
+        state.withdrawStatus = "pending";
         state.error = null;
       })
       .addCase(withdrawDonation.fulfilled, (state, action) => {

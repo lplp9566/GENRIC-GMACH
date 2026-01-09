@@ -8,7 +8,7 @@ export class DonationsEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.donations, { nullable: true })
+  @ManyToOne(() => UserEntity, (user) => user.donations, { nullable: true, eager: true })
   user: UserEntity;
 
   @Column({ type: 'date' })
@@ -21,7 +21,7 @@ export class DonationsEntity {
   @Column({ type: 'text' })
   donation_reason: string;
 
-  @ManyToOne(() => FundEntity, { nullable: true })
+  @ManyToOne(() => FundEntity, { nullable: true, eager: true })
   fund?: FundEntity;
 
   @Column({ type: 'int', nullable: true })
