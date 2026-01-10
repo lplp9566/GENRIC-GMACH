@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   Box,
   FormControl,
@@ -14,6 +15,7 @@ interface MonthlyPaymentFilteringProps {
   setSelectedMonth: (month: number) => void;
   years: number[];
   months?: number[];
+  extraFilters?: ReactNode;
 }
 const MonthlyAndYearFiltering = ({
   selectedYear,
@@ -22,6 +24,7 @@ const MonthlyAndYearFiltering = ({
   setSelectedMonth,
   years,
   months,
+  extraFilters,
 }: MonthlyPaymentFilteringProps) => {
   const getHebrewMonthName = (m: number) =>
     hebrewMonthNames[m - 1] || String(m);
@@ -66,6 +69,11 @@ const MonthlyAndYearFiltering = ({
                 </Select>
               </FormControl>
             </Grid>
+            {extraFilters && (
+              <Grid item xs={6} sm="auto">
+                {extraFilters}
+              </Grid>
+            )}
           </Grid>
         </Grid>
       </Grid>

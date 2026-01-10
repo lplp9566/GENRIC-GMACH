@@ -43,6 +43,9 @@ const StandingOrdersReturn = () => {
   const [selectedYear, setSelectedYear] = useState<number>(
     years.includes(currentYear) ? currentYear : years[0] ?? currentYear
   );
+  const [statusFilter, setStatusFilter] = useState<"all" | "paid" | "unpaid">(
+    "all"
+  );
   const paymentsThisYear = useMemo(
     () =>
       orderReturn.filter(
@@ -85,14 +88,23 @@ const StandingOrdersReturn = () => {
           ),
     [paymentsThisYear, selectedMonth]
   );
-  const sumMonthPaid = paymentsThisMonth
+  const filteredPayments = useMemo(() => {
+    if (statusFilter === "paid") {
+      return paymentsThisMonth.filter((p) => p.paid);
+    }
+    if (statusFilter === "unpaid") {
+      return paymentsThisMonth.filter((p) => !p.paid);
+    }
+    return paymentsThisMonth;
+  }, [paymentsThisMonth, statusFilter]);
+  const sumMonthPaid = filteredPayments
     .filter((p) => p.paid)
     .reduce((sum, p) => sum + p.amount, 0);
-  const sumMonthNotPaid = paymentsThisMonth
+  const sumMonthNotPaid = filteredPayments
     .filter((p) => !p.paid)
     .reduce((sum, p) => sum + p.amount, 0);
 
-  const countMonth = paymentsThisMonth.length;
+  const countMonth = filteredPayments.length;
 
   return (
     <Container
@@ -102,7 +114,11 @@ const StandingOrdersReturn = () => {
         // bgcolor: "#F9FBFC",
         fontFamily: "Heebo, Arial, sans-serif",
       }}
-    >      <StandingOrdersReturnHeader />
+    >
+      <StandingOrdersReturnHeader
+        statusFilter={statusFilter}
+        onStatusChange={setStatusFilter}
+      />
       <Box
         sx={{
           // backgroundColor: "#FFFFFF",
@@ -148,7 +164,7 @@ const StandingOrdersReturn = () => {
             years={years}
             months={months}
           />
-          <StandingOrderReturnTable payments={paymentsThisMonth} />
+          <StandingOrderReturnTable payments={filteredPayments} />
         </Box>
       </Box>
     </Container>

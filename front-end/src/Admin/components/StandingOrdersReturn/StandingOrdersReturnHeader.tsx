@@ -1,7 +1,19 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, Stack, Typography, useMediaQuery, useTheme } from '@mui/material'
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useState } from "react";
-import { AddStandingOrderRefundModal } from './NewOrderReturn';
-import { RtlThemeProvider } from '../../../Theme/rtl';
+import { AddStandingOrderRefundModal } from "./NewOrderReturn";
+import { RtlThemeProvider } from "../../../Theme/rtl";
 
 type StatusFilter = "all" | "paid" | "unpaid";
 
@@ -15,14 +27,15 @@ const StandingOrdersReturnHeader = ({
   onStatusChange,
 }: StandingOrdersReturnHeaderProps) => {
   const [newOrderOpen, setNewOrderOpen] = useState(false);
-    const theme = useTheme();
+  const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <Paper
-    elevation={3}
-    sx={{
-      p: 3,
-      mb: 4,
+      elevation={3}
+      sx={{
+        p: 3,
+        mb: 4,
         borderRadius: 2,
         width: {
           xs: "100%",
@@ -33,9 +46,8 @@ const StandingOrdersReturnHeader = ({
         mx: "auto",
         dir: "rtl",
       }}
-      >
+    >
       <Stack spacing={2}>
-        {/* כותרת ואייקון */}
         <Box
           sx={{
             display: "flex",
@@ -51,12 +63,10 @@ const StandingOrdersReturnHeader = ({
             alt="loan"
           />
           <Typography variant="h5" fontWeight={600} textAlign="center">
-            ניהול החזרים מהוראות קבע
+            ניהול החזר הוראת קבע{" "}
           </Typography>
         </Box>
 
-
-        {/* כפתור + פילטר */}
         <Box
           sx={{
             display: "flex",
@@ -76,9 +86,9 @@ const StandingOrdersReturnHeader = ({
               "&:hover": { bgcolor: "#1f645f" },
             }}
           >
-           הוסף החזר הוראת קבע 
+            הוסף החזר הוראת קבע{" "}
           </Button>
-          {/* <RtlProvider> */}
+
           <RtlThemeProvider>
             <FormControl
               size="small"
@@ -95,34 +105,33 @@ const StandingOrdersReturnHeader = ({
                   "&.Mui-focused": { color: "#2a8c82" },
                 }}
               >
-                מצב 
+                סינון{" "}
               </InputLabel>
               <Select
                 labelId="filter-status-label"
                 value={statusFilter}
-                label="מצב"
+                label="?????"
                 onChange={(e) => onStatusChange(e.target.value as StatusFilter)}
                 sx={{
                   borderRadius: 1,
-              
                 }}
               >
-                <MenuItem value="all">???</MenuItem>
-                <MenuItem value="paid">????</MenuItem>
-                <MenuItem value="unpaid">?? ????</MenuItem>
-                <MenuItem >שולם</MenuItem>
-                <MenuItem >לא שולם</MenuItem>
+                <MenuItem value="all">הכל</MenuItem>
+                <MenuItem value="paid">שולם</MenuItem>
+                <MenuItem value="unpaid">לא שולם</MenuItem>
               </Select>
             </FormControl>
-      </RtlThemeProvider>
-
+          </RtlThemeProvider>
         </Box>
       </Stack>
       {newOrderOpen && (
-        <AddStandingOrderRefundModal open={newOrderOpen} onClose={() => setNewOrderOpen(false)} />
+        <AddStandingOrderRefundModal
+          open={newOrderOpen}
+          onClose={() => setNewOrderOpen(false)}
+        />
       )}
     </Paper>
-  )
-}
+  );
+};
 
-export default StandingOrdersReturnHeader
+export default StandingOrdersReturnHeader;
