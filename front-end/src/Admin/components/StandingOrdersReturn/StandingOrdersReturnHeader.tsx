@@ -1,10 +1,20 @@
 import { Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, Stack, Typography, useMediaQuery, useTheme } from '@mui/material'
-import { useState } from 'react';
+import { useState } from "react";
 import { AddStandingOrderRefundModal } from './NewOrderReturn';
 import { RtlThemeProvider } from '../../../Theme/rtl';
 
-const StandingOrdersReturnHeader = () => {
-  const [newOrderOpen, setNewOrderOpen] =useState(false);
+type StatusFilter = "all" | "paid" | "unpaid";
+
+type StandingOrdersReturnHeaderProps = {
+  statusFilter: StatusFilter;
+  onStatusChange: (value: StatusFilter) => void;
+};
+
+const StandingOrdersReturnHeader = ({
+  statusFilter,
+  onStatusChange,
+}: StandingOrdersReturnHeaderProps) => {
+  const [newOrderOpen, setNewOrderOpen] = useState(false);
     const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   return (
@@ -89,15 +99,17 @@ const StandingOrdersReturnHeader = () => {
               </InputLabel>
               <Select
                 labelId="filter-status-label"
-                value={5}
+                value={statusFilter}
                 label="מצב"
-                onChange={() => {}}
+                onChange={(e) => onStatusChange(e.target.value as StatusFilter)}
                 sx={{
                   borderRadius: 1,
               
                 }}
               >
-                <MenuItem >הכל</MenuItem>
+                <MenuItem value="all">???</MenuItem>
+                <MenuItem value="paid">????</MenuItem>
+                <MenuItem value="unpaid">?? ????</MenuItem>
                 <MenuItem >שולם</MenuItem>
                 <MenuItem >לא שולם</MenuItem>
               </Select>

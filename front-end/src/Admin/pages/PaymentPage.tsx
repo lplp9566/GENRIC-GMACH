@@ -1,9 +1,6 @@
 // PaymentsPage.tsx
 import { useState, useMemo, useEffect } from "react";
-import {
-  Box,
-  Container,
-} from "@mui/material";
+import { Box, Container } from "@mui/material";
 
 import { useDispatch, useSelector } from "react-redux";
 import MonthlyPaymentHeader from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentHeader";
@@ -12,30 +9,45 @@ import MonthlyPaymentTable from "../components/MonthlyPayments/MainMonthlyPaymen
 import MonthlyAndYearFiltering from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentFiltering";
 import { AddPaymentModal } from "../components/MonthlyPayments/AddMonthlyPayment/AddMonthlyPayment";
 import { AppDispatch, RootState } from "../../store/store";
-import { gatAllMonthlyPayments, getMonthlyPaymentsByUserId } from "../../store/features/admin/adminMonthlyPayments";
+import {
+  gatAllMonthlyPayments,
+  getMonthlyPaymentsByUserId,
+} from "../../store/features/admin/adminMonthlyPayments";
 
 export default function PaymentsPage() {
   const dispatch = useDispatch<AppDispatch>();
   const payments = useSelector(
     (s: RootState) => s.AdminMonthlyPaymentsSlice.allPayments
   );
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+
+  const isAdmin = Boolean(authUser?.is_admin);
   const selectedUser = useSelector(
     (state: RootState) => state.AdminUsers.selectedUser
   );
-const paymentModal = useSelector(
+  const paymentModal = useSelector(
     (state: RootState) => state.mapModeSlice.MonthlyPaymentModalMode
   );
 
-
   useEffect(() => {
-    if (selectedUser) {
-      dispatch(getMonthlyPaymentsByUserId(selectedUser.id));
-    }
-    else{
-    dispatch(gatAllMonthlyPayments());
+    // לא אדמין – תמיד רק של עצמו
+    if (!isAdmin) {
+      const myId = authUser?.user?.id;
+      if (myId != null) {
+        dispatch(getMonthlyPaymentsByUserId(myId));
+      }
+      return;
     }
 
-  }, [dispatch, selectedUser, paymentModal]);
+    // אדמין + משתמש נבחר
+    if (selectedUser?.id != null) {
+      dispatch(getMonthlyPaymentsByUserId(selectedUser.id));
+      return;
+    }
+
+    // אדמין בלי משתמש נבחר
+    dispatch(gatAllMonthlyPayments());
+  }, [dispatch, isAdmin, selectedUser?.id, paymentModal]);
 
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -49,13 +61,10 @@ const paymentModal = useSelector(
   const [selectedYear, setSelectedYear] = useState<number>(
     years.includes(currentYear) ? currentYear : years[0] ?? currentYear
   );
-const paymentsThisYear = useMemo(
-  () =>
-    payments.filter(
-      (p) => selectedYear === 0 || p.year === selectedYear
-    ),
-  [payments, selectedYear]
-);
+  const paymentsThisYear = useMemo(
+    () => payments.filter((p) => selectedYear === 0 || p.year === selectedYear),
+    [payments, selectedYear]
+  );
 
   const months = useMemo(
     () =>
@@ -83,48 +92,47 @@ const paymentsThisYear = useMemo(
   );
   const sumMonth = paymentsThisMonth.reduce((sum, p) => sum + p.amount, 0);
   const countMonth = paymentsThisMonth.length;
-  
+
   return (
-    
     <Container
       sx={{
         py: 4,
         direction: "rtl",
-        // bgcolor: "#F9FBFC", 
-        fontFamily: 'Heebo, Arial, sans-serif',
+        // bgcolor: "#F9FBFC",
+        fontFamily: "Heebo, Arial, sans-serif",
       }}
     >
-      {paymentModal && (
-        <AddPaymentModal cape= {false}/>
-      )}
+      {paymentModal && <AddPaymentModal cape={false} />}
       <MonthlyPaymentHeader />
       <Box
         sx={{
           // backgroundColor: "#FFFFFF",
-          minHeight: "100vh", 
-          pt: 4, 
+          minHeight: "100vh",
+          pt: 4,
           direction: "rtl",
-          borderRadius: 3, 
-          boxShadow: "0 8px 25px rgba(0,0,0,0.08)", 
-          mt: 4, 
+          borderRadius: 3,
+          boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
+          mt: 4,
         }}
       >
         <Box
           sx={{
-            // bgcolor: "#FBFDFE", 
-            padding: { xs: 2, md: 3 }, 
-            borderRadius: 2, 
+            // bgcolor: "#FBFDFE",
+            padding: { xs: 2, md: 3 },
+            borderRadius: 2,
             mb: 4,
-
           }}
         >
-          <MonthlyPaymentsSummaryCard countMonth={countMonth} sumMonth={sumMonth} />
+          <MonthlyPaymentsSummaryCard
+            countMonth={countMonth}
+            sumMonth={sumMonth}
+          />
           <Box
             sx={{
               mb: 4,
-              p: { xs: 2, md: 3 }, 
-              // bgcolor: "#FFFFFF", 
-              borderRadius: 2, 
+              p: { xs: 2, md: 3 },
+              // bgcolor: "#FFFFFF",
+              borderRadius: 2,
               boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
             }}
           >

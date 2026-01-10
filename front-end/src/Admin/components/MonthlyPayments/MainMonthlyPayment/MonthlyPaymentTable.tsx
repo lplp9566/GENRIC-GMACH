@@ -30,7 +30,9 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
   paymentsThisMonth,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const authUser = useSelector((s: RootState) => s.authslice.user);
 
+  const isAdmin = Boolean(authUser?.is_admin);
   const [selectedPayment, setSelectedPayment] =
     useState<IMonthlyPayment | null>(null);
   const [editMode, setEditMode] = useState<boolean>(false);
@@ -71,7 +73,7 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
               <TableCell align="right">תאריך</TableCell>
               <TableCell align="right">אמצעי תשלום</TableCell>
               <TableCell align="right">הערות</TableCell>
-              <TableCell align="right">פעולות</TableCell>
+              {isAdmin && <TableCell align="right">פעולות</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -95,53 +97,58 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
                     }
                   </TableCell>
                   <TableCell align="right">{p.description}</TableCell>
-                  <TableCell align="right" onClick={(e) => e.stopPropagation()}>
-                    <Tooltip title="עריכת תשלום">
-                      <IconButton
-                        color="primary"
-                        size="small"
-                        onClick={() => {
-                          setSelectedPayment(p);
-                          setEditMode(true);
-                        }}
-                      >
-                        <EditIcon
-                          sx={{ color: "primary.main" }}
+                  {isAdmin && (
+                    <TableCell
+                      align="right"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Tooltip title="עריכת תשלום">
+                        <IconButton
+                          color="primary"
+                          size="small"
                           onClick={() => {
                             setSelectedPayment(p);
                             setEditMode(true);
                           }}
-                        />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="העתקת פעולה">
-                      <IconButton
-                        color="primary"
-                        size="small"
-                        onClick={() => {
-                          setSelectedPayment(p);
-                          setcopyMode(true);
-                          dispatch(setMonthlyPaymentModalMode(true));
-                        }}
-                      >
-                        <ContentCopyIcon sx={{ fontSize: 20 }} />
-                      </IconButton>
-                    </Tooltip>
+                        >
+                          <EditIcon
+                            sx={{ color: "primary.main" }}
+                            onClick={() => {
+                              setSelectedPayment(p);
+                              setEditMode(true);
+                            }}
+                          />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="העתקת פעולה">
+                        <IconButton
+                          color="primary"
+                          size="small"
+                          onClick={() => {
+                            setSelectedPayment(p);
+                            setcopyMode(true);
+                            dispatch(setMonthlyPaymentModalMode(true));
+                          }}
+                        >
+                          <ContentCopyIcon sx={{ fontSize: 20 }} />
+                        </IconButton>
+                      </Tooltip>
 
-                    {/* מחיקה */}
-                    <Tooltip title="מחיקת תשלום">
-                      <IconButton
-                        color="error"
-                        size="small"
-                        onClick={() => {
-                          setSelectedPayment(p);
-                          setDeleteMode(true);
-                        }}
-                      >
-                        <DeleteOutlineIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
+                      {/* מחיקה */}
+                      <Tooltip title="מחיקת תשלום">
+                        <IconButton
+                          color="error"
+                          size="small"
+                          onClick={() => {
+                            setSelectedPayment(p);
+                            setDeleteMode(true);
+                          }}
+                        >
+                          <DeleteOutlineIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             ) : (
