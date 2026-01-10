@@ -1,11 +1,7 @@
 import {
   Box,
   Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
   Stack,
   Typography,
   useMediaQuery,
@@ -13,19 +9,8 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { AddStandingOrderRefundModal } from "./NewOrderReturn";
-import { RtlThemeProvider } from "../../../Theme/rtl";
 
-type StatusFilter = "all" | "paid" | "unpaid";
-
-type StandingOrdersReturnHeaderProps = {
-  statusFilter: StatusFilter;
-  onStatusChange: (value: StatusFilter) => void;
-};
-
-const StandingOrdersReturnHeader = ({
-  statusFilter,
-  onStatusChange,
-}: StandingOrdersReturnHeaderProps) => {
+const StandingOrdersReturnHeader = () => {
   const [newOrderOpen, setNewOrderOpen] = useState(false);
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
@@ -63,7 +48,7 @@ const StandingOrdersReturnHeader = ({
             alt="loan"
           />
           <Typography variant="h5" fontWeight={600} textAlign="center">
-            ניהול החזר הוראת קבע{" "}
+            ניהול החזרות הו"ק
           </Typography>
         </Box>
 
@@ -86,42 +71,8 @@ const StandingOrdersReturnHeader = ({
               "&:hover": { bgcolor: "#1f645f" },
             }}
           >
-            הוסף החזר הוראת קבע{" "}
+            הוסף החזר הו"ק{" "}
           </Button>
-
-          <RtlThemeProvider>
-            <FormControl
-              size="small"
-              fullWidth={isSm}
-              sx={{
-                minWidth: { xs: "auto", sm: 160 },
-              }}
-            >
-              <InputLabel
-                id="filter-status-label"
-                sx={{
-                  color: "#424242",
-                  fontWeight: 500,
-                  "&.Mui-focused": { color: "#2a8c82" },
-                }}
-              >
-                סינון{" "}
-              </InputLabel>
-              <Select
-                labelId="filter-status-label"
-                value={statusFilter}
-                label="?????"
-                onChange={(e) => onStatusChange(e.target.value as StatusFilter)}
-                sx={{
-                  borderRadius: 1,
-                }}
-              >
-                <MenuItem value="all">הכל</MenuItem>
-                <MenuItem value="paid">שולם</MenuItem>
-                <MenuItem value="unpaid">לא שולם</MenuItem>
-              </Select>
-            </FormControl>
-          </RtlThemeProvider>
         </Box>
       </Stack>
       {newOrderOpen && (

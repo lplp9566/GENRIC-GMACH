@@ -1,4 +1,11 @@
-import { Box, Container } from "@mui/material";
+import {
+  Box,
+  Container,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
 import StandingOrdersReturnHeader from "./StandingOrdersReturnHeader";
 import SummaryCard from "../Loans/LoansDashboard/SummaryCard";
 import MonthlyAndYearFiltering from "../MonthlyPayments/MainMonthlyPayment/MonthlyPaymentFiltering";
@@ -116,12 +123,9 @@ const StandingOrdersReturn = () => {
       }}
     >
       <StandingOrdersReturnHeader
-        statusFilter={statusFilter}
-        onStatusChange={setStatusFilter}
       />
       <Box
         sx={{
-          // backgroundColor: "#FFFFFF",
           minHeight: "100vh",
           pt: 4,
           direction: "rtl",
@@ -156,14 +160,31 @@ const StandingOrdersReturn = () => {
             />
           </Box>
 
-          <MonthlyAndYearFiltering
-            selectedMonth={selectedMonth}
-            setSelectedMonth={setSelectedMonth}
-            selectedYear={selectedYear}
-            setSelectedYear={setSelectedYear}
-            years={years}
-            months={months}
-          />
+      <MonthlyAndYearFiltering
+        selectedMonth={selectedMonth}
+        setSelectedMonth={setSelectedMonth}
+        selectedYear={selectedYear}
+        setSelectedYear={setSelectedYear}
+        years={years}
+        months={months}
+        extraFilters={
+          <FormControl fullWidth size="small">
+            <InputLabel id="return-status-label">סטטוס</InputLabel>
+            <Select
+              labelId="return-status-label"
+              value={statusFilter}
+              label="סטטוס"
+              onChange={(e) =>
+                setStatusFilter(e.target.value as "all" | "paid" | "unpaid")
+              }
+            >
+              <MenuItem value="all">הכל</MenuItem>
+              <MenuItem value="paid">שולם</MenuItem>
+              <MenuItem value="unpaid">לא שולם</MenuItem>
+            </Select>
+          </FormControl>
+        }
+      />
           <StandingOrderReturnTable payments={filteredPayments} />
         </Box>
       </Box>
