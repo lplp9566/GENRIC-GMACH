@@ -24,10 +24,9 @@ interface StandingOrderReturnTableProps {
   payments: IOrdersReturnDto[];
 }
 const StandingOrderReturnTable: FC<StandingOrderReturnTableProps> = ({
-
   payments,
 }) => {
-    const authUser = useSelector((s: RootState) => s.authslice.user);
+  const authUser = useSelector((s: RootState) => s.authslice.user);
   const isAdmin = Boolean(authUser?.is_admin);
   const [selectedPayment, setSelectedPayment] =
     useState<IOrdersReturnDto | null>(null);
@@ -36,8 +35,8 @@ const StandingOrderReturnTable: FC<StandingOrderReturnTableProps> = ({
   const [deleteMode, setDeleteMode] = useState<boolean>(false);
   const [copyMode, setcopyMode] = useState(false);
   const [payModalMode, setPayModalMode] = useState<boolean>(false);
-  console.log({copyMode},{editMode});
-  
+  console.log({ copyMode }, { editMode });
+
   const onDelete = async () => {
     // const promise = dispatch(
     //   deleteMonthlyPayment(Number(selectedPayment!.id))
@@ -56,14 +55,14 @@ const StandingOrderReturnTable: FC<StandingOrderReturnTableProps> = ({
         sx={{ borderRadius: 2, overflow: "auto", padding: 2, boxShadow: 1 }}
       >
         <Table size="small" sx={{ minWidth: 650 }}>
-          <TableHead >
+          <TableHead>
             <TableRow>
               <TableCell align="right">משתמש</TableCell>
               <TableCell align="right">סכום</TableCell>
               <TableCell align="right">תאריך</TableCell>
               <TableCell align="right">שולם</TableCell>
               <TableCell align="right">הערות</TableCell>
-         {isAdmin && <TableCell align="right">פעולות</TableCell>}     
+              {isAdmin && <TableCell align="right">פעולות</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -83,7 +82,7 @@ const StandingOrderReturnTable: FC<StandingOrderReturnTableProps> = ({
                   <TableCell align="right">
                     {p.paid ? (
                       <>{p.paid_at ? fmtDate(p.paid_at) : "שולם"}</>
-                    ) : (
+                    ) : isAdmin ? (
                       <Button
                         variant="contained"
                         size="small"
@@ -94,56 +93,63 @@ const StandingOrderReturnTable: FC<StandingOrderReturnTableProps> = ({
                       >
                         סמן כשולם
                       </Button>
+                    ) : (
+                      <span style={{ color: "red" }}>לא שולם</span>
                     )}
                   </TableCell>
 
                   <TableCell align="right">{p.note}</TableCell>
-                  <TableCell align="right" onClick={(e) => e.stopPropagation()}>
-                    <Tooltip title="עריכת תשלום">
-                      <IconButton
-                        color="primary"
-                        size="small"
-                        onClick={() => {
-                          setSelectedPayment(p);
-                          setEditMode(true);
-                        }}
-                      >
-                        <EditIcon
-                          sx={{ color: "primary.main" }}
+                  {isAdmin && (
+                    <TableCell
+                      align="right"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Tooltip title="עריכת תשלום">
+                        <IconButton
+                          color="primary"
+                          size="small"
                           onClick={() => {
                             setSelectedPayment(p);
                             setEditMode(true);
                           }}
-                        />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="העתקת פעולה">
-                      <IconButton
-                        color="primary"
-                        size="small"
-                        onClick={() => {
-                          setSelectedPayment(p);
-                          setcopyMode(true);
-                        }}
-                      >
-                        <ContentCopyIcon sx={{ fontSize: 20 }} />
-                      </IconButton>
-                    </Tooltip>
+                        >
+                          <EditIcon
+                            sx={{ color: "primary.main" }}
+                            onClick={() => {
+                              setSelectedPayment(p);
+                              setEditMode(true);
+                            }}
+                          />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="העתקת פעולה">
+                        <IconButton
+                          color="primary"
+                          size="small"
+                          onClick={() => {
+                            setSelectedPayment(p);
+                            setcopyMode(true);
+                          }}
+                        >
+                          <ContentCopyIcon sx={{ fontSize: 20 }} />
+                        </IconButton>
+                      </Tooltip>
 
-                    {/* מחיקה */}
-                    <Tooltip title="מחיקת תשלום">
-                      <IconButton
-                        color="error"
-                        size="small"
-                        onClick={() => {
-                          setSelectedPayment(p);
-                          setDeleteMode(true);
-                        }}
-                      >
-                        <DeleteOutlineIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
+                      {/* מחיקה */}
+                      <Tooltip title="מחיקת תשלום">
+                        <IconButton
+                          color="error"
+                          size="small"
+                          onClick={() => {
+                            setSelectedPayment(p);
+                            setDeleteMode(true);
+                          }}
+                        >
+                          <DeleteOutlineIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             ) : (
