@@ -4,12 +4,12 @@ import MenuIcon from "@mui/icons-material/Menu";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../store/store";
-import {  getAllUsers } from "../../../store/features/admin/adminUsersSlice";
+import { AppDispatch, RootState } from "../../../../store/store";
+import {  getAllUsers } from "../../../../store/features/admin/adminUsersSlice";
 import { LogoTitle } from "./LogoTitle";
 import { DesktopLinks } from "./DesktopLinks";
 import MobileDrawer from "./MobileDrawer";
-import { useAppTheme } from "../../../Theme/ThemeProvider";
+import { useAppTheme } from "../../../../Theme/ThemeProvider";
 
 
 // const NAV_BG  = "#003366";
@@ -19,7 +19,7 @@ const BP_MOBILE = 960;
 const USER_BAR_H = 36;
 
 
-export const Navbar: React.FC = () => {
+export const AdminNavbar: React.FC = () => {
   const isMobile = useMediaQuery(`(max-width:${BP_MOBILE}px)`);
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
@@ -108,4 +108,4 @@ const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
   );
 };
 
-export default Navbar;
+export default AdminNavbar;

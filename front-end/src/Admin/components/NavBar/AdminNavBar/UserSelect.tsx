@@ -2,8 +2,8 @@ import React from "react";
 import { Autocomplete, TextField, InputAdornment } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "../../../store/store";
-import { setSelectedUser } from "../../../store/features/admin/adminUsersSlice";
+import { RootState, AppDispatch } from "../../../../store/store";
+import { setSelectedUser } from "../../../../store/features/admin/adminUsersSlice";
 
 export const UserSelect: React.FC<{ fullWidth?: boolean }> = ({ fullWidth }) => {
   const dispatch = useDispatch<AppDispatch>();

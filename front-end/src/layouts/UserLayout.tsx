@@ -1,15 +1,15 @@
 import { Outlet } from "react-router-dom";
 import { Box } from "@mui/material";
-import Navbar from "../Admin/components/NavBar/NavBar";
+import UserNavbar from "../Admin/components/NavBar/UserNavBar/UserNavBar";
+ // תבנה אותו
 
-export default function PrivateLayout() {
+export default function UserLayout() {
   return (
     <>
-      <Navbar />
+      <UserNavbar />
       <Box>
         <Outlet />
       </Box>
     </>
   );
 }
-

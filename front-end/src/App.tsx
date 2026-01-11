@@ -1,9 +1,10 @@
-// src/App.tsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import PrivateLayout from "./layouts/PrivateLayout";
 import PublicLayout from "./layouts/PublicLayout";
+import AdminLayout from "./layouts/AdminLayout";
+import UserLayout from "./layouts/UserLayout";
 
 import LoginPage from "./Admin/pages/LoginPage";
+
 import HomePage from "./Admin/components/HomePage/HomePage";
 import LoansPage from "./Admin/pages/LoansPage";
 import NewLoan from "./Admin/components/Loans/NewLoan/NewLoanForm";
@@ -18,11 +19,16 @@ import DonationsPage from "./Admin/pages/DonationsPage";
 import ExpensesPage from "./Admin/pages/ExpensesPage";
 import DepositsPage from "./Admin/pages/DepositsPage";
 import DepositDetailsPage from "./Admin/components/Deposits/DepositsDetails/DepositDetailsPage";
-import ProtectedRoute from "./Auth/ProtectedRoute";
 import Investments from "./Admin/pages/InvestmentsPage";
 import InvestmentDetailsPage from "./Admin/components/Investments/InvestmentDetails/InvestmentDetailsPage";
-import { MatomoTracker } from "./MatomoTracker";
 import StandingOrdersReturnPage from "./Admin/pages/StandingOrdersReturnPage";
+
+import { MatomoTracker } from "./MatomoTracker";
+import AuthGuard from "./Auth/AuthGuard";
+import { AdminOnlyRoute, UserOnlyRoute } from "./Auth/RoleRoute";
+
+// TODO: להחליף לדפי משתמש אמיתיים
+const UserHomePlaceholder = () => <div>אזור משתמש</div>;
 
 export default function App() {
   return (
@@ -34,35 +40,42 @@ export default function App() {
           <Route path="/" element={<LoginPage />} />
         </Route>
 
-        {/* Private */}
+        {/* Private (must be logged in) */}
+        <Route element={<AuthGuard />}>
+          {/* Admin area */}
+          <Route element={<AdminOnlyRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/loans" element={<LoansPage />} />
+              <Route path="/loans/new" element={<NewLoan />} />
+              <Route path="/loans/:id" element={<LoanDetailsPage />} />
+              <Route path="/funds" element={<FundsOverviewDashboard />} />
+              <Route path="/FundsOverviewByYear" element={<FundsOverviewByYearPage />} />
+              <Route path="/users" element={<UsersPage />} />
+              <Route path="/users/new" element={<AddNewUser />} />
+              <Route path="/paymentsPage" element={<PaymentsPage />} />
+              <Route path="/rankPage" element={<RankPage />} />
+              <Route path="/donations" element={<DonationsPage />} />
+              <Route path="/expenses" element={<ExpensesPage />} />
+              <Route path="/deposits" element={<DepositsPage />} />
+              <Route path="/deposit/:id" element={<DepositDetailsPage />} />
+              <Route path="/investments" element={<Investments />} />
+              <Route path="/investments/:id" element={<InvestmentDetailsPage />} />
+              <Route path="/standing-orders" element={<StandingOrdersReturnPage />} />
+            </Route>
+          </Route>
 
-        <Route element={<ProtectedRoute />}>
-          <Route element={<PrivateLayout />}>
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/loans" element={<LoansPage />} />
-            <Route path="/loans/new" element={<NewLoan />} />
-            <Route path="/loans/:id" element={<LoanDetailsPage />} />
-            <Route path="/funds" element={<FundsOverviewDashboard />} />
-            <Route
-              path="/FundsOverviewByYear"
-              element={<FundsOverviewByYearPage />}
-            />
-            <Route path="/users" element={<UsersPage />} />
-            <Route path="/paymentsPage" element={<PaymentsPage />} />
-            <Route path="/rankPage" element={<RankPage />} />
-            <Route path="/users/new" element={<AddNewUser />} />
-            <Route path="/donations" element={<DonationsPage />} />
-            <Route path="/expenses" element={<ExpensesPage />} />
-            <Route path="/deposits" element={<DepositsPage />} />
-            <Route path="/deposit/:id" element={<DepositDetailsPage />} />
-            <Route path="/investments" element={<Investments />} />
-            <Route path="/standing-orders" element={<StandingOrdersReturnPage />} />
-            <Route
-              path="/investments/:id"
-              element={<InvestmentDetailsPage />}
-            />
+          {/* User area */}
+          <Route element={<UserOnlyRoute />}>
+            <Route element={<UserLayout />}>
+              <Route path="/u" element={<UserHomePlaceholder />} />
+
+              {/* אם הדף הזה משותף לשניהם, אפשר לשים אותו גם פה: */}
+              <Route path="/u/standing-orders" element={<StandingOrdersReturnPage />} />
+            </Route>
           </Route>
         </Route>
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

@@ -4,8 +4,8 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { UserSelect } from "./UserSelect";
 import { useDispatch } from "react-redux";
-import { logoutServer } from "../../../store/features/auth/authSlice";
-import type { AppDispatch } from "../../../store/store";
+import { logoutServer } from "../../../../store/features/auth/authSlice";
+import type { AppDispatch } from "../../../../store/store";
 
 const NAV_TXT = "#FFFFFF";
 
