@@ -27,9 +27,6 @@ import { MatomoTracker } from "./MatomoTracker";
 import AuthGuard from "./Auth/AuthGuard";
 import { AdminOnlyRoute, UserOnlyRoute } from "./Auth/RoleRoute";
 
-// TODO: להחליף לדפי משתמש אמיתיים
-const UserHomePlaceholder = () => <div>אזור משתמש</div>;
-
 export default function App() {
   return (
     <BrowserRouter>
@@ -68,9 +65,9 @@ export default function App() {
           {/* User area */}
           <Route element={<UserOnlyRoute />}>
             <Route element={<UserLayout />}>
-              <Route path="/u" element={<UserHomePlaceholder />} />
-
-              {/* אם הדף הזה משותף לשניהם, אפשר לשים אותו גם פה: */}
+              <Route path="/u" element={<Navigate to="/u/payments" replace />} />
+              <Route path="/u/payments" element={<PaymentsPage />} />
+              <Route path="/u/donations" element={<DonationsPage />} />
               <Route path="/u/standing-orders" element={<StandingOrdersReturnPage />} />
             </Route>
           </Route>
@@ -81,3 +78,4 @@ export default function App() {
     </BrowserRouter>
   );
 }
+

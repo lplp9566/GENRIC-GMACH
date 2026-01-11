@@ -4,7 +4,7 @@ import { RootState } from "../store/store";
 
 export function AdminOnlyRoute() {
   const { user } = useSelector((s: RootState) => s.authslice);
-  if (!user) return null; // בפועל לא יקרה כי AuthGuard מעל
+  if (!user) return null; 
   return user.is_admin ? <Outlet /> : <Navigate to="/u" replace />;
 }
 

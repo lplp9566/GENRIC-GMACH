@@ -97,10 +97,6 @@ const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
     </Box>
   )}
 </AppBar>
-
-
-
-
       <Box sx={{ height: APP_BAR_H }} />
 
       <MobileDrawer open={open} onClose={() => setOpen(false)} />
