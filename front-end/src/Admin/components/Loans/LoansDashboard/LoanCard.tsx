@@ -32,9 +32,10 @@ import { toast } from "react-toastify";
 interface LoanCardProps {
   loan: ILoanWithUser;
   onClick: () => void;
+  readOnly?: boolean;
 }
 
-const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
+const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick, readOnly }) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const balancePositive = (loan.balance ?? 0) >= 0;
@@ -101,29 +102,33 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
                 fontSize: "0.8rem",
               }}
             />
-            <IconButton
-              size="small"
-              color="primary"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedLoan(loan);
-                setEditOpen(true);
-              }}
-            >
-              <EditIcon />
-            </IconButton>
+            {!readOnly && (
+              <>
+                <IconButton
+                  size="small"
+                  color="primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedLoan(loan);
+                    setEditOpen(true);
+                  }}
+                >
+                  <EditIcon />
+                </IconButton>
 
-            <IconButton
-              size="small"
-              color="error"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedLoan(loan);
-                setDeleteMode(true);
-              }}
-            >
-              <DeleteIcon />
-            </IconButton>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedLoan(loan);
+                    setDeleteMode(true);
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </>
+            )}
           </Box>
           <Grid container spacing={1} mb={2}>
             <Grid item xs={6}>
@@ -231,14 +236,14 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick }) => {
           </Grid>
         </CardContent>
       </CardActionArea>
-      {selectedLoan && (
+      {!readOnly && selectedLoan && (
         <EditLoanModal
           open={editOpen}
           onClose={() => setEditOpen(false)}
           loan={selectedLoan}
         />
       )}
-      {deleteMode && selectedLoan && (
+      {!readOnly && deleteMode && selectedLoan && (
         <ConfirmModal
           open={deleteMode}
           onClose={() => setDeleteMode(false)}

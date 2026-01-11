@@ -28,9 +28,14 @@ type SortDirection = "asc" | "desc";
 interface ActionsTableProps {
   actions: ILoanAction[];
   loanId: number;
+  readOnly?: boolean;
 }
 
-export const ActionsTable: React.FC<ActionsTableProps> = ({ actions, loanId }) => {
+export const ActionsTable: React.FC<ActionsTableProps> = ({
+  actions,
+  loanId,
+  readOnly,
+}) => {
         const dispatch = useDispatch<AppDispatch>();
 
   const [currentSortField, setCurrentSortField] = useState<SortField>("date");
@@ -56,16 +61,14 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({ actions, loanId }) =
     LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
   ];
   const delateAction = () => {
-    toast.promise(
-      dispatch(deleteLoanAction({id:selected!.id,loanId:loanId})), {
-        pending: "מוחק פעולה...",
-        success: "הפעולה נמחקה בהצלחה!",
-        error: "שגיאה במחיקת הפעולה", }
-    );
-    setDeleteModal(false
-    )
+    toast.promise(dispatch(deleteLoanAction({ id: selected!.id, loanId })), {
+      pending: "Deleting action...",
+      success: "Action deleted.",
+      error: "Failed to delete action.",
+    });
+    setDeleteModal(false);
+  };
 
-  }
 
   const sortedActions = useMemo(() => {
     const copy = [...actions];
@@ -133,9 +136,11 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({ actions, loanId }) =
               >
                 סכום{renderSortIndicator("amount")}
               </TableCell>
-              <TableCell align="center" sx={{ cursor: "default" }}>
-                פעולות
-              </TableCell>
+              {!readOnly && (
+                <TableCell align="center" sx={{ cursor: "default" }}>
+                  ?????????x
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
 
@@ -146,7 +151,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({ actions, loanId }) =
                 hover
                 sx={{ "& td": { border: "none" } }}
               >
-                <TableCell align="right">
+                                <TableCell align="right">
                   {new Date(action.date).toLocaleDateString("he-IL")}
                 </TableCell>
                 <TableCell align="center">
@@ -175,69 +180,79 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({ actions, loanId }) =
                   sx={{ fontWeight: 600, color: "#007BFF" }}
                 >
                   {action.action_type !=
-                    LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE && "₪"}
+                    LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE && "NIS "}
                   {action.value.toLocaleString()}
                 </TableCell>
 
-                <TableCell align="center">
-                  <Stack
-                    direction="row"
-                    spacing={0.5}
-                    justifyContent="center"
-                    alignItems="center"
-                  >
-                    <Tooltip title="העתק">
-                      <IconButton size="small" onClick={() => {}}>
-                        <ContentCopyIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-
-                    <Tooltip title="ערוך">
-                      <span>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEdit(action)}
-                          // disabled={!onEdit}
+                {!readOnly && (
+                  <TableCell align="center">
+                    <Stack
+                      direction="row"
+                      spacing={0.5}
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      <Tooltip title="Copy">
+                        <IconButton size="small" onClick={() => {}}
                         >
-                          <EditIcon fontSize="small" />
+                          <ContentCopyIcon fontSize="small" />
                         </IconButton>
-                      </span>
-                    </Tooltip>
+                      </Tooltip>
 
-                    <Tooltip title="מחק">
-                      <span>
-                        <IconButton
-                          size="small"
-                          onClick={() => {setDeleteModal(true); setSelected(action);}}
-                          disabled={action.action_type != LoanPaymentActionType.PAYMENT}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-                  </Stack>
-                </TableCell>
+                      <Tooltip title="Edit">
+                        <span>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEdit(action)}
+                            // disabled={!onEdit}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+
+                      <Tooltip title="Delete">
+                        <span>
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              setDeleteModal(true);
+                              setSelected(action);
+                            }}
+                            disabled={
+                              action.action_type !=
+                              LoanPaymentActionType.PAYMENT
+                            }
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </Stack>
+                  </TableCell>
+                )}
+
               </TableRow>
             ))}
           </TableBody>
         </Table>
       )}
- {selected && (
-  <EditLoanActionModal
-    open={editModal}
-    action={selected}
-    onClose={() => setEditModal(false)}
-    loanId={loanId}
-  />
-)}
-{deleteModal && (
-  <ConfirmModal
-    open={deleteModal}
-    text="מחק פעולה"
-    onSubmit={delateAction}
-    onClose={() => setDeleteModal(false)}
-  />
-)}
+      {selected && !readOnly && (
+        <EditLoanActionModal
+          open={editModal}
+          action={selected}
+          onClose={() => setEditModal(false)}
+          loanId={loanId}
+        />
+      )}
+      {deleteModal && !readOnly && (
+        <ConfirmModal
+          open={deleteModal}
+          text="Delete this action?"
+          onSubmit={delateAction}
+          onClose={() => setDeleteModal(false)}
+        />
+      )}
 
     </Paper>
   );
