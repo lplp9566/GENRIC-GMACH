@@ -138,8 +138,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
               </TableCell>
               {!readOnly && (
                 <TableCell align="center" sx={{ cursor: "default" }}>
-                  ?????????x
-                </TableCell>
+                  פעולות                </TableCell>
               )}
             </TableRow>
           </TableHead>
@@ -180,7 +179,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                   sx={{ fontWeight: 600, color: "#007BFF" }}
                 >
                   {action.action_type !=
-                    LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE && "NIS "}
+                    LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE && "ש\"ח "}
                   {action.value.toLocaleString()}
                 </TableCell>
 
