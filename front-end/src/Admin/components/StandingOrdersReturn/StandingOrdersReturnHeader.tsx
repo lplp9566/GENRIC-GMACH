@@ -9,12 +9,15 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { AddStandingOrderRefundModal } from "./NewOrderReturn";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
 
 const StandingOrdersReturnHeader = () => {
   const [newOrderOpen, setNewOrderOpen] = useState(false);
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
-
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const isAdmin = Boolean(authUser?.is_admin);
   return (
     <Paper
       elevation={3}
@@ -51,7 +54,8 @@ const StandingOrdersReturnHeader = () => {
             ניהול החזרות הו"ק
           </Typography>
         </Box>
-
+{
+  isAdmin && (
         <Box
           sx={{
             display: "flex",
@@ -74,6 +78,9 @@ const StandingOrdersReturnHeader = () => {
             הוסף החזר הו"ק{" "}
           </Button>
         </Box>
+    
+  )
+}
       </Stack>
       {newOrderOpen && (
         <AddStandingOrderRefundModal

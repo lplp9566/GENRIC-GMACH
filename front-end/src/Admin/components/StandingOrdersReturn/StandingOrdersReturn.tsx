@@ -29,8 +29,15 @@ const StandingOrdersReturn = () => {
     useSelector(
       (s: RootState) => s.AdminStandingOrderReturnSlice.allOrdersReturn
     ) ?? [];
-
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const isAdmin = Boolean(authUser?.is_admin);
   useEffect(() => {
+    if(!isAdmin) {
+      const id = authUser?.user?.id;
+      if (id != null) {
+        dispatch(getOrdersReturnByUserId(id));
+      }
+    }
     if (selectedUser) {
       dispatch(getOrdersReturnByUserId(selectedUser.id));
     } else {

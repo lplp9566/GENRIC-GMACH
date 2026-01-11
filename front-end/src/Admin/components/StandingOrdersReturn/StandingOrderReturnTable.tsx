@@ -17,15 +17,21 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { AddPaymentDateModal } from "./PayOrderRetronModal";
+import { RootState } from "../../../store/store";
+import { useSelector } from "react-redux";
 
 interface StandingOrderReturnTableProps {
   payments: IOrdersReturnDto[];
 }
 const StandingOrderReturnTable: FC<StandingOrderReturnTableProps> = ({
+
   payments,
 }) => {
+    const authUser = useSelector((s: RootState) => s.authslice.user);
+  const isAdmin = Boolean(authUser?.is_admin);
   const [selectedPayment, setSelectedPayment] =
     useState<IOrdersReturnDto | null>(null);
+
   const [editMode, setEditMode] = useState<boolean>(false);
   const [deleteMode, setDeleteMode] = useState<boolean>(false);
   const [copyMode, setcopyMode] = useState(false);
@@ -57,7 +63,7 @@ const StandingOrderReturnTable: FC<StandingOrderReturnTableProps> = ({
               <TableCell align="right">תאריך</TableCell>
               <TableCell align="right">שולם</TableCell>
               <TableCell align="right">הערות</TableCell>
-              <TableCell align="right">פעולות</TableCell>
+         {isAdmin && <TableCell align="right">פעולות</TableCell>}     
             </TableRow>
           </TableHead>
           <TableBody>
