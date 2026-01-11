@@ -36,10 +36,12 @@ const StandingOrdersReturn = () => {
       const id = authUser?.user?.id;
       if (id != null) {
         dispatch(getOrdersReturnByUserId(id));
+        return;
       }
     }
     if (selectedUser) {
       dispatch(getOrdersReturnByUserId(selectedUser.id));
+      return;
     } else {
       dispatch(getAllOrdersReturn());
     }
