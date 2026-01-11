@@ -22,29 +22,38 @@ const FundsByYearGraphs = () => {
     (state: RootState) => state.AdminFundsOverviewReducer
   );
   const dispatch = useDispatch<AppDispatch>();
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const isAdmin = Boolean(authUser?.is_admin);
 
-  const DEFAULT_FIELDS = !selectedUser
-    ? AdminYearlyFinancialItems.slice(0, 3).map((f) => f.key)
-    : UserAdminFinancialItems.slice(0, 3).map((f) => f.key);
-  const COLORS = !selectedUser
-    ? AdminYearlyFinancialItems.map((f) => f.color)
-    : UserAdminFinancialItems.map((f) => f.color);
-  const { mode } = useSelector((state: RootState) => state.mapModeSlice);
+  const DEFAULT_FIELDS =
+    isAdmin && !selectedUser
+      ? AdminYearlyFinancialItems.slice(0, 3).map((f) => f.key)
+      : UserAdminFinancialItems.slice(0, 3).map((f) => f.key);
+  const COLORS =
+    isAdmin && !selectedUser
+      ? AdminYearlyFinancialItems.map((f) => f.color)
+      : UserAdminFinancialItems.map((f) => f.color);
   const [selectedFields, setSelectedFields] =
     useState<string[]>(DEFAULT_FIELDS);
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedYears, setSelectedYears] = useState<number[]>([]);
 
   useEffect(() => {
-    if (mode === "admin" && !selectedUser) {
+    if (!isAdmin && authUser?.user?.id) {
+      dispatch(getUserFundsOverview(authUser.user.id));
+    } else if (isAdmin && !selectedUser) {
       dispatch(getFundsOverviewByYear());
-    } else if (mode === "admin" && selectedUser) {
+    } else if (isAdmin && selectedUser) {
       dispatch(getUserFundsOverview(selectedUser.id));
     }
-  }, [dispatch, mode, selectedUser]);
-  const yearlyData = !selectedUser
-    ? Array.isArray(fundsOverviewByYear)
-      ? fundsOverviewByYear
+  }, [dispatch, isAdmin, selectedUser, authUser?.user?.id]);
+  const yearlyData = isAdmin
+    ? !selectedUser
+      ? Array.isArray(fundsOverviewByYear)
+        ? fundsOverviewByYear
+        : []
+      : Array.isArray(fundsOverview)
+      ? fundsOverview
       : []
     : Array.isArray(fundsOverview)
     ? fundsOverview
@@ -65,9 +74,10 @@ const FundsByYearGraphs = () => {
       0
     );
     return {
-      name: !selectedUser
-        ? AdminYearlyFinancialItems.find((f) => f.key === key)?.label ?? key
-        : UserAdminFinancialItems.find((f) => f.key === key)?.label ?? key,
+      name:
+        isAdmin && !selectedUser
+          ? AdminYearlyFinancialItems.find((f) => f.key === key)?.label ?? key
+          : UserAdminFinancialItems.find((f) => f.key === key)?.label ?? key,
       value: total,
       color: COLORS[idx % COLORS.length],
     };
@@ -80,9 +90,10 @@ const FundsByYearGraphs = () => {
       // הוספת עמודה של שנה
       obj["שנה"] = row.year;
       selectedFields.forEach((key) => {
-        const label = !selectedUser
-          ? AdminYearlyFinancialItems.find((f) => f.key === key)?.label ?? key
-          : UserAdminFinancialItems.find((f) => f.key === key)?.label ?? key;
+        const label =
+          isAdmin && !selectedUser
+            ? AdminYearlyFinancialItems.find((f) => f.key === key)?.label ?? key
+            : UserAdminFinancialItems.find((f) => f.key === key)?.label ?? key;
         obj[label] = (row as Record<string, any>)[key];
       });
       return obj;

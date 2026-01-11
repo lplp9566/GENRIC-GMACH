@@ -70,6 +70,7 @@ export default function App() {
               <Route path="/u/payments" element={<PaymentsPage />} />
               <Route path="/u/donations" element={<DonationsPage />} />
               <Route path="/u/standing-orders" element={<StandingOrdersReturnPage />} />
+              <Route path="/u/statistics" element={<FundsOverviewByYearPage />} />
             </Route>
           </Route>
         </Route>
