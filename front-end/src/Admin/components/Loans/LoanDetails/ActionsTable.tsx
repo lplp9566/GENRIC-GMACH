@@ -178,9 +178,13 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                   align="left"
                   sx={{ fontWeight: 600, color: "#007BFF" }}
                 >
+  
                   {action.action_type !=
                     LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE && "? "}
-                  {action.value.toLocaleString()}
+                  {action.value.toLocaleString("he-IL", {
+                    style: "currency",
+                    currency: "ILS",
+                  } )}
                 </TableCell>
 
                 {!readOnly && (
