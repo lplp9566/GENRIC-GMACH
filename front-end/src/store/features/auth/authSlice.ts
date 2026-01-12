@@ -71,7 +71,7 @@ export const logoutServer = createAsyncThunk<void, void, { rejectValue: string }
     // לוגאאוט בצד לקוח (ליתר בטחון)
     logoutLocal(state) {
       state.user = null;
-      state.status = "idle";
+      state.status = "rejected";
       state.error = null;
     },
   },
@@ -84,7 +84,7 @@ export const logoutServer = createAsyncThunk<void, void, { rejectValue: string }
     builder.addCase(validate.fulfilled, (s, a) => { s.status = "fulfilled"; s.user = a.payload; });
     builder.addCase(validate.rejected, (s) => { s.status = "rejected"; s.user = null; });
 
-    builder.addCase(logoutServer.fulfilled, (s) => { s.user = null; s.status = "idle"; s.error = null; });
+    builder.addCase(logoutServer.fulfilled, (s) => { s.user = null; s.status = "rejected"; s.error = null; });
   },
 });
 

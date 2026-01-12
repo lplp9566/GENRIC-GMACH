@@ -179,7 +179,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                   sx={{ fontWeight: 600, color: "#007BFF" }}
                 >
                   {action.action_type !=
-                    LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE && "ש\"ח "}
+                    LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE && "? \"ח "}
                   {action.value.toLocaleString()}
                 </TableCell>
 
