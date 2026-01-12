@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Grid, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Container,
+  Grid,
+  Paper,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
 import {
@@ -21,6 +31,7 @@ const UserLoansPage: React.FC = () => {
     (s: RootState) => s.AdminLoansSlice
   );
   const [selectedLoanId, setSelectedLoanId] = useState<number | null>(null);
+  const [filter, setFilter] = useState<StatusGeneric>(StatusGeneric.ACTIVE);
 
   useEffect(() => {
     if (userId) {
@@ -28,12 +39,12 @@ const UserLoansPage: React.FC = () => {
         getAllLoans({
           page: 1,
           limit: 100,
-          status: StatusGeneric.ACTIVE,
+          status: filter,
           userId,
         })
       );
     }
-  }, [dispatch, userId]);
+  }, [dispatch, userId, filter]);
 
   useEffect(() => {
     if (allLoans.length === 0) return;
@@ -61,9 +72,22 @@ const UserLoansPage: React.FC = () => {
           <Grid item xs={12} md={4}>
             <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
               <Typography variant="h6" fontWeight={600} mb={2}>
-                Loans
+                הלוואות{" "}
               </Typography>
-              <Box sx={{ maxHeight: "70vh", overflowY: "auto", pr: 1 }}>
+              <FormControl size="small" fullWidth sx={{ mb: 2 }}>
+                <InputLabel id="user-loans-filter-label">מצב הלוואה</InputLabel>
+                <Select
+                  labelId="user-loans-filter-label"
+                  label="Status"
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value as StatusGeneric)}
+                >
+                  <MenuItem value={StatusGeneric.ALL}>הכל</MenuItem>
+                  <MenuItem value={StatusGeneric.ACTIVE}>פעילות</MenuItem>
+                  <MenuItem value={StatusGeneric.INACTIVE}>לא פעילות</MenuItem>
+                </Select>
+              </FormControl>
+              <Box>
                 {allLoans.map((loan) => {
                   const isSelected = loan.id === selectedLoanId;
                   return (
@@ -108,7 +132,7 @@ const UserLoansPage: React.FC = () => {
                 </>
               ) : (
                 <Typography variant="body1">
-                  Select a loan to view details.
+                  Select a loan to view details.{" "}
                 </Typography>
               )}
             </Paper>
@@ -123,9 +147,7 @@ const UserLoansPage: React.FC = () => {
                   readOnly
                 />
               ) : (
-                <Typography variant="body1">
-                  Select a loan to view actions.
-                </Typography>
+                <Typography variant="body1"></Typography>
               )}
             </Paper>
           </Grid>
