@@ -35,6 +35,7 @@ const links = [
   { label: "הלוואות", path: "/u/loans" },
   { label: "תרומות", path: "/u/donations" },
   { label: "פקדנות", path: "/u/deposits" },
+  { label: "דמי חבר", path: "/u/payments" },
   { label: "החזרי הוראת קבע", path: "/u/standing-orders" },
   { label: "נתונים כללים", path: "/u/overview" },
   { label: "סטטיסטיקה", path: "/u/statistics" },
