@@ -1,31 +1,46 @@
-import { FC } from "react";
-import { IDeposit } from "../depositsDto";
-import { AttachMoney as AttachMoneyIcon } from "@mui/icons-material";
+import React, { useCallback, useState } from "react";
 import {
   Box,
+  Button,
   Card,
-  CardActionArea,
   CardContent,
   Chip,
+  Dialog,
+  DialogContent,
   Grid,
   Typography,
 } from "@mui/material";
+import SavingsIcon from "@mui/icons-material/Savings";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import EventIcon from "@mui/icons-material/Event";
+import { IDeposit, IDepositActionCreate } from "../depositsDto";
+import DepositsActions from "../DepositsAction/DepositsActions";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../../store/store";
+import { createDepositAction } from "../../../../store/features/admin/adminDepositsSlice";
 
 interface DepositCardProps {
   deposit: IDeposit;
   onClick: () => void;
 }
 
-const fmtCurrency = (n?: number | null) =>
-  typeof n === "number" ? `₪${n.toLocaleString("he-IL")}` : "—";
+const DepositCard: React.FC<DepositCardProps> = ({ deposit, onClick }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const [actionsOpen, setActionsOpen] = useState(false);
 
-const fmtDate = (v?: string | Date | null) => {
-  if (!v) return "—";
-  const d = new Date(v);
-  return isNaN(d.getTime()) ? "—" : d.toLocaleDateString("he-IL");
-};
+  const handleSubmit = useCallback(
+    async (dto: IDepositActionCreate) => {
+      await dispatch(createDepositAction(dto)).unwrap();
+      setActionsOpen(false);
+    },
+    [dispatch]
+  );
 
-const DepositCard: FC<DepositCardProps> = ({ deposit, onClick }) => {
+  const userName = `${deposit.user?.first_name ?? ""} ${
+    deposit.user?.last_name ?? ""
+  }`.trim();
+
   return (
     <Card
       sx={{
@@ -35,91 +50,119 @@ const DepositCard: FC<DepositCardProps> = ({ deposit, onClick }) => {
         "&:hover": { transform: "translateY(-4px)", boxShadow: 6 },
       }}
     >
-      <CardActionArea onClick={onClick}>
-        <CardContent sx={{ pt: 2, pb: 3, px: 3 }}>
-          {/* Header */}
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Box textAlign="right">
-              <Typography variant="h6" fontWeight={700}>
-                {deposit.user?.first_name ?? ""} {deposit.user?.last_name ?? ""}
+      <CardContent sx={{ pt: 2, pb: 3, px: 3, direction: "rtl" }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Box textAlign="right">
+            <Typography variant="body2" color="text.secondary" mt={0.2}>
+              הפקדה #{deposit.id}
+            </Typography>
+            {userName && (
+              <Typography variant="subtitle1" fontWeight={700} color="#1C3C3C">
+                {userName}
               </Typography>
-              <Typography variant="body2" color="text.secondary" mt={0.2}>
-                הפקדה #{deposit.id}
-              </Typography>
-            </Box>
-            <Chip
-              label={deposit.isActive ? "פעיל" : "סגור"}
-              size="small"
-              sx={{
-                color: deposit.isActive ? "#28A960" : "#6B6B6B",
-                fontWeight: 600,
-                fontSize: "0.8rem",
-              }}
-            />
+            )}
           </Box>
 
-          {/* Body */}
-          <Grid container spacing={2}>
-            {/* סכום ראשוני */}
-            <Grid item xs={12} sm={6}>
-              <Box display="flex" alignItems="center" gap={1}>
-                <AttachMoneyIcon fontSize="small" sx={{ color: "#006CF0" }} />
-                <Box textAlign="right">
-                  <Typography variant="body2" color="text.secondary">
-                    סכום התחלתי
-                  </Typography>
-                  <Typography variant="subtitle1" fontWeight={700} color="#006CF0">
-                    {fmtCurrency(deposit.initialDeposit)}
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
+          <Chip
+            label={deposit.isActive ? "פעיל" : "לא פעיל"}
+            size="small"
+            sx={{
+              backgroundColor: deposit.isActive ? "#D2F7E1" : "#F0F0F0",
+              color: deposit.isActive ? "#28A960" : "#6B6B6B",
+              fontWeight: 600,
+              fontSize: "0.8rem",
+            }}
+          />
+        </Box>
 
-            {/* סכום נוכחי */}
-            <Grid item xs={12} sm={6}>
-              <Box display="flex" alignItems="center" gap={1}>
-                <AttachMoneyIcon fontSize="small" sx={{ color: "#28A960" }} />
-                <Box textAlign="right">
-                  <Typography variant="body2" color="text.secondary">
-                    סכום נוכחי
-                  </Typography>
-                  <Typography variant="subtitle1" fontWeight={700} color="#28A960">
-                    {fmtCurrency(deposit.current_balance)}
-                  </Typography>
-                </Box>
+        <Grid container spacing={1} mb={2}>
+          <Grid item xs={6}>
+            <Box display="flex" alignItems="center" gap={1} sx={{ flexDirection: "row-reverse" }}>
+              <SavingsIcon fontSize="small" sx={{ color: "#006CF0" }} />
+              <Box textAlign="right">
+                <Typography variant="body2" color="text.secondary">
+                  סכום הפקדה
+                </Typography>
+                <Typography variant="subtitle1" fontWeight={700} color="#006CF0">
+                  ₪{deposit.initialDeposit.toLocaleString("he-IL")}
+                </Typography>
               </Box>
-            </Grid>
-
-            {/* תאריך התחלה */}
-            <Grid item xs={12} sm={6}>
-              <Box display="flex" alignItems="center" gap={1}>
-                <Box textAlign="right">
-                  <Typography variant="body2" color="text.secondary">
-                    תאריך התחלה
-                  </Typography>
-                  <Typography variant="subtitle1" fontWeight={700}>
-                    {fmtDate(deposit.start_date)}
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
-
-            {/* תאריך סיום */}
-            <Grid item xs={12} sm={6}>
-              <Box display="flex" alignItems="center" gap={1}>
-                <Box textAlign="right">
-                  <Typography variant="body2" color="text.secondary">
-                    תאריך סיום
-                  </Typography>
-                  <Typography variant="subtitle1" fontWeight={700}>
-                    {fmtDate(deposit.end_date)}
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
+            </Box>
           </Grid>
-        </CardContent>
-      </CardActionArea>
+          <Grid item xs={6}>
+            <Box display="flex" alignItems="center" gap={1} sx={{ flexDirection: "row-reverse" }}>
+              <AccountBalanceWalletIcon fontSize="small" sx={{ color: "#28A960" }} />
+              <Box textAlign="right">
+                <Typography variant="body2" color="text.secondary">
+                  יתרה נוכחית
+                </Typography>
+                <Typography variant="subtitle1" fontWeight={700} color="#28A960">
+                  ₪{deposit.current_balance.toLocaleString("he-IL")}
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+          <Grid item xs={6}>
+            <Box display="flex" alignItems="center" gap={1} sx={{ flexDirection: "row-reverse" }}>
+              <CalendarTodayIcon fontSize="small" sx={{ color: "#1C3C3C" }} />
+              <Box textAlign="right">
+                <Typography variant="body2" color="text.secondary">
+                  תאריך התחלה
+                </Typography>
+                <Typography variant="subtitle1" fontWeight={700} color="#1C3C3C">
+                  {deposit.start_date
+                    ? new Date(deposit.start_date).toLocaleDateString("he-IL")
+                    : "-"}
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+          <Grid item xs={6}>
+            <Box display="flex" alignItems="center" gap={1} sx={{ flexDirection: "row-reverse" }}>
+              <EventIcon fontSize="small" sx={{ color: "#D35400" }} />
+              <Box textAlign="right">
+                <Typography variant="body2" color="text.secondary">
+                  תאריך סיום
+                </Typography>
+                <Typography variant="subtitle1" fontWeight={700} color="#D35400">
+                  {deposit.end_date
+                    ? new Date(deposit.end_date).toLocaleDateString("he-IL")
+                    : "-"}
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
+
+        <Box display="flex" justifyContent="center" gap={1}>
+          <Button variant="outlined" onClick={onClick}>
+            הצג פרטי הפקדה
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => setActionsOpen(true)}
+            disabled={!deposit.isActive}
+            sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
+          >
+            הוסף פעולה
+          </Button>
+        </Box>
+      </CardContent>
+
+      <Dialog
+        open={actionsOpen}
+        onClose={() => setActionsOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogContent>
+          <DepositsActions
+            depositId={deposit.id}
+            max={deposit.current_balance ?? 0}
+            handleSubmit={handleSubmit}
+          />
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

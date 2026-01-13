@@ -108,7 +108,7 @@ export const LoansPage: React.FC = () => {
               p: 3,
               mb: 4,
               borderRadius: 2,
-              width: "100%",
+              width: "30%",
               mx: "auto",
               dir: "rtl",
             }}
