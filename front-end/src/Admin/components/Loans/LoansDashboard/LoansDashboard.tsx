@@ -26,11 +26,11 @@ const LoansDashboard: React.FC<LoanProps> = ({ loansData, total }) => {
   const totalAmount = loansData
     .reduce((sum, loan) => sum + loan.loan_amount, 0)
     .toLocaleString("he-IL");
-const totalRepaid = loansData
-    .reduce((sum, loan) => sum + ( loan.remaining_balance), 0)
+  const totalRepaid = loansData
+    .reduce((sum, loan) => sum + loan.remaining_balance, 0)
     .toLocaleString("he-IL");
   return (
-    <Box sx={{  py: 6, direction: "rtl" }}>
+    <Box sx={{ py: 6, direction: "rtl" }}>
       <Container maxWidth="lg">
         {/* מסגרת לבנה לכל התוכן */}
         <Paper

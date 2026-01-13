@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Container,
   Paper,
@@ -9,20 +9,25 @@ import {
   InputLabel,
   Select,
   MenuItem,
-
   SelectChangeEvent,
   Button,
   Stack,
   useTheme,
   useMediaQuery,
+  Grid,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
 import {
   getAllLoans,
+  getLoanDetails,
   setPage,
 } from "../../store/features/admin/adminLoanSlice";
-import Loans from "../components/Loans/LoansDashboard/LoansDashboard";
+import SummaryCard from "../components/Loans/LoansDashboard/SummaryCard";
+import LoanCard from "../components/Loans/LoansDashboard/LoanCard";
+import ActionsTable from "../components/Loans/LoanDetails/ActionsTable";
+import LoanHeader from "../components/Loans/LoanDetails/LoanHeader";
+import { GeneralLoanInfoCard } from "../components/Loans/LoanDetails/GeneralLoanInfoCard";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
 import { useNavigate } from "react-router-dom";
 import { StatusGeneric } from "../../common/indexTypes";
@@ -35,8 +40,14 @@ export const LoansPage: React.FC = () => {
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [filter, setFilter] = useState<StatusGeneric>(StatusGeneric.ACTIVE);
+  const [selectedLoanId, setSelectedLoanId] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [openView, setOpenView] = useState(false);
   const { allLoans, page, pageCount, status, total } = useSelector(
     (s: RootState) => s.AdminLoansSlice
+  );
+  const loanDetails = useSelector(
+    (s: RootState) => s.AdminLoansSlice.loanDetails
   );
   const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
   const limit = 20;
@@ -51,35 +62,58 @@ export const LoansPage: React.FC = () => {
     }
   }, [dispatch, page, filter, selectedUser]);
 
+  useEffect(() => {
+    if (!openView) return;
+    if (allLoans.length === 0) {
+      setSelectedLoanId(null);
+      return;
+    }
+    if (!selectedLoanId || !allLoans.some((l) => l.id === selectedLoanId)) {
+      setSelectedLoanId(allLoans[0].id);
+    }
+  }, [allLoans, openView, selectedLoanId]);
+
+  useEffect(() => {
+    if (selectedLoanId) dispatch(getLoanDetails(selectedLoanId));
+  }, [dispatch, selectedLoanId]);
+
+  useEffect(() => {
+    if (selectedLoanId && !allLoans.some((l) => l.id === selectedLoanId)) {
+      setSelectedLoanId(null);
+    }
+  }, [allLoans, selectedLoanId]);
+
   const handleFilterChange = (e: SelectChangeEvent) => {
     setFilter(e.target.value as StatusGeneric);
     dispatch(setPage(1));
   };
 
+  const selectedLoan = allLoans.find((l) => l.id === selectedLoanId) || null;
+  const totalAmount = useMemo(
+    () => allLoans.reduce((sum, loan) => sum + loan.loan_amount, 0),
+    [allLoans]
+  );
+  const totalRepaid = useMemo(
+    () => allLoans.reduce((sum, loan) => sum + loan.remaining_balance, 0),
+    [allLoans]
+  );
+
   return (
     <>
       <Box sx={{ minHeight: "100vh", py: 4 }}>
-        <Container maxWidth="lg">
-          {/* HEADER */}
+        <Container maxWidth="xl">
           <Paper
             elevation={3}
             sx={{
               p: 3,
               mb: 4,
               borderRadius: 2,
-              // bgcolor: "#FFFFFF",
-              width: {
-                xs: "100%",
-                sm: "90%",
-                md: "60%",
-                lg: "40%",
-              },
+              width: "100%",
               mx: "auto",
               dir: "rtl",
             }}
           >
             <Stack spacing={2}>
-              {/* כותרת ואייקון */}
               <Box
                 sx={{
                   display: "flex",
@@ -99,7 +133,6 @@ export const LoansPage: React.FC = () => {
                 </Typography>
               </Box>
 
-              {/* כפתור + פילטר */}
               <Box
                 sx={{
                   display: "flex",
@@ -115,53 +148,44 @@ export const LoansPage: React.FC = () => {
                   fullWidth={isSm}
                   sx={{
                     bgcolor: "#2a8c82",
-                    // color: "#fff",
                     "&:hover": { bgcolor: "#1f645f" },
                   }}
                 >
-                  הוסף הלוואה
+                  הוספת הלוואה
                 </Button>
-                {/* <RtlProvider> */}
-                  <FormControl
-                    size="small"
-                    fullWidth={isSm}
+                <FormControl
+                  size="small"
+                  fullWidth={isSm}
+                  sx={{
+                    minWidth: { xs: "auto", sm: 160 },
+                  }}
+                >
+                  <InputLabel
+                    id="filter-status-label"
                     sx={{
-                      minWidth: { xs: "auto", sm: 160 },
+                      fontWeight: 500,
+                      "&.Mui-focused": { color: "#2a8c82" },
                     }}
                   >
-                    <InputLabel
-                      id="filter-status-label"
-                      sx={{
-                        // color: "#424242",
-                        fontWeight: 500,
-                        "&.Mui-focused": { color: "#2a8c82" },
-                      }}
-                    >
-                      מצב הלוואה
-                    </InputLabel>
-                    <Select
-                      labelId="filter-status-label"
-                      value={filter}
-                      label="מצב הלוואה"
-                      onChange={handleFilterChange}
-                   
-                    >
-                      <MenuItem value={StatusGeneric.ALL}>הכל</MenuItem>
-                      <MenuItem value={StatusGeneric.ACTIVE}>פעילות</MenuItem>
-                      <MenuItem value={StatusGeneric.INACTIVE}>
-                        לא פעילות
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
-                {/* </RtlProvider> */}
+                    סינון הלוואות
+                  </InputLabel>
+                  <Select
+                    labelId="filter-status-label"
+                    value={filter}
+                    label="סינון הלוואות"
+                    onChange={handleFilterChange}
+                  >
+                    <MenuItem value={StatusGeneric.ALL}>הכל</MenuItem>
+                    <MenuItem value={StatusGeneric.ACTIVE}>פעיל</MenuItem>
+                    <MenuItem value={StatusGeneric.INACTIVE}>לא פעיל</MenuItem>
+                  </Select>
+                </FormControl>
               </Box>
             </Stack>
           </Paper>
 
-          {/* LOADING */}
           {status === "pending" && <LoadingIndicator />}
 
-          {/* טבלה עם גלילה אופקית */}
           {status === "fulfilled" && (
             <Box
               component={Paper}
@@ -169,15 +193,173 @@ export const LoansPage: React.FC = () => {
               sx={{
                 p: 2,
                 borderRadius: 2,
-                // bgcolor: "#FFFFFF",
                 overflowX: "auto",
               }}
             >
-              <Loans loansData={allLoans} total={total} />
+              {!openView && (
+                <Grid container spacing={2} justifyContent="center" mb={4}>
+                  <Grid item xs={12} sm={isSm ? 6 : 3}>
+                    <SummaryCard label="מספר הלוואות" value={total} />
+                  </Grid>
+                  <Grid item xs={12} sm={isSm ? 6 : 3}>
+                    <SummaryCard
+                      label="סכום הלוואות"
+                      value={`₪${totalAmount.toLocaleString("he-IL")}`}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={isSm ? 6 : 3}>
+                    <SummaryCard
+                      label="יתרה לתשלום"
+                      value={`₪${totalRepaid.toLocaleString("he-IL")}`}
+                    />
+                  </Grid>
+                </Grid>
+              )}
+
+              {openView && selectedLoan && loanDetails && (
+                <Box sx={{ mb: 4 }}>
+                  <LoanHeader
+                    firstName={selectedLoan.user.first_name}
+                    lastName={selectedLoan.user.last_name}
+                    principal={selectedLoan.loan_amount}
+                    remaining={loanDetails.remaining_balance}
+                    balance={loanDetails.balance}
+                    purpose={selectedLoan.purpose}
+                  />
+                </Box>
+              )}
+
+              {!openView && (
+                <Grid container spacing={4}>
+                  {allLoans.map((loan) => (
+                    <Grid item xs={12} sm={6} md={4} key={loan.id}>
+                      <LoanCard
+                        loan={loan}
+                        onClick={() => {
+                          setSelectedLoanId(loan.id);
+                          setOpenView(true);
+                        }}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+
+              {openView && (
+                <Grid container spacing={3} direction="row" sx={{ direction: "ltr" }}>
+                  {!expanded && (
+                    <Grid item xs={12} md={4}>
+                      <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            mb: 2,
+                          }}
+                        >
+                          <Typography variant="h6" fontWeight={600}>
+                            רשימת הלוואות
+                          </Typography>
+                          <Button
+                            variant="outlined"
+                            onClick={() => {
+                              setSelectedLoanId(null);
+                              setOpenView(false);
+                              setExpanded(false);
+                            }}
+                          >
+                            חזרה לכל ההלוואות
+                          </Button>
+                        </Box>
+                        {allLoans.length === 0 ? (
+                          <Typography>אין נתונים להצגה</Typography>
+                        ) : (
+                          <Box>
+                            {allLoans.map((loan) => {
+                              const isSelected = loan.id === selectedLoanId;
+                              return (
+                                <Box
+                                  key={loan.id}
+                                  sx={{
+                                    mb: 2,
+                                    border: isSelected
+                                      ? "2px solid #2a8c82"
+                                      : "1px solid rgba(0,0,0,0.08)",
+                                    borderRadius: 2,
+                                    overflow: "hidden",
+                                  }}
+                                >
+                                  <LoanCard
+                                    loan={loan}
+                                    onClick={() => setSelectedLoanId(loan.id)}
+                                  />
+                                </Box>
+                              );
+                            })}
+                          </Box>
+                        )}
+                      </Paper>
+                    </Grid>
+                  )}
+
+                  <Grid item xs={12} md={expanded ? 6 : 4}>
+                    <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          mb: 2,
+                        }}
+                      >
+                        <Typography variant="h6" fontWeight={600}>
+                          פרטי הלוואה
+                        </Typography>
+                        <Button
+                          variant="outlined"
+                          onClick={() => setExpanded((v) => !v)}
+                        >
+                          {expanded ? "הצג רשימת הלוואות" : "הרחב תצוגה"}
+                        </Button>
+                      </Box>
+                      {selectedLoan && loanDetails ? (
+                        <>
+                          <LoanHeader
+                            firstName={selectedLoan.user.first_name}
+                            lastName={selectedLoan.user.last_name}
+                            principal={selectedLoan.loan_amount}
+                            remaining={loanDetails.remaining_balance}
+                            balance={loanDetails.balance}
+                            purpose={selectedLoan.purpose}
+                          />
+                          <Box sx={{ mt: 2 }}>
+                            <GeneralLoanInfoCard loan={loanDetails} />
+                          </Box>
+                        </>
+                      ) : (
+                        <Typography>אין נתונים להצגה</Typography>
+                      )}
+                    </Paper>
+                  </Grid>
+
+                  <Grid item xs={12} md={expanded ? 6 : 4}>
+                    <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                      {selectedLoanId && loanDetails ? (
+                        <ActionsTable
+                          actions={loanDetails.actions ?? []}
+                          loanId={selectedLoanId}
+                        />
+                      ) : (
+                        <Typography>אין נתונים להצגה</Typography>
+                      )}
+                    </Paper>
+                  </Grid>
+                </Grid>
+              )}
             </Box>
           )}
 
-          {/* PAGINATION */}
           {pageCount > 1 && (
             <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
               <Pagination

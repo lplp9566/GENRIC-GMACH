@@ -1,5 +1,5 @@
 // src/components/Loans/CheckLoanModal.tsx
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -47,10 +47,12 @@ const CheckLoanModal: React.FC<Props> = ({
     createLoanActionStatus,
   } = useSelector((state: RootState) => state.AdminLoansSlice);
 
+  const loanKey = useMemo(() => JSON.stringify(loan), [loan]);
+
   // ברגע שהקומפוננטה נטענת - מפעילים בדיקת הלוואה
   useEffect(() => {
     dispatch(checkLoan(loan));
-  }, [dispatch, loan]);
+  }, [dispatch, loanKey]);
 
   const handleCreateLoan = () => {
     if (type === "create") {
@@ -81,13 +83,16 @@ const CheckLoanModal: React.FC<Props> = ({
 
     if (type === "update" && onSubmit) {
       (async () => {
-        onSubmit();
-      })()
-      .finally(() => {
-        dispatch(setCheckLoanStatus("idle"));
-        dispatch(setLoanActionStatus("idle"));
-        dispatch(setLoanModalMode(false));
-      });
+        try {
+          await onSubmit();
+        } catch {
+          // errors are handled by the caller/toasts
+        } finally {
+          dispatch(setCheckLoanStatus("idle"));
+          dispatch(setLoanActionStatus("idle"));
+          dispatch(setLoanModalMode(false));
+        }
+      })();
     }
   };
 

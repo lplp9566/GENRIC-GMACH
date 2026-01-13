@@ -28,6 +28,7 @@ const LoanHeader: React.FC<LoanHeaderProps> = ({
   return (
     <Box
       sx={{
+        width: "100%",
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
         alignItems: "center",

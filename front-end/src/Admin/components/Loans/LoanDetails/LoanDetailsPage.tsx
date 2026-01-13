@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Box, Button, Grid, Divider } from "@mui/material";
+import { Box, Button, Grid, Divider, Dialog, DialogContent } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { AppDispatch, RootState } from "../../../../store/store";
 import { getLoanDetails } from "../../../../store/features/admin/adminLoanSlice";
@@ -26,6 +26,7 @@ const LoanDetailsPage: React.FC = () => {
     (s: RootState) => s.AdminLoansSlice.loanDetails
   );
   const handleSubmit = useLoanSubmit(loanId);
+  const [actionsOpen, setActionsOpen] = React.useState(false);
 
   useEffect(() => {
     if (loanId) dispatch(getLoanDetails(loanId));
@@ -72,6 +73,16 @@ const LoanDetailsPage: React.FC = () => {
         balance={balance}
         purpose={loan.purpose}
       />
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <Button
+          variant="contained"
+          onClick={() => setActionsOpen(true)}
+          disabled={!loanDetails.isActive}
+          sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
+        >
+          ???? ?????
+        </Button>
+      </Box>
       <Divider />
       <Grid
         container
@@ -85,20 +96,24 @@ const LoanDetailsPage: React.FC = () => {
           <GeneralLoanInfoCard loan={loanDetails} />
         </Grid>
 
-        {loanDetails.isActive && (
-          <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "20%" } }}>
-            <Actions
-              loanId={loanId}
-              handleSubmit={handleSubmit}
-              max={loanDetails.remaining_balance}
-            />
-          </Grid>
-        )}
-
         <Grid item xs={12} md={4}>
           <ActionsTable actions={loanDetails.actions ?? []} loanId={loanId} />
         </Grid>
       </Grid>
+      <Dialog
+        open={actionsOpen}
+        onClose={() => setActionsOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogContent>
+          <Actions
+            loanId={loanId}
+            handleSubmit={handleSubmit}
+            max={loanDetails.remaining_balance}
+          />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

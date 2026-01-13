@@ -6,7 +6,7 @@ import { ICreateLoanAction } from "../../components/Loans/LoanDto";
 import { createLoanAction, getLoanDetails } from "../../../store/features/admin/adminLoanSlice";
 
 
-const useLoanSubmit =(loanId: number) =>{  
+const useLoanSubmit = (loanId: number, onSuccess?: () => void) => {  
   const dispatch = useDispatch<AppDispatch>();
 
   const handleSubmit = useCallback(
@@ -15,8 +15,10 @@ const useLoanSubmit =(loanId: number) =>{
       await dispatch(createLoanAction(dto)).unwrap();
       // 2) רענון הפרטים עם ה־id הנוכחי
       await dispatch(getLoanDetails(loanId)).unwrap();
+      onSuccess?.();
     },
-    [dispatch, loanId]
+    
+    [dispatch, loanId, onSuccess]
   );
 
   return handleSubmit;

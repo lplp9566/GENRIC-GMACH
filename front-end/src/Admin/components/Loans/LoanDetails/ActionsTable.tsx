@@ -36,7 +36,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
   loanId,
   readOnly,
 }) => {
-        const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [currentSortField, setCurrentSortField] = useState<SortField>("date");
   const [editModal, setEditModal] = useState<boolean>(false);
@@ -69,7 +69,6 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
     setDeleteModal(false);
   };
 
-
   const sortedActions = useMemo(() => {
     const copy = [...actions];
     copy.sort((a, b) => {
@@ -94,7 +93,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
         ? " ▲"
         : " ▼"
       : "";
- const handleEdit = (action: ILoanAction) => {
+  const handleEdit = (action: ILoanAction) => {
     setSelected(action);
     setEditModal(true);
   };
@@ -138,7 +137,8 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
               </TableCell>
               {!readOnly && (
                 <TableCell align="center" sx={{ cursor: "default" }}>
-                  פעולות                </TableCell>
+                  פעולות{" "}
+                </TableCell>
               )}
             </TableRow>
           </TableHead>
@@ -150,7 +150,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                 hover
                 sx={{ "& td": { border: "none" } }}
               >
-                                <TableCell align="right">
+                <TableCell align="right">
                   {new Date(action.date).toLocaleDateString("he-IL")}
                 </TableCell>
                 <TableCell align="center">
@@ -178,15 +178,12 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                   align="left"
                   sx={{ fontWeight: 600, color: "#007BFF" }}
                 >
-  
                   {action.action_type !=
-                    LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE && (
-            action.value.toLocaleString("he-IL", {
-                    style: "currency",
-                    currency: "ILS",
-                  } )
-                    ) }
-      
+                    LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE &&
+                    action.value.toLocaleString("he-IL", {
+                      style: "currency",
+                      currency: "ILS",
+                    })}
                 </TableCell>
 
                 {!readOnly && (
@@ -198,8 +195,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                       alignItems="center"
                     >
                       <Tooltip title="Copy">
-                        <IconButton size="small" onClick={() => {}}
-                        >
+                        <IconButton size="small" onClick={() => {}}>
                           <ContentCopyIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
@@ -236,7 +232,6 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                     </Stack>
                   </TableCell>
                 )}
-
               </TableRow>
             ))}
           </TableBody>
@@ -258,7 +253,6 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
           onClose={() => setDeleteModal(false)}
         />
       )}
-
     </Paper>
   );
 };
