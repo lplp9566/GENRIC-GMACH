@@ -1,4 +1,5 @@
 export enum DepositActionsType{
+    InitialDeposit = 'InitialDeposit',
     AddToDeposit = 'AddToDeposit',
     RemoveFromDeposit = 'RemoveFromDeposit',
     ChangeReturnDate = 'ChangeReturnDate', 

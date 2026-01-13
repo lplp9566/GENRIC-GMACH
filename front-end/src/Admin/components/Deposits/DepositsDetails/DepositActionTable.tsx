@@ -1,5 +1,14 @@
-import  { FC, useMemo, useState } from "react";
-import { Chip, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { FC, useMemo, useState } from "react";
+import {
+  Chip,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import { DepositActionsType, IDepositAction } from "../depositsDto";
 
 type SortField = "date" | "action_type" | "result";
@@ -10,12 +19,14 @@ interface DepositActionTableProps {
 }
 
 const ACTION_LABELS: Record<DepositActionsType, string> = {
+  [DepositActionsType.InitialDeposit]: "הפקדה ראשונית",
   [DepositActionsType.AddToDeposit]: "הפקדה",
   [DepositActionsType.RemoveFromDeposit]: "משיכה",
   [DepositActionsType.ChangeReturnDate]: "שינוי תאריך סיום",
 };
 
 const ACTION_ORDER: DepositActionsType[] = [
+  DepositActionsType.InitialDeposit,
   DepositActionsType.AddToDeposit,
   DepositActionsType.RemoveFromDeposit,
   DepositActionsType.ChangeReturnDate,
@@ -23,7 +34,8 @@ const ACTION_ORDER: DepositActionsType[] = [
 
 const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
   const [currentSortField, setCurrentSortField] = useState<SortField>("date");
-  const [currentSortDirection, setCurrentSortDirection] = useState<SortDirection>("asc");
+  const [currentSortDirection, setCurrentSortDirection] =
+    useState<SortDirection>("asc");
 
   const handleHeaderClick = (field: SortField) => {
     if (field === currentSortField) {
@@ -58,28 +70,41 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
   }, [actions, currentSortField, currentSortDirection]);
 
   const renderSortIndicator = (field: SortField) =>
-    currentSortField === field ? (currentSortDirection === "asc" ? " ▲" : " ▼") : "";
+    currentSortField === field
+      ? currentSortDirection === "asc"
+        ? " ▲"
+        : " ▼"
+      : "";
 
   return (
     <Paper elevation={3} sx={{ p: 3, borderRadius: 2, width: "100%" }}>
-      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}>
-        פעולות על הפקדה
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}
+      >
+        פעולות בהפקדה
       </Typography>
 
       {actions.length === 0 ? (
-        <Typography>לא נמצאו פעולות</Typography>
+        <Typography>אין פעולות להצגה</Typography>
       ) : (
         <Table size="small" sx={{ borderSpacing: "0 6px" }}>
           <TableHead>
-            <TableRow sx={{ "& th": {  fontWeight: 700, cursor: "pointer" } }}>
+            <TableRow sx={{ "& th": { fontWeight: 700, cursor: "pointer" } }}>
               <TableCell align="right" onClick={() => handleHeaderClick("date")}>
                 תאריך{renderSortIndicator("date")}
               </TableCell>
-              <TableCell align="center" onClick={() => handleHeaderClick("action_type")}>
+              <TableCell
+                align="center"
+                onClick={() => handleHeaderClick("action_type")}
+              >
                 סוג פעולה{renderSortIndicator("action_type")}
               </TableCell>
-              <TableCell align="left" onClick={() => handleHeaderClick("result")}>
-                פעולה{renderSortIndicator("result")}
+              <TableCell
+                align="left"
+                onClick={() => handleHeaderClick("result")}
+              >
+                תוצאה{renderSortIndicator("result")}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -99,7 +124,9 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
                       label={label}
                       size="small"
                       color={
-                        type === DepositActionsType.AddToDeposit
+                        type === DepositActionsType.InitialDeposit
+                          ? "success"
+                          : type === DepositActionsType.AddToDeposit
                           ? "success"
                           : type === DepositActionsType.RemoveFromDeposit
                           ? "warning"
@@ -110,11 +137,9 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
                     />
                   </TableCell>
                   <TableCell align="left" sx={{ fontWeight: 600, color: "#007BFF" }}>
-                    {type === DepositActionsType.ChangeReturnDate
-                      && action.update_date
-                      ? `${new Date(action.update_date).toLocaleDateString("he-IL")}`
-                      : null
-                    }
+                    {type === DepositActionsType.ChangeReturnDate && action.update_date
+                      ? new Date(action.update_date).toLocaleDateString("he-IL")
+                      : null}
                     {type !== DepositActionsType.ChangeReturnDate && "₪"}
                     {action.amount}
                   </TableCell>

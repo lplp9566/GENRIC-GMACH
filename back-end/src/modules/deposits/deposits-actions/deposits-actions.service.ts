@@ -33,6 +33,16 @@ export class DepositsActionsService {
         throw new Error('Deposit not found');
       }
       switch (depositAction.action_type) {
+        case DepositActionsType.InitialDeposit:
+          if (!depositAction.amount) throw new Error('Amount not found');
+          const initialAction = this.depositsActionsRepo.create({
+            deposit: deposit,
+            action_type: depositAction.action_type,
+            amount: depositAction.amount,
+            date: depositAction.date,
+          });
+          await this.depositsActionsRepo.save(initialAction);
+          return this.depositsService.getDepositsActive();
         case DepositActionsType.ChangeReturnDate:
           if (!depositAction.update_date) throw new Error('Update date not found');
   

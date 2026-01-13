@@ -9,6 +9,8 @@ import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-over
 import { getYearFromDate } from '../../services/services';
 import { DepositsEntity } from './Entity/deposits.entity';
 import { FindOpts, LoanStatus, PaginatedResult } from '../../common/index';
+import { DepositsActionsEntity } from './deposits-actions/Entity/deposits-actions.entity';
+import { DepositActionsType } from './deposits-actions/depostits-actions-dto';
 
 
 @Injectable()
@@ -16,6 +18,8 @@ export class DepositsService {
   constructor(
     @InjectRepository(DepositsEntity)
     private readonly depositsRepo: Repository<DepositsEntity>,
+    @InjectRepository(DepositsActionsEntity)
+    private readonly depositsActionsRepo: Repository<DepositsActionsEntity>,
     private readonly usersService: UsersService,
     private readonly userFinancialByYearService: UserFinancialByYearService,
     private readonly userFinancialService: UserFinancialService,
@@ -72,11 +76,15 @@ export class DepositsService {
       const year = getYearFromDate(deposit.start_date);
       const user = await this.usersService.getUserById(Number(deposit.user));
       if(!user) throw new Error('User not found');
-      // await this.fundsOverviewService.addToDepositsTotal(deposit.initialDeposit);
-      // await this.fundsOverviewServiceByYear.recordFixedDepositAdded(year,deposit.initialDeposit);
-      // await this.userFinancialService.recordFixedDepositAdded(user, deposit.initialDeposit);
-      // await this.userFinancialByYearService.recordFixedDepositAdded(user, year, deposit.initialDeposit);
-      return await this.depositsRepo.save(deposit);
+      const saved = await this.depositsRepo.save(deposit);
+      const initialAction = this.depositsActionsRepo.create({
+        deposit: saved,
+        action_type: DepositActionsType.InitialDeposit,
+        amount: saved.initialDeposit,
+        date: saved.start_date,
+      });
+      await this.depositsActionsRepo.save(initialAction);
+      return saved;
     } catch (error) {
         throw new BadRequestException(error.message);
     }

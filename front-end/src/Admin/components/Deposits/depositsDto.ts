@@ -16,6 +16,7 @@ export interface ICreateDeposits{
     end_date: string;
 }
 export enum DepositActionsType{
+    InitialDeposit = 'InitialDeposit',
     AddToDeposit = 'AddToDeposit',
     RemoveFromDeposit = 'RemoveFromDeposit',
     ChangeReturnDate = 'ChangeReturnDate', 
