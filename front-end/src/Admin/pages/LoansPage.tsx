@@ -50,7 +50,7 @@ export const LoansPage: React.FC = () => {
     (s: RootState) => s.AdminLoansSlice.loanDetails
   );
   const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
-  const limit = 20;
+  const limit = 10;
 
   useEffect(() => {
     if (selectedUser?.id) {
@@ -325,14 +325,6 @@ export const LoansPage: React.FC = () => {
                       </Box>
                       {selectedLoan && loanDetails ? (
                         <>
-                          <LoanHeader
-                            firstName={selectedLoan.user.first_name}
-                            lastName={selectedLoan.user.last_name}
-                            principal={selectedLoan.loan_amount}
-                            remaining={loanDetails.remaining_balance}
-                            balance={loanDetails.balance}
-                            purpose={selectedLoan.purpose}
-                          />
                           <Box sx={{ mt: 2 }}>
                             <GeneralLoanInfoCard loan={loanDetails} />
                           </Box>
