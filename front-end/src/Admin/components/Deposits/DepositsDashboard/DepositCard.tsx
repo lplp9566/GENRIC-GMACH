@@ -23,9 +23,10 @@ import { createDepositAction } from "../../../../store/features/admin/adminDepos
 interface DepositCardProps {
   deposit: IDeposit;
   onClick: () => void;
+  readOnly?: boolean;
 }
 
-const DepositCard: React.FC<DepositCardProps> = ({ deposit, onClick }) => {
+const DepositCard: React.FC<DepositCardProps> = ({ deposit, onClick, readOnly }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [actionsOpen, setActionsOpen] = useState(false);
 
@@ -138,31 +139,35 @@ const DepositCard: React.FC<DepositCardProps> = ({ deposit, onClick }) => {
           <Button variant="outlined" onClick={onClick}>
             הצג פרטי הפקדה
           </Button>
-          <Button
-            variant="contained"
-            onClick={() => setActionsOpen(true)}
-            disabled={!deposit.isActive}
-            sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
-          >
-            הוסף פעולה
-          </Button>
+          {!readOnly && (
+            <Button
+              variant="contained"
+              onClick={() => setActionsOpen(true)}
+              disabled={!deposit.isActive}
+              sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
+            >
+              הוסף פעולה
+            </Button>
+          )}
         </Box>
       </CardContent>
 
-      <Dialog
-        open={actionsOpen}
-        onClose={() => setActionsOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogContent>
-          <DepositsActions
-            depositId={deposit.id}
-            max={deposit.current_balance ?? 0}
-            handleSubmit={handleSubmit}
-          />
-        </DialogContent>
-      </Dialog>
+      {!readOnly && (
+        <Dialog
+          open={actionsOpen}
+          onClose={() => setActionsOpen(false)}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogContent>
+            <DepositsActions
+              depositId={deposit.id}
+              max={deposit.current_balance ?? 0}
+              handleSubmit={handleSubmit}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </Card>
   );
 };

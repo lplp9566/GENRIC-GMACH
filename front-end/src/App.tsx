@@ -24,6 +24,7 @@ import InvestmentDetailsPage from "./Admin/components/Investments/InvestmentDeta
 import StandingOrdersReturnPage from "./Admin/pages/StandingOrdersReturnPage";
 import UserHomePage from "./User/pages/UserHomePage";
 import UserLoansPage from "./User/pages/UserLoansPage";
+import UserDepositsPage from "./User/pages/UserDepositsPage";
 
 import { MatomoTracker } from "./MatomoTracker";
 import AuthGuard from "./Auth/AuthGuard";
@@ -69,6 +70,7 @@ export default function App() {
             <Route element={<UserLayout />}>
               <Route path="/u" element={<UserHomePage />} />
               <Route path="/u/loans" element={<UserLoansPage />} />
+              <Route path="/u/deposits" element={<UserDepositsPage />} />
               <Route path="/u/payments" element={<PaymentsPage />} />
               <Route path="/u/donations" element={<DonationsPage />} />
               <Route path="/u/standing-orders" element={<StandingOrdersReturnPage />} />
