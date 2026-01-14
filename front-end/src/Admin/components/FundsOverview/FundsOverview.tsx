@@ -14,7 +14,7 @@ import ErrorMessage from "../StatusComponents/ErrorMessage";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import SavingsIcon from "@mui/icons-material/Savings";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import CreditCardOffIcon from "@mui/icons-material/CreditCardOff";
 import PriceChangeIcon from "@mui/icons-material/PriceChange";
 import MoneyOutlinedIcon from "@mui/icons-material/MoneyOutlined";
@@ -56,10 +56,10 @@ const FundsOverview: React.FC = () => {
     { label: " קרנות מיוחדות ברוטו", value: fundsOverview.special_funds_gross, Icon: PriceChangeIcon },
         { label: " קרנות מיוחדות נטו", value: fundsOverview.special_funds_net, Icon: PriceChangeIcon },
 
-    { label: "דמי חבר", value: fundsOverview.monthly_deposits, Icon: SavingsIcon },
-    { label: "סך התרומות", value: fundsOverview.total_donations, Icon: SavingsIcon },
-    { label: "תרומות רגילות", value: fundsOverview.total_equity_donations, Icon: SavingsIcon },
-    { label: "פיקדונות", value: fundsOverview.total_user_deposits, Icon: SavingsIcon },
+    { label: "דמי חבר", value: fundsOverview.monthly_deposits, Icon: AccountBalanceIcon },
+    { label: "סך התרומות", value: fundsOverview.total_donations, Icon: AccountBalanceIcon },
+    { label: "תרומות רגילות", value: fundsOverview.total_equity_donations, Icon: AccountBalanceIcon },
+    { label: "פיקדונות", value: fundsOverview.total_user_deposits, Icon: AccountBalanceIcon },
     { label: 'החזרי הו"ק', value: fundsOverview.standing_order_return, Icon: MoneyOutlinedIcon },
     { label: "מזומן", value: fundsOverview.cash_holdings, Icon: AttachMoneyIcon },
     { label: "הוצאות", value: fundsOverview.total_expenses, Icon: CreditCardOffIcon },

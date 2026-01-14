@@ -35,7 +35,7 @@ import { AddPaymentModal } from "../MonthlyPayments/AddMonthlyPayment/AddMonthly
 import { setMonthlyPaymentModalMode } from "../../../store/features/Main/AppMode";
 import NewDepositModal from "../Deposits/newDeposit/newDeposit";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import SavingsIcon from "@mui/icons-material/Savings";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import DebtCards from "./DebtCards";
 import { getAllUsers } from "../../../store/features/admin/adminUsersSlice";
@@ -192,7 +192,7 @@ const HomePage: React.FC = () => {
     {
       label: "קרן הגמ״ח",
       value: formatILS(fundsOverview?.fund_principal),
-      icon: <SavingsIcon sx={{ fontSize: 40 }} />,
+      icon: <AccountBalanceIcon sx={{ fontSize: 40 }} />,
       colorKey: "success" as const,
     },
     {

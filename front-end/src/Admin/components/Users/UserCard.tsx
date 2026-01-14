@@ -24,7 +24,7 @@ import { revertPaymentMethod } from "../../../common/revertTypes/PaymentMethed";
 import TodayIcon from "@mui/icons-material/Today";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import SavingsIcon from "@mui/icons-material/Savings";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import EditUser from "./editUser";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"; // כתר/גביע כזה
@@ -127,7 +127,7 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
                 variant="outlined"
               />
               <Chip
-                icon={anyLoanNeg ? <WarningAmberIcon /> : <SavingsIcon />}
+                icon={anyLoanNeg ? <WarningAmberIcon /> : <AccountBalanceIcon />}
                 label={`${loans.length} הלווא${
                   loans.length !== 1 ? "ות" : "ה"
                 }`}
@@ -199,7 +199,7 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
                               bgcolor: neg ? "error.main" : "success.main",
                             }}
                           >
-                            {neg ? <WarningAmberIcon /> : <SavingsIcon />}
+                            {neg ? <WarningAmberIcon /> : <AccountBalanceIcon />}
                           </Avatar>
                         </ListItemAvatar>
                         <ListItemText
