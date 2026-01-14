@@ -10,7 +10,7 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import SavingsIcon from "@mui/icons-material/Savings";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EventIcon from "@mui/icons-material/Event";
@@ -79,7 +79,7 @@ const DepositCard: React.FC<DepositCardProps> = ({ deposit, onClick, readOnly })
         <Grid container spacing={1} mb={2}>
           <Grid item xs={6}>
             <Box display="flex" alignItems="center" gap={1} sx={{ flexDirection: "row-reverse" }}>
-              <SavingsIcon fontSize="small" sx={{ color: "#006CF0" }} />
+              <AccountBalanceIcon fontSize="small" sx={{ color: "#006CF0" }} />
               <Box textAlign="right">
                 <Typography variant="body2" color="text.secondary">
                   סכום הפקדה
