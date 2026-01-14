@@ -12,6 +12,7 @@ import { AdminDonationsSlice } from "./features/admin/adminDonationsSlice";
 import { AdminInvestmentsSlice } from "./features/admin/adminInvestmentsSlice";
 import { AdminStandingOrderReturnSlice } from "./features/admin/adminStandingOrderReturt";
 import { AdminExpensesSlice } from "./features/admin/adminExpensesSlice";
+import { AdminBankCurrentSlice } from "./features/admin/adminBankCurrentSlice";
 
 export const store = configureStore({
   reducer: {
@@ -27,7 +28,8 @@ export const store = configureStore({
     AdminDonationsSlice: AdminDonationsSlice.reducer,
     AdminInvestmentsSlice: AdminInvestmentsSlice.reducer,
     AdminStandingOrderReturnSlice: AdminStandingOrderReturnSlice.reducer,
-    AdminExpensesSlice:AdminExpensesSlice.reducer
+    AdminExpensesSlice: AdminExpensesSlice.reducer,
+    AdminBankCurrentSlice: AdminBankCurrentSlice.reducer,
   },
 });
 

@@ -1,6 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Grid, Typography, Button, Paper } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Typography,
+  Button,
+  Paper,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  IconButton,
+} from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import {
   Group,
@@ -11,6 +23,12 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { getFundsOverview } from "../../../store/features/admin/adminFundsOverviewSlice";
+import {
+  getBankCurrent,
+  createBankCurrent,
+  updateBankCurrent,
+  deleteBankCurrent,
+} from "../../../store/features/admin/adminBankCurrentSlice";
 import LoadingIndicator from "../StatusComponents/LoadingIndicator";
 import GemachRegulationsModal from "./GemachRegulationsModal";
 import { AddPaymentModal } from "../MonthlyPayments/AddMonthlyPayment/AddMonthlyPayment";
@@ -21,6 +39,9 @@ import SavingsIcon from "@mui/icons-material/Savings";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import DebtCards from "./DebtCards";
 import { getAllUsers } from "../../../store/features/admin/adminUsersSlice";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ConfirmModal from "../genricComponents/confirmModal";
 
 export const formatILS = (value?: number | string | null) => {
   const n = typeof value === "string" ? Number(value) : value ?? 0;
@@ -37,7 +58,8 @@ const HomePage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     dispatch(getFundsOverview());
-    dispatch(getAllUsers({isAdmin:false}))
+    dispatch(getAllUsers({ isAdmin: false }));
+    dispatch(getBankCurrent());
   }, [dispatch]);
 
   const paymentModal = useSelector(
@@ -48,6 +70,9 @@ const HomePage: React.FC = () => {
   );
   const { fundsOverview, status } = useSelector(
     (s: RootState) => s.AdminFundsOverviewReducer
+  );
+  const { items: bankCurrentItems } = useSelector(
+    (s: RootState) => s.AdminBankCurrentSlice
   );
   // const allLoans = useSelector((state:RootState)=> state.AdminLoansSlice.allLoans)
   const allUsers =
@@ -73,6 +98,16 @@ const HomePage: React.FC = () => {
 
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [bankDialogOpen, setBankDialogOpen] = useState(false);
+  const [bankDialogMode, setBankDialogMode] = useState<"create" | "edit">(
+    "create"
+  );
+  const [bankDeleteOpen, setBankDeleteOpen] = useState(false);
+  const [bankForm, setBankForm] = useState({
+    bank_name: "",
+    date: "",
+    amount: "",
+  });
 
   const quickActions = [
     {
@@ -102,6 +137,51 @@ const HomePage: React.FC = () => {
   console.log(quickActions);
   
 
+  const latestBankCurrent = bankCurrentItems[0] ?? null;
+
+  const handleOpenBankDialog = (mode: "create" | "edit") => {
+    setBankDialogMode(mode);
+    if (mode === "edit" && latestBankCurrent) {
+      setBankForm({
+        bank_name: latestBankCurrent.bank_name ?? "",
+        date: latestBankCurrent.date
+          ? latestBankCurrent.date.toString().slice(0, 10)
+          : "",
+        amount: latestBankCurrent.amount?.toString?.() ?? "",
+      });
+    } else {
+      setBankForm({ bank_name: "", date: "", amount: "" });
+    }
+    setBankDialogOpen(true);
+  };
+
+  const handleSubmitBankDialog = async () => {
+    if (!bankForm.bank_name || !bankForm.date || !bankForm.amount) return;
+    const payload = {
+      bank_name: bankForm.bank_name,
+      date: bankForm.date,
+      amount: Number(bankForm.amount),
+    };
+
+    if (bankDialogMode === "create") {
+      await dispatch(createBankCurrent(payload)).unwrap();
+    } else if (latestBankCurrent) {
+      await dispatch(
+        updateBankCurrent({ id: latestBankCurrent.id, data: payload })
+      ).unwrap();
+    }
+
+    setBankDialogOpen(false);
+    dispatch(getBankCurrent());
+  };
+
+  const handleDeleteBankCurrent = async () => {
+    if (!latestBankCurrent) return;
+    await dispatch(deleteBankCurrent(latestBankCurrent.id)).unwrap();
+    dispatch(getBankCurrent());
+    setBankDeleteOpen(false);
+  };
+
   const stats = [
     {
       label: "סכום זמין",
@@ -110,7 +190,7 @@ const HomePage: React.FC = () => {
       colorKey: "secondary" as const,
     },
     {
-      label: 'קרן הגמ"ח',
+      label: "קרן הגמ״ח",
       value: formatILS(fundsOverview?.fund_principal),
       icon: <SavingsIcon sx={{ fontSize: 40 }} />,
       colorKey: "success" as const,
@@ -120,6 +200,18 @@ const HomePage: React.FC = () => {
       value: formatILS(fundsOverview?.own_equity),
       icon: <TrendingUpIcon sx={{ fontSize: 40 }} />,
       colorKey: "primary" as const,
+    },
+    {
+      label: latestBankCurrent?.bank_name || "חשבון בנק",
+      value: latestBankCurrent
+        ? formatILS(latestBankCurrent.amount)
+        : "אין נתונים",
+      subValue: latestBankCurrent
+        ? new Date(latestBankCurrent.date).toLocaleDateString("he-IL")
+        : undefined,
+      icon: <AccountBalanceWalletIcon sx={{ fontSize: 40 }} />,
+      colorKey: "info" as const,
+      isBankCard: true,
     },
   ];
 
@@ -248,6 +340,42 @@ const HomePage: React.FC = () => {
                       <Typography variant="h5" fontWeight={900}>
                         {s.value}
                       </Typography>
+                      {"subValue" in s && s.subValue && (
+                        <Typography variant="body2" color="text.secondary">
+                          {s.subValue}
+                        </Typography>
+                      )}
+                      {"isBankCard" in s && s.isBankCard && (
+                        <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+                          {!latestBankCurrent ? (
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => handleOpenBankDialog("create")}
+                            >
+                              הוספה
+                            </Button>
+                          ) : (
+                            <>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleOpenBankDialog("edit")}
+                                aria-label="עריכה"
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => setBankDeleteOpen(true)}
+                                aria-label="מחיקה"
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </>
+                          )}
+                        </Box>
+                      )}
                     </Box>
                   </Box>
                 </Paper>
@@ -257,6 +385,55 @@ const HomePage: React.FC = () => {
 
           {paymentModal && <AddPaymentModal cape={false} />}
           {depositModal && <NewDepositModal />}
+          <ConfirmModal
+            open={bankDeleteOpen}
+            onClose={() => setBankDeleteOpen(false)}
+            onSubmit={handleDeleteBankCurrent}
+            text="למחוק את חשבון הבנק?"
+          />
+          <Dialog
+            open={bankDialogOpen}
+            onClose={() => setBankDialogOpen(false)}
+            fullWidth
+            maxWidth="sm"
+          >
+            <DialogTitle>
+              {bankDialogMode === "create"
+                ? "הוספת חשבון בנק"
+                : "עריכת חשבון בנק"}
+            </DialogTitle>
+            <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+              <TextField
+                label="שם הבנק"
+                value={bankForm.bank_name}
+                onChange={(e) =>
+                  setBankForm((p) => ({ ...p, bank_name: e.target.value }))
+                }
+                fullWidth
+              />
+              <TextField
+                label="תאריך"
+                type="date"
+                value={bankForm.date}
+                onChange={(e) => setBankForm((p) => ({ ...p, date: e.target.value }))}
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+              />
+              <TextField
+                label="סכום"
+                inputMode="numeric"
+                value={bankForm.amount}
+                onChange={(e) => setBankForm((p) => ({ ...p, amount: e.target.value }))}
+                fullWidth
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setBankDialogOpen(false)}>ביטול</Button>
+              <Button variant="contained" onClick={handleSubmitBankDialog}>
+                שמירה
+              </Button>
+            </DialogActions>
+          </Dialog>
 
           {/* QUICK ACTIONS */}
           <Box mt={{ xs: 6, sm: 10 }}>

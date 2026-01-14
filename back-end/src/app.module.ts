@@ -33,6 +33,7 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
 import { FundsModule } from './modules/funds/funds.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { ExpensesCategoryModule } from './modules/expenses-category/expenses-category.module';
+import { BankCurrentModule } from './modules/bank-current/bank-current.module';
 
 
 @Module({
@@ -83,6 +84,7 @@ import { ExpensesCategoryModule } from './modules/expenses-category/expenses-cat
     WhatsappModule,
     FundsModule,
     ExpensesCategoryModule,
+    BankCurrentModule,
   ],
   providers: [ UserRoleHistoryService],
   controllers: [UserRoleHistoryController,],
