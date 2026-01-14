@@ -61,7 +61,8 @@ build_frontend:
   # אם אין תלות הדדית, אין צורך ב-needs. אם יש – הוסף needs בהתאם.
   before_script:
     - cd front-end
-    - npm ci
+    - rm -rf node_modules package-lock.json
+    - npm i
   script:
     # אם יש לך script build ב-package.json זה עדיף:
     - npm run build
