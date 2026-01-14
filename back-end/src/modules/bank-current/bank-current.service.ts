@@ -23,6 +23,7 @@ export class BankCurrentService {
     return this.bankCurrentRepository.find({ order: { date: "DESC" } });
   }
 
+  
   findOne(id: number) {
     return this.bankCurrentRepository.findOne({ where: { id } });
   }
