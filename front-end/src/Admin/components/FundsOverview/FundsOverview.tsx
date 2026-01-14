@@ -2,15 +2,12 @@ import React, { useEffect } from "react";
 import { Box, Typography, Switch, FormControlLabel, Grid } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../store/store";
-
 import { getFundsOverview } from "../../../store/features/admin/adminFundsOverviewSlice";
 import { getAllFunds } from "../../../store/features/admin/adminDonationsSlice"; // ✅ חדש
-
 import LoadingIndicator from "../StatusComponents/LoadingIndicator";
 import FundsOverviewGauge from "./FundsOverviewGauge/FundsOverviewGauge";
 import FundsOverviewDefault from "./FundsOverviewDefault/FundsOverviewDefault";
 import ErrorMessage from "../StatusComponents/ErrorMessage";
-
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
