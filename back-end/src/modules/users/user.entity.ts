@@ -56,6 +56,12 @@ export class UserEntity {
   @Column({ type: 'boolean', default: false, nullable: true })
   is_member: boolean | null;
 
+  @Column({ type: 'boolean', default: true, nullable: true })
+  notify_account: boolean;
+  @Column({ type: 'boolean', default: true, nullable: true })
+  notify_receipts: boolean;
+  @Column({ type: 'boolean', default: true, nullable: true })
+  notify_general: boolean;
   @Column({ type: 'boolean', default: false })
   is_admin: boolean;
   @OneToOne(
