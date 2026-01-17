@@ -1,11 +1,8 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { UsersService } from '../users.service';
-import { In, Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { use } from 'passport';
 import { UserEntity } from '../user.entity';
 import { UserFinancialEntity } from './user-financials.entity';
-import { CashHoldingsTypesRecordType } from '../../cash-holdings/cash-holdings-dto';
 import { UserFinancialViewEntity } from './user-financials.view.entity';
 // cSpell:ignore Financials
 
@@ -19,7 +16,6 @@ constructor(
   @InjectRepository(UserFinancialViewEntity)
   private readonly userFinancialsViewRepository: Repository<UserFinancialViewEntity>,
 
-  // private readonly usersService: UsersService,
 ) {}
 
 async getOrCreateUserFinancials(user: UserEntity) {
@@ -45,6 +41,17 @@ let record = await this.userFinancialsViewRepository.findOne({
   //   await this.userFinancialsRepository.save(record);
   // }
   return record;
+}
+
+async getAllUserFinancials() {
+  return this.userFinancialsViewRepository.find();
+}
+
+async getUserFinancialsByUserId(userId: number) {
+  if (!userId) return null;
+  return this.userFinancialsViewRepository.findOne({
+    where: { userId },
+  });
 }
 
 // async recordMonthlyDeposit(user: UserEntity, amount: number) {      

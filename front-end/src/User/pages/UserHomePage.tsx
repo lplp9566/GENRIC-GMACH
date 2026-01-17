@@ -14,10 +14,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link as RouterLink } from "react-router-dom";
 import GemachRegulationsModal from "../../Admin/components/HomePage/GemachRegulationsModal";
 import { formatILS } from "../../Admin/components/HomePage/HomePage";
-import { parseDate, formatDate } from "../../Admin/Hooks/genricFunction";
+import { formatDate, parseDate } from "../../Admin/Hooks/genricFunction";
 import { AppDispatch, RootState } from "../../store/store";
 import { getOrdersReturnByUserId } from "../../store/features/admin/adminStandingOrderReturt";
 import { getDonationByUserId } from "../../store/features/admin/adminDonationsSlice";
+import { getAllDeposits } from "../../store/features/admin/adminDepositsSlice";
+import { StatusGeneric } from "../../common/indexTypes";
+import { getUserFinancialsByUserGuard } from "../../store/features/user/userFinancialSlice";
 
 const HEB_MONTHS = [
   "ינו",
@@ -36,6 +39,8 @@ const HEB_MONTHS = [
 
 const UserHomePage = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const ordersReturn =
     useSelector(
@@ -43,17 +48,29 @@ const UserHomePage = () => {
     ) ?? [];
   const donations =
     useSelector((s: RootState) => s.AdminDonationsSlice.allDonations) ?? [];
+  const deposits =
+    useSelector((s: RootState) => s.AdminDepositsSlice.allDeposits) ?? [];
+  const userFinancials = useSelector(
+    (s: RootState) => s.UserFinancialSlice.data
+  );
   const [openRegulations, setOpenRegulations] = useState(false);
 
   const user = authUser?.user;
   const userName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
-  const theme = useTheme();
-  const isDark = theme.palette.mode === "dark";
 
   useEffect(() => {
     if (user?.id != null) {
       dispatch(getOrdersReturnByUserId(user.id));
       dispatch(getDonationByUserId(user.id));
+      dispatch(getUserFinancialsByUserGuard());
+      dispatch(
+        getAllDeposits({
+          page: 1,
+          limit: 50,
+          status: StatusGeneric.ACTIVE,
+          userId: user.id,
+        })
+      );
     }
   }, [dispatch, user?.id]);
 
@@ -79,21 +96,15 @@ const UserHomePage = () => {
     since.setMonth(now.getMonth() - 12);
 
     let total = 0;
-    let count = 0;
-    let net = 0;
-
     donations.forEach((d: any) => {
       const dt = parseDate(d?.date);
       if (!dt || dt < since) return;
       const amount = Number(d?.amount ?? 0) || 0;
       const action = String(d?.action ?? "").toLowerCase();
-      if (action === "donation") total += amount;
-      if (action === "withdraw") total += 0;
-      net += action === "withdraw" ? -amount : amount;
-      count += 1;
+      total += action === "withdraw" ? -amount : amount;
     });
 
-    return { total, count, net };
+    return total;
   }, [donations]);
 
   const monthlyDonationSeries = useMemo(() => {
@@ -128,22 +139,22 @@ const UserHomePage = () => {
     ...monthlyDonationSeries.map((m) => Math.abs(m.value))
   );
 
-  const repaymentStatus = monthlyDebt === 0 ? "עמידה מלאה" : "חריגה";
-  const repaymentHint =
-    monthlyDebt === 0
-      ? "כל ההחזרים החודשיים מאוזנים."
-      : "נדרש טיפול באיזון החודשי.";
+  const nextChargeDate = useMemo(() => {
+    const chargeDay = Number(user?.payment_details?.charge_date ?? 0);
+    if (!chargeDay || chargeDay < 1 || chargeDay > 31) return null;
+    const now = new Date();
+    const candidate = new Date(now.getFullYear(), now.getMonth(), chargeDay);
+    if (candidate < now) {
+      candidate.setMonth(candidate.getMonth() + 1);
+    }
+    return candidate;
+  }, [user?.payment_details?.charge_date]);
 
-  const paymentMethod = String(user?.payment_details?.payment_method ?? "");
-  const paymentMethodLabel = {
-    direct_debit: "הוראת קבע",
-    credit_card: "כרטיס אשראי",
-    bank_transfer: "העברה בנקאית",
-    cash: "מזומן",
-    other: "אחר",
-  }[paymentMethod] ?? "לא הוגדר";
-
-  const joinDate = formatDate(parseDate(user?.join_date));
+  const activeDeposit = useMemo(() => {
+    const active = deposits.filter((d) => d?.isActive);
+    if (active.length === 0) return null;
+    return active[0];
+  }, [deposits]);
 
   return (
     <Box
@@ -182,21 +193,9 @@ const UserHomePage = () => {
             left: -80,
           }}
         />
-        <Box
-          sx={{
-            position: "absolute",
-            width: 180,
-            height: 180,
-            borderRadius: 6,
-            bgcolor: "rgba(255,255,255,0.12)",
-            bottom: -60,
-            right: -40,
-            transform: "rotate(12deg)",
-          }}
-        />
         <Stack spacing={1.5} position="relative" zIndex={1}>
           <Chip
-            label="איזור אישי"
+            label="דף הבית"
             color="default"
             sx={{
               alignSelf: "flex-start",
@@ -206,15 +205,15 @@ const UserHomePage = () => {
             }}
           />
           <Typography variant="h4" fontWeight={800}>
-            מרכז שליטה אישי{userName ? `, ${userName}` : ""}
+            ברוך הבא{userName ? `, ${userName}` : ""}
           </Typography>
           <Typography variant="subtitle1" sx={{ opacity: 0.9, maxWidth: 640 }}>
-            מסך אחד שמרכז את מצב ההחזרים, תרומות, הלוואות והוראות קבע שלך.
+            ריכוז מהיר של החובות, ההחזרים והדברים הטובים במקום אחד.
           </Typography>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
             <Button
-              component="a"
-              href="#section-overview"
+              component={RouterLink}
+              to="/u/profile"
               variant="contained"
               sx={{
                 borderRadius: 3,
@@ -224,11 +223,11 @@ const UserHomePage = () => {
                 "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
               }}
             >
-              קפיצה לתמונה שנתית
+              לאיזור אישי
             </Button>
             <Button
               component="a"
-              href="#section-loans"
+              href="#section-good"
               variant="outlined"
               sx={{
                 borderRadius: 3,
@@ -238,295 +237,121 @@ const UserHomePage = () => {
                 "&:hover": { borderColor: "#fff" },
               }}
             >
-              מצב הלוואות והחזרים
+              הדברים הטובים
             </Button>
           </Stack>
         </Stack>
       </Paper>
 
-      <Box id="section-overview" sx={{ mt: 4 }}>
+      <Box sx={{ mt: 4 }}>
         <Typography variant="h5" fontWeight={800} mb={2}>
-          תמונת מצב שנתית
+          חובות והחזרים
         </Typography>
         <Grid container spacing={{ xs: 2, md: 3 }}>
-          <Grid item xs={12} md={3}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 3,
-                borderRadius: 4,
-                background: isDark
-                  ? "linear-gradient(135deg, rgba(245,158,11,0.2), rgba(30,41,59,0.9))"
-                  : "linear-gradient(135deg, rgba(255,196,87,0.18), rgba(255,246,196,0.6))",
-                border: isDark
-                  ? "1px solid rgba(245,158,11,0.3)"
-                  : "1px solid rgba(245,158,11,0.25)",
-              }}
-            >
-              <Typography variant="subtitle2" fontWeight={700}>
-                תרומות 12 חודשים
-              </Typography>
-              <Typography variant="h5" fontWeight={800} mt={1}>
-                {formatILS(last12MonthsDonations.total)}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {last12MonthsDonations.count} פעולות נטו{" "}
-                {formatILS(last12MonthsDonations.net)}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 3,
-                borderRadius: 4,
-                background: isDark
-                  ? "linear-gradient(135deg, rgba(59,130,246,0.2), rgba(30,41,59,0.9))"
-                  : "linear-gradient(135deg, rgba(59,130,246,0.12), rgba(224,242,254,0.7))",
-                border: isDark
-                  ? "1px solid rgba(59,130,246,0.35)"
-                  : "1px solid rgba(59,130,246,0.2)",
-              }}
-            >
-              <Typography variant="subtitle2" fontWeight={700}>
-                הלוואות פתוחות
-              </Typography>
-              <Typography variant="h5" fontWeight={800} mt={1}>
-                {openLoans.length} הלוואות
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                יתרה כוללת: {formatILS(loansDebt)}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 3,
-                borderRadius: 4,
-                background: isDark
-                  ? "linear-gradient(135deg, rgba(34,197,94,0.2), rgba(30,41,59,0.9))"
-                  : "linear-gradient(135deg, rgba(34,197,94,0.12), rgba(220,252,231,0.7))",
-                border: isDark
-                  ? "1px solid rgba(34,197,94,0.35)"
-                  : "1px solid rgba(34,197,94,0.2)",
-              }}
-            >
-              <Typography variant="subtitle2" fontWeight={700}>
-                מצב החזר חודשי
-              </Typography>
-              <Typography variant="h5" fontWeight={800} mt={1}>
-                {repaymentStatus}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {monthlyDebt === 0
-                  ? "אין חוב חודשי פתוח"
-                  : `יתרת חוב: ${formatILS(monthlyDebt)}`}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 3,
-                borderRadius: 4,
-                background: isDark
-                  ? "linear-gradient(135deg, rgba(244,63,94,0.2), rgba(30,41,59,0.9))"
-                  : "linear-gradient(135deg, rgba(244,63,94,0.12), rgba(255,228,230,0.7))",
-                border: isDark
-                  ? "1px solid rgba(244,63,94,0.35)"
-                  : "1px solid rgba(244,63,94,0.2)",
-              }}
-            >
-              <Typography variant="subtitle2" fontWeight={700}>
-                הוראות קבע פתוחות
-              </Typography>
-              <Typography variant="h5" fontWeight={800} mt={1}>
-                {ordersReturn.filter((o) => !o.paid).length}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                יתרת חיוב: {formatILS(standingOrdersDebt)}
-              </Typography>
-            </Paper>
-          </Grid>
+          {[
+            {
+              title: "חוב הלוואות",
+              value: loansDebt,
+              detail: `${openLoans.length} הלוואות פעילות`,
+            },
+            {
+              title: "חוב חודשי",
+              value: monthlyDebt,
+              detail: "דמי חבר/החזר חודשי",
+            },
+            {
+              title: "חוב הוראות קבע",
+              value: standingOrdersDebt,
+              detail: `${ordersReturn.filter((o) => !o.paid).length} הוראות פתוחות`,
+            },
+          ].map((card) => (
+            <Grid item xs={12} md={4} key={card.title}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  borderRadius: 4,
+                  background: isDark
+                    ? "linear-gradient(135deg, rgba(244,63,94,0.2), rgba(30,41,59,0.9))"
+                    : "linear-gradient(135deg, rgba(244,63,94,0.12), rgba(255,228,230,0.7))",
+                  border: isDark
+                    ? "1px solid rgba(244,63,94,0.35)"
+                    : "1px solid rgba(244,63,94,0.2)",
+                }}
+              >
+                <Typography variant="subtitle2" fontWeight={700}>
+                  {card.title}
+                </Typography>
+                <Typography variant="h5" fontWeight={800} mt={1}>
+                  {formatILS(card.value)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {card.detail}
+                </Typography>
+              </Paper>
+            </Grid>
+          ))}
         </Grid>
       </Box>
 
-      <Box id="section-donations" sx={{ mt: 4 }}>
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 4 }}>
-          <Stack spacing={2}>
-            <Stack
-              direction={{ xs: "column", md: "row" }}
-              justifyContent="space-between"
-              spacing={1.5}
-            >
-              <Box>
-                <Typography variant="h6" fontWeight={800}>
-                  תרומות בשנה האחרונה
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  מגמת תרומות לפי חודשים (נטו, כולל משיכות).
-                </Typography>
-              </Box>
-              <Button
-                component={RouterLink}
-                to="/u/donations"
-                variant="outlined"
-                sx={{ borderRadius: 3, fontWeight: 700 }}
-              >
-                מעבר לכל התרומות
-              </Button>
-            </Stack>
-            <Divider />
-            <Grid container spacing={2}>
-              {monthlyDonationSeries.map((m) => {
-                const width = Math.round(
-                  (Math.abs(m.value) / maxDonationMonth) * 100
-                );
-                return (
-                  <Grid item xs={12} md={6} key={m.key}>
-                    <Stack spacing={1}>
-                      <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
-                        <Typography variant="subtitle2" fontWeight={700}>
-                          {m.label}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {formatILS(m.value)}
-                        </Typography>
-                      </Stack>
-                      <Box
-                        sx={{
-                          height: 10,
-                          borderRadius: 6,
-                          bgcolor: isDark
-                            ? "rgba(148,163,184,0.25)"
-                            : "rgba(15,23,42,0.08)",
-                          overflow: "hidden",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            height: "100%",
-                            width: `${width}%`,
-                            bgcolor:
-                              m.value >= 0
-                                ? "linear-gradient(90deg, #22c55e, #86efac)"
-                                : "linear-gradient(90deg, #f43f5e, #fb7185)",
-                          }}
-                        />
-                      </Box>
-                    </Stack>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Stack>
-        </Paper>
-      </Box>
-
-      <Box id="section-loans" sx={{ mt: 4 }}>
+      <Box id="section-good" sx={{ mt: 4 }}>
+        <Typography variant="h5" fontWeight={800} mb={2}>
+          הדברים הטובים
+        </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} md={7}>
             <Paper elevation={0} sx={{ p: 3, borderRadius: 4, height: "100%" }}>
               <Stack spacing={2}>
                 <Typography variant="h6" fontWeight={800}>
-                  הלוואות והחזרים
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  מצב ההחזרים החודשי והלוואות פעילות במקום אחד.
+                  סטטוס חיובי ומה צפוי
                 </Typography>
                 <Divider />
                 <Stack spacing={1.5}>
-                  <Typography variant="subtitle1" fontWeight={700}>
-                    סטטוס החזר חודשי
+                  <Typography variant="subtitle2" fontWeight={700}>
+                    יש לך הלוואות פתוחות?
                   </Typography>
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 2,
-                      borderRadius: 3,
-                      background: isDark
-                        ? monthlyDebt === 0
-                          ? "linear-gradient(135deg, rgba(34,197,94,0.2), rgba(30,41,59,0.9))"
-                          : "linear-gradient(135deg, rgba(244,63,94,0.2), rgba(30,41,59,0.9))"
-                        : monthlyDebt === 0
-                        ? "linear-gradient(135deg, rgba(34,197,94,0.15), rgba(240,253,244,0.9))"
-                        : "linear-gradient(135deg, rgba(244,63,94,0.15), rgba(255,241,242,0.9))",
-                      border: isDark
-                        ? monthlyDebt === 0
-                          ? "1px solid rgba(34,197,94,0.35)"
-                          : "1px solid rgba(244,63,94,0.35)"
-                        : monthlyDebt === 0
-                        ? "1px solid rgba(34,197,94,0.2)"
-                        : "1px solid rgba(244,63,94,0.2)",
-                    }}
-                  >
-                    <Stack spacing={0.5}>
-                      <Typography variant="subtitle2" fontWeight={700}>
-                        {repaymentStatus}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {repaymentHint}
-                      </Typography>
-                      {monthlyDebt > 0 && (
-                        <Typography variant="body2" fontWeight={700}>
-                          יתרת חוב: {formatILS(monthlyDebt)}
-                        </Typography>
-                      )}
-                    </Stack>
-                  </Paper>
+                  <Typography variant="body1" fontWeight={800}>
+                    {openLoans.length > 0
+                      ? `כן, ${openLoans.length} הלוואות בסך ${formatILS(
+                          loansDebt
+                        )}`
+                      : "אין הלוואות פתוחות"}
+                  </Typography>
                 </Stack>
                 <Stack spacing={1.5}>
-                  <Typography variant="subtitle1" fontWeight={700}>
-                    הלוואות פתוחות ({openLoans.length})
+                  <Typography variant="subtitle2" fontWeight={700}>
+                    החיוב הבא
                   </Typography>
-                  {openLoans.length === 0 ? (
-                    <Typography variant="body2" color="text.secondary">
-                      אין הלוואות פתוחות כרגע.
+                  <Typography variant="body1" fontWeight={800}>
+                    {nextChargeDate
+                      ? `${formatDate(nextChargeDate)} • ${formatILS(
+                          Math.abs(monthlyBalance)
+                        )}`
+                      : "לא הוגדר מועד חיוב"}
+                  </Typography>
+                </Stack>
+                <Stack spacing={1.5}>
+                  <Typography variant="subtitle2" fontWeight={700}>
+                    הפקדה פעילה
+                  </Typography>
+                  {activeDeposit ? (
+                    <Typography variant="body1" fontWeight={800}>
+                      {formatILS(activeDeposit.current_balance)} • החזר צפוי{" "}
+                      {formatDate(parseDate(activeDeposit.end_date))}
                     </Typography>
                   ) : (
-                    <Grid container spacing={2}>
-                      {openLoans.map((loan) => (
-                        <Grid item xs={12} md={6} key={loan.loanId}>
-                          <Paper
-                            elevation={0}
-                            sx={{
-                              p: 2,
-                              borderRadius: 3,
-                              border: isDark
-                                ? "1px solid rgba(148,163,184,0.25)"
-                                : "1px solid rgba(15,23,42,0.08)",
-                            }}
-                          >
-                            <Typography variant="subtitle2" fontWeight={700}>
-                              הלוואה #{loan.loanId}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              יתרה פתוחה
-                            </Typography>
-                            <Typography variant="h6" fontWeight={800}>
-                              {formatILS(Math.abs(loan.balance))}
-                            </Typography>
-                          </Paper>
-                        </Grid>
-                      ))}
-                    </Grid>
+                    <Typography variant="body2" color="text.secondary">
+                      אין הפקדה פעילה כרגע.
+                    </Typography>
                   )}
                 </Stack>
                 <Button
                   component={RouterLink}
-                  to="/u/loans"
+                  to="/u/deposits"
                   variant="outlined"
                   sx={{ borderRadius: 3, fontWeight: 700, alignSelf: "flex-start" }}
                 >
-                  פירוט הלוואות מלא
+                  פירוט הפקדות
                 </Button>
               </Stack>
             </Paper>
@@ -535,127 +360,89 @@ const UserHomePage = () => {
             <Paper elevation={0} sx={{ p: 3, borderRadius: 4, height: "100%" }}>
               <Stack spacing={2}>
                 <Typography variant="h6" fontWeight={800}>
-                  פרטי חיוב וניהול קשר
+                  תרומות ב-12 חודשים
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  סך נטו: {formatILS(last12MonthsDonations)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  סה״כ מאז הקמה:{" "}
+                  {formatILS(userFinancials?.total_donations ?? 0)}
                 </Typography>
                 <Divider />
-                <Stack spacing={1.5}>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      סוג תשלום
-                    </Typography>
-                    <Typography variant="subtitle2" fontWeight={700}>
-                      {paymentMethodLabel}
-                    </Typography>
-                  </Stack>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      מועד חיוב חודשי
-                    </Typography>
-                    <Typography variant="subtitle2" fontWeight={700}>
-                      {user?.payment_details?.charge_date ?? "לא הוגדר"}
-                    </Typography>
-                  </Stack>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      סטטוס חברות
-                    </Typography>
-                    <Typography variant="subtitle2" fontWeight={700}>
-                      {user?.membership_type ?? "לא ידוע"}
-                    </Typography>
-                  </Stack>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      תאריך הצטרפות
-                    </Typography>
-                    <Typography variant="subtitle2" fontWeight={700}>
-                      {joinDate || "לא הוגדר"}
-                    </Typography>
-                  </Stack>
-                </Stack>
-                <Divider />
-                <Stack spacing={1}>
-                  <Typography variant="subtitle2" fontWeight={700}>
-                    הוראות קבע פתוחות
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {ordersReturn.filter((o) => !o.paid).length} הוראות פעילות
-                  </Typography>
-                  <Typography variant="h6" fontWeight={800}>
-                    {formatILS(standingOrdersDebt)}
-                  </Typography>
-                  <Button
-                    component={RouterLink}
-                    to="/u/standing-orders"
-                    variant="outlined"
-                    sx={{ borderRadius: 3, fontWeight: 700, alignSelf: "flex-start" }}
-                  >
-                    פירוט הוראות קבע
-                  </Button>
-                </Stack>
+                <Grid container spacing={2}>
+                  {monthlyDonationSeries.map((m) => {
+                    const width = Math.round(
+                      (Math.abs(m.value) / maxDonationMonth) * 100
+                    );
+                    return (
+                      <Grid item xs={12} key={m.key}>
+                        <Stack spacing={1}>
+                          <Stack
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                          >
+                            <Typography variant="subtitle2" fontWeight={700}>
+                              {m.label}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {formatILS(m.value)}
+                            </Typography>
+                          </Stack>
+                          <Box
+                            sx={{
+                              height: 10,
+                              borderRadius: 6,
+                              bgcolor: isDark
+                                ? "rgba(148,163,184,0.25)"
+                                : "rgba(15,23,42,0.08)",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                height: "100%",
+                                width: `${width}%`,
+                                bgcolor:
+                                  m.value >= 0
+                                    ? "linear-gradient(90deg, #22c55e, #86efac)"
+                                    : "linear-gradient(90deg, #f43f5e, #fb7185)",
+                              }}
+                            />
+                          </Box>
+                        </Stack>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
               </Stack>
             </Paper>
           </Grid>
         </Grid>
       </Box>
 
-      <Box id="section-actions" sx={{ mt: 4 }}>
+      <Box sx={{ mt: 4 }}>
         <Paper elevation={0} sx={{ p: 3, borderRadius: 4 }}>
           <Stack spacing={2}>
-            <Typography variant="h6" fontWeight={800}>
-              פעולות מהירות
-            </Typography>
+            <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+              <Box flex={1}>
+                <Typography variant="h6" fontWeight={800}>
+                  שליחת הודעה
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  בקרוב נפתח כאן טופס פנייה מסודר אל הגמ״ח.
+                </Typography>
+              </Box>
+              <Button
+                variant="contained"
+                disabled
+                sx={{ borderRadius: 3, fontWeight: 700, height: 44 }}
+              >
+                טופס פנייה בקרוב
+              </Button>
+            </Stack>
             <Divider />
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={4}>
-                <Button
-                  component={RouterLink}
-                  to="/u/payments"
-                  variant="outlined"
-                  fullWidth
-                  sx={{ borderRadius: 3, fontWeight: 700, py: 1.5 }}
-                >
-                  צפייה בתשלומים
-                </Button>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Button
-                  component={RouterLink}
-                  to="/u/deposits"
-                  variant="outlined"
-                  fullWidth
-                  sx={{ borderRadius: 3, fontWeight: 700, py: 1.5 }}
-                >
-                  הפקדות וחסכונות
-                </Button>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Button
-                  component={RouterLink}
-                  to="/u/statistics"
-                  variant="outlined"
-                  fullWidth
-                  sx={{ borderRadius: 3, fontWeight: 700, py: 1.5 }}
-                >
-                  סטטיסטיקה שנתית
-                </Button>
-              </Grid>
-            </Grid>
             <Box textAlign={{ xs: "center", md: "left" }}>
               <Button
                 variant="contained"
