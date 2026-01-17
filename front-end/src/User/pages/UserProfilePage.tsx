@@ -130,7 +130,6 @@ const UserProfilePage = () => {
       dispatch(setAuthUserData(updated));
       setEditOpen(false);
     } catch {
-      // toast already handled
     }
   };
 

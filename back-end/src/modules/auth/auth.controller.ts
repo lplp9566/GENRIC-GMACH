@@ -1,4 +1,4 @@
-import {
+﻿import {
   Controller,
   Post,
   Body,
@@ -25,11 +25,33 @@ export class AuthController {
     const token = await this.authService.login(email, password);
     res.cookie('Authentication', token, {
       httpOnly: true,
-      secure: true,          // חובה כי Netlify הוא HTTPS
-  sameSite: 'none',
+      secure: true,
+      sameSite: 'none',
       maxAge: 1000 * 60 * 60 * 24,
     });
     return { message: 'Token issued successfully' };
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body('email') email: string) {
+    return this.authService.requestPasswordReset(email);
+  }
+
+  @Post('verify-reset-code')
+  async verifyResetCode(
+    @Body('email') email: string,
+    @Body('code') code: string,
+  ) {
+    return this.authService.verifyResetCode(email, code);
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Body('email') email: string,
+    @Body('code') code: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    return this.authService.resetPassword(email, code, newPassword);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -44,13 +66,12 @@ export class AuthController {
     return { message: 'You are admin', user: req.user };
   }
   @Post('logout')
-logout(@Res({ passthrough: true }) res: Response) {
-  res.clearCookie('Authentication', {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-  });
-  return { message: 'Logged out' };
-}
-
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('Authentication', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+    return { message: 'Logged out' };
+  }
 }

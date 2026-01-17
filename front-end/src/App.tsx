@@ -1,9 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+﻿import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import PublicLayout from "./layouts/PublicLayout";
 import AdminLayout from "./layouts/AdminLayout";
 import UserLayout from "./layouts/UserLayout";
 
 import LoginPage from "./Admin/pages/LoginPage";
+import ForgotPasswordPage from "./Auth/ForgotPasswordPage";
 
 import HomePage from "./Admin/components/HomePage/HomePage";
 import LoansPage from "./Admin/pages/LoansPage";
@@ -40,6 +41,7 @@ export default function App() {
         {/* Public */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Route>
 
         {/* Private (must be logged in) */}
@@ -52,7 +54,10 @@ export default function App() {
               <Route path="/loans/new" element={<NewLoan />} />
               <Route path="/loans/:id" element={<LoanDetailsPage />} />
               <Route path="/funds" element={<FundsOverviewDashboard />} />
-              <Route path="/FundsOverviewByYear" element={<FundsOverviewByYearPage />} />
+              <Route
+                path="/FundsOverviewByYear"
+                element={<FundsOverviewByYearPage />}
+              />
               <Route path="/users" element={<UsersPage />} />
               <Route path="/users/new" element={<AddNewUser />} />
               <Route path="/paymentsPage" element={<PaymentsPage />} />
@@ -62,8 +67,14 @@ export default function App() {
               <Route path="/deposits" element={<DepositsPage />} />
               <Route path="/deposit/:id" element={<DepositDetailsPage />} />
               <Route path="/investments" element={<Investments />} />
-              <Route path="/investments/:id" element={<InvestmentDetailsPage />} />
-              <Route path="/standing-orders" element={<StandingOrdersReturnPage />} />
+              <Route
+                path="/investments/:id"
+                element={<InvestmentDetailsPage />}
+              />
+              <Route
+                path="/standing-orders"
+                element={<StandingOrdersReturnPage />}
+              />
             </Route>
           </Route>
 
@@ -77,8 +88,14 @@ export default function App() {
               <Route path="/u/overview" element={<UserOverviewPage />} />
               <Route path="/u/payments" element={<PaymentsPage />} />
               <Route path="/u/donations" element={<DonationsPage />} />
-              <Route path="/u/standing-orders" element={<StandingOrdersReturnPage />} />
-              <Route path="/u/statistics" element={<FundsOverviewByYearPage />} />
+              <Route
+                path="/u/standing-orders"
+                element={<StandingOrdersReturnPage />}
+              />
+              <Route
+                path="/u/statistics"
+                element={<FundsOverviewByYearPage />}
+              />
             </Route>
           </Route>
         </Route>
@@ -88,4 +105,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-
