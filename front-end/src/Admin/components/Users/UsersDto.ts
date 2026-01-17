@@ -9,6 +9,9 @@ export interface IUser {
   email_address: string;
   iS_admin: boolean;
   is_member:boolean ;
+  notify_account?: boolean | null;
+  notify_receipts?: boolean | null;
+  notify_general?: boolean | null;
   payment_details: IPaymentDetails;
   current_role: ICurrentRole;
   membership_type: MembershipType

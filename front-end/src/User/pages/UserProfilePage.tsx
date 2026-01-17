@@ -10,6 +10,7 @@ import {
   Divider,
   Grid,
   Paper,
+  Switch,
   Stack,
   TextField,
   Typography,
@@ -23,6 +24,8 @@ import { getUserFinancialsByUserGuard } from "../../store/features/user/userFina
 import { getAllLoans } from "../../store/features/admin/adminLoanSlice";
 import { StatusGeneric } from "../../common/indexTypes";
 import { editUser } from "../../store/features/admin/adminUsersSlice";
+import { setAuthUserData } from "../../store/features/auth/authSlice";
+import { toast } from "react-toastify";
 
 const UserProfilePage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,6 +39,7 @@ const UserProfilePage = () => {
 
   const user = authUser?.user;
   const [editOpen, setEditOpen] = useState(false);
+  const [notifyOpen, setNotifyOpen] = useState(false);
   const [formData, setFormData] = useState(() => ({
     first_name: user?.first_name ?? "",
     last_name: user?.last_name ?? "",
@@ -45,6 +49,11 @@ const UserProfilePage = () => {
     bank_number: user?.payment_details?.bank_number ?? "",
     bank_branch: user?.payment_details?.bank_branch ?? "",
     bank_account_number: user?.payment_details?.bank_account_number ?? "",
+  }));
+  const [notifyData, setNotifyData] = useState(() => ({
+    notify_account: user?.notify_account ?? true,
+    notify_receipts: user?.notify_receipts ?? true,
+    notify_general: user?.notify_general ?? true,
   }));
 
   useEffect(() => {
@@ -66,6 +75,11 @@ const UserProfilePage = () => {
       bank_branch: user.payment_details?.bank_branch ?? "",
       bank_account_number: user.payment_details?.bank_account_number ?? "",
     });
+    setNotifyData({
+      notify_account: user.notify_account ?? true,
+      notify_receipts: user.notify_receipts ?? true,
+      notify_general: user.notify_general ?? true,
+    });
   }, [user]);
 
   const totalDonations = userFinancials?.total_donations ?? 0;
@@ -86,26 +100,65 @@ const UserProfilePage = () => {
     [user?.payment_details]
   );
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!user?.id) return;
-    dispatch(
-      editUser({
-        userId: user.id,
-        userData: {
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          email_address: formData.email_address,
-          id_number: formData.id_number,
-          phone_number: formData.phone_number,
-          payment_details: {
-            bank_number: Number(formData.bank_number) || 0,
-            bank_branch: Number(formData.bank_branch) || 0,
-            bank_account_number: Number(formData.bank_account_number) || 0,
-          } as any,
-        },
-      })
-    );
-    setEditOpen(false);
+    try {
+      const updated = await toast.promise(
+        dispatch(
+          editUser({
+            userId: user.id,
+            userData: {
+              first_name: formData.first_name,
+              last_name: formData.last_name,
+              email_address: formData.email_address,
+              id_number: formData.id_number,
+              phone_number: formData.phone_number,
+              payment_details: {
+                bank_number: Number(formData.bank_number) || 0,
+                bank_branch: Number(formData.bank_branch) || 0,
+                bank_account_number: Number(formData.bank_account_number) || 0,
+              } as any,
+            },
+          })
+        ).unwrap(),
+        {
+          pending: "שומר פרטים...",
+          success: "הפרטים עודכנו בהצלחה",
+          error: "שגיאה בעדכון הפרטים",
+        }
+      );
+      dispatch(setAuthUserData(updated));
+      setEditOpen(false);
+    } catch {
+      // toast already handled
+    }
+  };
+
+  const handleNotifySave = async () => {
+    if (!user?.id) return;
+    try {
+      const updated = await toast.promise(
+        dispatch(
+          editUser({
+            userId: user.id,
+            userData: {
+              notify_account: notifyData.notify_account,
+              notify_receipts: notifyData.notify_receipts,
+              notify_general: notifyData.notify_general,
+            },
+          })
+        ).unwrap(),
+        {
+          pending: "שומר התראות...",
+          success: "ההתראות עודכנו בהצלחה",
+          error: "שגיאה בעדכון ההתראות",
+        }
+      );
+      dispatch(setAuthUserData(updated));
+      setNotifyOpen(false);
+    } catch {
+      // toast already handled
+    }
   };
 
   return (
@@ -210,6 +263,49 @@ const UserProfilePage = () => {
                 sx={{ borderRadius: 3, fontWeight: 700 }}
               >
                 עריכת פרטים
+              </Button>
+            </Box>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="subtitle1" fontWeight={700} mb={1}>
+              העדפות התראות
+            </Typography>
+            <Stack spacing={1.2}>
+              {[
+                {
+                  label: "התראות חשבון",
+                  value: notifyData.notify_account,
+                },
+                {
+                  label: "קבלות ואישורים",
+                  value: notifyData.notify_receipts,
+                },
+                {
+                  label: "הודעות כלליות",
+                  value: notifyData.notify_general,
+                },
+              ].map((row) => (
+                <Stack
+                  key={row.label}
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {row.label}
+                  </Typography>
+                  <Typography variant="subtitle2" fontWeight={700}>
+                    {row.value ? "פעיל" : "כבוי"}
+                  </Typography>
+                </Stack>
+              ))}
+            </Stack>
+            <Box mt={2}>
+              <Button
+                variant="outlined"
+                onClick={() => setNotifyOpen(true)}
+                sx={{ borderRadius: 3, fontWeight: 700 }}
+              >
+                עריכת התראות
               </Button>
             </Box>
           </Paper>
@@ -380,6 +476,58 @@ const UserProfilePage = () => {
             ביטול
           </Button>
           <Button onClick={handleSave} variant="contained">
+            שמירה
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={notifyOpen} onClose={() => setNotifyOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle sx={{ textAlign: "right" }}>עריכת התראות</DialogTitle>
+        <DialogContent sx={{ direction: "rtl" }}>
+          <Stack spacing={2} mt={1}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Typography>התראות חשבון</Typography>
+              <Switch
+                checked={!!notifyData.notify_account}
+                onChange={(e) =>
+                  setNotifyData((prev) => ({
+                    ...prev,
+                    notify_account: e.target.checked,
+                  }))
+                }
+              />
+            </Stack>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Typography>קבלות ואישורים</Typography>
+              <Switch
+                checked={!!notifyData.notify_receipts}
+                onChange={(e) =>
+                  setNotifyData((prev) => ({
+                    ...prev,
+                    notify_receipts: e.target.checked,
+                  }))
+                }
+              />
+            </Stack>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Typography>הודעות כלליות</Typography>
+              <Switch
+                checked={!!notifyData.notify_general}
+                onChange={(e) =>
+                  setNotifyData((prev) => ({
+                    ...prev,
+                    notify_general: e.target.checked,
+                  }))
+                }
+              />
+            </Stack>
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>
+          <Button onClick={() => setNotifyOpen(false)} variant="outlined">
+            ביטול
+          </Button>
+          <Button onClick={handleNotifySave} variant="contained">
             שמירה
           </Button>
         </DialogActions>
