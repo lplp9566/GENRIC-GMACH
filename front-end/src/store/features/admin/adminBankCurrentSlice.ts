@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { Status } from "../../../Admin/components/Users/UsersDto";
+import { api } from "../../axiosInstance";
 
 export interface BankCurrentDto {
   id: number;
@@ -33,12 +34,10 @@ const initialState: AdminBankCurrentState = {
   error: null,
 };
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-
 export const getBankCurrent = createAsyncThunk(
   "/admin/getBankCurrent",
   async () => {
-    const response = await axios.get(`${BASE_URL}/bank-current`);
+    const response = await api.get(`/bank-current`);
     return response.data as BankCurrentDto[];
   }
 );
@@ -46,7 +45,7 @@ export const getBankCurrent = createAsyncThunk(
 export const createBankCurrent = createAsyncThunk(
   "/admin/createBankCurrent",
   async (payload: CreateBankCurrentDto) => {
-    const response = await axios.post(`${BASE_URL}/bank-current`, payload);
+    const response = await api.post(`/bank-current`, payload);
     return response.data as BankCurrentDto;
   }
 );
@@ -54,8 +53,8 @@ export const createBankCurrent = createAsyncThunk(
 export const updateBankCurrent = createAsyncThunk(
   "/admin/updateBankCurrent",
   async (payload: { id: number; data: UpdateBankCurrentDto }) => {
-    const response = await axios.patch(
-      `${BASE_URL}/bank-current/${payload.id}`,
+    const response = await api.patch(
+      `/bank-current/${payload.id}`,
       payload.data
     );
     return response.data;
@@ -65,7 +64,7 @@ export const updateBankCurrent = createAsyncThunk(
 export const deleteBankCurrent = createAsyncThunk(
   "/admin/deleteBankCurrent",
   async (id: number) => {
-    const response = await axios.delete(`${BASE_URL}/bank-current/${id}`);
+    const response = await api.delete(`/bank-current/${id}`);
     return response.data;
   }
 );

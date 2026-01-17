@@ -9,10 +9,11 @@ import {
 import { Status } from "../../../Admin/components/Users/UsersDto";
 import { FindOptionsGeneric, PaginatedResult } from "../../../common/indexTypes";
 import { AppDispatch } from "../../store";
+import { api } from "../../axiosInstance";
 
 interface AdminDepositType {
   allDeposits: IDeposit[];
-  currentDeposit: IDeposit | null;        // ← נשמר כאן הפיקדון הנוכחי
+  currentDeposit: IDeposit | null;
   depositActions: IDepositAction[];
   allDepositsStatus: Status;
   depositCheckStatus: Status; 
@@ -20,7 +21,6 @@ interface AdminDepositType {
     ok: boolean;
     error?: string;
   }
-  // ← סטטוס לבדוק אם הפיקדון פעיל
   createDepositStatus: Status;
   depositActionsStatus: Status;
   createDepositActionStatus: Status;
@@ -49,16 +49,13 @@ const initialState: AdminDepositType = {
   total: 0,
 };
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-
-// --- Thunks ---
 
 export const getAllDeposits = createAsyncThunk<
   PaginatedResult<IDeposit>,
   FindOptionsGeneric
 >("admin/getAllDeposits", async (opts) => {
-  const { data } = await axios.get<PaginatedResult<IDeposit>>(
-    `${BASE_URL}/deposits`,
+  const { data } = await api.get<PaginatedResult<IDeposit>>(
+    `/deposits`,
     { params: opts }
   );
   return data;
@@ -68,8 +65,8 @@ export const getDepositActions = createAsyncThunk<IDepositAction[], number>(
   "admin/getDepositActions",
   async (depositId) => {
     console.log(depositId, "getDepositActions");
-    const { data } = await axios.get<IDepositAction[]>(
-      `${BASE_URL}/deposits-actions/${depositId}`
+    const { data } = await api.get<IDepositAction[]>(
+      `/deposits-actions/${depositId}`
     );
     return data;
   }
@@ -78,7 +75,7 @@ export const getDepositActions = createAsyncThunk<IDepositAction[], number>(
 export const getDepositDetails = createAsyncThunk<IDeposit, number>(
   "admin/getDepositDetails",
   async (depositId) => {
-    const { data } = await axios.get<IDeposit>(`${BASE_URL}/deposits/${depositId}`);
+    const { data } = await api.get<IDeposit>(`/deposits/${depositId}`);
     console.log("Deposit details fetched:", data);
     
     return data;
@@ -88,7 +85,7 @@ export const getDepositDetails = createAsyncThunk<IDeposit, number>(
 export const createDeposit = createAsyncThunk(
   "admin/createDeposit",
   async (deposit: ICreateDeposits) => {
-    const { data } = await axios.post<IDeposit>(`${BASE_URL}/deposits`, deposit);
+    const { data } = await api.post<IDeposit>(`/deposits`, deposit);
     return data;
   }
 );
@@ -97,8 +94,8 @@ export const bringForwardCheck = createAsyncThunk(
   "admin/bringForwardCheck",
   async (dto: { depositId: number; newReturnDate: string }, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post<{ ok: boolean; error?: string }>(
-        `${BASE_URL}/deposits/${dto.depositId}/bring-forward/check`,
+      const { data } = await api.post<{ ok: boolean; error?: string }>(
+        `/deposits/${dto.depositId}/bring-forward/check`,
         { newReturnDate: dto.newReturnDate }
       );
       return data;
@@ -108,15 +105,15 @@ export const bringForwardCheck = createAsyncThunk(
   }
 );
 
-// יצירת פעולה → ואז רענון פעולות + פרטי הפיקדון
+
 export const createDepositAction = createAsyncThunk<
   IDepositAction,
   IDepositActionCreate,
   { dispatch: AppDispatch }
 >("admin/createDepositAction", async (dto, { dispatch, rejectWithValue }) => {
   try {
-    const { data } = await axios.post<IDepositAction>(
-      `${BASE_URL}/deposits-actions`,
+    const { data } = await api.post<IDepositAction>(
+      `/deposits-actions`,
       dto
     );
 
