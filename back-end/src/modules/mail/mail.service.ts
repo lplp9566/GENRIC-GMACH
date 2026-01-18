@@ -216,9 +216,12 @@ export class MailService {
   }
 
   private async renderHtmlToPdf(html: string): Promise<Buffer> {
+    const executablePath =
+      process.env.PUPPETEER_EXECUTABLE_PATH ||
+      process.env.PUPPETEER_CHROME_PATH;
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+      executablePath,
     });
     try {
       const page = await browser.newPage();
