@@ -5,7 +5,7 @@ import { AppDispatch, RootState } from "../../store/store";
 import { getAllUsers } from "../../store/features/admin/adminUsersSlice";
 import { Box, Container, Grid, Typography } from "@mui/material";
 import UsersHeader from "../components/Users/UsersHeader";
-import UserCard from "../components/Users/UserCard";
+import { UserCard } from "../components/Users/UserCard";
 
 export default function UsersPage() {
   const dispatch = useDispatch<AppDispatch>();

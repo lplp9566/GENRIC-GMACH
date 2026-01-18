@@ -123,9 +123,16 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
             </Stack>
           }
           subheader={
-            <Typography variant="body2" color="text.secondary">
-              ת"ז: {idsDisplay}
-            </Typography>
+            <Stack spacing={0.2}>
+              <Typography variant="body2" color="text.secondary">
+                ת"ז: {user.id_number}
+              </Typography>
+              {hasSpouse && spouseId && (
+                <Typography variant="body2" color="text.secondary">
+                  {spouseId}
+                </Typography>
+              )}
+            </Stack>
           }
           sx={{ pb: 0 }}
         />
@@ -273,4 +280,5 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
     </>
   );
 };
+export { UserCard };
 export default UserCard;

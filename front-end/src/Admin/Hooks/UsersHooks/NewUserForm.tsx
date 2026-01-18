@@ -111,7 +111,14 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
             "email_address",
             "phone_number",
           ] as const)
-        : (["first_name", "last_name", "id_number", "password", "phone_number"] as const);
+        : ([
+            "first_name",
+            "last_name",
+            "id_number",
+            "password",
+            "phone_number",
+            "email_address",
+          ] as const);
 
     const missingFields = requiredUserFields.filter(
       (field) => !data.userData[field]
