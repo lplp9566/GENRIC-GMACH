@@ -22,6 +22,7 @@ import { UserFinancialService } from './user-financials/user-financials.service'
 import { UserFinancialByYearService } from './user-financials-by-year/user-financial-by-year.service';
 import { MailService } from '../mail/mail.service';
 import { YearSummaryPdfStyleData } from '../mail/dto';
+import { OrderReturnEntity } from '../order-return/Entity/order-return.entity';
 import { HDate } from 'hebcal';
 
 @Injectable()
@@ -37,6 +38,8 @@ export class UsersService {
     private readonly roleHistoryRepo: Repository<UserRoleHistoryEntity>,
     @InjectRepository(RoleMonthlyRateEntity)
     private readonly ratesRepo: Repository<RoleMonthlyRateEntity>,
+    @InjectRepository(OrderReturnEntity)
+    private readonly orderReturnRepo: Repository<OrderReturnEntity>,
     @Inject(forwardRef(() => MonthlyDepositsService))
     private readonly monthlyDepositsService: MonthlyDepositsService,
     @Inject(forwardRef(() => UserRoleHistoryService))
@@ -563,13 +566,22 @@ export class UsersService {
       .filter(Boolean)
       .join(' ');
 
+    const loanBalances = user.payment_details?.loan_balances ?? [];
+    const loanDebt = loanBalances
+      .filter((loan) => loan.balance < 0)
+      .reduce((sum, loan) => sum + Math.abs(loan.balance), 0);
+    const unpaidOrders = await this.orderReturnRepo.find({
+      where: { user: { id: user.id }, paid: false },
+    });
+    const standingOrderDebt = unpaidOrders.reduce(
+      (sum, order) => sum + (Number(order.amount) || 0),
+      0,
+    );
+
     const data: YearSummaryPdfStyleData = {
       year,
-      activeLoansTotal:
-        (financialDetails?.total_loans_taken_amount ?? 0) -
-        (financialDetails?.total_loans_repaid ?? 0),
-      standingOrderReturnDebt:
-        financialDetails?.total_standing_order_return ?? 0,
+      activeLoansTotal: loanDebt,
+      standingOrderReturnDebt: standingOrderDebt,
       depositedAllTime:
         (financialDetails?.total_fixed_deposits_deposited ?? 0) -
         (financialDetails?.total_fixed_deposits_withdrawn ?? 0),
@@ -587,7 +599,10 @@ export class UsersService {
       hebrewJoinedAt: user.join_date
         ? new HDate(user.join_date).toString('h')
         : undefined,
-      memberFeeDebt: user.payment_details?.monthly_balance ?? 0,
+      memberFeeDebt:
+        (user.payment_details?.monthly_balance ?? 0) < 0
+          ? Math.abs(user.payment_details?.monthly_balance ?? 0)
+          : 0,
       memberFeePaidAllTime: financialDetails?.total_monthly_deposits ?? 0,
       memberFeePaidThisYear: yearDetails?.total_monthly_deposits ?? 0,
     };

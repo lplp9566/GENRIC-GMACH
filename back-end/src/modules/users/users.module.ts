@@ -17,6 +17,7 @@ import { WhatsappModule } from '../whatsapp/whatsapp.module';
 import { RoleMonthlyRateEntity } from '../role_monthly_rates/Entity/role_monthly_rates.entity';
 import { MailModule } from '../mail/mail.module';
 import { UserFinancialByYearModule } from './user-financials-by-year/user-financial-by-year.module';
+import { OrderReturnEntity } from '../order-return/Entity/order-return.entity';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ TypeOrmModule.forFeature([
   UserEntity,
   PaymentDetailsEntity,
   RoleMonthlyRateEntity,
+  OrderReturnEntity,
 ]),    forwardRef(() => MonthlyDepositsModule),
     forwardRef(() => LoanActionsModule),
     forwardRef(() => RequestsModule),

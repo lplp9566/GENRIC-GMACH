@@ -158,11 +158,19 @@ export class MailService {
 
             <div style="margin-top:16px; display:grid; grid-template-columns:1fr; gap:12px;">
 
-              ${sectionBox('דמי חבר', [
-                row('שולם בשנת ' + data.year, fmt(data.memberFeePaidThisYear)),
-                row('שולם דמי חבר (מתאריך ההצטרפות)', fmt(data.memberFeePaidAllTime)),
-                row('חוב עבור דמי חבר', fmt(data.memberFeeDebt)),
-              ])}
+              ${sectionBox(
+                'דמי חבר',
+                [
+                  row('שולם בשנת ' + data.year, fmt(data.memberFeePaidThisYear)),
+                  row(
+                    'שולם דמי חבר (מתאריך ההצטרפות)',
+                    fmt(data.memberFeePaidAllTime)
+                  ),
+                  data.memberFeeDebt > 0
+                    ? row('חוב עבור דמי חבר', fmt(data.memberFeeDebt))
+                    : '',
+                ].filter(Boolean) as string[]
+              )}
 
               ${sectionBox('תרומות', [
                 row('נתרם בשנת ' + data.year, fmt(data.donatedThisYear)),
