@@ -220,7 +220,8 @@ export class MailService {
     const executablePath =
       process.env.PUPPETEER_EXECUTABLE_PATH ||
       process.env.PUPPETEER_CHROME_PATH ||
-      this.resolveChromeFromCache();
+      this.resolveChromeFromCache() ||
+      puppeteer.executablePath();
     const browser = await puppeteer.launch({
       headless: true,
       executablePath,
