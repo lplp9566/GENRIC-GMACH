@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -26,6 +26,7 @@ import { StatusGeneric } from "../../common/indexTypes";
 import { editUser } from "../../store/features/admin/adminUsersSlice";
 import { setAuthUserData } from "../../store/features/auth/authSlice";
 import { toast } from "react-toastify";
+import { api } from "../../store/axiosInstance";
 
 const UserProfilePage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -92,16 +93,16 @@ const UserProfilePage = () => {
   const loanBalances = user?.payment_details?.loan_balances ?? [];
   const totalLoansCount = allLoans.length;
   const totalLoansBalance = allLoans.reduce((sum, loan) => {
-    const balance = loanBalances.find((lb) => lb.loanId === loan.id)?.balance || 0;
+    const balance =
+      loanBalances.find((lb) => lb.loanId === loan.id)?.balance || 0;
     return sum + Math.abs(balance);
   }, 0);
   const joinDate = formatDate(parseDate(user?.join_date));
   const bankInfo = useMemo(
     () => ({
-      bank_number: user?.payment_details?.bank_number ?? "לא הוגדר",
-      bank_branch: user?.payment_details?.bank_branch ?? "לא הוגדר",
-      bank_account_number:
-        user?.payment_details?.bank_account_number ?? "לא הוגדר",
+      bank_number: user?.payment_details?.bank_number ?? "לא הוזן",
+      bank_branch: user?.payment_details?.bank_branch ?? "לא הוזן",
+      bank_account_number: user?.payment_details?.bank_account_number ?? "לא הוזן",
     }),
     [user?.payment_details]
   );
@@ -133,7 +134,7 @@ const UserProfilePage = () => {
         {
           pending: "שומר פרטים...",
           success: "הפרטים עודכנו בהצלחה",
-          error: "שגיאה בעדכון הפרטים",
+          error: "עדכון הפרטים נכשל",
         }
       );
       dispatch(setAuthUserData(updated));
@@ -159,11 +160,22 @@ const UserProfilePage = () => {
         {
           pending: "שומר התראות...",
           success: "ההתראות עודכנו בהצלחה",
-          error: "שגיאה בעדכון ההתראות",
+          error: "עדכון ההתראות נכשל",
         }
       );
       dispatch(setAuthUserData(updated));
       setNotifyOpen(false);
+    } catch {
+    }
+  };
+
+  const handleSendYearSummary = async () => {
+    try {
+      await toast.promise(api.post("/users/year-summary"), {
+        pending: "שולח סיכום שנה אחרונה...",
+        success: "הסיכום נשלח למייל שלך",
+        error: "שליחת הסיכום נכשלה",
+      });
     } catch {
     }
   };
@@ -194,7 +206,7 @@ const UserProfilePage = () => {
       >
         <Stack spacing={1}>
           <Chip
-            label="איזור אישי"
+            label="אזור אישי"
             sx={{
               alignSelf: "flex-start",
               fontWeight: 700,
@@ -205,9 +217,18 @@ const UserProfilePage = () => {
             {user?.first_name} {user?.last_name}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            סיכום פרטים אישיים וסטטיסטיקות מצטברות.
+            סיכום פרטי אישי עם מידע עדכני.
           </Typography>
         </Stack>
+        <Box mt={2}>
+          <Button
+            variant="contained"
+            onClick={handleSendYearSummary}
+            sx={{ borderRadius: 3, fontWeight: 700 }}
+          >
+            שליחת סיכום שנה אחרונה
+          </Button>
+        </Box>
       </Paper>
 
       <Grid container spacing={3} sx={{ mt: 1 }}>
@@ -219,11 +240,11 @@ const UserProfilePage = () => {
             <Divider sx={{ mb: 2 }} />
             <Stack spacing={1.5}>
               {[
-                { label: "מספר זהות", value: user?.id_number ?? "לא הוגדר" },
-                { label: "טלפון", value: user?.phone_number ?? "לא הוגדר" },
-                { label: "אימייל", value: user?.email_address ?? "לא הוגדר" },
-                { label: "תאריך הצטרפות", value: joinDate || "לא הוגדר" },
-                { label: "סוג חברות", value: user?.membership_type ?? "לא הוגדר" },
+                { label: "מספר זהות", value: user?.id_number ?? "לא הוזן" },
+                { label: "טלפון", value: user?.phone_number ?? "לא הוזן" },
+                { label: "אימייל", value: user?.email_address ?? "לא הוזן" },
+                { label: "תאריך הצטרפות", value: joinDate || "לא הוזן" },
+                { label: "סוג חברות", value: user?.membership_type ?? "לא הוזן" },
               ].map((row) => (
                 <Stack
                   key={row.label}
@@ -263,7 +284,7 @@ const UserProfilePage = () => {
                 </Stack>
               ))}
             </Stack>
-         
+
             <Divider sx={{ my: 2 }} />
             <Typography variant="subtitle1" fontWeight={700} mb={1}>
               פרטי בן/בת זוג
@@ -272,15 +293,15 @@ const UserProfilePage = () => {
               {[
                 {
                   label: "שם פרטי",
-                  value: user?.spouse_first_name || "לא הוגדר",
+                  value: user?.spouse_first_name || "לא הוזן",
                 },
                 {
                   label: "שם משפחה",
-                  value: user?.spouse_last_name || "לא הוגדר",
+                  value: user?.spouse_last_name || "לא הוזן",
                 },
                 {
                   label: "תעודת זהות",
-                  value: user?.spouse_id_number || "לא הוגדר",
+                  value: user?.spouse_id_number || "לא הוזן",
                 },
               ].map((row) => (
                 <Stack
@@ -297,7 +318,7 @@ const UserProfilePage = () => {
                 </Stack>
               ))}
             </Stack>
-               <Box mt={2}>
+            <Box mt={2}>
               <Button
                 variant="outlined"
                 onClick={() => setEditOpen(true)}
@@ -308,7 +329,7 @@ const UserProfilePage = () => {
             </Box>
             <Divider sx={{ my: 2 }} />
             <Typography variant="subtitle1" fontWeight={700} mb={1}>
-              העדפות התראות
+              פרטי התראות
             </Typography>
             <Stack spacing={1.2}>
               {[
@@ -317,11 +338,11 @@ const UserProfilePage = () => {
                   value: notifyData.notify_account,
                 },
                 {
-                  label: "קבלות ואישורים",
+                  label: "קבלות/אישורים",
                   value: notifyData.notify_receipts,
                 },
                 {
-                  label: "הודעות כלליות",
+                  label: "עדכונים כלליים",
                   value: notifyData.notify_general,
                 },
               ].map((row) => (
@@ -354,7 +375,7 @@ const UserProfilePage = () => {
         <Grid item xs={12} md={5}>
           <Paper elevation={0} sx={{ p: 3, borderRadius: 4, height: "100%" }}>
             <Typography variant="h6" fontWeight={800} mb={2}>
-              מדדים מצטברים
+              מדדים אישיים
             </Typography>
             <Divider sx={{ mb: 2 }} />
             <Stack spacing={2}>
@@ -372,13 +393,13 @@ const UserProfilePage = () => {
                 }}
               >
                 <Typography variant="subtitle2" fontWeight={700}>
-                  סה״כ תרמת לגמ״ח (מהקמה)
+                  סך תרומות (מצטבר)
                 </Typography>
                 <Typography variant="h5" fontWeight={800} mt={0.5}>
                   {formatILS(totalDonations)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  כולל דמי חבר ותרומות במערכת.
+                  כולל דמי חבר ותרומות מצטברות.
                 </Typography>
               </Paper>
               <Paper
@@ -395,13 +416,13 @@ const UserProfilePage = () => {
                 }}
               >
                 <Typography variant="subtitle2" fontWeight={700}>
-                  הלוואות במערכת
+                  סך הלוואות שלקחת
                 </Typography>
                 <Typography variant="h5" fontWeight={800} mt={0.5}>
                   {totalLoansCount} הלוואות
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  יתרה להחזר: {formatILS(totalLoansBalance)}
+                  על סך {formatILS(totalLoansBalance)}
                 </Typography>
               </Paper>
               <Paper
@@ -418,13 +439,13 @@ const UserProfilePage = () => {
                 }}
               >
                 <Typography variant="subtitle2" fontWeight={700}>
-                  מדד ציון 3 שנים
+                  עדכון קרוב 3 חודשים
                 </Typography>
                 <Typography variant="h5" fontWeight={800} mt={0.5}>
                   בקרוב
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  נגדיר יחד את החישוב בהמשך.
+                  נבנה בקרוב עם נתונים נוספים.
                 </Typography>
               </Paper>
             </Stack>
@@ -453,7 +474,7 @@ const UserProfilePage = () => {
               fullWidth
             />
             <TextField
-              label="מייל"
+              label="אימייל"
               value={formData.email_address}
               onChange={(e) =>
                 setFormData((prev) => ({
@@ -475,7 +496,7 @@ const UserProfilePage = () => {
               fullWidth
             />
             <TextField
-              label="מספר תעודת זהות"
+              label="מספר זהות"
               value={formData.id_number}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, id_number: e.target.value }))
@@ -573,7 +594,7 @@ const UserProfilePage = () => {
               />
             </Stack>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography>קבלות ואישורים</Typography>
+              <Typography>קבלות/אישורים</Typography>
               <Switch
                 checked={!!notifyData.notify_receipts}
                 onChange={(e) =>
@@ -585,7 +606,7 @@ const UserProfilePage = () => {
               />
             </Stack>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography>הודעות כלליות</Typography>
+              <Typography>עדכונים כלליים</Typography>
               <Switch
                 checked={!!notifyData.notify_general}
                 onChange={(e) =>

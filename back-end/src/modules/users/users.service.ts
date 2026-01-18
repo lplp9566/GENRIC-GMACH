@@ -22,6 +22,7 @@ import { UserFinancialService } from './user-financials/user-financials.service'
 import { UserFinancialByYearService } from './user-financials-by-year/user-financial-by-year.service';
 import { MailService } from '../mail/mail.service';
 import { YearSummaryPdfStyleData } from '../mail/dto';
+import { HDate } from 'hebcal';
 
 @Injectable()
 export class UsersService {
@@ -41,19 +42,23 @@ export class UsersService {
     @Inject(forwardRef(() => UserRoleHistoryService))
     private readonly userRoleHistoryService: UserRoleHistoryService,
     private readonly dataSource: DataSource,
-    private readonly config: ConfigService, 
+    private readonly config: ConfigService,
     private readonly userFinancialService: UserFinancialService,
-    private readonly userFinancialByYear :UserFinancialByYearService,
-    private readonly mailService:MailService
-
+    private readonly userFinancialByYear: UserFinancialByYearService,
+    private readonly mailService: MailService,
   ) {}
- 
+
   async getAllMemberUserPaymentDetails(
     userId: number,
   ): Promise<PaymentDetailsEntity | null> {
     return this.paymentDetailsRepository.findOne({
-      where: { user: { id: userId, is_admin: false , membership_type: MembershipType.MEMBER} },
-      
+      where: {
+        user: {
+          id: userId,
+          is_admin: false,
+          membership_type: MembershipType.MEMBER,
+        },
+      },
     });
   }
   async getAllMembersAndFriends(): Promise<UserEntity[]> {
@@ -61,36 +66,43 @@ export class UsersService {
       where: { is_admin: false },
     });
   }
-async findUsers(filters: { membershipType?: MembershipType; isAdmin?: boolean }) {
-  const qb = this.usersRepository
-    .createQueryBuilder('u')
-    .leftJoinAndSelect('u.payment_details', 'pd')
-    .leftJoinAndSelect('u.current_role', 'cr');
+  async findUsers(filters: {
+    membershipType?: MembershipType;
+    isAdmin?: boolean;
+  }) {
+    const qb = this.usersRepository
+      .createQueryBuilder('u')
+      .leftJoinAndSelect('u.payment_details', 'pd')
+      .leftJoinAndSelect('u.current_role', 'cr');
 
-  if (filters.isAdmin !== undefined) qb.andWhere('u.is_admin = :isAdmin', { isAdmin: filters.isAdmin });
-  if (filters.membershipType) qb.andWhere('u.membership_type = :mt', { mt: filters.membershipType });
+    if (filters.isAdmin !== undefined)
+      qb.andWhere('u.is_admin = :isAdmin', { isAdmin: filters.isAdmin });
+    if (filters.membershipType)
+      qb.andWhere('u.membership_type = :mt', { mt: filters.membershipType });
 
-  const MEMBER = MembershipType.MEMBER; // תעדכן לערך האמיתי אצלך
+    const MEMBER = MembershipType.MEMBER; // תעדכן לערך האמיתי אצלך
 
-  // 1) חברים לפני ידידים
-  qb.addOrderBy(`CASE WHEN u.membership_type = :member THEN 0 ELSE 1 END`, 'ASC')
-    .setParameter('member', MEMBER);
+    // 1) חברים לפני ידידים
+    qb.addOrderBy(
+      `CASE WHEN u.membership_type = :member THEN 0 ELSE 1 END`,
+      'ASC',
+    ).setParameter('member', MEMBER);
 
-  // 2) קודם "מינוס חודשי" - אבל רק לחבר
-  qb.addOrderBy(
-    `CASE WHEN u.membership_type = :member AND COALESCE(pd.monthly_balance, 0) < 0 THEN 0 ELSE 1 END`,
-    'ASC',
-  );
+    // 2) קודם "מינוס חודשי" - אבל רק לחבר
+    qb.addOrderBy(
+      `CASE WHEN u.membership_type = :member AND COALESCE(pd.monthly_balance, 0) < 0 THEN 0 ELSE 1 END`,
+      'ASC',
+    );
 
-  // בתוך קבוצת המינוס החודשי: הכי שלילי קודם (-1900 לפני -400 לפני -40)
-  qb.addOrderBy(
-    `CASE WHEN u.membership_type = :member AND COALESCE(pd.monthly_balance, 0) < 0 THEN COALESCE(pd.monthly_balance, 0) ELSE 0 END`,
-    'ASC',
-  );
+    // בתוך קבוצת המינוס החודשי: הכי שלילי קודם (-1900 לפני -400 לפני -40)
+    qb.addOrderBy(
+      `CASE WHEN u.membership_type = :member AND COALESCE(pd.monthly_balance, 0) < 0 THEN COALESCE(pd.monthly_balance, 0) ELSE 0 END`,
+      'ASC',
+    );
 
-  // 3) אחר כך "הלוואה במינוס" - אבל רק לחבר
-  qb.addOrderBy(
-    `
+    // 3) אחר כך "הלוואה במינוס" - אבל רק לחבר
+    qb.addOrderBy(
+      `
     CASE WHEN u.membership_type = :member AND EXISTS (
       SELECT 1
       FROM jsonb_array_elements(COALESCE(pd.loan_balances::jsonb, '[]'::jsonb)) elem
@@ -98,12 +110,12 @@ async findUsers(filters: { membershipType?: MembershipType; isAdmin?: boolean })
     )
     THEN 0 ELSE 1 END
     `,
-    'ASC',
-  );
+      'ASC',
+    );
 
-  // 4) תאריך חיוב הקרוב (charge_date = יום בחודש)
-  qb.addOrderBy(
-    `
+    // 4) תאריך חיוב הקרוב (charge_date = יום בחודש)
+    qb.addOrderBy(
+      `
     CASE
       WHEN pd.charge_date IS NULL THEN (CURRENT_DATE + INTERVAL '100 years')
       ELSE
@@ -115,14 +127,13 @@ async findUsers(filters: { membershipType?: MembershipType; isAdmin?: boolean })
         END
     END
     `,
-    'ASC',
-  );
+      'ASC',
+    );
 
-  return qb.getMany();
-}
+    return qb.getMany();
+  }
 
-
-async onApplicationBootstrap() {
+  async onApplicationBootstrap() {
     if (this.config.get('SEED_ADMIN') !== 'true') return;
 
     const count = await this.usersRepository.count();
@@ -133,22 +144,24 @@ async onApplicationBootstrap() {
     // if (!email || !password) return;
 
     // תפקיד ברירת מחדל אם נדרש ע"י הסכמה
-    const defaultRole = await this.membershipRolesRepo.findOne({ where: { name: 'Member' } });
+    const defaultRole = await this.membershipRolesRepo.findOne({
+      where: { name: 'Member' },
+    });
     await this.createUserAndPaymentInfo(
       {
         first_name: 'מנהל',
         last_name: 'מערכת',
-        email_address: "chesedgmach@gmail.com",
-        password: "1234",         
+        email_address: 'chesedgmach@gmail.com',
+        password: '1234',
         is_admin: true,
         id_number: '123456789',
-         phone_number: '0501234567',
+        phone_number: '0501234567',
         current_role: null as any,
         join_date: new Date(),
-        membership_type: MembershipType.FRIEND
+        membership_type: MembershipType.FRIEND,
       },
       {
-        payment_method: payment_method.bank_transfer,     
+        payment_method: payment_method.bank_transfer,
         charge_date: 1,
         bank_number: 1,
         bank_branch: 1,
@@ -161,7 +174,6 @@ async onApplicationBootstrap() {
     paymentData: Partial<PaymentDetailsEntity>,
   ): Promise<UserEntity> {
     try {
-    
       if (
         paymentData.payment_method === undefined ||
         !Object.values(paymentData).includes(paymentData.payment_method)
@@ -179,7 +191,10 @@ async onApplicationBootstrap() {
       const newUser = this.usersRepository.create(userData);
       const paymentDetails = this.paymentDetailsRepository.create(paymentData);
       const savedUser = await this.usersRepository.save(newUser);
-      const userWithCurrentRole = await this.usersRepository.findOne({where:{id:savedUser.id},relations:["current_role"]});
+      const userWithCurrentRole = await this.usersRepository.findOne({
+        where: { id: savedUser.id },
+        relations: ['current_role'],
+      });
       newUser.payment_details = paymentDetails;
       if (userData.current_role) {
         await this.userRoleHistoryService.createUserRoleHistory({
@@ -189,7 +204,7 @@ async onApplicationBootstrap() {
         });
       }
       const savedPaymentDetails = await this.usersRepository.save(newUser);
-      await this.updateUserMonthlyBalance(newUser)
+      await this.updateUserMonthlyBalance(newUser);
       return savedPaymentDetails;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -217,7 +232,9 @@ async onApplicationBootstrap() {
   }
 
   async getUserByIdNumber(id_number: string): Promise<UserEntity | null> {
-    return this.usersRepository.findOne({ where: { id: Number(id_number), is_admin: false } });
+    return this.usersRepository.findOne({
+      where: { id: Number(id_number), is_admin: false },
+    });
   }
 
   async getAllUsers(): Promise<UserEntity[]> {
@@ -227,83 +244,98 @@ async onApplicationBootstrap() {
     });
   }
 
- async calculateTotalDue(userId: number): Promise<number> {
-  // 1. שליפת המשתמש ובדיקות
-  const user = await this.usersRepository.findOne({
-    where: { id: userId, is_admin: false },
-    relations: ['payment_details'],
-  });
-  if (!user) throw new BadRequestException('User not found');
-  if (!user.payment_details?.charge_date) {
-    throw new BadRequestException('Missing payment details');
-  }
-
-  // 2. היסטוריית הדרגות, ממוינת לפי תאריך עולה
-  const history = await this.roleHistoryRepo.find({
-    where: { user: { id: userId } },
-    relations: ['role'],
-    order: { from_date: 'ASC' },
-  });
-  if (history.length === 0) {
-    throw new BadRequestException('No role history for user');
-  }
-
-  // 3. תעריפים לכל הדרגות
-  const allRates = await this.ratesRepo.find({ relations: ['role'] });
-  if (allRates.length === 0) {
-    throw new BadRequestException('No monthly rates defined');
-  }
-
-  // --- Helpers: עבודה לפי חודש ב-UTC כדי למנוע "גלישה" לחודש קודם/הבא בגלל timezone
-  const toMonthStartUTC = (d: Date) =>
-    new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
-
-  // 4. נקודת ההתחלה – ראש החודש של החודש הראשון בהיסטוריה (UTC)
-  const firstFrom = new Date(history[0].from_date as any);
-  let iter = toMonthStartUTC(firstFrom);
-  console.log(user.join_date);
-  
-
-  // אם אתה רוצה *לא* לחייב על חודש ההצטרפות כשהוא באמצע חודש – תפתח את זה:
-  // if (firstFrom.getUTCDate() > 1) iter.setUTCMonth(iter.getUTCMonth() + 1);
-
-  // 5. נקודת הסיום – תחילת החודש הבא (UTC) אבל כ-EXCLUSIVE (לא נכלל בלולאה)
-  const today = new Date();
-   const chargeDay = user.payment_details.charge_date; 
-     const todayDay = today.getUTCDate();
-  const startOfThisMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
-  const startOfNextMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 1));
-
-   const endExclusive = (todayDay < chargeDay) ? startOfThisMonth : startOfNextMonth;
-
-
-  let totalDue = 0;
-
-  // 6. לולאה חודש-חודש: iter < endExclusive (ככה לא מחשב "עוד חודש")
-  while (iter.getTime() < endExclusive.getTime()) {
-    // א. הדרגה הפעילה בחודש הזה (לפי from_date)
-    const active = history
-      .filter((h) => toMonthStartUTC(new Date(h.from_date as any)).getTime() <= iter.getTime())
-      .sort((a, b) => +new Date(b.from_date as any) - +new Date(a.from_date as any))[0];
-
-    if (active) {
-      // ב. התעריף האחרון שנכנס לתוקף עד החודש הזה
-      const rate = allRates
-        .filter(
-          (r) =>
-            r.role.id === active.role.id &&
-            toMonthStartUTC(new Date(r.effective_from as any)).getTime() <= iter.getTime(),
-        )
-        .sort((a, b) => +new Date(b.effective_from as any) - +new Date(a.effective_from as any))[0];
-
-      if (rate) totalDue += rate.amount;
+  async calculateTotalDue(userId: number): Promise<number> {
+    // 1. שליפת המשתמש ובדיקות
+    const user = await this.usersRepository.findOne({
+      where: { id: userId, is_admin: false },
+      relations: ['payment_details'],
+    });
+    if (!user) throw new BadRequestException('User not found');
+    if (!user.payment_details?.charge_date) {
+      throw new BadRequestException('Missing payment details');
     }
 
-    iter.setUTCMonth(iter.getUTCMonth() + 1);
-  }
+    // 2. היסטוריית הדרגות, ממוינת לפי תאריך עולה
+    const history = await this.roleHistoryRepo.find({
+      where: { user: { id: userId } },
+      relations: ['role'],
+      order: { from_date: 'ASC' },
+    });
+    if (history.length === 0) {
+      throw new BadRequestException('No role history for user');
+    }
 
-  return totalDue;
-}
+    // 3. תעריפים לכל הדרגות
+    const allRates = await this.ratesRepo.find({ relations: ['role'] });
+    if (allRates.length === 0) {
+      throw new BadRequestException('No monthly rates defined');
+    }
+
+    // --- Helpers: עבודה לפי חודש ב-UTC כדי למנוע "גלישה" לחודש קודם/הבא בגלל timezone
+    const toMonthStartUTC = (d: Date) =>
+      new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
+
+    // 4. נקודת ההתחלה – ראש החודש של החודש הראשון בהיסטוריה (UTC)
+    const firstFrom = new Date(history[0].from_date as any);
+    let iter = toMonthStartUTC(firstFrom);
+    console.log(user.join_date);
+
+    // אם אתה רוצה *לא* לחייב על חודש ההצטרפות כשהוא באמצע חודש – תפתח את זה:
+    // if (firstFrom.getUTCDate() > 1) iter.setUTCMonth(iter.getUTCMonth() + 1);
+
+    // 5. נקודת הסיום – תחילת החודש הבא (UTC) אבל כ-EXCLUSIVE (לא נכלל בלולאה)
+    const today = new Date();
+    const chargeDay = user.payment_details.charge_date;
+    const todayDay = today.getUTCDate();
+    const startOfThisMonth = new Date(
+      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1),
+    );
+    const startOfNextMonth = new Date(
+      Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 1),
+    );
+
+    const endExclusive =
+      todayDay < chargeDay ? startOfThisMonth : startOfNextMonth;
+
+    let totalDue = 0;
+
+    // 6. לולאה חודש-חודש: iter < endExclusive (ככה לא מחשב "עוד חודש")
+    while (iter.getTime() < endExclusive.getTime()) {
+      // א. הדרגה הפעילה בחודש הזה (לפי from_date)
+      const active = history
+        .filter(
+          (h) =>
+            toMonthStartUTC(new Date(h.from_date as any)).getTime() <=
+            iter.getTime(),
+        )
+        .sort(
+          (a, b) =>
+            +new Date(b.from_date as any) - +new Date(a.from_date as any),
+        )[0];
+
+      if (active) {
+        // ב. התעריף האחרון שנכנס לתוקף עד החודש הזה
+        const rate = allRates
+          .filter(
+            (r) =>
+              r.role.id === active.role.id &&
+              toMonthStartUTC(new Date(r.effective_from as any)).getTime() <=
+                iter.getTime(),
+          )
+          .sort(
+            (a, b) =>
+              +new Date(b.effective_from as any) -
+              +new Date(a.effective_from as any),
+          )[0];
+
+        if (rate) totalDue += rate.amount;
+      }
+
+      iter.setUTCMonth(iter.getUTCMonth() + 1);
+    }
+
+    return totalDue;
+  }
 
   async getUserTotalDeposits(userId: number): Promise<number> {
     const UserTotalDeposits =
@@ -315,31 +347,38 @@ async onApplicationBootstrap() {
     user: UserEntity,
   ): Promise<{ total_due: number; total_paid: number; balance: number }> {
     const totalDue = await this.calculateTotalDue(user.id);
-    console.log(totalDue,"totalDue");
+    console.log(totalDue, 'totalDue');
     const totalPaid = await this.getUserTotalDeposits(user.id);
     const balance = totalPaid - totalDue;
-    console.log(totalDue,"totalDue",totalPaid,"totalPaid",balance,"balance");
+    console.log(
+      totalDue,
+      'totalDue',
+      totalPaid,
+      'totalPaid',
+      balance,
+      'balance',
+    );
     return { total_due: totalDue, total_paid: totalPaid, balance };
   }
 
   async updateUserMonthlyBalance(user: UserEntity) {
-  const paymentDetails = await this.paymentDetailsRepository.findOne({
-    where: { user: { id: user.id, is_admin: false } },
-    relations: ['user'],
-  });
+    const paymentDetails = await this.paymentDetailsRepository.findOne({
+      where: { user: { id: user.id, is_admin: false } },
+      relations: ['user'],
+    });
 
-  if (!paymentDetails) {
-    // אם באמת מותר למחוק payment_details – אל תפיל פה את המערכת
-    // אפשר להחזיר null או 0 או לזרוק חריגה "מסודרת"
-    return null;
+    if (!paymentDetails) {
+      // אם באמת מותר למחוק payment_details – אל תפיל פה את המערכת
+      // אפשר להחזיר null או 0 או לזרוק חריגה "מסודרת"
+      return null;
+    }
+
+    const balanceData = await this.calculateUserMonthlyBalance(user);
+    paymentDetails.monthly_balance = balanceData.balance;
+
+    await this.paymentDetailsRepository.save(paymentDetails);
+    return paymentDetails.monthly_balance;
   }
-
-  const balanceData = await this.calculateUserMonthlyBalance(user);
-  paymentDetails.monthly_balance = balanceData.balance;
-
-  await this.paymentDetailsRepository.save(paymentDetails);
-  return paymentDetails.monthly_balance;
-}
 
   async getAllUsersBalances(): Promise<
     { user: string; total_due: number; total_paid: number; balance: number }[]
@@ -361,7 +400,7 @@ async onApplicationBootstrap() {
   }
   async keepAlive() {
     console.log('I am alive');
-    
+
     return 'I am alive';
   }
   async setCurrentRole(userId: number, roleId: number) {
@@ -439,7 +478,7 @@ async onApplicationBootstrap() {
       return updated!;
     }); // סוף הטרנזקציה (commit אם הכול עבר, אחרת rollback)
   }
-    async searchUsers(query: string, limit = 5): Promise<UserEntity[]> {
+  async searchUsers(query: string, limit = 5): Promise<UserEntity[]> {
     const q = `%${query}%`;
     return this.usersRepository
       .createQueryBuilder('user')
@@ -451,45 +490,109 @@ async onApplicationBootstrap() {
       .limit(limit)
       .getMany();
   }
-  async createYearSummary (year:number){
-    const users = await this.getAllUsers()
-    const memberUsers = users.filter((user)=> user.membership_type == MembershipType.MEMBER)
-    const friendUsers = users.filter((user)=>user.membership_type == MembershipType.FRIEND)
-  for (const user of memberUsers){
-    console.log(user.id);
-    
-    const financialDetails = await this.userFinancialService.getOrCreateUserFinancials(user)
-    const yearDetails = await this.userFinancialByYear.getOrCreateFinancialRecord(user,year)
-    
-    const data:YearSummaryPdfStyleData = {
-      year ,
-   activeLoansTotal:
-  (financialDetails?.total_loans_taken_amount ?? 0) -
-  (financialDetails?.total_loans_repaid ?? 0),
-      cashboxTotal:financialDetails?.total_cash_holdings ?? 0,
-      depositedAllTime :(financialDetails?.total_fixed_deposits_deposited ?? 0) - (financialDetails?.total_fixed_deposits_withdrawn ?? 0),
+  async createYearSummary(year: number) {
+    const users = await this.getAllUsers();
+    const memberUsers = users.filter(
+      (user) => user.membership_type == MembershipType.MEMBER,
+    );
+    const friendUsers = users.filter(
+      (user) => user.membership_type == MembershipType.FRIEND,
+    );
+    for (const user of memberUsers) {
+      console.log(user.id);
+
+      const financialDetails =
+        await this.userFinancialService.getOrCreateUserFinancials(user);
+      const yearDetails =
+        await this.userFinancialByYear.getOrCreateFinancialRecord(user, year);
+      const spouseName = [user.spouse_first_name, user.spouse_last_name]
+        .filter(Boolean)
+        .join(' ');
+
+    const hebrewJoinedAt = user.join_date
+      ? new HDate(user.join_date).toString('h')
+      : undefined;
+
+    const data: YearSummaryPdfStyleData = {
+        year,
+        activeLoansTotal:
+          (financialDetails?.total_loans_taken_amount ?? 0) -
+          (financialDetails?.total_loans_repaid ?? 0),
+        standingOrderReturnDebt:
+          financialDetails?.total_standing_order_return ?? 0,
+        // cashboxTotal: financialDetails?.total_cash_holdings ?? 0,
+        depositedAllTime:
+          (financialDetails?.total_fixed_deposits_deposited ?? 0) -
+          (financialDetails?.total_fixed_deposits_withdrawn ?? 0),
+        depositedThisYear: yearDetails?.total_fixed_deposits_added ?? 0,
+        donatedAllTime: financialDetails?.total_donations ?? 0,
+        donatedThisYear: yearDetails?.total_donations ?? 0,
+        memberName: `${user.first_name} ${user.last_name}`,
+        memberId: user.id_number ?? undefined,
+        reportDate: new Date().toLocaleDateString('he-IL'),
+        spouseName: spouseName || undefined,
+        spouseId: user.spouse_id_number ?? undefined,
+        // gemachOwnCapital: 0,
+        joinedAt: user.join_date
+          ? user.join_date.toLocaleDateString('he-IL')
+          : '-',
+        hebrewJoinedAt,
+        memberFeeDebt: user.payment_details.monthly_balance ?? 0,
+        memberFeePaidAllTime: financialDetails?.total_monthly_deposits ?? 0,
+        memberFeePaidThisYear: yearDetails?.total_monthly_deposits ?? 0,
+      };
+      await this.mailService.sendYearSummaryPdfStyle(user.email_address, data);
+    }
+    return 'ok';
+  }
+
+  async createYearSummaryForUser(userId: number, year: number) {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId, is_admin: false },
+      relations: ['payment_details'],
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const financialDetails =
+      await this.userFinancialService.getOrCreateUserFinancials(user);
+    const yearDetails =
+      await this.userFinancialByYear.getOrCreateFinancialRecord(user, year);
+    const spouseName = [user.spouse_first_name, user.spouse_last_name]
+      .filter(Boolean)
+      .join(' ');
+
+    const data: YearSummaryPdfStyleData = {
+      year,
+      activeLoansTotal:
+        (financialDetails?.total_loans_taken_amount ?? 0) -
+        (financialDetails?.total_loans_repaid ?? 0),
+      standingOrderReturnDebt:
+        financialDetails?.total_standing_order_return ?? 0,
+      depositedAllTime:
+        (financialDetails?.total_fixed_deposits_deposited ?? 0) -
+        (financialDetails?.total_fixed_deposits_withdrawn ?? 0),
       depositedThisYear: yearDetails?.total_fixed_deposits_added ?? 0,
-      donatedAllTime:financialDetails?.total_donations ?? 0 ,
-      donatedThisYear :yearDetails?.total_donations ?? 0 ,
-      expensesCommissions :0 ,
-      expensesInvestments:0,
-      expensesLoansActivity:0 ,
-      expensesTotal:0 ,
-      gemachDonationsTotal:0,
-      gemachMainFund:0,
-      gemachMemberFeesTotal:0,
-      memberName:`${user.first_name} ${user.last_name}`,
-      reportDate:"2026/01/01",
-      gemachOwnCapital:0,
-      joinedAt:user.join_date?.toDateString()!,
-      memberFeeDebt:user.payment_details.monthly_balance ?? 0,
-      memberFeePaidAllTime:financialDetails?.total_monthly_deposits ?? 0,
-      memberFeePaidThisYear:yearDetails?.total_monthly_deposits ?? 0 ,
-    }    
-      await this.mailService.sendYearSummaryPdfStyle("mair1230@gmail.com", data);
+      donatedAllTime: financialDetails?.total_donations ?? 0,
+      donatedThisYear: yearDetails?.total_donations ?? 0,
+      memberName: `${user.first_name} ${user.last_name}`,
+      memberId: user.id_number ?? undefined,
+      reportDate: new Date().toLocaleDateString('he-IL'),
+      spouseName: spouseName || undefined,
+      spouseId: user.spouse_id_number ?? undefined,
+      joinedAt: user.join_date
+        ? user.join_date.toLocaleDateString('he-IL')
+        : '-',
+      hebrewJoinedAt: user.join_date
+        ? new HDate(user.join_date).toString('h')
+        : undefined,
+      memberFeeDebt: user.payment_details?.monthly_balance ?? 0,
+      memberFeePaidAllTime: financialDetails?.total_monthly_deposits ?? 0,
+      memberFeePaidThisYear: yearDetails?.total_monthly_deposits ?? 0,
+    };
 
+    await this.mailService.sendYearSummaryPdfStyle(user.email_address, data);
+    return { ok: true };
   }
-    return  "dfd"
-  }
-
 }

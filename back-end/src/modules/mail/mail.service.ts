@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { YearSummaryPdfStyleData } from './dto';
+import * as fs from 'fs';
 import * as path from 'path';
+import puppeteer = require('puppeteer');
+import { HDate } from 'hebcal';
+import { YearSummaryPdfStyleData } from './dto';
 
 @Injectable()
 export class MailService {
@@ -34,102 +37,147 @@ export class MailService {
     };
 
     const info = await this.transporter.sendMail(mailOptions);
-    console.log('📧 Email sent:', info.messageId);
+    console.log('Email sent:', info.messageId);
     return info;
   }
 
   async sendYearSummaryPdfStyle(to: string, data: YearSummaryPdfStyleData) {
-    const orgName = 'מזכירות הגמ"ח';
     const subject = `דוח סיכום אישי לשנת ${data.year}`;
-
-    const fmt = (n: number) =>
-      new Intl.NumberFormat('he-IL', { maximumFractionDigits: 2 }).format(n) + ' ₪';
-
-    // ✅ לוגו קבוע מאותה תיקיה: src/modules/.../mail/logo.png
-    const logoCid = 'gemach-logo';
-const logoPath = path.join(process.cwd(), 'public', 'logo.png');
+    const html = this.buildYearSummaryHtml(data);
+    const pdfBuffer = await this.renderHtmlToPdf(html);
 
     const attachments: nodemailer.Attachment[] = [
       {
-        filename: 'logo.png',
-        path: logoPath,
-        cid: logoCid,
+        filename: `year-summary-${data.year}.pdf`,
+        content: pdfBuffer,
+        contentType: 'application/pdf',
       },
     ];
 
-    const html = `
-    <div style="direction:rtl; text-align:right; background:#f2f2f2; padding:24px; font-family: Arial, sans-serif;">
-      <div style="max-width:760px; margin:0 auto; background:#fff; border:1px solid #e6e6e6; border-radius:10px; overflow:hidden;">
+    const text = 'מצורף דוח סיכום אישי כקובץ PDF.';
+    return this.sendMail(
+      to,
+      subject,
+      '<div style="direction:rtl">מצורף דוח סיכום אישי כקובץ PDF.</div>',
+      text,
+      attachments,
+    );
+  }
 
-        <!-- Header -->
-        <div style="padding:18px 22px; border-bottom:1px solid #eee; display:flex; align-items:center; gap:14px;">
-          <div style="flex:1;">
-            <div style="font-size:13px; color:#666;">ד״ס</div>
-            <div style="font-size:13px; color:#666;">${new Date().toLocaleDateString('he-IL')}</div>
-            <div style="margin-top:6px; font-weight:800; font-size:18px; color:#111;">
-              סיכום אישי לשנת ${data.year}
-            </div>
-          </div>
+  private buildYearSummaryHtml(data: YearSummaryPdfStyleData) {
+    const orgName = 'מזכירות הגמ"ח';
+    const fmt = (n: number) =>
+      new Intl.NumberFormat('he-IL', { maximumFractionDigits: 2 }).format(n) + ' ₪';
 
-          <img src="cid:${logoCid}" alt="לוגו" style="height:52px; width:auto; display:block;" />
-        </div>
+    const logoPath = path.join(process.cwd(), 'public', 'logo.png');
+    const logoDataUrl = fs.existsSync(logoPath)
+      ? `data:image/png;base64,${fs.readFileSync(logoPath).toString('base64')}`
+      : '';
 
-        <!-- Body -->
-        <div style="padding:20px 22px;">
-          <!-- Member details -->
-          <div style="border:1px solid #eee; border-radius:10px; padding:14px; background:#fafafa;">
-            <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:14px;">
-              <div style="min-width:220px;"><strong>שם:</strong> ${data.memberName}</div>
-              ${data.memberId ? `<div style="min-width:220px;"><strong>חבר מס׳:</strong> ${data.memberId}</div>` : ``}
-              <div style="min-width:220px;"><strong>תאריך הצטרפות:</strong> ${data.joinedAt}</div>
-            </div>
-          </div>
+    const fontPath = path.join(
+      process.cwd(),
+      'public',
+      'fonts',
+      'Heebo-Regular.ttf',
+    );
+    const fontDataUrl = fs.existsSync(fontPath)
+      ? `data:font/ttf;base64,${fs.readFileSync(fontPath).toString('base64')}`
+      : '';
 
-          <div style="margin-top:16px; display:grid; grid-template-columns:1fr; gap:12px;">
+    const hebrewDate = new HDate(new Date()).toString('h');
 
-            ${sectionBox('דמי חבר', [
-              row('שולם בשנת ' + data.year, fmt(data.memberFeePaidThisYear)),
-              row('שולם דמי חבר (מתאריך ההצטרפות)', fmt(data.memberFeePaidAllTime)),
-              row('חוב עבור דמי חבר', fmt(data.memberFeeDebt)),
-            ])}
+    const memberIdLine = data.memberId
+      ? `<div style="min-width:220px;"><strong> תעודת זהות:</strong> ${data.memberId}</div>`
+      : '';
 
-            ${sectionBox('תרומות', [
-              row('נתרם בשנת ' + data.year, fmt(data.donatedThisYear)),
-              row('סך תרומות', fmt(data.donatedAllTime)),
-            ])}
+    const spouseNameLine = data.spouseName
+      ? `<div style="min-width:220px;"><strong>שם בן/בת זוג:</strong> ${data.spouseName}</div>`
+      : '';
 
-            ${sectionBox('הפקדות', [
-              row('הופקד בשנת ' + data.year, fmt(data.depositedThisYear)),
-              row('סך הפקדות', fmt(data.depositedAllTime)),
-            ])}
+    const spouseIdLine = data.spouseId
+      ? `<div style="min-width:220px;"><strong>תעודת זהות בן/בת זוג:</strong> ${data.spouseId}</div>`
+      : '';
 
-            ${sectionBox('הלוואות', [
-              row('הלוואה פעילה – סך הכל', fmt(data.activeLoansTotal)),
-            ])}
-          </div>
+    const hebrewJoinedAtLine = data.hebrewJoinedAt
+      ? `<div style="min-width:220px;"><strong>תאריך הצטרפות עברי:</strong> ${data.hebrewJoinedAt}</div>`
+      : '';
 
-          <div style="margin-top:18px; border-top:1px dashed #ddd; padding-top:16px;">
-            <div style="font-weight:800; margin-bottom:10px;">נתוני הגמ״ח</div>
+    const loanDebtRow = data.activeLoansTotal > 0
+      ? row('חוב בהלוואות', fmt(data.activeLoansTotal))
+      : '';
 
-            <div style="border:1px solid #eee; border-radius:10px; overflow:hidden;">
-              ${kvLine('הון עצמי של הגמ״ח', fmt(data.gemachOwnCapital))}
-              ${kvLine('קרן הגמ״ח', fmt(data.gemachMainFund))}
-              ${kvLine('דמי חבר', fmt(data.gemachMemberFeesTotal))}
-              ${kvLine('תרומות', fmt(data.gemachDonationsTotal))}
-              ${typeof data.gemachKohRefund === 'number' ? kvLine('החזר ק״וה', fmt(data.gemachKohRefund)) : ''}
+    const standingOrderDebtValue = data.standingOrderReturnDebt ?? 0;
+    const standingOrderDebtRow = standingOrderDebtValue > 0
+      ? row('חוב בהחזרי הוראת קבע', fmt(standingOrderDebtValue))
+      : '';
 
-              ${typeof data.depositsFund === 'number' ? kvLine('הפקדות', fmt(data.depositsFund)) : ''}
-              ${data['??_fundsTextLine'] ? kvLine('קרנות', String(data['??_fundsTextLine'])) : ''}
+    const debtRows = [loanDebtRow, standingOrderDebtRow].filter(Boolean);
+    const debtsSection = debtRows.length
+      ? sectionBox('חובות', debtRows as string[])
+      : '';
 
-              ${kvLine('הוצאות', fmt(data.expensesTotal))}
-              ${kvLine('עמלות', fmt(data.expensesCommissions))}
-              ${kvLine('פעילות הלוואות', fmt(data.expensesLoansActivity))}
-              ${kvLine('השקעות', fmt(data.expensesInvestments))}
+    return `
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <style>
+          ${fontDataUrl ? `@font-face { font-family: 'HeeboEmbed'; src: url('${fontDataUrl}') format('truetype'); font-weight: 400; font-style: normal; }` : ''}
+          body, * { font-family: ${fontDataUrl ? "'HeeboEmbed'" : 'Arial'}, sans-serif !important; }
+        </style>
+      </head>
+      <body style="direction:rtl; text-align:right; background:#f2f2f2; padding:24px;">
+        <div style="max-width:760px; margin:0 auto; background:#fff; border:1px solid #e6e6e6; border-radius:10px; overflow:hidden;">
 
-              <div style="background:#f6fbff; padding:12px 14px; display:flex; justify-content:space-between; font-weight:900;">
-                <div>סך הכל בקופת הגמ״ח</div>
-                <div>${fmt(data.cashboxTotal)}</div>
+          <div style="padding:10px 22px 0; font-size:13px; color:#111; font-weight:700; text-align:right;">בס"ד</div>
+
+          <div style="padding:18px 22px; border-bottom:1px solid #eee; display:flex; align-items:center; gap:14px;">
+            <div style="flex:1;">
+              <div style="font-size:13px; color:#666;">תאריך</div>
+              <div style="font-size:13px; color:#666;">${data.reportDate}</div>
+              <div style="font-size:13px; color:#666;">תאריך עברי: ${hebrewDate}</div>
+              <div style="margin-top:6px; font-weight:800; font-size:18px; color:#111;">
+                סיכום אישי לשנת ${data.year}
               </div>
+            </div>
+
+            ${logoDataUrl ? `<img src="${logoDataUrl}" alt="לוגו" style="height:52px; width:auto; display:block;" />` : ''}
+          </div>
+
+          <div style="padding:20px 22px;">
+            <div style="border:1px solid #eee; border-radius:10px; padding:14px; background:#fafafa;">
+              <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:14px;">
+                <div style="min-width:220px;"><strong>שם:</strong> ${data.memberName}</div>
+                ${memberIdLine}
+                <div style="min-width:220px;"><strong>תאריך הצטרפות:</strong> ${data.joinedAt}</div>
+                ${hebrewJoinedAtLine}
+                ${spouseNameLine}
+                ${spouseIdLine}
+              </div>
+            </div>
+
+            <div style="margin-top:16px; display:grid; grid-template-columns:1fr; gap:12px;">
+
+              ${sectionBox('דמי חבר', [
+                row('שולם בשנת ' + data.year, fmt(data.memberFeePaidThisYear)),
+                row('שולם דמי חבר (מתאריך ההצטרפות)', fmt(data.memberFeePaidAllTime)),
+                row('חוב עבור דמי חבר', fmt(data.memberFeeDebt)),
+              ])}
+
+              ${sectionBox('תרומות', [
+                row('נתרם בשנת ' + data.year, fmt(data.donatedThisYear)),
+                row('סך תרומות', fmt(data.donatedAllTime)),
+              ])}
+
+              ${sectionBox('הפקדות', [
+                row('הופקד בשנת ' + data.year, fmt(data.depositedThisYear)),
+                row('סך הפקדות', fmt(data.depositedAllTime)),
+              ])}
+
+              ${sectionBox('הלוואות', [
+                row('הלוואה פעילה – סך הכל', fmt(data.activeLoansTotal)),
+              ])}
+
+              ${debtsSection}
             </div>
 
             <div style="margin-top:14px; font-size:14px;">
@@ -138,28 +186,13 @@ const logoPath = path.join(process.cwd(), 'public', 'logo.png');
             </div>
 
             <div style="margin-top:10px; font-size:12px; color:#888;">
-              אם קיבלת את המייל הזה בטעות, אפשר להתעלם ממנו.
+              אם קיבלת את הדוח הזה בטעות, אפשר להתעלם ממנו.
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </body>
+    </html>
     `;
-
-    const text = `סיכום אישי לשנת ${data.year}
-שם: ${data.memberName}
-תאריך הצטרפות: ${data.joinedAt}
-
-דמי חבר: שולם השנה ${fmt(data.memberFeePaidThisYear)}, מצטבר ${fmt(data.memberFeePaidAllTime)}, חוב ${fmt(data.memberFeeDebt)}
-תרומות: השנה ${fmt(data.donatedThisYear)}, מצטבר ${fmt(data.donatedAllTime)}
-הפקדות: השנה ${fmt(data.depositedThisYear)}, מצטבר ${fmt(data.depositedAllTime)}
-הלוואות פעילות: ${fmt(data.activeLoansTotal)}
-
-בכבוד רב,
-${orgName}
-`;
-
-    return this.sendMail(to, subject, html, text, attachments);
 
     function sectionBox(title: string, innerRows: string[]) {
       return `
@@ -180,14 +213,21 @@ ${orgName}
         </div>
       `;
     }
+  }
 
-    function kvLine(label: string, value: string) {
-      return `
-        <div style="padding:10px 14px; display:flex; justify-content:space-between; border-bottom:1px solid #f2f2f2;">
-          <div style="color:#333;">${label}</div>
-          <div style="font-weight:700; color:#111; white-space:nowrap;">${value}</div>
-        </div>
-      `;
+  private async renderHtmlToPdf(html: string): Promise<Buffer> {
+    const browser = await puppeteer.launch({ headless: true });
+    try {
+      const page = await browser.newPage();
+      await page.setContent(html, { waitUntil: 'networkidle0' });
+      const pdfBytes = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
+      });
+      return Buffer.from(pdfBytes);
+    } finally {
+      await browser.close();
     }
   }
 }

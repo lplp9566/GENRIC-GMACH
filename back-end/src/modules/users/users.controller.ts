@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserEntity } from './user.entity';
 import { PaymentDetailsEntity } from './payment-details/payment_details.entity';
@@ -66,6 +66,14 @@ async getAllUsers(
   ) {
     const { userData, paymentData } = dto ?? {};
     return this.usersService.updateUserAndPaymentInfo(id, userData, paymentData);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('year-summary')
+  async sendYearSummaryToUser(@Req() req: any) {
+    const userId = req.user.sub;
+    const year = new Date().getFullYear() - 1;
+    return this.usersService.createYearSummaryForUser(userId, year);
   }
  
 }
