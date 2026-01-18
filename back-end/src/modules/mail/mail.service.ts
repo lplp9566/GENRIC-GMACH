@@ -3,6 +3,7 @@ import * as nodemailer from 'nodemailer';
 import * as fs from 'fs';
 import * as path from 'path';
 import puppeteer = require('puppeteer');
+import * as os from 'os';
 import { HDate } from 'hebcal';
 import { YearSummaryPdfStyleData } from './dto';
 
@@ -218,7 +219,8 @@ export class MailService {
   private async renderHtmlToPdf(html: string): Promise<Buffer> {
     const executablePath =
       process.env.PUPPETEER_EXECUTABLE_PATH ||
-      process.env.PUPPETEER_CHROME_PATH;
+      process.env.PUPPETEER_CHROME_PATH ||
+      this.resolveChromeFromCache();
     const browser = await puppeteer.launch({
       headless: true,
       executablePath,
@@ -235,5 +237,35 @@ export class MailService {
     } finally {
       await browser.close();
     }
+  }
+
+  private resolveChromeFromCache(): string | undefined {
+    const cacheDir =
+      process.env.PUPPETEER_CACHE_DIR ||
+      path.join(os.homedir(), '.cache', 'puppeteer');
+    if (!fs.existsSync(cacheDir)) return undefined;
+
+    const chromeRoot = path.join(cacheDir, 'chrome');
+    if (!fs.existsSync(chromeRoot)) return undefined;
+
+    const platforms = [
+      ['linux', 'chrome-linux64', 'chrome'],
+      ['linux', 'chrome-linux', 'chrome'],
+      ['linux-arm64', 'chrome-linux64', 'chrome'],
+    ];
+
+    const versions = fs
+      .readdirSync(chromeRoot, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name);
+
+    for (const version of versions) {
+      for (const [platform, dirName, exeName] of platforms) {
+        const candidate = path.join(chromeRoot, version, platform, dirName, exeName);
+        if (fs.existsSync(candidate)) return candidate;
+      }
+    }
+
+    return undefined;
   }
 }
