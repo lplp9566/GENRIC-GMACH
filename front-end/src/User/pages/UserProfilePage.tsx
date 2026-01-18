@@ -139,7 +139,6 @@ const UserProfilePage = () => {
       dispatch(setAuthUserData(updated));
       setEditOpen(false);
     } catch {
-      // toast already handled
     }
   };
 
@@ -166,7 +165,6 @@ const UserProfilePage = () => {
       dispatch(setAuthUserData(updated));
       setNotifyOpen(false);
     } catch {
-      // toast already handled
     }
   };
 
@@ -265,15 +263,7 @@ const UserProfilePage = () => {
                 </Stack>
               ))}
             </Stack>
-            <Box mt={2}>
-              <Button
-                variant="outlined"
-                onClick={() => setEditOpen(true)}
-                sx={{ borderRadius: 3, fontWeight: 700 }}
-              >
-                עריכת פרטים
-              </Button>
-            </Box>
+         
             <Divider sx={{ my: 2 }} />
             <Typography variant="subtitle1" fontWeight={700} mb={1}>
               פרטי בן/בת זוג
@@ -307,6 +297,15 @@ const UserProfilePage = () => {
                 </Stack>
               ))}
             </Stack>
+               <Box mt={2}>
+              <Button
+                variant="outlined"
+                onClick={() => setEditOpen(true)}
+                sx={{ borderRadius: 3, fontWeight: 700 }}
+              >
+                עריכת פרטים
+              </Button>
+            </Box>
             <Divider sx={{ my: 2 }} />
             <Typography variant="subtitle1" fontWeight={700} mb={1}>
               העדפות התראות

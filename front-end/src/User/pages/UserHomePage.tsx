@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -23,24 +23,37 @@ import { StatusGeneric } from "../../common/indexTypes";
 import { getUserFinancialsByUserGuard } from "../../store/features/user/userFinancialSlice";
 
 const HEB_MONTHS = [
-  "ינו",
-  "פבר",
+  "ינואר",
+  "פברואר",
   "מרץ",
-  "אפר",
+  "אפריל",
   "מאי",
-  "יונ",
-  "יול",
-  "אוג",
-  "ספט",
-  "אוק",
-  "נוב",
-  "דצמ",
+  "יוני",
+  "יולי",
+  "אוגוסט",
+  "ספטמבר",
+  "אוקטובר",
+  "נובמבר",
+  "דצמבר",
 ];
 
 const UserHomePage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const accent = isDark ? "#fbbf24" : "#0f766e";
+  const accentSoft = isDark ? "rgba(251,191,36,0.12)" : "rgba(15,118,110,0.12)";
+  const surface = isDark ? "rgba(15,23,42,0.9)" : "rgba(255,255,255,0.9)";
+  const softBorder = isDark
+    ? "1px solid rgba(148,163,184,0.2)"
+    : "1px solid rgba(15,23,42,0.08)";
+  const sectionSx = {
+    animation: "fadeUp 0.6s ease both",
+    "@keyframes fadeUp": {
+      from: { opacity: 0, transform: "translateY(12px)" },
+      to: { opacity: 1, transform: "translateY(0)" },
+    },
+  };
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const ordersReturn =
     useSelector(
@@ -163,52 +176,67 @@ const UserHomePage = () => {
         py: { xs: 4, md: 6 },
         px: { xs: 2, sm: 4, md: 6 },
         direction: "rtl",
-        fontFamily: "Heebo, Arial, sans-serif",
+        fontFamily: '"Assistant", "Heebo", Arial, sans-serif',
         background: isDark
-          ? "radial-gradient(circle at 12% 8%, rgba(255,200,87,0.14), transparent 40%), radial-gradient(circle at 90% 12%, rgba(0,150,136,0.18), transparent 35%), linear-gradient(180deg, #0b1120 0%, #0f172a 65%)"
-          : "radial-gradient(circle at 12% 8%, rgba(255,200,87,0.18), transparent 40%), radial-gradient(circle at 90% 12%, rgba(0,150,136,0.15), transparent 35%), linear-gradient(180deg, #f7f7fb 0%, #ffffff 65%)",
+          ? "radial-gradient(circle at 12% 8%, rgba(251,191,36,0.18), transparent 45%), radial-gradient(circle at 88% 10%, rgba(20,184,166,0.18), transparent 35%), linear-gradient(180deg, #0b1120 0%, #0f172a 70%)"
+          : "radial-gradient(circle at 12% 8%, rgba(251,191,36,0.22), transparent 45%), radial-gradient(circle at 88% 10%, rgba(20,184,166,0.18), transparent 35%), linear-gradient(180deg, #f8fafc 0%, #ffffff 70%)",
       }}
     >
       <Paper
         elevation={0}
         sx={{
           p: { xs: 3, md: 4 },
-          borderRadius: 4,
+          borderRadius: 5,
           background: isDark
-            ? "linear-gradient(130deg, rgba(5,46,111,0.95), rgba(10,70,64,0.95))"
-            : "linear-gradient(130deg, rgba(13,71,161,0.95), rgba(0,150,136,0.92))",
+            ? "linear-gradient(135deg, rgba(13,71,161,0.9), rgba(15,23,42,0.96))"
+            : "linear-gradient(135deg, rgba(14,116,144,0.95), rgba(13,71,161,0.9))",
           color: "#fff",
           position: "relative",
           overflow: "hidden",
+          border: isDark
+            ? "1px solid rgba(59,130,246,0.35)"
+            : "1px solid rgba(14,116,144,0.35)",
         }}
       >
         <Box
           sx={{
             position: "absolute",
-            width: 320,
-            height: 320,
+            width: 360,
+            height: 360,
             borderRadius: "50%",
             bgcolor: "rgba(255,255,255,0.08)",
-            top: -120,
-            left: -80,
+            top: -140,
+            left: -100,
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            width: 240,
+            height: 240,
+            borderRadius: 80,
+            bgcolor: "rgba(255,255,255,0.12)",
+            bottom: -80,
+            right: -40,
+            transform: "rotate(12deg)",
           }}
         />
         <Stack spacing={1.5} position="relative" zIndex={1}>
           <Chip
-            label="דף הבית"
+            label='גמ"ח דיגיטלי'
             color="default"
             sx={{
               alignSelf: "flex-start",
-              bgcolor: "rgba(255,255,255,0.2)",
+              bgcolor: "rgba(255,255,255,0.24)",
               color: "#fff",
               fontWeight: 700,
             }}
           />
-          <Typography variant="h4" fontWeight={800}>
+          <Typography variant="h3" fontWeight={800} sx={{ letterSpacing: "-0.5px" }}>
             ברוך הבא{userName ? `, ${userName}` : ""}
           </Typography>
           <Typography variant="subtitle1" sx={{ opacity: 0.9, maxWidth: 640 }}>
-            ריכוז מהיר של החובות, ההחזרים והדברים הטובים במקום אחד.
+            כאן תוכל לראות את מצב ההלוואות, ההפקדות והתרומות, ולנהל את הפעילות שלך במהירות.
           </Typography>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
             <Button
@@ -219,11 +247,11 @@ const UserHomePage = () => {
                 borderRadius: 3,
                 fontWeight: 700,
                 bgcolor: "#fff",
-                color: "#0d47a1",
+                color: "#0f172a",
                 "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
               }}
             >
-              לאיזור אישי
+              פרופיל אישי
             </Button>
             <Button
               component="a"
@@ -237,32 +265,32 @@ const UserHomePage = () => {
                 "&:hover": { borderColor: "#fff" },
               }}
             >
-              הדברים הטובים
+              לסקירה פיננסית
             </Button>
           </Stack>
         </Stack>
       </Paper>
 
-      <Box sx={{ mt: 4 }}>
+      <Box sx={{ mt: 4, ...sectionSx }}>
         <Typography variant="h5" fontWeight={800} mb={2}>
-          חובות והחזרים
+          התחייבויות פתוחות
         </Typography>
         <Grid container spacing={{ xs: 2, md: 3 }}>
           {[
             {
               title: "חוב הלוואות",
               value: loansDebt,
-              detail: `${openLoans.length} הלוואות פעילות`,
+              detail: `${openLoans.length} הלוואות פתוחות`,
             },
             {
-              title: "חוב חודשי",
+              title: "חיוב חודשי",
               value: monthlyDebt,
-              detail: "דמי חבר/החזר חודשי",
+              detail: "חיוב חודשי לגמ\"ח",
             },
             {
-              title: "חוב הוראות קבע",
+              title: "הוראות קבע",
               value: standingOrdersDebt,
-              detail: `${ordersReturn.filter((o) => !o.paid).length} הוראות פתוחות`,
+              detail: `${ordersReturn.filter((o) => !o.paid).length} הוראות קבע בהמתנה`,
             },
           ].map((card) => (
             <Grid item xs={12} md={4} key={card.title}>
@@ -271,18 +299,32 @@ const UserHomePage = () => {
                 sx={{
                   p: 3,
                   borderRadius: 4,
-                  background: isDark
-                    ? "linear-gradient(135deg, rgba(244,63,94,0.2), rgba(30,41,59,0.9))"
-                    : "linear-gradient(135deg, rgba(244,63,94,0.12), rgba(255,228,230,0.7))",
-                  border: isDark
-                    ? "1px solid rgba(244,63,94,0.35)"
-                    : "1px solid rgba(244,63,94,0.2)",
+                  background: surface,
+                  border: softBorder,
+                  backdropFilter: "blur(6px)",
                 }}
               >
-                <Typography variant="subtitle2" fontWeight={700}>
-                  {card.title}
-                </Typography>
-                <Typography variant="h5" fontWeight={800} mt={1}>
+                <Stack direction="row" spacing={1.5} alignItems="center">
+                  <Box
+                    sx={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 2.5,
+                      bgcolor: accentSoft,
+                      color: accent,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 800,
+                    }}
+                  >
+                    ₪
+                  </Box>
+                  <Typography variant="subtitle2" fontWeight={700}>
+                    {card.title}
+                  </Typography>
+                </Stack>
+                <Typography variant="h5" fontWeight={800} mt={2}>
                   {formatILS(card.value)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -294,16 +336,26 @@ const UserHomePage = () => {
         </Grid>
       </Box>
 
-      <Box id="section-good" sx={{ mt: 4 }}>
+      <Box id="section-good" sx={{ mt: 4, ...sectionSx }}>
         <Typography variant="h5" fontWeight={800} mb={2}>
-          הדברים הטובים
+          תמונה כללית
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} md={7}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 4, height: "100%" }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                borderRadius: 4,
+                height: "100%",
+                background: surface,
+                border: softBorder,
+                backdropFilter: "blur(6px)",
+              }}
+            >
               <Stack spacing={2}>
                 <Typography variant="h6" fontWeight={800}>
-                  סטטוס חיובי ומה צפוי
+                  סטטוס התחייבויות
                 </Typography>
                 <Divider />
                 <Stack spacing={1.5}>
@@ -320,28 +372,29 @@ const UserHomePage = () => {
                 </Stack>
                 <Stack spacing={1.5}>
                   <Typography variant="subtitle2" fontWeight={700}>
-                    החיוב הבא
+                    מועד חיוב הבא
                   </Typography>
                   <Typography variant="body1" fontWeight={800}>
                     {nextChargeDate
                       ? `${formatDate(nextChargeDate)} • ${formatILS(
                           Math.abs(monthlyBalance)
                         )}`
-                      : "לא הוגדר מועד חיוב"}
+                      : "אין מועד חיוב מוגדר"}
                   </Typography>
                 </Stack>
                 <Stack spacing={1.5}>
                   <Typography variant="subtitle2" fontWeight={700}>
-                    הפקדה פעילה
+                    פיקדון פעיל
                   </Typography>
                   {activeDeposit ? (
                     <Typography variant="body1" fontWeight={800}>
-                      {formatILS(activeDeposit.current_balance)} • החזר צפוי{" "}
+                      {formatILS(activeDeposit.current_balance)} • סיום
+                      {" "}
                       {formatDate(parseDate(activeDeposit.end_date))}
                     </Typography>
                   ) : (
                     <Typography variant="body2" color="text.secondary">
-                      אין הפקדה פעילה כרגע.
+                      אין פיקדון פעיל כרגע.
                     </Typography>
                   )}
                 </Stack>
@@ -349,25 +402,41 @@ const UserHomePage = () => {
                   component={RouterLink}
                   to="/u/deposits"
                   variant="outlined"
-                  sx={{ borderRadius: 3, fontWeight: 700, alignSelf: "flex-start" }}
+                  sx={{
+                    borderRadius: 3,
+                    fontWeight: 700,
+                    alignSelf: "flex-start",
+                    borderColor: accent,
+                    color: accent,
+                    "&:hover": { borderColor: accent },
+                  }}
                 >
-                  פירוט הפקדות
+                  לצפייה בהפקדות
                 </Button>
               </Stack>
             </Paper>
           </Grid>
           <Grid item xs={12} md={5}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 4, height: "100%" }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                borderRadius: 4,
+                height: "100%",
+                background: surface,
+                border: softBorder,
+                backdropFilter: "blur(6px)",
+              }}
+            >
               <Stack spacing={2}>
                 <Typography variant="h6" fontWeight={800}>
-                  תרומות ב-12 חודשים
+                  תרומות ב-12 חודשים אחרונים
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  סך נטו: {formatILS(last12MonthsDonations)}
+                  סה"כ 12 חודשים: {formatILS(last12MonthsDonations)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  סה״כ מאז הקמה:{" "}
-                  {formatILS(userFinancials?.total_donations ?? 0)}
+                  סה"כ כללי לתרומות: {formatILS(userFinancials?.total_donations ?? 0)}
                 </Typography>
                 <Divider />
                 <Grid container spacing={2}>
@@ -404,7 +473,7 @@ const UserHomePage = () => {
                               sx={{
                                 height: "100%",
                                 width: `${width}%`,
-                                bgcolor:
+                                background:
                                   m.value >= 0
                                     ? "linear-gradient(90deg, #22c55e, #86efac)"
                                     : "linear-gradient(90deg, #f43f5e, #fb7185)",
@@ -422,16 +491,25 @@ const UserHomePage = () => {
         </Grid>
       </Box>
 
-      <Box sx={{ mt: 4 }}>
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 4 }}>
+      <Box sx={{ mt: 4, ...sectionSx }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            borderRadius: 4,
+            background: surface,
+            border: softBorder,
+            backdropFilter: "blur(6px)",
+          }}
+        >
           <Stack spacing={2}>
             <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
               <Box flex={1}>
                 <Typography variant="h6" fontWeight={800}>
-                  שליחת הודעה
+                  רגולציה ונהלים
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  בקרוב נפתח כאן טופס פנייה מסודר אל הגמ״ח.
+                  כללי הגמ"ח מוצגים כאן וניתן לצפות במסמכי הנהלים.
                 </Typography>
               </Box>
               <Button
@@ -439,7 +517,7 @@ const UserHomePage = () => {
                 disabled
                 sx={{ borderRadius: 3, fontWeight: 700, height: 44 }}
               >
-                טופס פנייה בקרוב
+                בקרוב: מסמכים
               </Button>
             </Stack>
             <Divider />
@@ -449,7 +527,7 @@ const UserHomePage = () => {
                 sx={{ borderRadius: 3, fontWeight: 800 }}
                 onClick={() => setOpenRegulations(true)}
               >
-                תקנון הגמ״ח
+                תקנון הגמ"ח
               </Button>
             </Box>
           </Stack>

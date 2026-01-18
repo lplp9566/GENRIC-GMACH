@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Box,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-} from "@mui/material";
+import { Box, FormControl, FormLabel, Select, MenuItem } from "@mui/material";
 import { IAddUserFormData, MembershipType } from "../UsersDto";
 
 type Props = {
@@ -20,9 +13,8 @@ const StepMembershipType: React.FC<Props> = ({ data, setData }) => {
   return (
     <Box sx={{ mt: 2 }}>
       <FormControl>
-        <FormLabel sx={{ mb: 1 }}>בחרי סוג משתמש</FormLabel>
-
-        <RadioGroup
+        <FormLabel sx={{ mb: 1 }}>��� ��� �����</FormLabel>
+        <Select
           value={value}
           onChange={(e) => {
             const nextValue = e.target.value as MembershipType;
@@ -31,18 +23,12 @@ const StepMembershipType: React.FC<Props> = ({ data, setData }) => {
               userData: { ...prev.userData, membership_type: nextValue },
             }));
           }}
+          size="small"
+          sx={{ minWidth: 220 }}
         >
-          <FormControlLabel
-            value={MembershipType.MEMBER}
-            control={<Radio />}
-            label="חבר גמ״ח"
-          />
-          <FormControlLabel
-            value={MembershipType.FRIEND}
-            control={<Radio />}
-            label="ידיד גמ״ח"
-          />
-        </RadioGroup>
+          <MenuItem value={MembershipType.MEMBER}>חבר</MenuItem>
+          <MenuItem value={MembershipType.FRIEND}>ידיד</MenuItem>
+        </Select>
       </FormControl>
     </Box>
   );
