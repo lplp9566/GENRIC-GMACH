@@ -13,7 +13,7 @@ const StepMembershipType: React.FC<Props> = ({ data, setData }) => {
   return (
     <Box sx={{ mt: 2 }}>
       <FormControl>
-        <FormLabel sx={{ mb: 1 }}>��� ��� �����</FormLabel>
+        <FormLabel sx={{ mb: 1 }}>סוג משתמש</FormLabel>
         <Select
           value={value}
           onChange={(e) => {
