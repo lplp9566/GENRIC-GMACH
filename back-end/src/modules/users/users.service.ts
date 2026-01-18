@@ -515,10 +515,6 @@ export class UsersService {
     const hebrewJoinedAt = user.join_date
       ? new HDate(user.join_date).toString('h')
       : undefined;
-    const loanBalances = user.payment_details?.loan_balances ?? [];
-    const loanDebt = loanBalances
-      .filter((loan) => loan.balance < 0)
-      .reduce((sum, loan) => sum + Math.abs(loan.balance), 0);
     const unpaidOrders = await this.orderReturnRepo.find({
       where: { user: { id: user.id }, paid: false },
     });
@@ -528,8 +524,10 @@ export class UsersService {
     );
 
     const data: YearSummaryPdfStyleData = {
-        year,
-        activeLoansTotal: loanDebt,
+      year,
+        activeLoansTotal:
+          (financialDetails?.total_loans_taken_amount ?? 0) -
+          (financialDetails?.total_loans_repaid ?? 0),
         standingOrderReturnDebt: standingOrderDebt,
         // cashboxTotal: financialDetails?.total_cash_holdings ?? 0,
         depositedAllTime:
@@ -574,10 +572,6 @@ export class UsersService {
       .filter(Boolean)
       .join(' ');
 
-    const loanBalances = user.payment_details?.loan_balances ?? [];
-    const loanDebt = loanBalances
-      .filter((loan) => loan.balance < 0)
-      .reduce((sum, loan) => sum + Math.abs(loan.balance), 0);
     const unpaidOrders = await this.orderReturnRepo.find({
       where: { user: { id: user.id }, paid: false },
     });
@@ -588,7 +582,9 @@ export class UsersService {
 
     const data: YearSummaryPdfStyleData = {
       year,
-      activeLoansTotal: loanDebt,
+      activeLoansTotal:
+        (financialDetails?.total_loans_taken_amount ?? 0) -
+        (financialDetails?.total_loans_repaid ?? 0),
       standingOrderReturnDebt: standingOrderDebt,
       depositedAllTime:
         (financialDetails?.total_fixed_deposits_deposited ?? 0) -
