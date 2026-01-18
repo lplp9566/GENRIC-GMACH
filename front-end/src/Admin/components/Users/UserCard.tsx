@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { IUser, MembershipType } from "./UsersDto";
 import {
   Avatar,
@@ -27,13 +27,12 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import EditUser from "./editUser";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"; // כתר/גביע כזה
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
 const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
   const [expanded, setExpanded] = useState(false);
   const [editModal, seteditModal] = useState(false);
 
-  // נתוני סיכום
   const mb = user.payment_details.monthly_balance!;
   if (mb === null) return null;
   const loans = user.payment_details.loan_balances;
@@ -41,6 +40,7 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
   const today = new Date().getDate();
   const isChargeToday = user.payment_details.charge_date === today;
   const balanceColor = mb < 0 ? "error" : "success";
+
   const toggleExpand = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     setExpanded((prev) => !prev);
@@ -48,8 +48,25 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
   const onEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     seteditModal(true);
-    // navigate(`/users/${user.id}/edit`);
   };
+
+  const primaryFirst = user.first_name ?? "";
+  const primaryLast = user.last_name ?? "";
+  const spouseFirst = user.spouse_first_name ?? "";
+  const spouseLast = user.spouse_last_name ?? "";
+  const spouseId = user.spouse_id_number ?? "";
+
+  const hasSpouse = Boolean(spouseFirst || spouseLast || spouseId);
+  const lastDisplay = hasSpouse && spouseLast && spouseLast !== primaryLast
+    ? `${primaryLast} / ${spouseLast}`
+    : primaryLast;
+  const firstDisplay = hasSpouse && spouseFirst
+    ? `${primaryFirst} + ${spouseFirst}`
+    : primaryFirst;
+  const idsDisplay = hasSpouse && spouseId
+    ? `${user.id_number} / ${spouseId}`
+    : user.id_number;
+
   const StyledCard = styled(Card)(({ theme }) => ({
     borderRadius: theme.spacing(2),
     boxShadow: theme.shadows[1],
@@ -79,7 +96,7 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
       <StyledCard onClick={() => toggleExpand()} sx={{ position: "relative" }}>
         {user.is_member && (
           <EmojiEventsIcon
-            titleAccess="חבר גמ״ח"
+            titleAccess="חבר"
             sx={{
               position: "absolute",
               top: 10,
@@ -94,18 +111,22 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
         <CardHeader
           avatar={
             <Avatar sx={{ bgcolor: "primary.main" }}>
-              {user.first_name[0]}
+              {primaryFirst[0]}
             </Avatar>
           }
           title={
             <Stack direction="row" alignItems="center" spacing={1}>
               <Typography variant="h6">
-                {user.first_name} {user.last_name}
+                {firstDisplay} {lastDisplay}
               </Typography>
               {isChargeToday && <TodayIcon color="info" fontSize="small" />}
             </Stack>
           }
-          subheader={user.current_role?.name ?? "-"}
+          subheader={
+            <Typography variant="body2" color="text.secondary">
+              ת"ז: {idsDisplay}
+            </Typography>
+          }
           sx={{ pb: 0 }}
         />
 
@@ -120,7 +141,7 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
             <Stack direction="row" spacing={2} flexWrap="wrap">
               <Chip
                 icon={<AccountBalanceWalletIcon />}
-                label={`${mb.toLocaleString()} ₪`}
+                label={`${mb.toLocaleString()} ש"ח`}
                 size="small"
                 sx={{ minWidth: 100 }}
                 color={balanceColor}
@@ -128,9 +149,7 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
               />
               <Chip
                 icon={anyLoanNeg ? <WarningAmberIcon /> : <AccountBalanceIcon />}
-                label={`${loans.length} הלווא${
-                  loans.length !== 1 ? "ות" : "ה"
-                }`}
+                label={`${loans.length} הלווא${loans.length !== 1 ? "ות" : "ה"}`}
                 size="small"
                 sx={{ minWidth: 100 }}
                 color={anyLoanNeg ? "error" : "primary"}
@@ -140,13 +159,8 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
           </CardContent>
         )}
         {user.membership_type == MembershipType.FRIEND && (
-          <Button
-            variant="outlined"
-            size="small"
-            // onClick={onEdit}
-            // startIcon={<EditIcon />}
-          >
-            הפוך לחבר
+          <Button variant="outlined" size="small">
+            משתמש חבר
           </Button>
         )}
         <Divider />
@@ -167,18 +181,17 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
             {user.membership_type === MembershipType.MEMBER && (
               <>
                 <Typography variant="subtitle2" gutterBottom>
-                  מאזן חודשי
+                  מצב חודשי
                 </Typography>
                 <Typography
                   variant="h6"
                   color={balanceColor + ".main"}
                   gutterBottom
                 >
-                  {mb.toLocaleString()} ₪
+                  {mb.toLocaleString()} ש"ח
                 </Typography>
                 <Typography variant="subtitle2" gutterBottom>
-                  {" "}
-                  פירוט הלוואות{" "}
+                  פירוט הלוואות
                 </Typography>
                 <List disablePadding sx={{ mb: 2 }}>
                   {loans.map((ln) => {
@@ -193,7 +206,6 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
                         }}
                       >
                         <ListItemAvatar>
-                          {" "}
                           <Avatar
                             sx={{
                               bgcolor: neg ? "error.main" : "success.main",
@@ -204,15 +216,15 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
                         </ListItemAvatar>
                         <ListItemText
                           primary={`#${ln.loanId}`}
-                          secondary={`${ln.balance.toLocaleString()} ₪`}
+                          secondary={`${ln.balance.toLocaleString()} ש"ח`}
                           secondaryTypographyProps={{
                             color: neg ? "error.main" : "text.primary",
                           }}
                         />
                       </ListItem>
                     );
-                  })}{" "}
-                </List>{" "}
+                  })}
+                </List>
               </>
             )}
 
@@ -222,16 +234,16 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
               <strong>טלפון:</strong> {user.phone_number}
             </Typography>
             <Typography variant="body2">
-              <strong>ת"ז:</strong> {user.id_number}
+              <strong>ת"ז:</strong> {idsDisplay}
             </Typography>
             <Typography variant="body2">
-              <strong>הצטרפות:</strong>{" "}
+              <strong>תאריך הצטרפות:</strong>{" "}
               {user.join_date
                 ? new Date(user.join_date).toLocaleDateString("he-IL")
                 : "-"}
             </Typography>
             <Typography variant="body2">
-              <strong>פרטי בנק:</strong> {user.payment_details.bank_number} /{" "}
+              <strong>בנק:</strong> {user.payment_details.bank_number} /{" "}
               {user.payment_details.bank_branch} /{" "}
               {user.payment_details.bank_account_number}
             </Typography>
@@ -239,13 +251,13 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
               <strong>תאריך חיוב:</strong> {user.payment_details.charge_date}
             </Typography>
             <Typography variant="body2">
-              <strong>שיטת תשלום:</strong>{" "}
+              <strong>אמצעי תשלום:</strong>{" "}
               {revertPaymentMethod(user.payment_details.payment_method)}
             </Typography>
 
             <Box mt={2} textAlign="right">
               <Button variant="contained" size="small" onClick={onEdit}>
-                ערוך נתוני משתמש
+                עריכת משתמש
               </Button>
             </Box>
           </CardContent>

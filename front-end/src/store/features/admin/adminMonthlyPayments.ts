@@ -1,8 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
-import axios from "axios";
 import { IMonthlyPayment, INewMonthlyPayment } from "../../../Admin/components/MonthlyPayments/MonthlyPaymentsDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
+import { api } from "../../axiosInstance";
 
 interface AdminMonthlyPaymentsType {
   allPayments: IMonthlyPayment[] | [];
@@ -18,19 +17,18 @@ const initialState: AdminMonthlyPaymentsType = {
     AddMonthlyPaymentStatus: "idle",
     updateMonthlyPaymentStatus: "idle",
 };
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const gatAllMonthlyPayments = createAsyncThunk(
   "/admin/getAllMonthlyPayments",
   async () => {
-    const response = await axios.get(`${BASE_URL}/monthly-deposits`);
+    const response = await api.get(`/monthly-deposits`);
     return response.data;
   }
 );
 export const getMonthlyPaymentsByUserId = createAsyncThunk(
   "/admin/getMonthlyPaymentsByUserId",
   async (userId: number) => {
-    const response = await axios.get<IMonthlyPayment[]>(
-      `${BASE_URL}/monthly-deposits/user`,
+    const response = await api.get<IMonthlyPayment[]>(
+      `/monthly-deposits/user`,
       {
         params: { userId },
       }
@@ -41,8 +39,8 @@ export const getMonthlyPaymentsByUserId = createAsyncThunk(
 export const updateMonthlyPayment = createAsyncThunk(
   "/admin/updateMonthlyPayment",
   async (monthlyPayment: IMonthlyPayment) => {
-    const response = await axios.patch<IMonthlyPayment>(
-      `${BASE_URL}/monthly-deposits/${monthlyPayment.id}`,
+    const response = await api.patch<IMonthlyPayment>(
+      `/monthly-deposits/${monthlyPayment.id}`,
       monthlyPayment
     );
     return response.data;
@@ -51,8 +49,8 @@ export const updateMonthlyPayment = createAsyncThunk(
 export const createMonthlyPayment = createAsyncThunk(
   "/admin/createMonthlyPayment",
   async (monthlyPayment: INewMonthlyPayment) => {
-    const response = await axios.post<INewMonthlyPayment>(
-      `${BASE_URL}/monthly-deposits`,
+    const response = await api.post<INewMonthlyPayment>(
+      `/monthly-deposits`,
       monthlyPayment
     );
     return response.data;       
@@ -61,7 +59,7 @@ export const createMonthlyPayment = createAsyncThunk(
 export const deleteMonthlyPayment = createAsyncThunk(
   "/admin/deleteMonthlyPayment",
   async (id: number) => {
-  await axios.delete(`${BASE_URL}/monthly-deposits/${id}`);
+  await api.delete(`/monthly-deposits/${id}`);
     return id; 
   }
 )

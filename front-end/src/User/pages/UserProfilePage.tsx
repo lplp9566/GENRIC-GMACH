@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -10,8 +10,8 @@ import {
   Divider,
   Grid,
   Paper,
-  Switch,
   Stack,
+  Switch,
   TextField,
   Typography,
   useTheme,
@@ -46,6 +46,9 @@ const UserProfilePage = () => {
     email_address: user?.email_address ?? "",
     id_number: user?.id_number ?? "",
     phone_number: user?.phone_number ?? "",
+    spouse_first_name: user?.spouse_first_name ?? "",
+    spouse_last_name: user?.spouse_last_name ?? "",
+    spouse_id_number: user?.spouse_id_number ?? "",
     bank_number: user?.payment_details?.bank_number ?? "",
     bank_branch: user?.payment_details?.bank_branch ?? "",
     bank_account_number: user?.payment_details?.bank_account_number ?? "",
@@ -71,6 +74,9 @@ const UserProfilePage = () => {
       email_address: user.email_address ?? "",
       id_number: user.id_number ?? "",
       phone_number: user.phone_number ?? "",
+      spouse_first_name: user.spouse_first_name ?? "",
+      spouse_last_name: user.spouse_last_name ?? "",
+      spouse_id_number: user.spouse_id_number ?? "",
       bank_number: user.payment_details?.bank_number ?? "",
       bank_branch: user.payment_details?.bank_branch ?? "",
       bank_account_number: user.payment_details?.bank_account_number ?? "",
@@ -113,6 +119,9 @@ const UserProfilePage = () => {
               email_address: formData.email_address,
               id_number: formData.id_number,
               phone_number: formData.phone_number,
+              spouse_first_name: formData.spouse_first_name,
+              spouse_last_name: formData.spouse_last_name,
+              spouse_id_number: formData.spouse_id_number,
               payment_details: {
                 bank_number: Number(formData.bank_number) || 0,
                 bank_branch: Number(formData.bank_branch) || 0,
@@ -130,6 +139,7 @@ const UserProfilePage = () => {
       dispatch(setAuthUserData(updated));
       setEditOpen(false);
     } catch {
+      // toast already handled
     }
   };
 
@@ -264,6 +274,39 @@ const UserProfilePage = () => {
                 עריכת פרטים
               </Button>
             </Box>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="subtitle1" fontWeight={700} mb={1}>
+              פרטי בן/בת זוג
+            </Typography>
+            <Stack spacing={1.2}>
+              {[
+                {
+                  label: "שם פרטי",
+                  value: user?.spouse_first_name || "לא הוגדר",
+                },
+                {
+                  label: "שם משפחה",
+                  value: user?.spouse_last_name || "לא הוגדר",
+                },
+                {
+                  label: "תעודת זהות",
+                  value: user?.spouse_id_number || "לא הוגדר",
+                },
+              ].map((row) => (
+                <Stack
+                  key={row.label}
+                  direction="row"
+                  justifyContent="space-between"
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {row.label}
+                  </Typography>
+                  <Typography variant="subtitle2" fontWeight={700}>
+                    {row.value}
+                  </Typography>
+                </Stack>
+              ))}
+            </Stack>
             <Divider sx={{ my: 2 }} />
             <Typography variant="subtitle1" fontWeight={700} mb={1}>
               העדפות התראות
@@ -437,6 +480,40 @@ const UserProfilePage = () => {
               value={formData.id_number}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, id_number: e.target.value }))
+              }
+              fullWidth
+            />
+            <Divider />
+            <TextField
+              label="שם פרטי בן/בת זוג"
+              value={formData.spouse_first_name}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  spouse_first_name: e.target.value,
+                }))
+              }
+              fullWidth
+            />
+            <TextField
+              label="שם משפחה בן/בת זוג"
+              value={formData.spouse_last_name}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  spouse_last_name: e.target.value,
+                }))
+              }
+              fullWidth
+            />
+            <TextField
+              label="תעודת זהות בן/בת זוג"
+              value={formData.spouse_id_number}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  spouse_id_number: e.target.value,
+                }))
               }
               fullWidth
             />

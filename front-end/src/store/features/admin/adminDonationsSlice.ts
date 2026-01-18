@@ -7,8 +7,7 @@ import {
   IUpdateDonation,
 } from "../../../Admin/components/Donations/DonationDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
-
-import axios from "axios";
+import { api } from "../../axiosInstance";
 
 interface AdminDonationType {
   allDonations: IDonation[];
@@ -22,7 +21,6 @@ interface AdminDonationType {
   createFundDonationStatus: Status
 
 }
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 const initialState: AdminDonationType = {
   allDonations: [],
   error: null,
@@ -36,16 +34,16 @@ const initialState: AdminDonationType = {
 };
 export const getAllDonations = createAsyncThunk<IDonation[]
 >("admin/getAllDonations", async () => {
-  const { data } = await axios.get<IDonation[]>(
-    `${BASE_URL}/donations`,
+  const { data } = await api.get<IDonation[]>(
+    `/donations`,
   );
   return data;
 });
 export const getDonationByUserId = createAsyncThunk<IDonation[], number>(
   "admin/getDonationByUserId",
   async (id) => {
-    const { data } = await axios.get<IDonation[]>(
-      `${BASE_URL}/donations/user/${id}`,
+    const { data } = await api.get<IDonation[]>(
+      `/donations/user/${id}`,
     );
     return data;
   }
@@ -53,7 +51,7 @@ export const getDonationByUserId = createAsyncThunk<IDonation[], number>(
 export const createDonation = createAsyncThunk<IDonation, ICreateDonation>(
   "admin/createDonation",
   async (donation) => {
-    const { data } = await axios.post<IDonation>(`${BASE_URL}/donations`, donation);
+    const { data } = await api.post<IDonation>(`/donations`, donation);
     console.log(data.user.last_name)
     return data; 
   }
@@ -61,28 +59,28 @@ export const createDonation = createAsyncThunk<IDonation, ICreateDonation>(
 export const withdrawDonation = createAsyncThunk<IDonation, ICreateDonation>(
   "admin/withdrawDonation",
   async (donation) => {
-    const { data } = await axios.post<IDonation>(`${BASE_URL}/donations`, donation);
+    const { data } = await api.post<IDonation>(`/donations`, donation);
     return data; 
   }
 );
 export const updateDonationById = createAsyncThunk<IDonation, IUpdateDonation>(
   "admin/editDonation",
   async (donation) => {
-    const { data } = await axios.patch<IDonation>(`${BASE_URL}/donations/${donation.id}`, donation);
+    const { data } = await api.patch<IDonation>(`/donations/${donation.id}`, donation);
     return data;
   }
 );
 export const createFundDonation = createAsyncThunk<IFundDonation, ICreateFund>(
   "admin/createFundDonation",
   async (donation) => {
-    const { data } = await axios.post<IFundDonation>(`${BASE_URL}/funds`, donation);
+    const { data } = await api.post<IFundDonation>(`/funds`, donation);
     return data;
   }
 )
 export const getAllFunds = createAsyncThunk<IFundDonation[]
 >("admin/getAllFunds", async () => {
-  const { data } = await axios.get<IFundDonation[]>(
-    `${BASE_URL}/funds`,
+  const { data } = await api.get<IFundDonation[]>(
+    `/funds`,
   );
   return data;
 })

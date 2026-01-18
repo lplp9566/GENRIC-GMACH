@@ -7,7 +7,7 @@ import {
   IUpdateRoleMonthlyRates,
 } from "../../../Admin/components/ranks/ranksDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
-import axios from "axios";
+import { api } from "../../axiosInstance";
 
 interface AdminRankState {
   memberShipRanks: IMembershipRank[] | [];
@@ -26,26 +26,25 @@ const initialState: AdminRankState = {
   updateMembershipRankStatus: "idle",
   deleteMembershipRankStatus: "idle",
 };
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const getAllMonthlyRanks = createAsyncThunk(
   "admin/getAllMonthlyRanks",
   async () => {
-    const response = await axios.get(`${BASE_URL}/membership-roles/with-rates`);
+    const response = await api.get(`/membership-roles/with-rates`);
     return response.data;
   }
 );
 export const getAllMembershipRanks = createAsyncThunk(
   "admin/getAllMembershipRanks",
   async () => {
-    const response = await axios.get(`${BASE_URL}/membership-roles`);
+    const response = await api.get(`/membership-roles`);
     return response.data;
   }
 );
 export const createMembershipRank = createAsyncThunk(
   "admin/createMembershipRank",
   async (membershipRank: ICreateMembershipRank) => {
-    const response = await axios.post<ICreateMembershipRank>(
-      `${BASE_URL}/membership-roles`,
+    const response = await api.post<ICreateMembershipRank>(
+      `/membership-roles`,
       membershipRank
     );
     return response.data;
@@ -58,8 +57,8 @@ export const createMonthlyRank = createAsyncThunk(
     amount: number;
     effective_from: string;
   }) => {
-    const response = await axios.post<IMonthlyRank>(
-      `${BASE_URL}/role-monthly-rates`,
+    const response = await api.post<IMonthlyRank>(
+      `/role-monthly-rates`,
       monthlyRank
     );
     return response.data;
@@ -68,8 +67,8 @@ export const createMonthlyRank = createAsyncThunk(
 export const updateMembershipRank = createAsyncThunk(
   "admin/updateMembershipRank",
   async (monthlyRates: IUpdateRoleMonthlyRates) => {
-    const response = await axios.patch<IUpdateRoleMonthlyRates>(
-      `${BASE_URL}/role-monthly-rates/${monthlyRates.id}`,
+    const response = await api.patch<IUpdateRoleMonthlyRates>(
+      `/role-monthly-rates/${monthlyRates.id}`,
       monthlyRates
     );
     return response.data;
@@ -78,7 +77,7 @@ export const updateMembershipRank = createAsyncThunk(
 export const deleteMembershipRank = createAsyncThunk(
   "admin/deleteMembershipRank",
   async (id: number) => {
-     await axios.delete(`${BASE_URL}/role-monthly-rates/${id}`);
+     await api.delete(`/role-monthly-rates/${id}`);
     return id;
   }
 );
@@ -142,7 +141,7 @@ export const AdminRankSlice = createSlice({
         state.updateMembershipRankStatus = "fulfilled";
         state.error = null;
 
-        const updated = action.payload as IUpdateRoleMonthlyRates; // מה שחזר מהשרת
+        const updated = action.payload as IUpdateRoleMonthlyRates; 
 
         state.monthlyRanks = state.monthlyRanks.map((rank) => ({
           ...rank,

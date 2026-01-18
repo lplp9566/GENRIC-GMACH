@@ -1,4 +1,4 @@
-// editUser.tsx
+﻿// editUser.tsx
 import React, { FC, useState } from "react";
 import StepperNavigation from "../StepperNavigation/StepperNavigation";
 import { IPaymentDetails, IUser } from "./UsersDto";
@@ -11,6 +11,7 @@ import {
   Typography,
   Select,
   MenuItem,
+  Divider,
 } from "@mui/material";
 import { AppDispatch } from "../../../store/store";
 import { useDispatch } from "react-redux";
@@ -68,19 +69,18 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
   };
 
   const handleSave = async () => {
-        onClose();
+    onClose();
 
     const promise = dispatch(
       editUser({ userId: user.id!, userData: formData })
     ) as unknown as Promise<any>;
     toast.promise(promise, {
-      pending: "מעדכן...",
-      success: "המשתמש עודכן בהצלחה! 👌",
-      error: "אירעה שגיאה בעדכון המשתמש 💥",
+      pending: "שומר...",
+      success: "משתמש עודכן בהצלחה!",
+      error: "שגיאה בעדכון המשתמש",
     });
     await promise;
     await dispatch(getAllUsers({ isAdmin: false }));
-
   };
 
   const handleClose = () => {
@@ -89,7 +89,6 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
   };
 
   return (
-    // <RtlProvider>
     <RtlThemeProvider>
       <Modal open={open} onClose={handleClose}>
         <Box
@@ -107,7 +106,7 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
           }}
         >
           <StepperNavigation
-            steps={["פרטים אישיים", "פרטי חשבון", "סיכום ואישור"]}
+            steps={["פרטי משתמש", "פרטי בנק", "סיכום"]}
             activeStep={activeStep}
           />
 
@@ -115,7 +114,7 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
             {activeStep === 0 && (
               <Stack spacing={2}>
                 <Typography variant="h6" textAlign={"center"}>
-                  פרטים אישיים
+                  פרטי משתמש
                 </Typography>
                 <Box>
                   <TextField
@@ -136,47 +135,70 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
                     dir="rtl"
                     value={String(!!formData.is_member)}
                     onChange={handleMemberChange}
-                  sx={{ width: "49.5%", marginLeft: "2px",marginTop:2 }}
+                    sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2 }}
                   >
-                    <MenuItem value="true">חבר גמ"ח</MenuItem>
-                    <MenuItem value="false">לא חבר גמ"ח</MenuItem>
+                    <MenuItem value="true">חבר</MenuItem>
+                    <MenuItem value="false">לא חבר</MenuItem>
                   </Select>
-                <TextField
-                  label="אימייל"
-                  type="email"
-                  dir="rtl"
-                  value={formData.email_address ?? ""}
-                  onChange={handleChange("email_address")}
-                  fullWidth
-                  sx={{ width: "49.5%", marginLeft: "2px",marginTop:2 }}
-                />
+                  <TextField
+                    label="אימייל"
+                    type="email"
+                    dir="rtl"
+                    value={formData.email_address ?? ""}
+                    onChange={handleChange("email_address")}
+                    fullWidth
+                    sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2 }}
+                  />
 
-                <TextField
-                  label="טלפון"
-                  dir="rtl"
-                  value={formData.phone_number ?? ""}
-                  onChange={handleChange("phone_number")}
-                  fullWidth
-                  sx={{ width: "49.5%", marginLeft: "2px",marginTop:2 }}
-                />
-                <TextField
-                  label="תעודת זהות "
-                  dir="rtl"
-                  value={formData.id_number ?? ""}
-                  onChange={handleChange("id_number")}
-                  fullWidth
-                  sx={{ width: "49.5%", marginLeft: "2px",marginTop:2 }}
-                />
-                              </Box>
+                  <TextField
+                    label="טלפון"
+                    dir="rtl"
+                    value={formData.phone_number ?? ""}
+                    onChange={handleChange("phone_number")}
+                    fullWidth
+                    sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2 }}
+                  />
+                  <TextField
+                    label="תעודת זהות"
+                    dir="rtl"
+                    value={formData.id_number ?? ""}
+                    onChange={handleChange("id_number")}
+                    fullWidth
+                    sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2 }}
+                  />
+                  <Divider sx={{ my: 2 }} />
+                  <TextField
+                    label="שם פרטי בן/בת זוג"
+                    dir="rtl"
+                    value={formData.spouse_first_name ?? ""}
+                    onChange={handleChange("spouse_first_name")}
+                    fullWidth
+                    sx={{ width: "49.5%", marginLeft: "2px" }}
+                  />
+                  <TextField
+                    label="שם משפחה בן/בת זוג"
+                    dir="rtl"
+                    value={formData.spouse_last_name ?? ""}
+                    onChange={handleChange("spouse_last_name")}
+                    fullWidth
+                    sx={{ width: "49.5%" }}
+                  />
+                  <TextField
+                    label="תעודת זהות בן/בת זוג"
+                    dir="rtl"
+                    value={formData.spouse_id_number ?? ""}
+                    onChange={handleChange("spouse_id_number")}
+                    fullWidth
+                    sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2 }}
+                  />
+                </Box>
               </Stack>
-
             )}
 
             {activeStep === 1 && (
               <Stack spacing={2}>
                 <Typography variant="h6" textAlign={"center"}>
-                  {" "}
-                  פרטי חשבון בנק{" "}
+                  פרטי בנק
                 </Typography>
                 <TextField
                   label="מספר בנק"
@@ -211,11 +233,17 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
 
             {activeStep === 2 && (
               <Stack spacing={1}>
-                <Typography variant="h6">סיכום ואישור</Typography>
+                <Typography variant="h6">סיכום</Typography>
                 <Typography>שם פרטי: {formData.first_name}</Typography>
                 <Typography>שם משפחה: {formData.last_name}</Typography>
                 <Typography>אימייל: {formData.email_address}</Typography>
                 <Typography>טלפון: {formData.phone_number}</Typography>
+                {formData.spouse_first_name && (
+                  <Typography>בן/בת זוג: {formData.spouse_first_name} {formData.spouse_last_name}</Typography>
+                )}
+                {formData.spouse_id_number && (
+                  <Typography>ת"ז בן/בת זוג: {formData.spouse_id_number}</Typography>
+                )}
               </Stack>
             )}
           </Box>
@@ -238,7 +266,7 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
             <Stack direction="row" spacing={1}>
               {activeStep > 0 && (
                 <Button variant="outlined" onClick={handleBack}>
-                  הקודם
+                  חזור
                 </Button>
               )}
             </Stack>

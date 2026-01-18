@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
 
 import {
   FindOptionsGeneric,
@@ -16,6 +15,7 @@ import {
   ILoanWithUser,
 } from "../../../Admin/components/Loans/LoanDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
+import { api } from "../../axiosInstance";
 
 interface AdminLoanType {
   allLoans: ILoanWithUser[];
@@ -57,14 +57,12 @@ const initialState: AdminLoanType = {
     butten: false,
   },
 };
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-
 export const getAllLoans = createAsyncThunk<
   PaginatedResult<ILoanWithUser>,
   FindOptionsGeneric
 >("admin/getAllLoans", async (opts) => {
-  const response = await axios.get<PaginatedResult<ILoanWithUser>>(
-    `${BASE_URL}/loans`,
+  const response = await api.get<PaginatedResult<ILoanWithUser>>(
+    `/loans`,
     { params: opts }
   );
   return response.data;
@@ -72,8 +70,8 @@ export const getAllLoans = createAsyncThunk<
 export const checkLoan = createAsyncThunk(
   "admin/checkLoan",
   async (loan: ICreateLoan) => {
-    const response = await axios.post<ILoanCheckResponse>(
-      `${BASE_URL}/loans/check-loan`,
+    const response = await api.post<ILoanCheckResponse>(
+      `/loans/check-loan`,
       loan
     );
     return response.data;
@@ -82,7 +80,7 @@ export const checkLoan = createAsyncThunk(
 export const createLoan = createAsyncThunk(
   "admin/createLoan",
   async (loan: ICreateLoan) => {
-    const response = await axios.post<ILoanWithUser>(`${BASE_URL}/loans`, loan);
+    const response = await api.post<ILoanWithUser>(`/loans`, loan);
     return response.data;
   }
 );
@@ -90,8 +88,8 @@ export const createLoanAction = createAsyncThunk(
   "admin/createLoanAction",
   async (loanAction: ICreateLoanAction) => {
     console.log(loanAction);
-    const response = await axios.post<ICreateLoanAction>(
-      `${BASE_URL}/loan-actions`,
+    const response = await api.post<ICreateLoanAction>(
+      `/loan-actions`,
       loanAction
     );
     return response.data;
@@ -100,14 +98,14 @@ export const createLoanAction = createAsyncThunk(
 export const getAllLoanActions = createAsyncThunk(
   "admin/getAllLoanActions",
   async () => {
-    const response = await axios.get(`${BASE_URL}/loan-actions`);
+    const response = await api.get(`/loan-actions`);
     return response.data;
   }
 );
 export const getLoanDetails = createAsyncThunk(
   "admin/getLoanDetails",
   async (id: number) => {
-    const response = await axios.get(`${BASE_URL}/loans/id`, {
+    const response = await api.get(`/loans/id`, {
       params: { id },
     });
     return response.data;
@@ -116,8 +114,7 @@ export const getLoanDetails = createAsyncThunk(
 export const editLoan = createAsyncThunk(
   "admin/editLoan",
   async (loan: IEditLoan) => {
-    const response = await axios.patch(`${BASE_URL}/loans/${loan.loan}`, loan);
-
+    const response = await api.patch(`/loans/${loan.loan}`, loan);
     // if (response.status === 200){ await thunkAPI.dispatch (getAllLoans({page:1,limit:20}));}
     return response.data;
   }
@@ -128,8 +125,8 @@ export const editLoanAction = createAsyncThunk(
     loanAction: { id: number; loanId: number; date?: Date; value?: number },
     thunkAPI
   ) => {
-    const response = await axios.patch(
-      `${BASE_URL}/loan-actions/${loanAction.id}`,
+    const response = await api.patch(
+      `/loan-actions/${loanAction.id}`,
       loanAction
     );
     await thunkAPI.dispatch(getLoanDetails(loanAction.loanId));
@@ -143,7 +140,7 @@ interface deleteLoanAction {
 export const deleteLoanAction = createAsyncThunk(
   "admin/deleteLoanAction",
   async (deleteLoanAction: deleteLoanAction, thunkAPI) => {
-    const response = await axios.delete(`${BASE_URL}/loan-actions/${deleteLoanAction.id}`);
+    const response = await api.delete(`/loan-actions/${deleteLoanAction.id}`);
     await thunkAPI.dispatch(getLoanDetails(deleteLoanAction.loanId));
     return response.data;
   }
@@ -152,8 +149,8 @@ export const deleteLoan = createAsyncThunk(
   "admin/deleteLoan",
   async (id: number, thunkAPI) => {
     console.log(id);
-    
-    const response = await axios.delete(`${BASE_URL}/loans/${id}`);
+
+    const response = await api.delete(`/loans/${id}`);
     await thunkAPI.dispatch(
       getAllLoans({ page: 1, limit: 20, status: StatusGeneric.ACTIVE })
     );

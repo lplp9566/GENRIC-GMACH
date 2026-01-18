@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Box, IconButton, InputAdornment, TextField } from "@mui/material";
 import SelectRank from "../../SelectRank/SelectRank";
 import { UserDetailsStepProps } from "./AddUserStepsProps";
@@ -32,7 +32,7 @@ const StepUserDetails: React.FC<UserDetailsStepProps> = ({
       />
       <TextField
         dir="rtl"
-        label="תז"
+        label="תעודת זהות"
         value={data.userData.id_number}
         onChange={onUserChange("id_number")}
         fullWidth
@@ -84,17 +84,41 @@ const StepUserDetails: React.FC<UserDetailsStepProps> = ({
             </InputAdornment>
           ),
         }}
-      />{" "}
-      {data.userData.membership_type === "MEMBER" && <SelectRank
-        onChange={(rankId: any) =>
-          setData((d) => ({
-            ...d,
-            userData: { ...d.userData, current_role: rankId },
-          }))
-        }
-        value={data.userData.current_role!}
-      />}
-     
+      />
+
+      <TextField
+        dir="rtl"
+        label="שם פרטי בן/בת זוג"
+        value={data.userData.spouse_first_name ?? ""}
+        onChange={onUserChange("spouse_first_name")}
+        fullWidth
+      />
+      <TextField
+        dir="rtl"
+        label="שם משפחה בן/בת זוג"
+        value={data.userData.spouse_last_name ?? ""}
+        onChange={onUserChange("spouse_last_name")}
+        fullWidth
+      />
+      <TextField
+        dir="rtl"
+        label="תעודת זהות בן/בת זוג"
+        value={data.userData.spouse_id_number ?? ""}
+        onChange={onUserChange("spouse_id_number")}
+        fullWidth
+      />
+
+      {data.userData.membership_type === "MEMBER" && (
+        <SelectRank
+          onChange={(rankId: any) =>
+            setData((d) => ({
+              ...d,
+              userData: { ...d.userData, current_role: rankId },
+            }))
+          }
+          value={data.userData.current_role!}
+        />
+      )}
     </Box>
   );
 };

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import { Status } from "../../../Admin/components/Users/UsersDto";
+import { api } from "../../axiosInstance";
 
 export interface UserFinancials {
   id: number;
@@ -24,7 +24,6 @@ interface UserFinancialState {
   error: string | null;
 }
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const initialState: UserFinancialState = {
   data: null,
@@ -35,8 +34,8 @@ const initialState: UserFinancialState = {
 export const getUserFinancialsByUserGuard = createAsyncThunk<UserFinancials>(
   "userFinancials/getByUserGuard",
   async () => {
-    const { data } = await axios.get<UserFinancials>(
-      `${BASE_URL}/user-financial/by-user-guard`
+    const { data } = await api.get<UserFinancials>(
+      `/user-financial/by-user-guard`
     );
     return data;
   }
@@ -46,8 +45,8 @@ export const getUserFinancialsByUserId = createAsyncThunk<
   UserFinancials,
   number
 >("userFinancials/getByUserId", async (userId) => {
-  const { data } = await axios.get<UserFinancials>(
-    `${BASE_URL}/user-financial/by-user?id=${userId}`
+  const { data } = await api.get<UserFinancials>(
+    `/user-financial/by-user?id=${userId}`
   );
   return data;
 });

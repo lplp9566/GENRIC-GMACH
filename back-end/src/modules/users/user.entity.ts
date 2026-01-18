@@ -56,6 +56,15 @@ export class UserEntity {
   @Column({ type: 'boolean', default: false, nullable: true })
   is_member: boolean | null;
 
+  @Column({ type: 'text', nullable: true })
+  spouse_first_name: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  spouse_last_name: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  spouse_id_number: string | null;
+
   @Column({ type: 'boolean', default: true, nullable: true })
   notify_account: boolean;
   @Column({ type: 'boolean', default: true, nullable: true })

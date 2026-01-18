@@ -1,11 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { IExpenses, IExpensesCategory } from "../../../Admin/components/Expenses/dto";
+import {
+  IExpenses,
+  IExpensesCategory,
+} from "../../../Admin/components/Expenses/dto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
+import { api } from "../../axiosInstance";
 
 interface AdminExpensesType {
   allExpenses: IExpenses[] | [];
-  allExpensesCategory: IExpensesCategory[] ;
+  allExpensesCategory: IExpensesCategory[];
   createExpensesCategoryStatus: Status;
   createExpensesStatus: Status;
   getAllExpensesStatus: Status;
@@ -14,7 +17,7 @@ interface AdminExpensesType {
   updateExpensesStatus: Status;
   delateExpensesCategoryStatus: Status;
   delateExpensesStatus: Status;
-  error?: string | null; // אופציונלי - מומלץ (כמו בדוניישנס)
+  error?: string | null;
 }
 
 const initialState: AdminExpensesType = {
@@ -31,26 +34,18 @@ const initialState: AdminExpensesType = {
   error: null,
 };
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-
-/* =========================
-   Expenses
-   ========================= */
-
-// GET /expenses
 export const getAllExpenses = createAsyncThunk<IExpenses[]>(
   "admin/getAllExpenses",
   async () => {
-    const { data } = await axios.get<IExpenses[]>(`${BASE_URL}/expenses`);
+    const { data } = await api.get<IExpenses[]>(`/expenses`);
     return data;
   }
 );
 
-// POST /expenses
 export const createExpense = createAsyncThunk<IExpenses, Partial<IExpenses>>(
   "admin/createExpense",
   async (expense) => {
-    const { data } = await axios.post<IExpenses>(`${BASE_URL}/expenses`, expense);
+    const { data } = await api.post<IExpenses>(`/expenses`, expense);
     return data;
   }
 );
@@ -59,7 +54,7 @@ export const createExpense = createAsyncThunk<IExpenses, Partial<IExpenses>>(
 export const getExpenseById = createAsyncThunk<IExpenses, number>(
   "admin/getExpenseById",
   async (id) => {
-    const { data } = await axios.get<IExpenses>(`${BASE_URL}/expenses/${id}`);
+    const { data } = await api.get<IExpenses>(`/expenses/${id}`);
     return data;
   }
 );
@@ -68,30 +63,28 @@ export const getExpenseById = createAsyncThunk<IExpenses, number>(
 export const deleteExpenseById = createAsyncThunk<number, number>(
   "admin/deleteExpenseById",
   async (id) => {
-    await axios.delete(`${BASE_URL}/expenses/${id}`);
+    await api.delete(`/expenses/${id}`);
     return id; // נחזיר id כדי למחוק מהסטייט
   }
 );
 
-/**
- * ⚠️ אין לך endpoint כזה כרגע בשרת:
- * PATCH /expenses/:id
- * אם תוסיף אותו – תפתח את זה ותשתמש במודאל עריכה.
- */
-export const updateExpenseById = createAsyncThunk<IExpenses, Partial<IExpenses> & { id: number }>(
-  "admin/updateExpenseById",
-  async (expense) => {
-    const { data } = await axios.patch<IExpenses>(`${BASE_URL}/expenses/${expense.id}`, expense);
-    return data;
-  }
-);
+export const updateExpenseById = createAsyncThunk<
+  IExpenses,
+  Partial<IExpenses> & { id: number }
+>("admin/updateExpenseById", async (expense) => {
+  const { data } = await api.patch<IExpenses>(
+    `/expenses/${expense.id}`,
+    expense
+  );
+  return data;
+});
 
 export const CreateExpensesCategory = createAsyncThunk<
   IExpensesCategory,
   Partial<IExpensesCategory>
 >("admin/CreateExpensesCategory", async (category) => {
-  const { data } = await axios.post<IExpensesCategory>(
-    `${BASE_URL}/expenses-category`,
+  const { data } = await api.post<IExpensesCategory>(
+    `/expenses-category`,
     category
   );
   return data;
@@ -101,48 +94,38 @@ export const CreateExpensesCategory = createAsyncThunk<
 export const getAllExpensesCategory = createAsyncThunk<IExpensesCategory[]>(
   "admin/getAllExpensesCategory",
   async () => {
-    const { data } = await axios.get<IExpensesCategory[]>(
-      `${BASE_URL}/expenses-category`
-    );
+    const { data } = await api.get<IExpensesCategory[]>(`/expenses-category`);
     return data;
   }
 );
 
 // GET /expenses-category/:id
-export const getExpensesCategoryById = createAsyncThunk<IExpensesCategory, number>(
-  "admin/getExpensesCategoryById",
-  async (id) => {
-    const { data } = await axios.get<IExpensesCategory>(
-      `${BASE_URL}/expenses-category/${id}`
-    );
-    return data;
-  }
-);
+export const getExpensesCategoryById = createAsyncThunk<
+  IExpensesCategory,
+  number
+>("admin/getExpensesCategoryById", async (id) => {
+  const { data } = await api.get<IExpensesCategory>(`/expenses-category/${id}`);
+  return data;
+});
 
-// PATCH /expenses-category/:id
 export const updateExpensesCategoryById = createAsyncThunk<
   IExpensesCategory,
   { id: number; name: string }
 >("admin/updateExpensesCategoryById", async (payload) => {
-  const { data } = await axios.patch<IExpensesCategory>(
-    `${BASE_URL}/expenses-category/${payload.id}`,
+  const { data } = await api.patch<IExpensesCategory>(
+    `/expenses-category/${payload.id}`,
     { name: payload.name }
   );
   return data;
 });
 
-// DELETE /expenses-category/:id
 export const deleteExpensesCategoryById = createAsyncThunk<number, number>(
   "admin/deleteExpensesCategoryById",
   async (id) => {
-    await axios.delete(`${BASE_URL}/expenses-category/${id}`);
+    await api.delete(`/expenses-category/${id}`);
     return id;
   }
 );
-
-/* =========================
-   Slice
-   ========================= */
 
 export const AdminExpensesSlice = createSlice({
   name: "adminExpenses",
@@ -170,7 +153,6 @@ export const AdminExpensesSlice = createSlice({
       })
       .addCase(createExpense.fulfilled, (state, action) => {
         state.createExpensesStatus = "fulfilled";
-        // כמו בתרומות: מכניסים חדש לראש הרשימה
         (state.allExpenses as IExpenses[]).unshift(action.payload);
       })
       .addCase(createExpense.rejected, (state, action) => {
@@ -194,15 +176,9 @@ export const AdminExpensesSlice = createSlice({
         state.error = action.error.message ?? "Failed to delete expense";
       })
 
-      // אם תרצה להכניס getExpenseById ל-state (לא חובה לרשימות)
       .addCase(getExpenseById.rejected, (state, action) => {
         state.error = action.error.message ?? "Failed to fetch expense";
       })
-
-    /**
-     * ⚠️ updateExpenseById – רק אם תוסיף PATCH בשרת
-     */
-    // builder
       .addCase(updateExpenseById.pending, (state) => {
         state.updateExpensesStatus = "pending";
         state.error = null;
@@ -243,11 +219,10 @@ export const AdminExpensesSlice = createSlice({
       .addCase(CreateExpensesCategory.fulfilled, (state, action) => {
         state.createExpensesCategoryStatus = "fulfilled";
         const prev = Array.isArray(state.allExpensesCategory)
-  ? state.allExpensesCategory
-  : [];
+          ? state.allExpensesCategory
+          : [];
 
-state.allExpensesCategory = [...prev, action.payload];
-
+        state.allExpensesCategory = [...prev, action.payload];
       })
       .addCase(CreateExpensesCategory.rejected, (state, action) => {
         state.createExpensesCategoryStatus = "rejected";
@@ -261,9 +236,9 @@ state.allExpensesCategory = [...prev, action.payload];
       .addCase(updateExpensesCategoryById.fulfilled, (state, action) => {
         state.updateExpensesCategoryStatus = "fulfilled";
         const updated = action.payload;
-        const index = (state.allExpensesCategory as IExpensesCategory[]).findIndex(
-          (c: any) => c.id === (updated as any).id
-        );
+        const index = (
+          state.allExpensesCategory as IExpensesCategory[]
+        ).findIndex((c: any) => c.id === (updated as any).id);
         if (index !== -1) {
           (state.allExpensesCategory as IExpensesCategory[])[index] = updated;
         }
@@ -280,9 +255,9 @@ state.allExpensesCategory = [...prev, action.payload];
       .addCase(deleteExpensesCategoryById.fulfilled, (state, action) => {
         state.delateExpensesCategoryStatus = "fulfilled";
         const id = action.payload;
-        state.allExpensesCategory = (state.allExpensesCategory as IExpensesCategory[]).filter(
-          (c: any) => c.id !== id
-        );
+        state.allExpensesCategory = (
+          state.allExpensesCategory as IExpensesCategory[]
+        ).filter((c: any) => c.id !== id);
       })
       .addCase(deleteExpensesCategoryById.rejected, (state, action) => {
         state.delateExpensesCategoryStatus = "rejected";

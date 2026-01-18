@@ -1,12 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 
-import axios from "axios"
 import { IFundsOverview, IFundsOverviewByYear } from "../../../Admin/components/FundsOverview/FundsOverviewDto"
 import { Status } from "../../../Admin/components/Users/UsersDto"
+import { api } from "../../axiosInstance"
 export interface IRegulation{
     id?: number,
     regulation: string
-    
 }
 interface AdminFundsOverviewType {
     fundsOverview: IFundsOverview | null
@@ -26,32 +25,31 @@ const initialSlice:AdminFundsOverviewType={
     regulationStatus:"idle"
 }
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const getFundsOverview = createAsyncThunk(
     '/admin/getFundsOverview',
     async()=>{
-        const response = await axios.get(`${BASE_URL}/funds-overview`);
+        const response = await api.get(`/funds-overview`);
         return response.data
     }
  )
 export const getFundsOverviewByYear = createAsyncThunk(
     '/admin/getFundsOverviewByYear',
     async()=>{
-        const response = await axios.get(`${BASE_URL}/funds-overview-by-year`);
+        const response = await api.get(`/funds-overview-by-year`);
         return response.data
     }
 )
 export const getRegulation = createAsyncThunk(
     '/admin/getRegulation',
     async()=>{
-        const response = await axios.get(`${BASE_URL}/regulation`);
+        const response = await api.get(`/regulation`);
         return response.data
     }
 )
 export const UpdateRegulation = createAsyncThunk(
     '/admin/updateRegulation',
     async(regulation:IRegulation)=>{
-        const response = await axios.post(`${BASE_URL}/regulation`,regulation);
+        const response = await api.post(`/regulation`,regulation);
         return response.data
     }
 )

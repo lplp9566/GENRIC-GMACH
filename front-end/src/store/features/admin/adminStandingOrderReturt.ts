@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   CreateOrdersReturnDto,
   IOrdersReturnDto,
@@ -6,6 +5,7 @@ import {
 } from "../../../Admin/components/StandingOrdersReturn/ordersReturnDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { api } from "../../axiosInstance";
 
 interface AdminStandingOrderReturnType {
   allOrdersReturn: IOrdersReturnDto[] | [];
@@ -21,19 +21,18 @@ const initialState: AdminStandingOrderReturnType = {
   createOrderReturnStatus: "idle",
   payOrderReturnStatus: "idle",
 };
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const getAllOrdersReturn = createAsyncThunk(
   "admin/getAllOrdersReturn",
   async () => {
-    const response = await axios.get(`${BASE_URL}/order-return`);
+    const response = await api.get(`/order-return`);
     return response.data;
   }
 );
 export const getOrdersReturnByUserId = createAsyncThunk(
   "admin/getOrdersReturnByUserId",
   async (userId: number) => {
-    const response = await axios.get<IOrdersReturnDto[]>(
-      `${BASE_URL}/order-return/user/${userId}`,
+    const response = await api.get<IOrdersReturnDto[]>(
+      `/order-return/user/${userId}`,
     );
     return response.data;
   }
@@ -43,8 +42,8 @@ export const createOrderReturn = createAsyncThunk(
   async (orderReturn: CreateOrdersReturnDto) => {
     console.log(orderReturn);
 
-    const response = await axios.post<IOrdersReturnDto>(
-      `${BASE_URL}/order-return`,
+    const response = await api.post<IOrdersReturnDto>(
+      `/order-return`,
       orderReturn
     );
     return response.data;
@@ -53,8 +52,8 @@ export const createOrderReturn = createAsyncThunk(
 export const payOrderReturn = createAsyncThunk(
   "admin/payOrderReturn",
   async (payData: PayOrdersReturnDto) => {
-    const response = await axios.post(
-      `${BASE_URL}/order-return/${payData.id}/pay`,
+    const response = await api.post(
+      `/order-return/${payData.id}/pay`,
       payData
     );
     return response.data;
@@ -93,7 +92,6 @@ export const AdminStandingOrderReturnSlice = createSlice({
       })
       .addCase(createOrderReturn.fulfilled, (state, { payload }) => {
         state.createOrderReturnStatus = "fulfilled";
-              // state.allOrdersReturn.push(payload);
         state.allOrdersReturn = [...state.allOrdersReturn, payload];
       })
       .addCase(createOrderReturn.rejected, (state, action) => {

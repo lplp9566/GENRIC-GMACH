@@ -1,4 +1,4 @@
-export interface IUser {
+﻿export interface IUser {
   id: number;
   first_name: string;
   last_name: string;
@@ -8,13 +8,16 @@ export interface IUser {
   phone_number: string;
   email_address: string;
   iS_admin: boolean;
-  is_member:boolean ;
+  is_member: boolean;
   notify_account?: boolean | null;
   notify_receipts?: boolean | null;
   notify_general?: boolean | null;
+  spouse_first_name?: string | null;
+  spouse_last_name?: string | null;
+  spouse_id_number?: string | null;
   payment_details: IPaymentDetails;
   current_role: ICurrentRole;
-  membership_type: MembershipType
+  membership_type: MembershipType;
 }
 export interface ICurrentRole {
   id: number;
@@ -52,7 +55,10 @@ export interface ICreateUser {
   phone_number: string;
   is_admin: boolean;
   current_role: number | null;
-  membership_type: MembershipType
+  membership_type: MembershipType;
+  spouse_first_name?: string | null;
+  spouse_last_name?: string | null;
+  spouse_id_number?: string | null;
 }
 export interface ICreatePaymentDetails {
   bank_number: number | null;
@@ -69,41 +75,4 @@ export interface IAddUserFormData {
 export enum MembershipType {
   FRIEND = "FRIEND",
   MEMBER = "MEMBER",
-
 }
-// export type BaseUserData = {
-//   first_name: string;
-//   last_name: string;
-//   id_number: string;
-//   password: string;
-//   email_address: string;
-//   phone_number: string;
-//   is_admin: boolean;
-// };
-
-// export type MemberFormData = {
-//   userData: BaseUserData & {
-//     membership_type: MembershipType.MEMBER;
-//       join_date: string;
-//       current_role: number;
-//   };
-//   paymentData?: {
-//     bank_number: number | null;
-//     bank_branch: number | null;
-//     bank_account_number: number | null;
-//     charge_date: number | null;
-//     payment_method: payment_method_enum;
-//   };
-// };
-// export type FriendFormData = {
-//   userData: BaseUserData & {
-//     membership_type: MembershipType.FRIEND;
-//   };
-//   paymentData?: {
-//     bank_number: number | null;
-//     bank_branch: number | null;
-//     bank_account_number: number | null;
-//     charge_date: number | null;
-//     payment_method: payment_method_enum | null;
-//   };
-// };

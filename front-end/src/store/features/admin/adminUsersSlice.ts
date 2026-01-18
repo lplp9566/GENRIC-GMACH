@@ -1,4 +1,3 @@
-import axios from "axios";
 
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
@@ -6,8 +5,8 @@ import {
   IUser,
   Status,
 } from "../../../Admin/components/Users/UsersDto";
+import { api } from "../../axiosInstance";
 
-axios.defaults.withCredentials = true;
 
 interface AdminUsersType {
   allUsers: IUser[] | [];
@@ -23,14 +22,13 @@ const initialState: AdminUsersType = {
   error: null,
   createUserStatus: "idle",
 };
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const getAllUsers = createAsyncThunk(
   "admin/getUsers",
   async (filters: { membershipType?: string; isAdmin: boolean }) => {
     const params: any = { isAdmin: filters.isAdmin };
     if (filters.membershipType) params.membershipType = filters.membershipType;
 
-    const response = await axios.get(`${BASE_URL}/users`, { params });
+    const response = await api.get(`/users`, { params });
     return response.data;
   }
 );
@@ -38,7 +36,7 @@ export const getAllUsers = createAsyncThunk(
 export const createUser = createAsyncThunk(
   "admin/createUser",
   async (user: IAddUserFormData) => {
-    const response = await axios.post<IUser>(`${BASE_URL}/users`, user);
+    const response = await api.post<IUser>(`/users`, user);
     return response.data;
   }
 );
@@ -57,6 +55,9 @@ export const editUser = createAsyncThunk(
         notify_account: data.userData.notify_account,
         notify_receipts: data.userData.notify_receipts,
         notify_general: data.userData.notify_general,
+        spouse_first_name: data.userData.spouse_first_name,
+        spouse_last_name: data.userData.spouse_last_name,
+        spouse_id_number: data.userData.spouse_id_number,
       },
       paymentData: {
         bank_number: data.userData.payment_details?.bank_number,
@@ -66,8 +67,8 @@ export const editUser = createAsyncThunk(
         payment_method: data.userData.payment_details?.payment_method,
       },
     };
-    const response = await axios.patch<IUser>(
-      `${BASE_URL}/users/${data.userId}`,
+    const response = await api.patch<IUser>(
+      `/users/${data.userId}`,
       payload
     );
     return response.data;

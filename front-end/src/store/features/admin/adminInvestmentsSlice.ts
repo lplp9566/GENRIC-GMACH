@@ -5,7 +5,7 @@ import {
   TransactionDto,
 } from "../../../Admin/components/Investments/InvestmentDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
-import axios from "axios";
+import { api } from "../../axiosInstance";
 
 interface AdminInvestmentType {
   allInvestments: InvestmentDto[];
@@ -41,28 +41,27 @@ const initialState: AdminInvestmentType = {
   investmentDetails: null,
   investmentTransactions: [],
 };
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const getAllInvestments = createAsyncThunk<
   InvestmentDto[]
 >("admin/getAllInvestments", async () => {
-    const response = await axios.get<InvestmentDto[]>(    
-      `${BASE_URL}/investments`,
+    const response = await api.get<InvestmentDto[]>(    
+      `/investments`,
     );
     return response.data;
 })
 export const getInvestmentById = createAsyncThunk
 ("admin/getInvestmentById", async (id:number) => {
-    const response = await axios.post<InvestmentDto>(    
-      `${BASE_URL}/investments/get-by-id`,    
+    const response = await api.post<InvestmentDto>(    
+      `/investments/get-by-id`,    
        {id} 
     );
     return response.data;
 });
 export const getTransactionsByInvestmentId = createAsyncThunk
 ("admin/getTransactionsByInvestmentId", async (investmentId:number) => {
-    const response = await axios.post<TransactionDto[]>(    
-      `${BASE_URL}/investment-transactions/by-investment`,    
+    const response = await api.post<TransactionDto[]>(    
+      `/investment-transactions/by-investment`,    
         { investmentId }
     );
     return response.data;
@@ -70,8 +69,8 @@ export const getTransactionsByInvestmentId = createAsyncThunk
 export const createInitialInvestment = createAsyncThunk(
   "admin/createInitialInvestment",
   async (investmentData: createInvestment) => {    
-    const response = await axios.post<InvestmentDto>(    
-      `${BASE_URL}/investments`,    
+    const response = await api.post<InvestmentDto>(    
+      `/investments`,    
       investmentData
     );
     return response.data;
@@ -80,8 +79,8 @@ export const createInitialInvestment = createAsyncThunk(
 export const addToInvestment = createAsyncThunk(
   "admin/addToInvestment",
   async (data: { id: number; amount: number; date: Date }) => {
-    const response = await axios.post<InvestmentDto>(
-        `${BASE_URL}/investments/add-to-investment`,
+    const response = await api.post<InvestmentDto>(
+        `/investments/add-to-investment`,
         data
     );
     return response.data;
@@ -90,8 +89,8 @@ export const addToInvestment = createAsyncThunk(
 export const updateInvestmentValue = createAsyncThunk(
   "admin/updateInvestmentValue",
   async (data: { id: number; new_value: number; date: Date }) => {  
-    const response = await axios.post<InvestmentDto>(
-        `${BASE_URL}/investments/update-value`,
+    const response = await api.post<InvestmentDto>(
+        `/investments/update-value`,
         data
     );
     return response.data;
@@ -100,8 +99,8 @@ export const updateInvestmentValue = createAsyncThunk(
 export const withdrawFromInvestment = createAsyncThunk(
   "admin/withdrawFromInvestment",
   async (data: { id: number; amount: number; date: Date }) => { 
-    const response = await axios.post<InvestmentDto>(
-        `${BASE_URL}/investments/withdraw`,
+    const response = await api.post<InvestmentDto>(
+        `/investments/withdraw`,
         data
     );
     return response.data;
@@ -110,8 +109,8 @@ export const withdrawFromInvestment = createAsyncThunk(
 export const applyManagementFee = createAsyncThunk(
   "admin/applyManagementFee",
   async (data: { id: number; feeAmount: number; date: Date }) => {
-    const response = await axios.post<InvestmentDto>(
-        `${BASE_URL}/investments/management-fee`,
+    const response = await api.post<InvestmentDto>(
+        `/investments/management-fee`,
         data  
     );
     return response.data;
