@@ -216,7 +216,10 @@ export class MailService {
   }
 
   private async renderHtmlToPdf(html: string): Promise<Buffer> {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+    });
     try {
       const page = await browser.newPage();
       await page.setContent(html, { waitUntil: 'networkidle0' });
