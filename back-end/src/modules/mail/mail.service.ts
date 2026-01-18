@@ -183,7 +183,7 @@ export class MailService {
               ])}
 
               ${sectionBox('הלוואות', [
-                row('הלוואה פעילה – סך הכל', fmt(data.activeLoansTotal)),
+                row('יתרה להחזר בהלוואות', fmt(data.activeLoansTotal)),
               ])}
 
               ${debtsSection}
@@ -192,10 +192,6 @@ export class MailService {
             <div style="margin-top:14px; font-size:14px;">
               <div>בכבוד רב,</div>
               <div style="font-weight:700;">${orgName}</div>
-            </div>
-
-            <div style="margin-top:10px; font-size:12px; color:#888;">
-              אם קיבלת את הדוח הזה בטעות, אפשר להתעלם ממנו.
             </div>
           </div>
         </div>
