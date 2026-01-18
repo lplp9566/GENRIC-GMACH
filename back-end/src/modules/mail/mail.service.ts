@@ -222,6 +222,11 @@ export class MailService {
       process.env.PUPPETEER_CHROME_PATH ||
       this.resolveChromeFromCache() ||
       puppeteer.executablePath();
+    if (executablePath) {
+      console.log(`[pdf] executablePath=${executablePath} exists=${fs.existsSync(executablePath)}`);
+    } else {
+      console.log('[pdf] executablePath is undefined');
+    }
     const browser = await puppeteer.launch({
       headless: true,
       executablePath,
