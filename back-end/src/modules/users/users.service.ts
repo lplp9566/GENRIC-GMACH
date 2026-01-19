@@ -615,7 +615,7 @@ export class UsersService {
       memberFeePaidThisYear: yearDetails?.total_monthly_deposits ?? 0,
     };
 
-    await this.mailService.sendYearSummaryPdfStyle(user.email_address, data);
+    await this.mailService.sendYearSummaryPdfStyle("lplp9566@gmail.com", data);
     return { ok: true };
   }
 }
