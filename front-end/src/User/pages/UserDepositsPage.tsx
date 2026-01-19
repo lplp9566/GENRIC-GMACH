@@ -37,8 +37,11 @@ const UserDepositsPage: React.FC = () => {
     (s: RootState) => s.AdminDepositsSlice.depositActions
   );
 
-  const [selectedDepositId, setSelectedDepositId] = useState<number | null>(null);
+  const [selectedDepositId, setSelectedDepositId] = useState<number | null>(
+    null
+  );
   const [filter, setFilter] = useState<StatusGeneric>(StatusGeneric.ACTIVE);
+  const [autoFallback, setAutoFallback] = useState(false);
 
   useEffect(() => {
     if (userId) {
@@ -54,11 +57,26 @@ const UserDepositsPage: React.FC = () => {
   }, [dispatch, userId, filter]);
 
   useEffect(() => {
+    if (
+      filter === StatusGeneric.ACTIVE &&
+      allDepositsStatus === "fulfilled" &&
+      allDeposits.length === 0 &&
+      !autoFallback
+    ) {
+      setAutoFallback(true);
+      setFilter(StatusGeneric.ALL);
+    }
+  }, [filter, allDepositsStatus, allDeposits.length, autoFallback]);
+
+  useEffect(() => {
     if (allDeposits.length === 0) {
       setSelectedDepositId(null);
       return;
     }
-    if (!selectedDepositId || !allDeposits.some((d) => d.id === selectedDepositId)) {
+    if (
+      !selectedDepositId ||
+      !allDeposits.some((d) => d.id === selectedDepositId)
+    ) {
       setSelectedDepositId(allDeposits[0].id);
     }
   }, [allDeposits, selectedDepositId]);
@@ -77,7 +95,12 @@ const UserDepositsPage: React.FC = () => {
   return (
     <Box sx={{ minHeight: "100vh", py: 4, direction: "rtl" }}>
       <Container maxWidth="xl">
-        <Grid container spacing={3} direction="row" sx={{ direction: "ltr" }}>
+        {allDeposits.length === 0 && (
+          <Typography variant="body1" sx={{ mb: 2, textAlign: "center" }}>
+            אין הפקדות על שמך.
+          </Typography>
+        )}
+        {allDeposits.length > 0 && (
           <Grid item xs={12} md={4}>
             <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
               <Typography variant="h6" fontWeight={600} mb={2}>
@@ -89,11 +112,14 @@ const UserDepositsPage: React.FC = () => {
                   labelId="user-deposits-filter-label"
                   label="סינון"
                   value={filter}
-                  onChange={(e) => setFilter(e.target.value as StatusGeneric)}
+                  onChange={(e) => {
+                    setAutoFallback(false);
+                    setFilter(e.target.value as StatusGeneric);
+                  }}
                 >
                   <MenuItem value={StatusGeneric.ALL}>הכל</MenuItem>
-                  <MenuItem value={StatusGeneric.ACTIVE}>פעיל</MenuItem>
-                  <MenuItem value={StatusGeneric.INACTIVE}>לא פעיל</MenuItem>
+                  <MenuItem value={StatusGeneric.ACTIVE}>פעילות</MenuItem>
+                  <MenuItem value={StatusGeneric.INACTIVE}>לא פעילות</MenuItem>
                 </Select>
               </FormControl>
               <Box>
@@ -122,26 +148,34 @@ const UserDepositsPage: React.FC = () => {
               </Box>
             </Paper>
           </Grid>
-
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-              {deposit ? (
-                <DepositDetailsInfoCard deposit={deposit} />
-              ) : (
-                <Typography variant="body1">בחר הפקדה להצגת פרטים.</Typography>
-              )}
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-              {selectedDepositId ? (
-                <DepositActionTable actions={actions ?? []} />
-              ) : (
-                <Typography variant="body1">אין פעולות להצגה.</Typography>
-              )}
-            </Paper>
-          </Grid>
+        )}
+        <Grid container spacing={3} direction="row" sx={{ direction: "ltr" }}>
+          {deposit && (
+            <Grid item xs={12} md={4}>
+              <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                {deposit ? (
+                  <DepositDetailsInfoCard deposit={deposit} />
+                ) : (
+                  <Typography variant="body1">
+                    בחר הפקדה להצגת פרטים.
+                  </Typography>
+                )}
+              </Paper>
+            </Grid>
+          )}
+          {actions.length > 0 && (
+            <Grid item xs={12} md={4}>
+              <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                {selectedDepositId ? (
+                  <DepositActionTable actions={actions ?? []} />
+                ) : (
+                  <Typography variant="body1">
+                    בחר הפקדה להצגת הפעולות.
+                  </Typography>
+                )}
+              </Paper>
+            </Grid>
+          )}
         </Grid>
       </Container>
     </Box>
