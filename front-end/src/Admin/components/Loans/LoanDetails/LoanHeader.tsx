@@ -37,18 +37,19 @@ const LoanHeader: React.FC<LoanHeaderProps> = ({
         mb: 4,
       }}
     >
-      {/* לווה */}
-      <Paper
-        elevation={3}
-        sx={{ p: 2, flex: "1 1 23%", textAlign: "center" }}
-      >
-        <Typography variant="subtitle2" color="textSecondary">
-          לווה
-        </Typography>
-        <Typography variant="h6" fontWeight={700}>
-          {firstName} {lastName}
-        </Typography>
-      </Paper>
+      {lastName && firstName && (
+        <Paper
+          elevation={3}
+          sx={{ p: 2, flex: "1 1 23%", textAlign: "center" }}
+        >
+          <Typography variant="subtitle2" color="textSecondary">
+            לווה
+          </Typography>
+          <Typography variant="h6" fontWeight={700}>
+            {firstName} {lastName}
+          </Typography>
+        </Paper>
+      )}
 
       {/* אחוזי החזר (דונאט) ובלאנס */}
       <Box
@@ -102,12 +103,9 @@ const LoanHeader: React.FC<LoanHeaderProps> = ({
           </Box>
         </Box>
       </Box>
-
-      {/* מטרה */}
-      <Paper
-        elevation={3}
-        sx={{ p: 2, flex: "1 1 30%", textAlign: "center"}}
-      >
+      {
+        purpose && (
+      <Paper elevation={3} sx={{ p: 2, flex: "1 1 30%", textAlign: "center" }}>
         <Typography variant="subtitle2" color="textSecondary">
           מטרה
         </Typography>
@@ -115,6 +113,8 @@ const LoanHeader: React.FC<LoanHeaderProps> = ({
           {purpose}
         </Typography>
       </Paper>
+        )
+      }
     </Box>
   );
 };

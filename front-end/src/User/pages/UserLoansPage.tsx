@@ -122,7 +122,6 @@ const UserLoansPage: React.FC = () => {
                     principal={selectedLoan.loan_amount}
                     remaining={loanDetails.remaining_balance}
                     balance={loanDetails.balance}
-                    purpose={selectedLoan.purpose}
                   />
                   <Box sx={{ mt: 2 }}>
                     <GeneralLoanInfoCard loan={loanDetails} />
