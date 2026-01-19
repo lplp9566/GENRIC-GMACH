@@ -32,6 +32,7 @@ const UserLoansPage: React.FC = () => {
   );
   const [selectedLoanId, setSelectedLoanId] = useState<number | null>(null);
   const [filter, setFilter] = useState<StatusGeneric>(StatusGeneric.ACTIVE);
+  const [autoFallback, setAutoFallback] = useState(false);
 
   useEffect(() => {
     if (userId) {
@@ -45,6 +46,18 @@ const UserLoansPage: React.FC = () => {
       );
     }
   }, [dispatch, userId, filter]);
+
+  useEffect(() => {
+    if (
+      filter === StatusGeneric.ACTIVE &&
+      status === "fulfilled" &&
+      allLoans.length === 0 &&
+      !autoFallback
+    ) {
+      setAutoFallback(true);
+      setFilter(StatusGeneric.ALL);
+    }
+  }, [filter, status, allLoans.length, autoFallback]);
 
   useEffect(() => {
     if (allLoans.length === 0) return;
@@ -72,44 +85,53 @@ const UserLoansPage: React.FC = () => {
           <Grid item xs={12} md={4}>
             <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
               <Typography variant="h6" fontWeight={600} mb={2}>
-                הלוואות{" "}
+                ???????
               </Typography>
               <FormControl size="small" fullWidth sx={{ mb: 2 }}>
-                <InputLabel id="user-loans-filter-label">מצב הלוואה</InputLabel>
+                <InputLabel id="user-loans-filter-label">?????</InputLabel>
                 <Select
                   labelId="user-loans-filter-label"
-                  label="Status"
+                  label="?????"
                   value={filter}
-                  onChange={(e) => setFilter(e.target.value as StatusGeneric)}
+                  onChange={(e) => {
+                    setAutoFallback(false);
+                    setFilter(e.target.value as StatusGeneric);
+                  }}
                 >
-                  <MenuItem value={StatusGeneric.ALL}>הכל</MenuItem>
-                  <MenuItem value={StatusGeneric.ACTIVE}>פעילות</MenuItem>
-                  <MenuItem value={StatusGeneric.INACTIVE}>לא פעילות</MenuItem>
+                  <MenuItem value={StatusGeneric.ALL}>???</MenuItem>
+                  <MenuItem value={StatusGeneric.ACTIVE}>??????</MenuItem>
+                  <MenuItem value={StatusGeneric.INACTIVE}>?? ??????</MenuItem>
                 </Select>
               </FormControl>
               <Box>
-                {allLoans.map((loan) => {
-                  const isSelected = loan.id === selectedLoanId;
-                  return (
-                    <Box
-                      key={loan.id}
-                      sx={{
-                        mb: 2,
-                        border: isSelected
-                          ? "2px solid #2a8c82"
-                          : "1px solid rgba(0,0,0,0.08)",
-                        borderRadius: 2,
-                        overflow: "hidden",
-                      }}
-                    >
-                      <LoanCard
-                        loan={loan}
-                        readOnly
-                        onClick={() => setSelectedLoanId(loan.id)}
-                      />
-                    </Box>
-                  );
-                })}
+                {allLoans.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    ??? ??????? ?? ???
+                  </Typography>
+                ) : (
+                  allLoans.map((loan) => {
+                    const isSelected = loan.id === selectedLoanId;
+                    return (
+                      <Box
+                        key={loan.id}
+                        sx={{
+                          mb: 2,
+                          border: isSelected
+                            ? "2px solid #2a8c82"
+                            : "1px solid rgba(0,0,0,0.08)",
+                          borderRadius: 2,
+                          overflow: "hidden",
+                        }}
+                      >
+                        <LoanCard
+                          loan={loan}
+                          readOnly
+                          onClick={() => setSelectedLoanId(loan.id)}
+                        />
+                      </Box>
+                    );
+                  })
+                )}
               </Box>
             </Paper>
           </Grid>
@@ -128,9 +150,7 @@ const UserLoansPage: React.FC = () => {
                   </Box>
                 </>
               ) : (
-                <Typography variant="body1">
-                  Select a loan to view details.{" "}
-                </Typography>
+                <Typography variant="body1">??? ?????? ????? ?????.</Typography>
               )}
             </Paper>
           </Grid>
@@ -144,7 +164,7 @@ const UserLoansPage: React.FC = () => {
                   readOnly
                 />
               ) : (
-                <Typography variant="body1"></Typography>
+                <Typography variant="body1">??? ?????? ????? ???????.</Typography>
               )}
             </Paper>
           </Grid>
