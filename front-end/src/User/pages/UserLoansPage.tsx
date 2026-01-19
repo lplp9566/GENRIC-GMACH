@@ -119,8 +119,6 @@ const UserLoansPage: React.FC = () => {
               {selectedLoan && loanDetails ? (
                 <>
                   <LoanHeader
-                    firstName={selectedLoan.user.first_name}
-                    lastName={selectedLoan.user.last_name}
                     principal={selectedLoan.loan_amount}
                     remaining={loanDetails.remaining_balance}
                     balance={loanDetails.balance}

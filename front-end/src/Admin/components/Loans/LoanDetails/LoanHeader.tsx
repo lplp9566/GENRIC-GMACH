@@ -5,12 +5,12 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 
 interface LoanHeaderProps {
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   principal: number;
   remaining: number;
   balance: number;
-  purpose: string;
+  purpose?: string;
 }
 
 const LoanHeader: React.FC<LoanHeaderProps> = ({
