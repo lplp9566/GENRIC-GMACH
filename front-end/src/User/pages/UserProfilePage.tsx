@@ -90,11 +90,31 @@ const UserProfilePage = () => {
   }, [user]);
 
   const totalDonations = userFinancials?.total_donations ?? 0;
+  const totalMemberFees = userFinancials?.total_monthly_deposits ?? 0;
+  const totalContributions = totalDonations + totalMemberFees;
+
+  const activeLoans = allLoans.filter((loan) => loan.isActive);
+  const activeLoansCount = activeLoans.length;
+  const activeLoansTotalAmount = activeLoans.reduce(
+    (sum, loan) => sum + (loan.loan_amount ?? 0),
+    0
+  );
+  const activeLoansRemaining = activeLoans.reduce(
+    (sum, loan) => sum + (loan.remaining_balance ?? 0),
+    0
+  );
+
   const totalLoansCount = allLoans.length;
   const totalLoansAmount = allLoans.reduce(
     (sum, loan) => sum + (loan.loan_amount ?? 0),
     0
   );
+
+  const loanUsageRatio =
+    totalContributions > 0
+      ? Math.min(1, activeLoansRemaining / totalContributions)
+      : 0;
+  const loanUsagePercent = Math.round(loanUsageRatio * 100);
   const joinDate = formatDate(parseDate(user?.join_date));
   const bankInfo = useMemo(
     () => ({
@@ -390,16 +410,58 @@ const UserProfilePage = () => {
                     : "1px solid rgba(34,197,94,0.2)",
                 }}
               >
-                <Typography variant="subtitle2" fontWeight={700}>
-                  סך תרומות (מצטבר)
-                </Typography>
-                <Typography variant="h5" fontWeight={800} mt={0.5}>
-                  {formatILS(totalDonations)}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  כולל דמי חבר ותרומות מצטברות.
-                </Typography>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="subtitle2" fontWeight={700}>
+                      סך תרומות ודמי חבר
+                    </Typography>
+                    <Typography variant="h5" fontWeight={800} mt={0.5}>
+                      {formatILS(totalContributions)}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      כולל תרומות + דמי חבר מצטברים
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      position: "relative",
+                      width: 140,
+                      height: 140,
+                      borderRadius: "50%",
+                      background: `conic-gradient(${isDark ? "#38bdf8" : "#2563eb"} ${loanUsagePercent}%, ${isDark ? "rgba(148,163,184,0.25)" : "rgba(148,163,184,0.2)"} 0)`,
+                      transition: "background 1.2s ease",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        inset: 10,
+                        borderRadius: "50%",
+                        background: isDark ? "#0f172a" : "#ffffff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexDirection: "column",
+                        textAlign: "center",
+                        animation: "pulseGlow 2.6s ease-in-out infinite",
+                        "@keyframes pulseGlow": {
+                          "0%": { boxShadow: "0 0 0 rgba(56,189,248,0.0)" },
+                          "50%": { boxShadow: "0 0 22px rgba(56,189,248,0.35)" },
+                          "100%": { boxShadow: "0 0 0 rgba(56,189,248,0.0)" },
+                        },
+                      }}
+                    >
+                      <Typography variant="h6" fontWeight={800}>
+                        {loanUsagePercent}%
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        מהתרומות בהלוואות
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Stack>
               </Paper>
+
               <Paper
                 elevation={0}
                 sx={{
@@ -414,15 +476,16 @@ const UserProfilePage = () => {
                 }}
               >
                 <Typography variant="subtitle2" fontWeight={700}>
-                  ?? ??????? ?????
+                  הלוואות פעילות
                 </Typography>
                 <Typography variant="h5" fontWeight={800} mt={0.5}>
-                  {totalLoansCount} ???????
+                  {activeLoansCount} הלוואות על סך {formatILS(activeLoansTotalAmount)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  ?? ?? {formatILS(totalLoansAmount)}
+                  נותר להחזיר {formatILS(activeLoansRemaining)}
                 </Typography>
               </Paper>
+
               <Paper
                 elevation={0}
                 sx={{
@@ -437,13 +500,13 @@ const UserProfilePage = () => {
                 }}
               >
                 <Typography variant="subtitle2" fontWeight={700}>
-                  עדכון קרוב 3 חודשים
+                  כל ההלוואות מאז ההצטרפות
                 </Typography>
                 <Typography variant="h5" fontWeight={800} mt={0.5}>
-                  בקרוב
+                  {totalLoansCount} הלוואות על סך {formatILS(totalLoansAmount)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  נבנה בקרוב עם נתונים נוספים.
+                  נתון מצטבר מיום ההצטרפות
                 </Typography>
               </Paper>
             </Stack>
