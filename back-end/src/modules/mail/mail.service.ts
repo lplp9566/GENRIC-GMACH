@@ -182,9 +182,11 @@ export class MailService {
                 row('סך הפקדות', fmt(data.depositedAllTime)),
               ])}
 
-              ${sectionBox('הלוואות', [
-                row('יתרה להחזר בהלוואות', fmt(data.activeLoansTotal)),
-              ])}
+              ${data.activeLoansTotal > 0
+                ? sectionBox('הלוואות', [
+                    row('יתרה להחזר בהלוואות', fmt(data.activeLoansTotal)),
+                  ])
+                : ''}
 
               ${debtsSection}
             </div>
