@@ -517,6 +517,7 @@ export class UsersService {
         : undefined;
       const totalLoansTaken = financialDetails?.total_loans_taken_amount ?? 0;
       const totalLoansRepaid = financialDetails?.total_loans_repaid ?? 0;
+      const totalLoansTakenCount = financialDetails?.total_loans_taken ?? 0;
       const remainingLoanBalance = Math.max(
         0,
         totalLoansTaken - totalLoansRepaid,
@@ -538,6 +539,8 @@ export class UsersService {
         year,
         activeLoansTotal: remainingLoanBalance,
         loanDebtTotal: loanDebt,
+        totalLoansTakenCount,
+        totalLoansTakenAmount: totalLoansTaken,
         standingOrderReturnDebt: standingOrderDebt,
         // cashboxTotal: financialDetails?.total_cash_holdings ?? 0,
         depositedAllTime:
@@ -584,6 +587,7 @@ export class UsersService {
 
     const totalLoansTaken = financialDetails?.total_loans_taken_amount ?? 0;
     const totalLoansRepaid = financialDetails?.total_loans_repaid ?? 0;
+    const totalLoansTakenCount = financialDetails?.total_loans_taken ?? 0;
     const remainingLoanBalance = Math.max(
       0,
       totalLoansTaken - totalLoansRepaid,
@@ -605,6 +609,8 @@ export class UsersService {
       year,
       activeLoansTotal: remainingLoanBalance,
       loanDebtTotal: loanDebt,
+      totalLoansTakenCount,
+      totalLoansTakenAmount: totalLoansTaken,
       standingOrderReturnDebt: standingOrderDebt,
       depositedAllTime:
         (financialDetails?.total_fixed_deposits_deposited ?? 0) -

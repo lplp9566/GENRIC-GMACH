@@ -22,6 +22,8 @@
 
   activeLoansTotal: number;
   loanDebtTotal: number;
+  totalLoansTakenCount: number;
+  totalLoansTakenAmount: number;
   standingOrderReturnDebt?: number;
 
   cashboxTotal?: number;

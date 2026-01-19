@@ -185,6 +185,12 @@ export class MailService {
               ${data.activeLoansTotal > 0
                 ? sectionBox('הלוואות', [
                     row('יתרה להחזר בהלוואות', fmt(data.activeLoansTotal)),
+                    row(
+                      'סך הלוואות שלקחת',
+                      `${data.totalLoansTakenCount} על סך ${fmt(
+                        data.totalLoansTakenAmount,
+                      )}`,
+                    ),
                   ])
                 : ''}
 
