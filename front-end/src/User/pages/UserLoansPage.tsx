@@ -85,28 +85,28 @@ const UserLoansPage: React.FC = () => {
           <Grid item xs={12} md={4}>
             <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
               <Typography variant="h6" fontWeight={600} mb={2}>
-                ???????
+                הלוואות
               </Typography>
-              <FormControl size="small" fullWidth sx={{ mb: 2 }}>
-                <InputLabel id="user-loans-filter-label">?????</InputLabel>
+              <FormControl size="small" fullWidth sx={ { mb: 2 } }>
+                <InputLabel id="user-loans-filter-label">סינון</InputLabel>
                 <Select
                   labelId="user-loans-filter-label"
-                  label="?????"
+                  label="סינון"
                   value={filter}
                   onChange={(e) => {
                     setAutoFallback(false);
                     setFilter(e.target.value as StatusGeneric);
                   }}
                 >
-                  <MenuItem value={StatusGeneric.ALL}>???</MenuItem>
-                  <MenuItem value={StatusGeneric.ACTIVE}>??????</MenuItem>
-                  <MenuItem value={StatusGeneric.INACTIVE}>?? ??????</MenuItem>
+                  <MenuItem value={StatusGeneric.ALL}>הכל</MenuItem>
+                  <MenuItem value={StatusGeneric.ACTIVE}>פעילות</MenuItem>
+                  <MenuItem value={StatusGeneric.INACTIVE}>לא פעילות</MenuItem>
                 </Select>
               </FormControl>
               <Box>
                 {allLoans.length === 0 ? (
                   <Typography variant="body2" color="text.secondary">
-                    ??? ??????? ?? ???
+                    אין הלוואות על שמך
                   </Typography>
                 ) : (
                   allLoans.map((loan) => {
@@ -150,7 +150,7 @@ const UserLoansPage: React.FC = () => {
                   </Box>
                 </>
               ) : (
-                <Typography variant="body1">??? ?????? ????? ?????.</Typography>
+                <Typography variant="body1">בחר הלוואה להצגת פרטים.</Typography>
               )}
             </Paper>
           </Grid>
@@ -164,7 +164,7 @@ const UserLoansPage: React.FC = () => {
                   readOnly
                 />
               ) : (
-                <Typography variant="body1">??? ?????? ????? ???????.</Typography>
+                <Typography variant="body1">בחר הלוואה להצגת הפעולות.</Typography>
               )}
             </Paper>
           </Grid>
