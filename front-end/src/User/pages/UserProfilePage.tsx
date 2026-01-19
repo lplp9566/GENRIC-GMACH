@@ -63,7 +63,7 @@ const UserProfilePage = () => {
   useEffect(() => {
     if (user?.id != null) {
       dispatch(getUserFinancialsByUserGuard());
-      dispatch(getAllLoans({ status: StatusGeneric.ACTIVE, userId: user.id }));
+      dispatch(getAllLoans({ status: StatusGeneric.ALL, userId: user.id }));
     }
   }, [dispatch, user?.id]);
 
@@ -90,13 +90,11 @@ const UserProfilePage = () => {
   }, [user]);
 
   const totalDonations = userFinancials?.total_donations ?? 0;
-  const loanBalances = user?.payment_details?.loan_balances ?? [];
   const totalLoansCount = allLoans.length;
-  const totalLoansBalance = allLoans.reduce((sum, loan) => {
-    const balance =
-      loanBalances.find((lb) => lb.loanId === loan.id)?.balance || 0;
-    return sum + Math.abs(balance);
-  }, 0);
+  const totalLoansAmount = allLoans.reduce(
+    (sum, loan) => sum + (loan.loan_amount ?? 0),
+    0
+  );
   const joinDate = formatDate(parseDate(user?.join_date));
   const bankInfo = useMemo(
     () => ({
@@ -416,13 +414,13 @@ const UserProfilePage = () => {
                 }}
               >
                 <Typography variant="subtitle2" fontWeight={700}>
-                  סך הלוואות שלקחת
+                  ?? ??????? ?????
                 </Typography>
                 <Typography variant="h5" fontWeight={800} mt={0.5}>
-                  {totalLoansCount} הלוואות
+                  {totalLoansCount} ???????
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  על סך {formatILS(totalLoansBalance)}
+                  ?? ?? {formatILS(totalLoansAmount)}
                 </Typography>
               </Paper>
               <Paper

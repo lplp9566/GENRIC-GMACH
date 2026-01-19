@@ -80,7 +80,7 @@ const LoanDetailsPage: React.FC = () => {
           disabled={!loanDetails.isActive}
           sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
         >
-          ???? ?????
+          פעולות להלוואה
         </Button>
       </Box>
       <Divider />
