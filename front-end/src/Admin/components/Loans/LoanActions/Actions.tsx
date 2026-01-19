@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Box,
@@ -19,19 +18,26 @@ import AmountChangeLoanForm from "./AmountChangeLoanForm";
 interface ActionsProps {
   loanId: number;
   handleSubmit: (dto: ICreateLoanAction) => void;
-  max : number
+  max: number;
 }
 
-
-export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit,max}) => {
-  const [mode, setMode] = useState<LoanPaymentActionType>(LoanPaymentActionType.PAYMENT);
+export const Actions: React.FC<ActionsProps> = ({
+  loanId,
+  handleSubmit,
+  max,
+}) => {
+  const [mode, setMode] = useState<LoanPaymentActionType>(
+    LoanPaymentActionType.PAYMENT
+  );
 
   const handleModeChange = (e: SelectChangeEvent) =>
     setMode(e.target.value as LoanPaymentActionType);
   return (
     <Box dir="rtl">
-      <Paper elevation={2} sx={{ p: 2, borderRadius: 2}}>
-        <Typography variant="h6" sx={{textAlign:"center", paddingBottom:2}}>פעולות להלוואה</Typography>
+      <Paper elevation={2} sx={{ p: 2, borderRadius: 2 }}>
+        <Typography variant="h6" sx={{ textAlign: "center", paddingBottom: 2 }}>
+          פעולות להלוואה
+        </Typography>
         <FormControl fullWidth size="small">
           <InputLabel id="action-select-label">בחר פעולה</InputLabel>
           <Select
@@ -39,11 +45,13 @@ export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit,max}) => 
             value={mode}
             label="בחר פעולה"
             onChange={handleModeChange}
-            sx={{  borderRadius: 1 }}
+            sx={{ borderRadius: 1 }}
           >
-            <MenuItem value={LoanPaymentActionType.PAYMENT}>תשלום הלוואה</MenuItem>
+            <MenuItem value={LoanPaymentActionType.PAYMENT}>
+              תשלום הלוואה
+            </MenuItem>
             <MenuItem value={LoanPaymentActionType.AMOUNT_CHANGE}>
-           הוספת סכום לההלואה 
+              הוספת סכום לההלואה
             </MenuItem>
             <MenuItem value={LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE}>
               עדכון תשלום חודשי
@@ -55,16 +63,26 @@ export const Actions: React.FC<ActionsProps> = ({ loanId ,handleSubmit,max}) => 
         </FormControl>
 
         {mode === LoanPaymentActionType.PAYMENT && (
-          <PaymentLoanActionForm loanId={loanId} onSubmit={handleSubmit} maxAmount={max}/>
+          <PaymentLoanActionForm
+            loanId={loanId}
+            onSubmit={handleSubmit}
+            maxAmount={max}
+          />
         )}
         {mode === LoanPaymentActionType.AMOUNT_CHANGE && (
           <AmountChangeLoanForm loanId={loanId} onSubmit={handleSubmit} />
         )}
         {mode === LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE && (
-          <MonthlyPaymentChangeLoanForm loanId={loanId} onSubmit={handleSubmit} />
+          <MonthlyPaymentChangeLoanForm
+            loanId={loanId}
+            onSubmit={handleSubmit}
+          />
         )}
         {mode === LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE && (
-          <DateOfPaymentChangeLoanForm loanId={loanId} onSubmit={handleSubmit} />
+          <DateOfPaymentChangeLoanForm
+            loanId={loanId}
+            onSubmit={handleSubmit}
+          />
         )}
       </Paper>
     </Box>

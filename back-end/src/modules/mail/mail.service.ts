@@ -103,8 +103,8 @@ export class MailService {
       ? `<div style="min-width:220px;"><strong>תאריך הצטרפות עברי:</strong> ${data.hebrewJoinedAt}</div>`
       : '';
 
-    const loanDebtRow = data.activeLoansTotal > 0
-      ? row('חוב בהלוואות', fmt(data.activeLoansTotal))
+    const loanDebtRow = data.loanDebtTotal > 0
+      ? row('חוב בהלוואות', fmt(data.loanDebtTotal))
       : '';
 
     const standingOrderDebtValue = data.standingOrderReturnDebt ?? 0;

@@ -21,6 +21,7 @@
   depositedAllTime: number;
 
   activeLoansTotal: number;
+  loanDebtTotal: number;
   standingOrderReturnDebt?: number;
 
   cashboxTotal?: number;
