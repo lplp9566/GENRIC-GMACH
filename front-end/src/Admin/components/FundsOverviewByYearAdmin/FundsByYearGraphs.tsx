@@ -43,7 +43,6 @@ const FundsByYearGraphs = () => {
   );
 
   const DEFAULT_FIELDS = useMemo(() => items.slice(0, 3).map((f) => f.key), [items]);
-  const COLORS = useMemo(() => items.map((f) => f.color), [items]);
   const colorByKey = useMemo(
     () => Object.fromEntries(items.map((i) => [i.key, i.color])),
     [items]
