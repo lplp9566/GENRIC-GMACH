@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   CartesianGrid,
   Legend,
@@ -18,11 +18,18 @@ import { Box, Typography } from "@mui/material";
 interface LineChartGrapeProps {
   data: any[];
   selectedFields: string[];
-  COLORS: string[];
+  COLORS: string[]; // אפשר להשאיר, אבל נעדיף צבע לפי key
 }
 
-// ✅ Tooltip מותאם ל־Theme
- export const ChartTooltip = ({ active, payload, label }: any) => {
+type Item = { key: string; label: string; color: string };
+
+// ✅ Tooltip מותאם ל־Theme (עם תמיכה בתרגום key->label)
+export const ChartTooltip = ({
+  active,
+  payload,
+  label,
+  labelByKey,
+}: any) => {
   const theme = useTheme();
 
   if (!active || !payload?.length) return null;
@@ -43,56 +50,110 @@ interface LineChartGrapeProps {
         direction: "rtl",
       }}
     >
-      <Typography variant="caption" color="text.secondary" display="block" mb={0.75}>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        display="block"
+        mb={0.75}
+      >
         {label}
       </Typography>
 
-      {payload.map((p: any, i: number) => (
-        <Box
-          key={i}
-          sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, mb: 0.5 }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
+      {payload.map((p: any, i: number) => {
+        // p.dataKey לרוב מחזיר את ה-key, p.name לפעמים key ולפעמים label
+        const key = p.dataKey ?? p.name;
+        const displayName = labelByKey?.[key] ?? p.name ?? key;
+
+        return (
+          <Box
+            key={i}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 2,
+              mb: 0.5,
+            }}
+          >
             <Box
               sx={{
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                backgroundColor: p.color,
-                flex: "0 0 auto",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                minWidth: 0,
               }}
-            />
-            <Typography
-              variant="body2"
-              sx={{
-                color: p.color,
-                fontWeight: 800,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-              title={p.name}
             >
-              {p.name}
+              <Box
+                sx={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  backgroundColor: p.color,
+                  flex: "0 0 auto",
+                }}
+              />
+              <Typography
+                variant="body2"
+                sx={{
+                  color: p.color,
+                  fontWeight: 800,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+                title={displayName}
+              >
+                {displayName}
+              </Typography>
+            </Box>
+
+            <Typography variant="body2" fontWeight={900} color={p.color}>
+              ₪{Number(p.value ?? 0).toLocaleString()}
             </Typography>
           </Box>
-
-          <Typography variant="body2" fontWeight={900} color={p.color}>
-            ₪{Number(p.value ?? 0).toLocaleString()}
-          </Typography>
-        </Box>
-      ))}
+        );
+      })}
     </Box>
   );
 };
 
-const LineChartGraph: React.FC<LineChartGrapeProps> = ({ data, selectedFields, COLORS }) => {
+const LineChartGraph: React.FC<LineChartGrapeProps> = ({
+  data,
+  selectedFields,
+  COLORS,
+}) => {
   const theme = useTheme();
   const { selectedUser } = useSelector((state: RootState) => state.AdminUsers);
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const isAdmin = Boolean(authUser?.is_admin);
+
+  // ✅ כלל אחיד: AdminYearlyFinancialItems רק לאדמין בלי משתמש נבחר
+  const items: Item[] = useMemo(() => {
+    return (isAdmin && !selectedUser
+      ? AdminYearlyFinancialItems
+      : UserAdminFinancialItems) as Item[];
+  }, [isAdmin, selectedUser]);
+
+  const labelByKey = useMemo(() => {
+    return Object.fromEntries(items.map((i) => [i.key, i.label]));
+  }, [items]);
+
+  const colorByKey = useMemo(() => {
+    return Object.fromEntries(items.map((i) => [i.key, i.color]));
+  }, [items]);
+
+  const getColor = (key: string, idx: number) =>
+    colorByKey[key] ?? COLORS[idx % COLORS.length];
 
   // צבעים ל־צירים/גריד/טקסט לפי theme
-  const gridColor = alpha(theme.palette.text.primary, theme.palette.mode === "dark" ? 0.18 : 0.12);
-  const axisColor = alpha(theme.palette.text.primary, theme.palette.mode === "dark" ? 0.65 : 0.55);
+  const gridColor = alpha(
+    theme.palette.text.primary,
+    theme.palette.mode === "dark" ? 0.18 : 0.12
+  );
+  const axisColor = alpha(
+    theme.palette.text.primary,
+    theme.palette.mode === "dark" ? 0.65 : 0.55
+  );
 
   return (
     <ResponsiveContainer width="100%" height={350}>
@@ -113,33 +174,32 @@ const LineChartGraph: React.FC<LineChartGrapeProps> = ({ data, selectedFields, C
           tickLine={{ stroke: gridColor }}
         />
 
-        {/* ✅ Tooltip מותאם */}
-        <Tooltip content={<ChartTooltip />} />
+        <Tooltip content={<ChartTooltip labelByKey={labelByKey} />} />
 
-        {/* ✅ Legend צבעים עדינים */}
+        {/* ✅ Legend: תרגום dataKey->label */}
         <Legend
+          formatter={(value: string) => labelByKey[value] ?? value}
           wrapperStyle={{
             color: theme.palette.text.primary,
             direction: "rtl",
           }}
         />
 
-        {selectedFields.map((key, idx) => (
-          <Line
-            key={key}
-            type="monotone"
-            dataKey={key}
-            name={
-              !selectedUser
-                ? AdminYearlyFinancialItems.find((f) => f.key === key)?.label
-                : UserAdminFinancialItems.find((f) => f.key === key)?.label
-            }
-            stroke={COLORS[idx % COLORS.length]}
-            strokeWidth={2}
-            dot={{ r: 3 }}
-            activeDot={{ r: 5 }}
-          />
-        ))}
+        {selectedFields.map((key, idx) => {
+          const c = getColor(key, idx);
+          return (
+            <Line
+              key={key}
+              type="monotone"
+              dataKey={key}
+              name={labelByKey[key] ?? key} // טוב להשאיר
+              stroke={c}
+              strokeWidth={2}
+              dot={{ r: 3 }}
+              activeDot={{ r: 5 }}
+            />
+          );
+        })}
       </LineChart>
     </ResponsiveContainer>
   );

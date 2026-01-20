@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Paper, Typography, Box, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AdminYearlyFinancialItems, UserAdminFinancialItems } from "./items";
@@ -13,33 +13,51 @@ import FundsTable from "./Graphs/FundsTable";
 import LoadingIndicator from "../StatusComponents/LoadingIndicator";
 import { getUserFundsOverview } from "../../../store/features/user/userFundsOverviewSlice";
 
+const KEY_MAP: Record<string, string | null> = {
+  // Admin -> User
+  total_special_fund_donations: "special_fund_donations",
+  total_loans_taken: "total_loans_taken_count",
+  total_fixed_deposits_deposited: "total_fixed_deposits_added",
+  total_cash_holdings: null, // לא קיים אצל משתמש
+  // אם יש עוד הבדלים בשמות – להוסיף כאן
+};
+
 const FundsByYearGraphs = () => {
   const { selectedUser } = useSelector((state: RootState) => state.AdminUsers);
+
   const { fundsOverview } = useSelector(
     (state: RootState) => state.UserFundsOverviewSlice
   );
   const { fundsOverviewByYear } = useSelector(
     (state: RootState) => state.AdminFundsOverviewReducer
   );
-  console.log(fundsOverview);
-  
+
   const dispatch = useDispatch<AppDispatch>();
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const isAdmin = Boolean(authUser?.is_admin);
 
-  const DEFAULT_FIELDS =
-    isAdmin && !selectedUser
-      ? AdminYearlyFinancialItems.slice(0, 3).map((f) => f.key)
-      : UserAdminFinancialItems.slice(0, 3).map((f) => f.key);
-  const COLORS =
-    isAdmin && !selectedUser
-      ? AdminYearlyFinancialItems.map((f) => f.color)
-      : UserAdminFinancialItems.map((f) => f.color);
-  const [selectedFields, setSelectedFields] =
-    useState<string[]>(DEFAULT_FIELDS);
+  // סט השדות הנכון לפי מצב (כלל אחיד)
+  const items = useMemo(
+    () => (isAdmin && !selectedUser ? AdminYearlyFinancialItems : UserAdminFinancialItems),
+    [isAdmin, selectedUser]
+  );
+
+  const DEFAULT_FIELDS = useMemo(() => items.slice(0, 3).map((f) => f.key), [items]);
+  const COLORS = useMemo(() => items.map((f) => f.color), [items]);
+  const colorByKey = useMemo(
+    () => Object.fromEntries(items.map((i) => [i.key, i.color])),
+    [items]
+  );
+  const labelByKey = useMemo(
+    () => Object.fromEntries(items.map((i) => [i.key, i.label])),
+    [items]
+  );
+
+  const [selectedFields, setSelectedFields] = useState<string[]>(DEFAULT_FIELDS);
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedYears, setSelectedYears] = useState<number[]>([]);
 
+  // מביא נתונים לפי מצב
   useEffect(() => {
     if (!isAdmin && authUser?.user?.id) {
       dispatch(getUserFundsOverview(authUser.user.id));
@@ -49,55 +67,67 @@ const FundsByYearGraphs = () => {
       dispatch(getUserFundsOverview(selectedUser.id));
     }
   }, [dispatch, isAdmin, selectedUser, authUser?.user?.id]);
-  const yearlyData = isAdmin
-    ? !selectedUser
-      ? Array.isArray(fundsOverviewByYear)
-        ? fundsOverviewByYear
-        : []
-      : Array.isArray(fundsOverview)
-      ? fundsOverview
-      : []
-    : Array.isArray(fundsOverview)
-    ? fundsOverview
-    : [];
 
+  const yearlyData = useMemo(() => {
+    if (isAdmin) {
+      if (!selectedUser) {
+        return Array.isArray(fundsOverviewByYear) ? fundsOverviewByYear : [];
+      }
+      return Array.isArray(fundsOverview) ? fundsOverview : [];
+    }
+    return Array.isArray(fundsOverview) ? fundsOverview : [];
+  }, [isAdmin, selectedUser, fundsOverview, fundsOverviewByYear]);
+
+  // שנים ברירת מחדל
   useEffect(() => {
     if (yearlyData.length > 0) {
       setSelectedYears(yearlyData.map((y) => y.year));
     }
   }, [yearlyData]);
 
-  // Pie Data
-  const filteredData = yearlyData.filter((y) => selectedYears.includes(y.year));
-  const pieData = selectedFields.map((key, idx) => {
+  // ✅ חשוב: כשעוברים מצב (אדמין/יוזר נבחר וכו') – לנרמל selectedFields כדי שלא יישארו keys לא חוקיים
+  useEffect(() => {
+    const allowed = new Set(items.map((i) => i.key));
 
-    const total = filteredData.reduce(
-      (sum, year) => sum + (Number((year as Record<string, any>)[key]) || 0),
-      0
-    );
-    return {
-      name:
-        isAdmin && !selectedUser
-          ? AdminYearlyFinancialItems.find((f) => f.key === key)?.label ?? key
-          : UserAdminFinancialItems.find((f) => f.key === key)?.label ?? key,
-      value: total,
-      color: COLORS[idx % COLORS.length],
-    };
-  });
+    setSelectedFields((prev) => {
+      const normalized = prev
+        .map((k) => (KEY_MAP[k] === undefined ? k : KEY_MAP[k])) // להמיר אם יש mapping
+        .filter((k): k is string => Boolean(k) && allowed.has(k!)); // להסיר null/לא קיים
 
-  // ==== כאן ייצוא עם כותרות בעברית ורק מה שנבחר ====
+      return normalized.length ? normalized : DEFAULT_FIELDS;
+    });
+  }, [items, DEFAULT_FIELDS]);
+
+  const filteredData = useMemo(
+    () => yearlyData.filter((y) => selectedYears.includes(y.year)),
+    [yearlyData, selectedYears]
+  );
+
+  const pieData = useMemo(() => {
+    return selectedFields.map((key) => {
+      const total = filteredData.reduce(
+        (sum, year) => sum + (Number((year as Record<string, any>)[key]) || 0),
+        0
+      );
+
+      return {
+        name: labelByKey[key] ?? key,
+        value: total,
+        color: colorByKey[key] ?? "#8884d8",
+      };
+    });
+  }, [selectedFields, filteredData, labelByKey, colorByKey]);
+
   const exportToExcel = () => {
     const dataToExport = filteredData.map((row) => {
       const obj: Record<string, any> = {};
-      // הוספת עמודה של שנה
       obj["שנה"] = row.year;
+
       selectedFields.forEach((key) => {
-        const label =
-          isAdmin && !selectedUser
-            ? AdminYearlyFinancialItems.find((f) => f.key === key)?.label ?? key
-            : UserAdminFinancialItems.find((f) => f.key === key)?.label ?? key;
+        const label = labelByKey[key] ?? key;
         obj[label] = (row as Record<string, any>)[key];
       });
+
       return obj;
     });
 
@@ -106,21 +136,13 @@ const FundsByYearGraphs = () => {
     XLSX.utils.book_append_sheet(wb, ws, "נתונים");
     XLSX.writeFile(wb, "export.xlsx");
   };
-  const handleFieldChange = (arr: string[]) => {
-    setSelectedFields(arr);
-  };
 
-  if (yearlyData.length === 0) {
-    return <LoadingIndicator />;
-  }
+  const handleFieldChange = (arr: string[]) => setSelectedFields(arr);
+
+  if (yearlyData.length === 0) return <LoadingIndicator />;
 
   return (
-    <Paper
-      sx={{
-        mt: 5,
-        p: 3,
-      }}
-    >
+    <Paper sx={{ mt: 5, p: 3 }}>
       <Box
         sx={{
           display: "flex",
@@ -140,7 +162,6 @@ const FundsByYearGraphs = () => {
             minWidth: 0,
             p: 0,
             left: 0,
-
           }}
           onClick={exportToExcel}
           startIcon={
@@ -150,13 +171,13 @@ const FundsByYearGraphs = () => {
               style={{ width: 32, height: 32 }}
             />
           }
-        ></Button>
+        />
+
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            // background: "rgba(255, 230, 240, 0.11)",
             borderRadius: 3,
             p: 2,
             boxShadow: 1,
@@ -175,6 +196,7 @@ const FundsByYearGraphs = () => {
           >
             גרפים כספיים וטבלה מפורטת לפי בחירה
           </Typography>
+
           <Box
             sx={{
               mb: 2,
@@ -185,31 +207,26 @@ const FundsByYearGraphs = () => {
               alignItems: "center",
             }}
           >
-            <FundsFieldSelect
-              selectedFields={selectedFields}
-              onChange={handleFieldChange}
-            />
+            <FundsFieldSelect selectedFields={selectedFields} onChange={handleFieldChange} />
+
             <FundsYearSelect
               years={yearlyData.map((y) => y.year)}
               selectedYears={selectedYears}
               onChange={setSelectedYears}
             />
           </Box>
+
           <FundsTabs value={selectedTab} onChange={setSelectedTab} />
         </Box>
       </Box>
 
       {selectedTab < 5 ? (
-        <FundsGraphs
-          type={selectedTab}
-          data={filteredData}
-          selectedFields={selectedFields}
-          pieData={pieData}
-        />
+        <FundsGraphs type={selectedTab} data={filteredData} selectedFields={selectedFields} pieData={pieData} />
       ) : (
         <FundsTable data={filteredData} selectedFields={selectedFields} />
       )}
     </Paper>
   );
 };
+
 export default FundsByYearGraphs;
