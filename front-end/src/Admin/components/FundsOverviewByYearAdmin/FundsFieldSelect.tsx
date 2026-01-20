@@ -17,6 +17,8 @@ const FundsFieldSelect= ({ selectedFields, onChange}: Props)=> {
     const arr = typeof value === "string" ? value.split(",") : value;
     onChange(arr);
   };
+  console.log(AdminYearlyFinancialItems.map(f => f.key));
+  
   return (
   <FormControl sx={{ minWidth: isMobile ? 110 : 170 }}>
       {/* <InputLabel>בחירת קטגוריות</InputLabel> */}

@@ -21,6 +21,8 @@ const FundsByYearGraphs = () => {
   const { fundsOverviewByYear } = useSelector(
     (state: RootState) => state.AdminFundsOverviewReducer
   );
+  console.log(fundsOverview);
+  
   const dispatch = useDispatch<AppDispatch>();
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const isAdmin = Boolean(authUser?.is_admin);
