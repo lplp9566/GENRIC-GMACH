@@ -94,13 +94,8 @@ const UserDepositsPage: React.FC = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", py: 4, direction: "rtl" }}>
-      <Container maxWidth="xl">
-        {allDeposits.length === 0 && (
-          <Typography variant="body1" sx={{ mb: 2, textAlign: "center" }}>
-            אין הפקדות על שמך.
-          </Typography>
-        )}
-        {allDeposits.length > 0 && (
+            <Container maxWidth="xl">
+        <Grid container spacing={3} direction="row" sx={{ direction: "ltr" }}>
           <Grid item xs={12} md={4}>
             <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
               <Typography variant="h6" fontWeight={600} mb={2}>
@@ -123,59 +118,57 @@ const UserDepositsPage: React.FC = () => {
                 </Select>
               </FormControl>
               <Box>
-                {allDeposits.map((depositItem) => {
-                  const isSelected = depositItem.id === selectedDepositId;
-                  return (
-                    <Box
-                      key={depositItem.id}
-                      sx={{
-                        mb: 2,
-                        border: isSelected
-                          ? "2px solid #2a8c82"
-                          : "1px solid rgba(0,0,0,0.08)",
-                        borderRadius: 2,
-                        overflow: "hidden",
-                      }}
-                    >
-                      <DepositCard
-                        deposit={depositItem}
-                        readOnly
-                        onClick={() => setSelectedDepositId(depositItem.id)}
-                      />
-                    </Box>
-                  );
-                })}
+                {allDeposits.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    אין הפקדות על שמך
+                  </Typography>
+                ) : (
+                  allDeposits.map((depositItem) => {
+                    const isSelected = depositItem.id === selectedDepositId;
+                    return (
+                      <Box
+                        key={depositItem.id}
+                        sx={{
+                          mb: 2,
+                          border: isSelected
+                            ? "2px solid #2a8c82"
+                            : "1px solid rgba(0,0,0,0.08)",
+                          borderRadius: 2,
+                          overflow: "hidden",
+                        }}
+                      >
+                        <DepositCard
+                          deposit={depositItem}
+                          readOnly
+                          onClick={() => setSelectedDepositId(depositItem.id)}
+                        />
+                      </Box>
+                    );
+                  })
+                )}
               </Box>
             </Paper>
           </Grid>
-        )}
-        <Grid container spacing={3} direction="row" sx={{ direction: "ltr" }}>
-          {deposit && (
-            <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-                {deposit ? (
-                  <DepositDetailsInfoCard deposit={deposit} />
-                ) : (
-                  <Typography variant="body1">
-                    בחר הפקדה להצגת פרטים.
-                  </Typography>
-                )}
-              </Paper>
-            </Grid>
-          )}
-          {actions.length > 0 && (
-            <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-                {selectedDepositId ? (
-                  <DepositActionTable actions={actions ?? []} />
-                ) : (
-                  <Typography variant="body1">
-                    בחר הפקדה להצגת הפעולות.
-                  </Typography>
-                )}
-              </Paper>
-            </Grid>
-          )}
+
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+              {deposit ? (
+                <DepositDetailsInfoCard deposit={deposit} />
+              ) : (
+                <Typography variant="body1">בחר הפקדה להצגת פרטים.</Typography>
+              )}
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+              {selectedDepositId ? (
+                <DepositActionTable actions={actions ?? []} />
+              ) : (
+                <Typography variant="body1">בחר הפקדה להצגת הפעולות.</Typography>
+              )}
+            </Paper>
+          </Grid>
         </Grid>
       </Container>
     </Box>

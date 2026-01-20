@@ -68,7 +68,7 @@ const FundsByYearGraphs = () => {
   // Pie Data
   const filteredData = yearlyData.filter((y) => selectedYears.includes(y.year));
   const pieData = selectedFields.map((key, idx) => {
-    // סוכם את הערך של השדה הזה בכל השנים שבחרו
+
     const total = filteredData.reduce(
       (sum, year) => sum + (Number((year as Record<string, any>)[key]) || 0),
       0
@@ -117,7 +117,6 @@ const FundsByYearGraphs = () => {
       sx={{
         mt: 5,
         p: 3,
-        // background: "linear-gradient(90deg, #f7fafc 80%, #e3f5ff 100%)",
       }}
     >
       <Box
@@ -140,7 +139,6 @@ const FundsByYearGraphs = () => {
             p: 0,
             left: 0,
 
-            // "&:hover": { backgroundColor: "#f0f6ff" },
           }}
           onClick={exportToExcel}
           startIcon={
