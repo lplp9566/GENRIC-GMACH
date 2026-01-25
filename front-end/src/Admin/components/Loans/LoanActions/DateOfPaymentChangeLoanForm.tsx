@@ -6,15 +6,27 @@ import { toast } from "react-toastify";
 interface Props {
   loanId: number;
   onSubmit: (dto: ICreateLoanAction) => void;
+  initialDate?: string;
+  initialValue?: number;
 }
 
-const DateOfPaymentChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
+const DateOfPaymentChangeLoanForm: React.FC<Props> = ({
+  loanId,
+  onSubmit,
+  initialDate,
+  initialValue,
+}) => {
   // const loanDetails = useSelector(
   //   (s: RootState) => s.AdminLoansSlice.loanDetails
   // );
 
   const [date, setDate] = useState<string>("");
   const [day, setDay] = useState<number | string>("");
+
+  React.useEffect(() => {
+    if (initialDate !== undefined) setDate(initialDate);
+    if (initialValue !== undefined) setDay(initialValue);
+  }, [initialDate, initialValue]);
 
   const handleDayOfPayment = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);

@@ -9,11 +9,15 @@ import CheckLoanModal from "../CheckLoanModal";
 interface Props {
   loanId: number;
   onSubmit: (dto: ICreateLoanAction) => void;
+  initialDate?: string;
+  initialValue?: number;
 }
 
 const MonthlyPaymentChangeLoanForm: React.FC<Props> = ({
   loanId,
   onSubmit,
+  initialDate,
+  initialValue,
 }) => {
     const dispatch = useDispatch<AppDispatch>();
   const [monthly, setMonthly] = useState<number | "">(0);
@@ -26,6 +30,10 @@ const MonthlyPaymentChangeLoanForm: React.FC<Props> = ({
   
   const isValid = monthly !== "" && date !== "";
   if (!Loan) return null;
+  React.useEffect(() => {
+    if (initialDate !== undefined) setDate(initialDate);
+    if (initialValue !== undefined) setMonthly(initialValue);
+  }, [initialDate, initialValue]);
   const newLoan: ICreateLoan = {
     loan_amount: Loan.remaining_balance,
     loan_date: Loan.loan_date,

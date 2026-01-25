@@ -136,7 +136,7 @@ const hendeleSave = async () => {
         <Button
           onClick={hendeleSave}
           variant="contained"
-          disabled={!action  || !isPayment}
+          disabled={!action}
         >
           שמירה
         </Button>

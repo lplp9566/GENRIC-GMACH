@@ -9,14 +9,27 @@ import { RootState } from "../../../../store/store";
 interface Props {
   loanId: number;
   onSubmit: (dto: ICreateLoanAction) => void;
-  maxAmount : number
+  maxAmount : number;
+  initialDate?: string;
+  initialAmount?: number;
 }
 
- const PaymentForm: React.FC<Props> = ({ loanId, onSubmit ,maxAmount}) => {
+ const PaymentForm: React.FC<Props> = ({
+  loanId,
+  onSubmit,
+  maxAmount,
+  initialDate,
+  initialAmount,
+}) => {
   const loanDetails = useSelector((s: RootState) => s.AdminLoansSlice.loanDetails);
 
   const [amount, setAmount] = useState<number | string>("");
   const [date, setDate]     = useState<string>("");
+
+  React.useEffect(() => {
+    if (initialDate !== undefined) setDate(initialDate);
+    if (initialAmount !== undefined) setAmount(initialAmount);
+  }, [initialDate, initialAmount]);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value =   Number (e.target.value);

@@ -14,9 +14,16 @@ import CheckLoanModal from "../CheckLoanModal";
 interface Props {
   loanId: number;
   onSubmit: (dto: ICreateLoanAction) => void;
+  initialDate?: string;
+  initialValue?: number;
 }
 
-const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
+const AmountChangeLoanForm: React.FC<Props> = ({
+  loanId,
+  onSubmit,
+  initialDate,
+  initialValue,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
   const [newAmount, setNewAmount] = useState<number | "">("");
   const [date, setDate] = useState<string>("");
@@ -29,6 +36,10 @@ const AmountChangeLoanForm: React.FC<Props> = ({ loanId, onSubmit }) => {
   );
 
   if (!Loan) return null;
+  React.useEffect(() => {
+    if (initialDate !== undefined) setDate(initialDate);
+    if (initialValue !== undefined) setNewAmount(initialValue);
+  }, [initialDate, initialValue]);
   const newLoan: ICreateLoan = {
     loan_amount:  Number(newAmount),
     loan_date: Loan.loan_date,

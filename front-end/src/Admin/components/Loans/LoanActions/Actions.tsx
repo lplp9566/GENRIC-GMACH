@@ -19,19 +19,38 @@ interface ActionsProps {
   loanId: number;
   handleSubmit: (dto: ICreateLoanAction) => void;
   max: number;
+  initialAction?: ICreateLoanAction | null;
 }
+
+const toDateInputValue = (dateLike?: string) => {
+  if (!dateLike) return "";
+  const d = new Date(dateLike);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
 
 export const Actions: React.FC<ActionsProps> = ({
   loanId,
   handleSubmit,
   max,
+  initialAction,
 }) => {
   const [mode, setMode] = useState<LoanPaymentActionType>(
     LoanPaymentActionType.PAYMENT
   );
 
+  React.useEffect(() => {
+    if (initialAction?.action_type) {
+      setMode(initialAction.action_type);
+    }
+  }, [initialAction]);
+
   const handleModeChange = (e: SelectChangeEvent) =>
     setMode(e.target.value as LoanPaymentActionType);
+  const initialDate = toDateInputValue(initialAction?.date);
+  const initialValue = initialAction?.value;
   return (
     <Box dir="rtl">
       <Paper elevation={2} sx={{ p: 2, borderRadius: 2 }}>
@@ -67,21 +86,32 @@ export const Actions: React.FC<ActionsProps> = ({
             loanId={loanId}
             onSubmit={handleSubmit}
             maxAmount={max}
+            initialDate={initialDate}
+            initialAmount={initialValue}
           />
         )}
         {mode === LoanPaymentActionType.AMOUNT_CHANGE && (
-          <AmountChangeLoanForm loanId={loanId} onSubmit={handleSubmit} />
+          <AmountChangeLoanForm
+            loanId={loanId}
+            onSubmit={handleSubmit}
+            initialDate={initialDate}
+            initialValue={initialValue}
+          />
         )}
         {mode === LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE && (
           <MonthlyPaymentChangeLoanForm
             loanId={loanId}
             onSubmit={handleSubmit}
+            initialDate={initialDate}
+            initialValue={initialValue}
           />
         )}
         {mode === LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE && (
           <DateOfPaymentChangeLoanForm
             loanId={loanId}
             onSubmit={handleSubmit}
+            initialDate={initialDate}
+            initialValue={initialValue}
           />
         )}
       </Paper>

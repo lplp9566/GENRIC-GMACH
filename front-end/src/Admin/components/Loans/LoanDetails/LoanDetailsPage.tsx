@@ -12,6 +12,7 @@ import useLoanSubmit from "../../../Hooks/LoanHooks/LoanActionsHooks";
 import { GeneralLoanInfoCard } from "./GeneralLoanInfoCard";
 import Actions from "../LoanActions/Actions";
 import LoanHeader from "./LoanHeader";
+import { ICreateLoanAction, ILoanAction } from "../LoanDto";
 
 const LoanDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +28,8 @@ const LoanDetailsPage: React.FC = () => {
   );
   const handleSubmit = useLoanSubmit(loanId);
   const [actionsOpen, setActionsOpen] = React.useState(false);
+  const [initialAction, setInitialAction] =
+    React.useState<ICreateLoanAction | null>(null);
 
   useEffect(() => {
     if (loanId) dispatch(getLoanDetails(loanId));
@@ -41,6 +44,20 @@ const LoanDetailsPage: React.FC = () => {
   const balance = loanDetails.balance;
   // const percentRepaid =
   //   principal > 0 ? Math.min((repaid / principal) * 100, 100) : 0;
+
+  const handleOpenActions = (prefill?: ICreateLoanAction | null) => {
+    setInitialAction(prefill ?? null);
+    setActionsOpen(true);
+  };
+
+  const handleCopyAction = (action: ILoanAction) => {
+    handleOpenActions({
+      loanId,
+      action_type: action.action_type,
+      date: action.date,
+      value: action.value,
+    });
+  };
 
   return (
     <Box
@@ -76,7 +93,7 @@ const LoanDetailsPage: React.FC = () => {
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
         <Button
           variant="contained"
-          onClick={() => setActionsOpen(true)}
+          onClick={() => handleOpenActions(null)}
           disabled={!loanDetails.isActive}
           sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
         >
@@ -97,12 +114,19 @@ const LoanDetailsPage: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <ActionsTable actions={loanDetails.actions ?? []} loanId={loanId} />
+          <ActionsTable
+            actions={loanDetails.actions ?? []}
+            loanId={loanId}
+            onCopyAction={handleCopyAction}
+          />
         </Grid>
       </Grid>
       <Dialog
         open={actionsOpen}
-        onClose={() => setActionsOpen(false)}
+        onClose={() => {
+          setActionsOpen(false);
+          setInitialAction(null);
+        }}
         maxWidth="sm"
         fullWidth
       >
@@ -111,6 +135,7 @@ const LoanDetailsPage: React.FC = () => {
             loanId={loanId}
             handleSubmit={handleSubmit}
             max={loanDetails.remaining_balance}
+            initialAction={initialAction}
           />
         </DialogContent>
       </Dialog>

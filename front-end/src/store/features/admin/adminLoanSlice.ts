@@ -86,12 +86,13 @@ export const createLoan = createAsyncThunk(
 );
 export const createLoanAction = createAsyncThunk(
   "admin/createLoanAction",
-  async (loanAction: ICreateLoanAction) => {
+  async (loanAction: ICreateLoanAction, thunkAPI) => {
     console.log(loanAction);
     const response = await api.post<ICreateLoanAction>(
       `/loan-actions`,
       loanAction
     );
+    await thunkAPI.dispatch(getLoanDetails(loanAction.loanId));
     return response.data;
   }
 );

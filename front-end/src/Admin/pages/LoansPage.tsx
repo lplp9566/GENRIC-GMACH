@@ -11,6 +11,8 @@ import {
   MenuItem,
   SelectChangeEvent,
   Button,
+  Dialog,
+  DialogContent,
   Stack,
   useTheme,
   useMediaQuery,
@@ -26,11 +28,14 @@ import {
 import SummaryCard from "../components/Loans/LoansDashboard/SummaryCard";
 import LoanCard from "../components/Loans/LoansDashboard/LoanCard";
 import ActionsTable from "../components/Loans/LoanDetails/ActionsTable";
+import Actions from "../components/Loans/LoanActions/Actions";
 import LoanHeader from "../components/Loans/LoanDetails/LoanHeader";
 import { GeneralLoanInfoCard } from "../components/Loans/LoanDetails/GeneralLoanInfoCard";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
 import { useNavigate } from "react-router-dom";
 import { StatusGeneric } from "../../common/indexTypes";
+import useLoanSubmit from "../Hooks/LoanHooks/LoanActionsHooks";
+import { ICreateLoanAction, ILoanAction } from "../components/Loans/LoanDto";
 
 export const LoansPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -43,6 +48,9 @@ export const LoansPage: React.FC = () => {
   const [selectedLoanId, setSelectedLoanId] = useState<number | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [openView, setOpenView] = useState(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const [initialAction, setInitialAction] =
+    useState<ICreateLoanAction | null>(null);
   const { allLoans, page, pageCount, status, total } = useSelector(
     (s: RootState) => s.AdminLoansSlice
   );
@@ -89,6 +97,7 @@ export const LoansPage: React.FC = () => {
   };
 
   const selectedLoan = allLoans.find((l) => l.id === selectedLoanId) || null;
+  const handleSubmit = useLoanSubmit(selectedLoanId ?? 0);
   const totalAmount = useMemo(
     () => allLoans.reduce((sum, loan) => sum + loan.loan_amount, 0),
     [allLoans]
@@ -97,6 +106,20 @@ export const LoansPage: React.FC = () => {
     () => allLoans.reduce((sum, loan) => sum + loan.remaining_balance, 0),
     [allLoans]
   );
+  const handleOpenActions = (prefill?: ICreateLoanAction | null) => {
+    setInitialAction(prefill ?? null);
+    setActionsOpen(true);
+  };
+
+  const handleCopyAction = (action: ILoanAction) => {
+    if (!selectedLoanId) return;
+    handleOpenActions({
+      loanId: selectedLoanId,
+      action_type: action.action_type,
+      date: action.date,
+      value: action.value,
+    });
+  };
 
   return (
     <>
@@ -341,6 +364,7 @@ export const LoansPage: React.FC = () => {
                         <ActionsTable
                           actions={loanDetails.actions ?? []}
                           loanId={selectedLoanId}
+                          onCopyAction={handleCopyAction}
                         />
                       ) : (
                         <Typography>אין נתונים להצגה</Typography>
@@ -379,6 +403,27 @@ export const LoansPage: React.FC = () => {
               />
             </Box>
           )}
+        <Dialog
+          open={actionsOpen}
+          onClose={() => {
+            setActionsOpen(false);
+            setInitialAction(null);
+          }}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogContent>
+            {selectedLoanId && loanDetails && (
+              <Actions
+                loanId={selectedLoanId}
+                handleSubmit={handleSubmit}
+                max={loanDetails.remaining_balance}
+                initialAction={initialAction}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+
         </Container>
       </Box>
     </>

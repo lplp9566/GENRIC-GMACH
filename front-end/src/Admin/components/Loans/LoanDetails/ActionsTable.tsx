@@ -29,12 +29,14 @@ interface ActionsTableProps {
   actions: ILoanAction[];
   loanId: number;
   readOnly?: boolean;
+  onCopyAction?: (action: ILoanAction) => void;
 }
 
 export const ActionsTable: React.FC<ActionsTableProps> = ({
   actions,
   loanId,
   readOnly,
+  onCopyAction,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -96,6 +98,9 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
   const handleEdit = (action: ILoanAction) => {
     setSelected(action);
     setEditModal(true);
+  };
+  const handleCopy = (action: ILoanAction) => {
+    onCopyAction?.(action);
   };
   return (
     <Paper elevation={3} sx={{ borderRadius: 2, width: "99%" }}>
@@ -194,13 +199,13 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                       justifyContent="center"
                       alignItems="center"
                     >
-                      <Tooltip title="Copy">
-                        <IconButton size="small" onClick={() => {}}>
+                      <Tooltip title="העתקה">
+                        <IconButton size="small" onClick={() => handleCopy(action)}>
                           <ContentCopyIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
 
-                      <Tooltip title="Edit">
+                      <Tooltip title="עריכה">
                         <span>
                           <IconButton
                             size="small"
@@ -212,7 +217,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                         </span>
                       </Tooltip>
 
-                      <Tooltip title="Delete">
+                      <Tooltip title="מחיקה">
                         <span>
                           <IconButton
                             size="small"
@@ -220,10 +225,6 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                               setDeleteModal(true);
                               setSelected(action);
                             }}
-                            disabled={
-                              action.action_type !=
-                              LoanPaymentActionType.PAYMENT
-                            }
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
