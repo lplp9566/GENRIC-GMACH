@@ -29,7 +29,7 @@ const [addFundModal, setaddFundModal] = useState(false)
         mb: 4,
         borderRadius: 2,
         // bgcolor: "#FFFFFF",
-        width: "40%",
+        width: { xs: "100%", sm: "90%", md: "60%", lg: "40%" },
         mx: "auto",
         dir: "rtl",
       }}
@@ -59,8 +59,10 @@ const [addFundModal, setaddFundModal] = useState(false)
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: { xs: "stretch", sm: "center" },
+            gap: 2,
           }}
         >
           <Button
@@ -71,6 +73,7 @@ const [addFundModal, setaddFundModal] = useState(false)
 }}
 
             sx={{
+              width: { xs: "100%", sm: "auto" },
               // backgroundColor: "green",
               // color: "#ffffff",
               "&:hover": {
@@ -83,6 +86,7 @@ const [addFundModal, setaddFundModal] = useState(false)
           <Button
             onClick={() => dispatch(setWithdrawDonationModal(true))}
             variant="outlined"
+            sx={{ width: { xs: "100%", sm: "auto" } }}
             // sx={{
             //   borderColor: "#2a8c82",
             //   color: "#2a8c82",
@@ -94,7 +98,12 @@ const [addFundModal, setaddFundModal] = useState(false)
           >
             משיכה מקרן{" "}
           </Button>
-          <Button onClick={()=> setaddFundModal(true)}>הוספת קרן </Button>
+          <Button
+            onClick={() => setaddFundModal(true)}
+            sx={{ width: { xs: "100%", sm: "auto" } }}
+          >
+            הוספת קרן{" "}
+          </Button>
         </Box>
           )
         }

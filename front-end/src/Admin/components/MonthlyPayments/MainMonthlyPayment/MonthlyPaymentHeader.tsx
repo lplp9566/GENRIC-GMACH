@@ -17,7 +17,7 @@ const MonthlyPaymentHeader = () => {
         mb: 4,
         borderRadius: 2,
         // bgcolor: "#FFFFFF",
-        width: "40%",
+        width: { xs: "100%", sm: "90%", md: "60%", lg: "40%" },
         mx: "auto",
         dir: "rtl",
       }}
@@ -44,14 +44,17 @@ const MonthlyPaymentHeader = () => {
           <Box
             sx={{
               display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
               justifyContent: "space-between",
-              alignItems: "center",
+              alignItems: { xs: "stretch", sm: "center" },
+              gap: 2,
             }}
           >
             <Button
               variant="contained"
               onClick={() => dispatch(setMonthlyPaymentModalMode(true))}
               sx={{
+                width: { xs: "100%", sm: "auto" },
                 backgroundColor: "green",
                 color: "#ffffff",
                 "&:hover": {
@@ -65,6 +68,7 @@ const MonthlyPaymentHeader = () => {
               variant="outlined"
               onClick={() => navigate("/rankPage")}
               sx={{
+                width: { xs: "100%", sm: "auto" },
                 borderColor: "#2a8c82",
                 color: "#2a8c82",
                 "&:hover": {

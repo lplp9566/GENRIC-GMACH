@@ -42,6 +42,7 @@ import { getAllUsers } from "../../../store/features/admin/adminUsersSlice";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ConfirmModal from "../genricComponents/confirmModal";
+import AiChatDialog from "./AiChatDialog";
 
 export const formatILS = (value?: number | string | null) => {
   const n = typeof value === "string" ? Number(value) : value ?? 0;
@@ -99,6 +100,7 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [bankDialogOpen, setBankDialogOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const [bankDialogMode, setBankDialogMode] = useState<"create" | "edit">(
     "create"
   );
@@ -266,6 +268,13 @@ const HomePage: React.FC = () => {
             >
               מערכת ניהול גמ"ח אהבת חסד  משפחת פסיקוב
             </Typography>
+            <Button
+              variant="contained"
+              sx={{ mt: 2, borderRadius: 3, fontWeight: 900 }}
+              onClick={() => setChatOpen(true)}
+            >
+              פתח צ׳אט AI
+            </Button>
           </Box>
 
           {/* STATS */}
@@ -434,6 +443,7 @@ const HomePage: React.FC = () => {
               </Button>
             </DialogActions>
           </Dialog>
+          <AiChatDialog open={chatOpen} onClose={() => setChatOpen(false)} />
 
           {/* QUICK ACTIONS */}
           <Box mt={{ xs: 6, sm: 10 }}>

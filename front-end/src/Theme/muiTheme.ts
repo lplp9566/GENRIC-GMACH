@@ -211,7 +211,10 @@ export const getMuiTheme = (mode: AppMode) => {
           root: {
             border: `1px solid ${alpha(t.border, isDark ? 0.6 : 1)}`,
             borderRadius: 18,
-            overflow: "hidden",
+            overflowX: "auto",
+            overflowY: "hidden",
+            WebkitOverflowScrolling: "touch",
+            maxWidth: "100%",
           },
         },
       },

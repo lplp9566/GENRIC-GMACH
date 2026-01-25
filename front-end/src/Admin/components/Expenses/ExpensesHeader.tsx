@@ -18,7 +18,7 @@ const ExpensesHeader = () => {
         p: 3,
         mb: 4,
         borderRadius: 2,
-        width: "40%",
+        width: { xs: "100%", sm: "90%", md: "60%", lg: "40%" },
         mx: "auto",
         dir: "rtl",
       }}
@@ -47,15 +47,17 @@ const ExpensesHeader = () => {
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "space-between",
-            alignItems: "center",
-            gap: 1,
+            alignItems: { xs: "stretch", sm: "center" },
+            gap: 2,
           }}
         >
           <Button
             variant="contained"
             onClick={() => setOpenAddExpense(true)}
             sx={{
+              width: { xs: "100%", sm: "auto" },
               "&:hover": {
                 backgroundColor: "rgb(26, 29, 27)",
               },
@@ -67,6 +69,7 @@ const ExpensesHeader = () => {
           <Button
             variant="outlined"
             onClick={() => setOpenAddCategory(true)}
+            sx={{ width: { xs: "100%", sm: "auto" } }}
           >
             הוסף קטגוריה
           </Button>
