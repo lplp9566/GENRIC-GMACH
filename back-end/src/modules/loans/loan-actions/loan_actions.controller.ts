@@ -27,6 +27,6 @@ export class LoanActionsController {
   }
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.loanPaymentsService.deletePayment(+id);
+    return this.loanPaymentsService.deleteAction(+id);
   }
 }

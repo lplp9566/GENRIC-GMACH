@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Container,
   Paper,
@@ -76,10 +76,16 @@ export const LoansPage: React.FC = () => {
       setSelectedLoanId(null);
       return;
     }
-    if (!selectedLoanId || !allLoans.some((l) => l.id === selectedLoanId)) {
+  }, [allLoans, openView, selectedLoanId]);
+
+  const prevOpenViewRef = useRef(openView);
+  useEffect(() => {
+    const wasOpen = prevOpenViewRef.current;
+    prevOpenViewRef.current = openView;
+    if (openView && !wasOpen && !selectedLoanId && allLoans.length > 0) {
       setSelectedLoanId(allLoans[0].id);
     }
-  }, [allLoans, openView, selectedLoanId]);
+  }, [openView, selectedLoanId, allLoans]);
 
   useEffect(() => {
     if (selectedLoanId) dispatch(getLoanDetails(selectedLoanId));
@@ -97,7 +103,13 @@ export const LoansPage: React.FC = () => {
   };
 
   const selectedLoan = allLoans.find((l) => l.id === selectedLoanId) || null;
-  const handleSubmit = useLoanSubmit(selectedLoanId ?? 0);
+  const handleSubmit = useLoanSubmit(selectedLoanId ?? 0, () => {
+    setActionsOpen(false);
+    setInitialAction(null);
+    const opts = selectedUser?.id
+      ? { page, limit, status: filter, userId: selectedUser.id }
+      : { page, limit, status: filter };
+  });
   const totalAmount = useMemo(
     () => allLoans.reduce((sum, loan) => sum + loan.loan_amount, 0),
     [allLoans]
@@ -262,6 +274,12 @@ export const LoansPage: React.FC = () => {
                           setSelectedLoanId(loan.id);
                           setOpenView(true);
                         }}
+                        onActionSuccess={() => {
+                          const opts = selectedUser?.id
+                            ? { page, limit, status: filter, userId: selectedUser.id }
+                            : { page, limit, status: filter };
+                          dispatch(getAllLoans(opts));
+                        }}
                       />
                     </Grid>
                   ))}
@@ -316,6 +334,12 @@ export const LoansPage: React.FC = () => {
                                   <LoanCard
                                     loan={loan}
                                     onClick={() => setSelectedLoanId(loan.id)}
+                                    onActionSuccess={() => {
+                                      const opts = selectedUser?.id
+                                        ? { page, limit, status: filter, userId: selectedUser.id }
+                                        : { page, limit, status: filter };
+                                      dispatch(getAllLoans(opts));
+                                    }}
                                   />
                                 </Box>
                               );

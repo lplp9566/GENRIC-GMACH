@@ -26,7 +26,10 @@ const LoanDetailsPage: React.FC = () => {
   const loanDetails = useSelector(
     (s: RootState) => s.AdminLoansSlice.loanDetails
   );
-  const handleSubmit = useLoanSubmit(loanId);
+  const handleSubmit = useLoanSubmit(loanId, () => {
+    setActionsOpen(false);
+    setInitialAction(null);
+  });
   const [actionsOpen, setActionsOpen] = React.useState(false);
   const [initialAction, setInitialAction] =
     React.useState<ICreateLoanAction | null>(null);

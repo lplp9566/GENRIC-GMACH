@@ -36,9 +36,15 @@ interface LoanCardProps {
   loan: ILoanWithUser;
   onClick: () => void;
   readOnly?: boolean;
+  onActionSuccess?: () => void;
 }
 
-const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick, readOnly }) => {
+const LoanCard: React.FC<LoanCardProps> = ({
+  loan,
+  onClick,
+  readOnly,
+  onActionSuccess,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const balancePositive = (loan.balance ?? 0) >= 0;
@@ -46,7 +52,10 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onClick, readOnly }) => {
   const [selectedLoan, setSelectedLoan] = useState<ILoanWithUser | null>(null);
   const [deleteMode, setDeleteMode] = useState<boolean>(false);
   const [actionsOpen, setActionsOpen] = useState(false);
-  const handleSubmit = useLoanSubmit(loan.id);
+  const handleSubmit = useLoanSubmit(loan.id, () => {
+    setActionsOpen(false);
+    onActionSuccess?.();
+  });
 
   const onDelete = () => {
     toast.promise(dispatch(deleteLoan(Number(loan.id))).unwrap(), {

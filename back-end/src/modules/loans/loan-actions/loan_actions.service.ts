@@ -214,7 +214,7 @@ export class LoanActionsService {
     throw new BadRequestException(error.message);
   }
 }
-async deletePayment(actionId: number): Promise<{ deleted: true }> {
+async deleteAction(actionId: number): Promise<{ deleted: true }> {
   try {
     const action = await this.paymentsRepo.findOne({
       where: { id: actionId },
@@ -222,37 +222,48 @@ async deletePayment(actionId: number): Promise<{ deleted: true }> {
     });
     if (!action) throw new BadRequestException('Payment action not found');
 
-    if (action.action_type !== LoanPaymentActionType.PAYMENT) {
-      throw new BadRequestException('Only PAYMENT actions can be deleted');
-    }
-
     const loan = action.loan;
-
     const value = Number(action.value);
 
-    // מחיקה של תשלום = להחזיר את הכסף ליתרה (להגדיל remaining_balance)
-    loan.remaining_balance = Number(loan.remaining_balance) + value;
-
-    // אם ההלוואה הייתה סגורה בגלל 0 יתרה — עכשיו היא נפתחת מחדש
-    if (loan.remaining_balance > 0) {
-      loan.isActive = true;
-      // אם יש לך לוגיקה שמחזירה balance ב-paymentDetails, כאן המקום לקרוא לה.
-      // כרגע אצלך ראיתי רק deleteLoanBalance.
+    if (action.action_type === LoanPaymentActionType.PAYMENT) {
+      loan.remaining_balance = Number(loan.remaining_balance) + value;
+      if (loan.remaining_balance > 0) {
+        loan.isActive = true;
+      }
+      loan.total_installments =
+        loan.monthly_payment > 0
+          ? loan.remaining_balance / loan.monthly_payment
+          : 0;
+      await this.loansRepo.save(loan);
+      await this.paymentsRepo.remove(action);
+      await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
+      return { deleted: true };
     }
 
-    loan.total_installments =
-      loan.monthly_payment > 0
-        ? loan.remaining_balance / loan.monthly_payment
-        : 0;
+    if (action.action_type === LoanPaymentActionType.AMOUNT_CHANGE) {
+      loan.loan_amount = Number(loan.loan_amount) - value;
+      loan.remaining_balance = Number(loan.remaining_balance) - value;
+      if (loan.remaining_balance < 0) loan.remaining_balance = 0;
+      loan.isActive = loan.remaining_balance > 0;
+      if (!loan.isActive) {
+        await this.paymentDetailsService.deleteLoanBalance(
+          loan.id,
+          loan.user.id,
+        );
+      }
+      loan.total_installments =
+        loan.monthly_payment > 0
+          ? loan.remaining_balance / loan.monthly_payment
+          : 0;
+      await this.loansRepo.save(loan);
+      await this.paymentsRepo.remove(action);
+      await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
+      return { deleted: true };
+    }
 
-    await this.loansRepo.save(loan);
-    await this.paymentsRepo.remove(action);
-
-    await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
-
-    return { deleted: true };
+    throw new BadRequestException('Unsupported action type for delete');
   } catch (error) {
-    console.error('❌ Error in deletePayment:', error.message);
+    console.error('? Error in deleteAction:', error.message);
     throw new BadRequestException(error.message);
   }
 }

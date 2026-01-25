@@ -240,6 +240,25 @@ export const AdminLoansSlice = createSlice({
       .addCase(getLoanDetails.fulfilled, (state, action) => {
         state.loanDetails = action.payload;
         state.loanDeleteStatus = "fulfilled";
+        const updated = action.payload as ILoanWithPayment | null;
+        if (updated?.id && state.allLoans.length > 0) {
+          const idx = state.allLoans.findIndex((l) => l.id === updated.id);
+          if (idx !== -1) {
+            const existing = state.allLoans[idx];
+            state.allLoans[idx] = {
+              ...existing,
+              loan_amount: updated.loan_amount,
+              monthly_payment: updated.monthly_payment,
+              payment_date: updated.payment_date,
+              isActive: updated.isActive,
+              remaining_balance: updated.remaining_balance,
+              total_installments: updated.total_installments,
+              total_remaining_payments: updated.total_remaining_payments,
+              first_payment_date: updated.first_payment_date,
+              balance: updated.balance,
+            };
+          }
+        }
       })
       .addCase(getLoanDetails.rejected, (state, action) => {
         state.loanDetails = null;
