@@ -106,9 +106,9 @@ export const LoansPage: React.FC = () => {
   const handleSubmit = useLoanSubmit(selectedLoanId ?? 0, () => {
     setActionsOpen(false);
     setInitialAction(null);
-    const opts = selectedUser?.id
-      ? { page, limit, status: filter, userId: selectedUser.id }
-      : { page, limit, status: filter };
+    // const opts = selectedUser?.id
+    //   ? { page, limit, status: filter, userId: selectedUser.id }
+    //   : { page, limit, status: filter };
   });
   const totalAmount = useMemo(
     () => allLoans.reduce((sum, loan) => sum + loan.loan_amount, 0),

@@ -28,7 +28,6 @@ import { AppDispatch, RootState } from "../../store/store";
 import {
   addGuarantor,
   approveGuarantor,
-  checkLoanRequest,
   createLoanRequest,
   fetchGuarantorRequests,
   fetchLoanRequests,
