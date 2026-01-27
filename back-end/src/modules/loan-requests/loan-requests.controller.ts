@@ -50,6 +50,8 @@ export class LoanRequestsController {
     @Param("id") id: string,
     @Body()
     body: {
+      amount?: number;
+      monthly_payment?: number;
       purpose: string;
       payment_date: number;
       payment_method: payment_method;

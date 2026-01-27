@@ -76,6 +76,8 @@ const LoanRequestsPage: React.FC = () => {
   const [editPurpose, setEditPurpose] = useState("");
   const [editPaymentDate, setEditPaymentDate] = useState<number | "">("");
   const [editPaymentMethod, setEditPaymentMethod] = useState<string>("direct_debit");
+  const [editAmount, setEditAmount] = useState<number | "">("");
+  const [editMonthly, setEditMonthly] = useState<number | "">("");
   const guarantorNames =
     selectedRequest?.guarantor_requests?.map(
       (g) => `${g.guarantor.first_name} ${g.guarantor.last_name}`
@@ -86,6 +88,8 @@ const LoanRequestsPage: React.FC = () => {
     setEditPurpose(selectedRequest.purpose ?? "");
     setEditPaymentDate(selectedRequest.payment_date ?? "");
     setEditPaymentMethod(selectedRequest.payment_method ?? "direct_debit");
+    setEditAmount(selectedRequest.amount ?? "");
+    setEditMonthly(selectedRequest.monthly_payment ?? "");
   }, [selectedRequest]);
 
   const canEditRequest = selectedRequest?.status === "ADMIN_PENDING";
@@ -206,8 +210,22 @@ const LoanRequestsPage: React.FC = () => {
                   {selectedRequest.user?.first_name}{" "}
                   {selectedRequest.user?.last_name}
                 </Typography>
-                <Typography>סכום: {selectedRequest.amount}</Typography>
-                <Typography>החזר חודשי: {selectedRequest.monthly_payment}</Typography>
+                <TextField
+                  label="סכום"
+                  type="number"
+                  value={editAmount}
+                  onChange={(e) => setEditAmount(Number(e.target.value))}
+                  fullWidth
+                  disabled={!canEditRequest}
+                />
+                <TextField
+                  label="החזר חודשי"
+                  type="number"
+                  value={editMonthly}
+                  onChange={(e) => setEditMonthly(Number(e.target.value))}
+                  fullWidth
+                  disabled={!canEditRequest}
+                />
                 <TextField
                   label="מטרה"
                   value={editPurpose}
@@ -256,6 +274,8 @@ const LoanRequestsPage: React.FC = () => {
                         updateLoanRequestDetails({
                           id: selectedRequest.id,
                           purpose: editPurpose,
+                          amount: Number(editAmount),
+                          monthly_payment: Number(editMonthly),
                           payment_date: Number(editPaymentDate),
                           payment_method: editPaymentMethod,
                         })

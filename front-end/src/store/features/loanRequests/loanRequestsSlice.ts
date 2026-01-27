@@ -114,6 +114,8 @@ export const updateLoanRequestDetails = createAsyncThunk(
   async (payload: {
     id: number;
     purpose: string;
+    amount?: number;
+    monthly_payment?: number;
     payment_date: number;
     payment_method: string;
   }) => {

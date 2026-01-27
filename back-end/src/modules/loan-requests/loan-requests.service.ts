@@ -103,6 +103,8 @@ export class LoanRequestsService {
   async updateDetails(
     requestId: number,
     payload: {
+      amount?: number;
+      monthly_payment?: number;
       purpose: string;
       payment_date: number;
       payment_method: payment_method;
@@ -113,6 +115,9 @@ export class LoanRequestsService {
       relations: ["user"],
     });
     if (!request) throw new BadRequestException("Request not found");
+    if (payload.amount !== undefined) request.amount = payload.amount;
+    if (payload.monthly_payment !== undefined)
+      request.monthly_payment = payload.monthly_payment;
     request.purpose = payload.purpose;
     request.payment_date = payload.payment_date;
     request.payment_method = payload.payment_method;
