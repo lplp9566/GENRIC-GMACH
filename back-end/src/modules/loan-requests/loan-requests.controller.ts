@@ -27,6 +27,8 @@ export class LoanRequestsController {
       amount: number;
       monthly_payment: number;
       payment_date?: number;
+      purpose?: string;
+      payment_method?: payment_method;
     }
   ) {
     return this.service.createRequest(body);

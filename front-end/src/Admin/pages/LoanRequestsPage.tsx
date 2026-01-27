@@ -6,6 +6,10 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   Table,
   TableBody,
@@ -13,6 +17,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +26,7 @@ import {
   adminApproveRequest,
   adminRejectRequest,
   fetchLoanRequests,
+  updateLoanRequestDetails,
 } from "../../store/features/loanRequests/loanRequestsSlice";
 import CheckLoanModal from "../components/Loans/CheckLoanModal";
 import { ICreateLoan } from "../components/Loans/LoanDto";
@@ -67,10 +73,22 @@ const LoanRequestsPage: React.FC = () => {
   };
 
   const selectedRequest = requests.find((r) => r.id === selected) || null;
+  const [editPurpose, setEditPurpose] = useState("");
+  const [editPaymentDate, setEditPaymentDate] = useState<number | "">("");
+  const [editPaymentMethod, setEditPaymentMethod] = useState<string>("direct_debit");
   const guarantorNames =
     selectedRequest?.guarantor_requests?.map(
       (g) => `${g.guarantor.first_name} ${g.guarantor.last_name}`
     ) ?? [];
+
+  useEffect(() => {
+    if (!selectedRequest) return;
+    setEditPurpose(selectedRequest.purpose ?? "");
+    setEditPaymentDate(selectedRequest.payment_date ?? "");
+    setEditPaymentMethod(selectedRequest.payment_method ?? "direct_debit");
+  }, [selectedRequest]);
+
+  const canEditRequest = selectedRequest?.status === "ADMIN_PENDING";
 
   return (
     <Box sx={{ minHeight: "100vh", py: 4, direction: "rtl" }}>
@@ -188,15 +206,38 @@ const LoanRequestsPage: React.FC = () => {
                   {selectedRequest.user?.first_name}{" "}
                   {selectedRequest.user?.last_name}
                 </Typography>
-                <Typography>מטרה: {selectedRequest.purpose || "-"}</Typography>
                 <Typography>סכום: {selectedRequest.amount}</Typography>
                 <Typography>החזר חודשי: {selectedRequest.monthly_payment}</Typography>
-                <Typography>
-                  יום חיוב: {selectedRequest.payment_date ?? "-"}
-                </Typography>
-                <Typography>
-                  אמצעי חיוב: {selectedRequest.payment_method ?? "-"}
-                </Typography>
+                <TextField
+                  label="מטרה"
+                  value={editPurpose}
+                  onChange={(e) => setEditPurpose(e.target.value)}
+                  fullWidth
+                  disabled={!canEditRequest}
+                />
+                <TextField
+                  label="יום חיוב (1-28)"
+                  type="number"
+                  value={editPaymentDate}
+                  onChange={(e) => setEditPaymentDate(Number(e.target.value))}
+                  fullWidth
+                  disabled={!canEditRequest}
+                />
+                <FormControl fullWidth>
+                  <InputLabel>אמצעי חיוב</InputLabel>
+                  <Select
+                    value={editPaymentMethod}
+                    label="אמצעי חיוב"
+                    onChange={(e) => setEditPaymentMethod(e.target.value)}
+                    disabled={!canEditRequest}
+                  >
+                    <MenuItem value="direct_debit">הוראת קבע</MenuItem>
+                    <MenuItem value="credit_card">כרטיס אשראי</MenuItem>
+                    <MenuItem value="bank_transfer">העברה בנקאית</MenuItem>
+                    <MenuItem value="cash">מזומן</MenuItem>
+                    <MenuItem value="other">אחר</MenuItem>
+                  </Select>
+                </FormControl>
                 <Typography>סטטוס: {selectedRequest.status}</Typography>
                 <Typography>
                   ערבים: {guarantorNames.length ? guarantorNames.join(", ") : "-"}
@@ -207,6 +248,22 @@ const LoanRequestsPage: React.FC = () => {
                   </Typography>
                 )}
                 <Stack direction="row" spacing={1}>
+                  <Button
+                    variant="outlined"
+                    disabled={!canEditRequest}
+                    onClick={() =>
+                      dispatch(
+                        updateLoanRequestDetails({
+                          id: selectedRequest.id,
+                          purpose: editPurpose,
+                          payment_date: Number(editPaymentDate),
+                          payment_method: editPaymentMethod,
+                        })
+                      )
+                    }
+                  >
+                    שמירת פרטים
+                  </Button>
                   <Button
                     variant="contained"
                     disabled={selectedRequest.status !== "ADMIN_PENDING"}

@@ -9,6 +9,10 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Button,
+  Stack,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
@@ -25,6 +29,8 @@ import LoadingIndicator from "../../Admin/components/StatusComponents/LoadingInd
 
 const UserLoansPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme();
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const userId = authUser?.user?.id;
   const { allLoans, status, loanDetails } = useSelector(
@@ -81,17 +87,46 @@ const UserLoansPage: React.FC = () => {
   return (
     <Box sx={{ minHeight: "100vh", py: 4, direction: "rtl" }}>
       <Container maxWidth="xl">
-        <Grid container spacing={3} direction="row" sx={{ direction: "ltr" }}>
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-              <Typography variant="h6" fontWeight={600} mb={2}>
-                הלוואות
-              </Typography>
-              <FormControl size="small" fullWidth sx={ { mb: 2 } }>
-                <InputLabel id="user-loans-filter-label">סינון</InputLabel>
+        <Paper
+          elevation={3}
+          sx={{
+            p: 3,
+            mb: 4,
+            borderRadius: 2,
+            width: { xs: "100%", sm: "90%", md: "60%", lg: "40%" },
+            mx: "auto",
+            dir: "rtl",
+          }}
+        >
+          <Stack spacing={2}>
+            <Typography variant="h5" fontWeight={600} textAlign="center">
+              הלוואות
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                justifyContent: "space-between",
+                alignItems: { xs: "stretch", sm: "center" },
+                gap: 2,
+              }}
+            >
+              <Button
+                variant="contained"
+                onClick={() => window.location.assign("/u/loan-requests")}
+                fullWidth={isSm}
+                sx={{
+                  bgcolor: "#2a8c82",
+                  "&:hover": { bgcolor: "#1f645f" },
+                }}
+              >
+                בקשת הלוואה
+              </Button>
+              <FormControl size="small" fullWidth={isSm}>
+                <InputLabel id="user-loans-filter-label">סטטוס</InputLabel>
                 <Select
                   labelId="user-loans-filter-label"
-                  label="סינון"
+                  label="סטטוס"
                   value={filter}
                   onChange={(e) => {
                     setAutoFallback(false);
@@ -103,6 +138,15 @@ const UserLoansPage: React.FC = () => {
                   <MenuItem value={StatusGeneric.INACTIVE}>לא פעילות</MenuItem>
                 </Select>
               </FormControl>
+            </Box>
+          </Stack>
+        </Paper>
+        <Grid container spacing={3} direction="row" sx={{ direction: "ltr" }}>
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+              <Typography variant="h6" fontWeight={600} mb={2}>
+                הלוואות
+              </Typography>
               <Box>
                 {allLoans.length === 0 ? (
                   <Typography variant="body2" color="text.secondary">

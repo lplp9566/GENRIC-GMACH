@@ -80,6 +80,8 @@ export const createLoanRequest = createAsyncThunk(
     amount: number;
     monthly_payment: number;
     payment_date?: number;
+    purpose?: string;
+    payment_method?: string;
   }) => {
     const res = await api.post(`/loan-requests`, payload);
     return res.data as { request: LoanRequest | null; check: LoanCheckResponse };

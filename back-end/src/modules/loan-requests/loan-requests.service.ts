@@ -43,18 +43,34 @@ export class LoanRequestsService {
     return this.loansService.checkLoan(loanData);
   }
 
-  async createRequest(input: CheckLoanInput) {
+  async createRequest(
+    input: CheckLoanInput & {
+      purpose?: string;
+      payment_method?: payment_method;
+    }
+  ) {
     const user = await this.usersRepo.findOne({ where: { id: input.userId } });
     if (!user) throw new BadRequestException("User not found");
     const check = await this.checkLoan(input);
     if (!check.ok) {
       return { request: null, check };
     }
+    const hasDetails =
+      Boolean(input.purpose) &&
+      Boolean(input.payment_date) &&
+      Boolean(input.payment_method);
     const request = this.requestsRepo.create({
       user,
       amount: input.amount,
       monthly_payment: input.monthly_payment,
-      status: LoanRequestStatus.NEED_DETAILS,
+      purpose: input.purpose ?? null,
+      payment_date: input.payment_date ?? null,
+      payment_method: input.payment_method ?? null,
+      status: hasDetails
+        ? user.is_member
+          ? LoanRequestStatus.ADMIN_PENDING
+          : LoanRequestStatus.NEED_GUARANTOR
+        : LoanRequestStatus.NEED_DETAILS,
       error_message: null,
       max_allowed: null,
     });
