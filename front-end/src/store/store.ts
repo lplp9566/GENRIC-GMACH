@@ -14,6 +14,7 @@ import { AdminStandingOrderReturnSlice } from "./features/admin/adminStandingOrd
 import { AdminExpensesSlice } from "./features/admin/adminExpensesSlice";
 import { AdminBankCurrentSlice } from "./features/admin/adminBankCurrentSlice";
 import UserFinancialSlice from "./features/user/userFinancialSlice";
+import LoanRequestsReducer from "./features/loanRequests/loanRequestsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -32,6 +33,7 @@ export const store = configureStore({
     AdminExpensesSlice: AdminExpensesSlice.reducer,
     AdminBankCurrentSlice: AdminBankCurrentSlice.reducer,
     UserFinancialSlice: UserFinancialSlice,
+    LoanRequestsSlice: LoanRequestsReducer,
   },
 });
 

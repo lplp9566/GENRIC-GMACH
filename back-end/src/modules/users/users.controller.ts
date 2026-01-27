@@ -22,8 +22,11 @@ export class UsersController {
     const { userData, paymentData } = body;
     return this.usersService.createUserAndPaymentInfo(userData, paymentData);
   }
+  
 @Get()
-@UseGuards(JwtAuthGuard, AdminGuard)
+@UseGuards(JwtAuthGuard,
+  //  AdminGuard
+  )
 async getAllUsers(
   @Query('membershipType') membershipType?: MembershipType,
   @Query('isAdmin') isAdmin?: string,

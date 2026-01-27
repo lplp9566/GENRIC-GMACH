@@ -177,17 +177,30 @@ export const LoansPage: React.FC = () => {
                   gap: 2,
                 }}
               >
-                <Button
-                  variant="contained"
-                  onClick={() => navigate("/loans/new")}
-                  fullWidth={isSm}
-                  sx={{
-                    bgcolor: "#2a8c82",
-                    "&:hover": { bgcolor: "#1f645f" },
-                  }}
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={1}
+                  sx={{ width: { xs: "100%", sm: "auto" } }}
                 >
-                  הוספת הלוואה
-                </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate("/loans/new")}
+                    fullWidth={isSm}
+                    sx={{
+                      bgcolor: "#2a8c82",
+                      "&:hover": { bgcolor: "#1f645f" },
+                    }}
+                  >
+                    הוספת הלוואה
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => navigate("/loan-requests")}
+                    fullWidth={isSm}
+                  >
+                    בקשות הלוואה
+                  </Button>
+                </Stack>
                 <FormControl
                   size="small"
                   fullWidth={isSm}

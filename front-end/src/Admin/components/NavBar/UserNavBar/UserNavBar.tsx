@@ -33,6 +33,7 @@ const links = [
   { label: "דף הבית", path: "/u" },
   { label: "איזור אישי", path: "/u/profile" },
   { label: "הלוואות", path: "/u/loans" },
+  { label: "בקשות הלוואה", path: "/u/loan-requests" },
   { label: "תרומות", path: "/u/donations" },
   { label: "פקדנות", path: "/u/deposits" },
   { label: "דמי חבר", path: "/u/payments" },

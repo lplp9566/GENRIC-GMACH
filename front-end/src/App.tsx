@@ -8,6 +8,7 @@ import ForgotPasswordPage from "./Auth/ForgotPasswordPage";
 
 import HomePage from "./Admin/components/HomePage/HomePage";
 import LoansPage from "./Admin/pages/LoansPage";
+import LoanRequestsPage from "./Admin/pages/LoanRequestsPage";
 import NewLoan from "./Admin/components/Loans/NewLoan/NewLoanForm";
 import LoanDetailsPage from "./Admin/components/Loans/LoanDetails/LoanDetailsPage";
 import FundsOverviewDashboard from "./Admin/pages/FundsOverviewDashboard";
@@ -25,6 +26,7 @@ import InvestmentDetailsPage from "./Admin/components/Investments/InvestmentDeta
 import StandingOrdersReturnPage from "./Admin/pages/StandingOrdersReturnPage";
 import UserHomePage from "./User/pages/UserHomePage";
 import UserLoansPage from "./User/pages/UserLoansPage";
+import UserLoanRequestsPage from "./User/pages/UserLoanRequestsPage";
 import UserDepositsPage from "./User/pages/UserDepositsPage";
 import UserProfilePage from "./User/pages/UserProfilePage";
 import UserOverviewPage from "./User/pages/UserOverviewPage";
@@ -51,6 +53,7 @@ export default function App() {
             <Route element={<AdminLayout />}>
               <Route path="/home" element={<HomePage />} />
               <Route path="/loans" element={<LoansPage />} />
+              <Route path="/loan-requests" element={<LoanRequestsPage />} />
               <Route path="/loans/new" element={<NewLoan />} />
               <Route path="/loans/:id" element={<LoanDetailsPage />} />
               <Route path="/funds" element={<FundsOverviewDashboard />} />
@@ -84,6 +87,7 @@ export default function App() {
               <Route path="/u" element={<UserHomePage />} />
               <Route path="/u/profile" element={<UserProfilePage />} />
               <Route path="/u/loans" element={<UserLoansPage />} />
+              <Route path="/u/loan-requests" element={<UserLoanRequestsPage />} />
               <Route path="/u/deposits" element={<UserDepositsPage />} />
               <Route path="/u/overview" element={<UserOverviewPage />} />
               <Route path="/u/payments" element={<PaymentsPage />} />

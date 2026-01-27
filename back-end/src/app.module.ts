@@ -6,6 +6,7 @@ import { UsersModule } from './modules/users/users.module';
 import { FundsOverviewModule } from './modules/funds-overview/funds-overview.module';
 import { LoanActionsModule } from './modules/loans/loan-actions/loan-actions.module';
 import { LoansModule } from './modules/loans/loans.module';
+import { LoanRequestsModule } from './modules/loan-requests/loan-requests.module';
 import { UserFinancialByYearModule } from './modules/users/user-financials-by-year/user-financial-by-year.module';
 import { PaymentDetailsModule } from './modules/users/payment-details/payment-details.module';
 import { MonthlyDepositsModule } from './modules/monthly_deposits/monthly_deposits.module';
@@ -62,6 +63,7 @@ import { AiAgentModule } from './ai-agent/ai-agent.module';
     UsersModule,
     LoansModule,
     LoanActionsModule,
+    LoanRequestsModule,
     FundsOverviewModule,
     UserFinancialByYearModule,
     ExpensesModule,
