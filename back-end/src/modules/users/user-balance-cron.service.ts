@@ -10,6 +10,7 @@ import { LoanEntity } from '../loans/Entity/loans.entity';
 
 // ⭐ נוסיף שירות שליחת הודעות
 import { WhatsappService } from '../whatsapp/whatsapp.service';
+import { MembershipType } from './userTypes';
 
 @Injectable()
 export class UserBalanceCronService {
@@ -30,11 +31,12 @@ export class UserBalanceCronService {
   ) {}
 
   // עדכון יתרות חודשיות
-  @Cron('10 23 * * *', { timeZone: 'Asia/Jerusalem' })
+  @Cron('17 23 * * *', { timeZone: 'Asia/Jerusalem' })
   async updateAllUsersBalances() {
     this.logger.log('🔄 Updating all users balances...');
     const users = await this.usersService.getAllUsers();
-    for (const user of users!) {
+    const activeUsers = users.filter(user => user.membership_type == MembershipType.MEMBER);
+    for (const user of activeUsers) {
       const net = await this.usersService.updateUserMonthlyBalance(user);
       this.logger.debug(`user ${user.id}: payment balance updated to ${net}`);
     }
