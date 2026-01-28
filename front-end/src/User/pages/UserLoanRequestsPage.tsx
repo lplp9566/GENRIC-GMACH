@@ -61,10 +61,7 @@ const UserLoanRequestsPage: React.FC = () => {
     "pending" | "open" | "rejected" | "all"
   >("pending");
 
-  const statusMap: Record<
-    string,
-    { label: string; color: string }
-  > = {
+  const statusMap: Record<string, { label: string; color: string }> = {
     DRAFT: { label: "טיוטה", color: "text.secondary" },
     CHECK_FAILED: { label: "בדיקה נכשלה", color: "error.main" },
     NEED_DETAILS: { label: "נדרשים פרטים", color: "warning.main" },
@@ -228,25 +225,26 @@ const UserLoanRequestsPage: React.FC = () => {
                               </Typography>
                             </TableCell>
                             <TableCell align="right">{req.amount}</TableCell>
-                            <TableCell align="right">{req.monthly_payment}</TableCell>
+                            <TableCell align="right">
+                              {req.monthly_payment}
+                            </TableCell>
                             <TableCell align="right">
                               {req.created_at
-                                ? new Date(req.created_at).toLocaleDateString("he-IL")
+                                ? new Date(req.created_at).toLocaleDateString(
+                                    "he-IL"
+                                  )
                                 : "-"}
                             </TableCell>
                             <TableCell align="right">
-                              {
-                                req.status != "ADMIN_APPROVED"  && (
-<Button
-                                size="small"
-                                variant="text"
-                                onClick={() => openRequestDetails(req.id)}
-                              >
-                                עריכה
-                              </Button>
-                                )
-                              }
-                              
+                              {req.status != "ADMIN_APPROVED" && (
+                                <Button
+                                  size="small"
+                                  variant="text"
+                                  onClick={() => openRequestDetails(req.id)}
+                                >
+                                  עריכה
+                                </Button>
+                              )}
                             </TableCell>
                           </TableRow>
                         ))}
@@ -282,9 +280,7 @@ const UserLoanRequestsPage: React.FC = () => {
             </Select>
           </FormControl>
           {guarantorRequests.length === 0 && (
-            <Typography color="text.secondary">
-              אין בקשות ערבויות
-            </Typography>
+            <Typography color="text.secondary">אין בקשות ערבויות</Typography>
           )}
           <Grid container spacing={2}>
             {guarantorRequests
@@ -294,61 +290,63 @@ const UserLoanRequestsPage: React.FC = () => {
                   return g.status === "PENDING";
                 if (guarantorFilter === "rejected")
                   return g.status === "REJECTED";
-                if (guarantorFilter === "open")
-                  return g.status === "PENDING";
+                if (guarantorFilter === "open") return g.status === "PENDING";
                 return true;
               })
               .map((g) => (
-              <Grid item xs={12} md={6} key={g.id}>
-                <Card variant="outlined">
-                  <CardContent>
-                    <Typography fontWeight={600}>
-                      בקשת ערב לבקשה #{g.request?.id}
-                    </Typography>
-                    <Typography>
-                      מבקש: {g.request?.user?.first_name}{" "}
-                      {g.request?.user?.last_name}
-                    </Typography>
-                    <Typography>מטרה: {g.request?.purpose || "-"}</Typography>
-                    <Typography>סכום: {g.request?.amount}</Typography>
-                    <Typography>
-                      החזר חודשי: {g.request?.monthly_payment}
-                    </Typography>
-                    <Typography>
-                      יום חיוב: {g.request?.payment_date ?? "-"}
-                    </Typography>
-                    <Typography>
-                      אמצעי חיוב: {g.request?.payment_method ?? "-"}
-                    </Typography>
-                    <Typography>סטטוס: {g.status}</Typography>
-                    {g.status === "PENDING" && (
-                      <Stack direction="row" spacing={1} mt={1}>
-                        <Button
-                          variant="contained"
-                          onClick={() =>
-                            dispatch(
-                              approveGuarantor({ id: g.request.id, gid: g.id })
-                            )
-                          }
-                        >
-                          אישור
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          onClick={() =>
-                            dispatch(
-                              rejectGuarantor({ id: g.request.id, gid: g.id })
-                            )
-                          }
-                        >
-                          דחייה
-                        </Button>
-                      </Stack>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
+                <Grid item xs={12} md={6} key={g.id}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Typography fontWeight={600}>
+                        בקשת ערב לבקשה #{g.request?.id}
+                      </Typography>
+                      <Typography>
+                        מבקש: {g.request?.user?.first_name}{" "}
+                        {g.request?.user?.last_name}
+                      </Typography>
+                      <Typography>מטרה: {g.request?.purpose || "-"}</Typography>
+                      <Typography>סכום: {g.request?.amount}</Typography>
+                      <Typography>
+                        החזר חודשי: {g.request?.monthly_payment}
+                      </Typography>
+                      <Typography>
+                        יום חיוב: {g.request?.payment_date ?? "-"}
+                      </Typography>
+                      <Typography>
+                        אמצעי חיוב: {g.request?.payment_method ?? "-"}
+                      </Typography>
+                      <Typography>סטטוס: {g.status}</Typography>
+                      {g.status === "PENDING" && (
+                        <Stack direction="row" spacing={1} mt={1}>
+                          <Button
+                            variant="contained"
+                            onClick={() =>
+                              dispatch(
+                                approveGuarantor({
+                                  id: g.request.id,
+                                  gid: g.id,
+                                })
+                              )
+                            }
+                          >
+                            אישור
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            onClick={() =>
+                              dispatch(
+                                rejectGuarantor({ id: g.request.id, gid: g.id })
+                              )
+                            }
+                          >
+                            דחייה
+                          </Button>
+                        </Stack>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
           </Grid>
         </Box>
       </Container>
@@ -359,10 +357,10 @@ const UserLoanRequestsPage: React.FC = () => {
         fullWidth
       >
         <DialogTitle>בקשת הלוואה חדשה</DialogTitle>
-      <DialogContent>
-        <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField
-            label="סכום"
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <TextField
+              label="סכום"
               fullWidth
               type="number"
               value={amount}
@@ -373,97 +371,99 @@ const UserLoanRequestsPage: React.FC = () => {
               fullWidth
               type="number"
               value={monthlyPayment}
-            onChange={(e) => setMonthlyPayment(Number(e.target.value))}
-          />
-          {activeRequestId === null && (
-            <>
-              <Button variant="outlined" onClick={handleCheck}>
-                בדיקת זכאות
-              </Button>
-              {checkResponse && (
-                <Typography color={checkResponse.ok ? "success.main" : "error"}>
-                  {checkResponse.ok
-                    ? "הבדיקה עברה בהצלחה"
-                    : checkResponse.error || "הבדיקה נכשלה"}
-                </Typography>
-              )}
-            </>
-          )}
-          <TextField
-            label="מטרה"
-            value={purpose}
-            onChange={(e) => setPurpose(e.target.value)}
-            fullWidth
-            disabled={!canEditDetails}
-          />
-          <TextField
-            label="יום חיוב (1-28)"
-            type="number"
-            value={paymentDate}
-            onChange={(e) => setPaymentDate(Number(e.target.value))}
-            fullWidth
-            disabled={!canEditDetails}
-          />
-          <FormControl fullWidth>
-            <InputLabel>אמצעי חיוב</InputLabel>
-            <Select
-              value={paymentMethod}
-              label="אמצעי חיוב"
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              disabled={!canEditDetails}
-            >
-              <MenuItem value="direct_debit">הוראת קבע</MenuItem>
-              <MenuItem value="credit_card">כרטיס אשראי</MenuItem>
-              <MenuItem value="bank_transfer">העברה בנקאית</MenuItem>
-              <MenuItem value="cash">מזומן</MenuItem>
-              <MenuItem value="other">אחר</MenuItem>
-            </Select>
-          </FormControl>
-          {activeRequestId === null ? (
-            <Button
-              variant="contained"
-              onClick={handleCreateRequest}
-              disabled={!checkDone || !checkResponse?.ok}
-            >
-              שליחת בקשה
-            </Button>
-          ) : (
-            <Button
-              variant="contained"
-              onClick={handleSaveDetails}
-              disabled={!canEditDetails}
-            >
-              שמירת פרטים
-            </Button>
-          )}
-          {!isMember &&
-            activeRequestId !== null &&
-            (activeRequest?.status === "NEED_GUARANTOR" ||
-              activeRequest?.status === "GUARANTOR_REJECTED") && (
-              <Stack spacing={2}>
-                <FormControl fullWidth>
-                  <InputLabel>בחירת ערב</InputLabel>
-                  <Select
-                    value={guarantorId}
-                    label="בחירת ערב"
-                    onChange={(e) => setGuarantorId(Number(e.target.value))}
-                    disabled={!canEditDetails}
-                  >
-                    {(allUsers || []).map((u: any) => (
-                      <MenuItem key={u.id} value={u.id}>
-                        {u.first_name} {u.last_name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <Button variant="outlined" onClick={handleAddGuarantor}>
-                  שליחת בקשת ערב
+              onChange={(e) => setMonthlyPayment(Number(e.target.value))}
+            />
+            {activeRequestId === null && (
+              <>
+                <Button variant="outlined" onClick={handleCheck}>
+                  בדיקת זכאות
                 </Button>
-              </Stack>
+                {checkResponse && (
+                  <Typography
+                    color={checkResponse.ok ? "success.main" : "error"}
+                  >
+                    {checkResponse.ok
+                      ? "הבדיקה עברה בהצלחה"
+                      : checkResponse.error || "הבדיקה נכשלה"}
+                  </Typography>
+                )}
+              </>
             )}
-        </Stack>
-      </DialogContent>
-    </Dialog>
+            <TextField
+              label="מטרה"
+              value={purpose}
+              onChange={(e) => setPurpose(e.target.value)}
+              fullWidth
+              disabled={!canEditDetails}
+            />
+            <TextField
+              label="יום חיוב (1-28)"
+              type="number"
+              value={paymentDate}
+              onChange={(e) => setPaymentDate(Number(e.target.value))}
+              fullWidth
+              disabled={!canEditDetails}
+            />
+            <FormControl fullWidth>
+              <InputLabel>אמצעי חיוב</InputLabel>
+              <Select
+                value={paymentMethod}
+                label="אמצעי חיוב"
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                disabled={!canEditDetails}
+              >
+                <MenuItem value="direct_debit">הוראת קבע</MenuItem>
+                <MenuItem value="credit_card">כרטיס אשראי</MenuItem>
+                <MenuItem value="bank_transfer">העברה בנקאית</MenuItem>
+                <MenuItem value="cash">מזומן</MenuItem>
+                <MenuItem value="other">אחר</MenuItem>
+              </Select>
+            </FormControl>
+            {activeRequestId === null ? (
+              <Button
+                variant="contained"
+                onClick={handleCreateRequest}
+                disabled={!checkDone || !checkResponse?.ok}
+              >
+                שליחת בקשה
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={handleSaveDetails}
+                disabled={!canEditDetails}
+              >
+                שמירת פרטים
+              </Button>
+            )}
+            {!isMember &&
+              activeRequestId !== null &&
+              (activeRequest?.status === "NEED_GUARANTOR" ||
+                activeRequest?.status === "GUARANTOR_REJECTED") && (
+                <Stack spacing={2}>
+                  <FormControl fullWidth>
+                    <InputLabel>בחירת ערב</InputLabel>
+                    <Select
+                      value={guarantorId}
+                      label="בחירת ערב"
+                      onChange={(e) => setGuarantorId(Number(e.target.value))}
+                      disabled={!canEditDetails}
+                    >
+                      {(allUsers || []).map((u: any) => (
+                        <MenuItem key={u.id} value={u.id}>
+                          {u.first_name} {u.last_name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <Button variant="outlined" onClick={handleAddGuarantor}>
+                    שליחת בקשת ערב
+                  </Button>
+                </Stack>
+              )}
+          </Stack>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

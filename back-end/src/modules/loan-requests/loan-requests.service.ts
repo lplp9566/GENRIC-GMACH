@@ -183,7 +183,7 @@ export class LoanRequestsService {
     if (!request) throw new BadRequestException("Request not found");
     request.status = approve
       ? LoanRequestStatus.ADMIN_PENDING
-      : LoanRequestStatus.NEED_GUARANTOR;
+      : LoanRequestStatus.GUARANTOR_REJECTED;
     return this.requestsRepo.save(request);
   }
 

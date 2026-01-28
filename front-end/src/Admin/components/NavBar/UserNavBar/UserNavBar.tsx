@@ -9,6 +9,7 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Popover,
   Toolbar,
   Tooltip,
   useMediaQuery,
@@ -18,12 +19,13 @@ import MenuIcon from "@mui/icons-material/Menu";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { NavLink, useLocation } from "react-router-dom";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { logoutServer } from "../../../../store/features/auth/authSlice";
-import type { AppDispatch } from "../../../../store/store";
+import type { AppDispatch, RootState } from "../../../../store/store";
 import { LogoTitle } from "../AdminNavBar/LogoTitle";
 import { useAppTheme } from "../../../../Theme/ThemeProvider";
+import { fetchGuarantorRequests } from "../../../../store/features/loanRequests/loanRequestsSlice";
 
 const NAV_BG = "#0D2233";
 const NAV_TXT = "#FFFFFF";
@@ -43,6 +45,15 @@ const links = [
 
 const UserNavbar = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const userId = authUser?.user?.id;
+  const guarantorRequests = useSelector(
+    (s: RootState) => s.LoanRequestsSlice.guarantorRequests
+  );
+  const pendingGuarantor = guarantorRequests.filter(
+    (r) => r.status === "PENDING"
+  ).length;
+  const [notifAnchor, setNotifAnchor] = useState<null | HTMLElement>(null);
   const isMobile = useMediaQuery(`(max-width:${BP_MOBILE}px)`);
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
@@ -53,6 +64,17 @@ const UserNavbar = () => {
     if (p === "/u") return activePath === p;
     return activePath === p || activePath.startsWith(`${p}/`);
   };
+
+  useEffect(() => {
+    if (!userId) return;
+    dispatch(fetchGuarantorRequests(userId));
+  }, [dispatch, userId]);
+
+  const openNotif = Boolean(notifAnchor);
+  const handleNotifOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setNotifAnchor(event.currentTarget);
+  };
+  const handleNotifClose = () => setNotifAnchor(null);
 
   return (
     <>
@@ -91,8 +113,8 @@ const UserNavbar = () => {
               </IconButton>
             </Tooltip>
             <Tooltip title="התראות">
-              <IconButton sx={{ color: NAV_TXT }}>
-                <Badge badgeContent={0} color="error" invisible>
+              <IconButton sx={{ color: NAV_TXT }} onClick={handleNotifOpen}>
+                <Badge badgeContent={pendingGuarantor} color="error">
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
@@ -121,6 +143,31 @@ const UserNavbar = () => {
           </Box>
         </Toolbar>
       </AppBar>
+
+      <Popover
+        open={openNotif}
+        anchorEl={notifAnchor}
+        onClose={handleNotifClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        PaperProps={{
+          sx: {
+            p: 2,
+            minWidth: 220,
+            borderRadius: 2,
+            bgcolor: NAV_BG,
+            color: NAV_TXT,
+          },
+        }}
+      >
+        {pendingGuarantor > 0 ? (
+          <Typography fontWeight={600}>
+            יש בקשת אישור ערבות ({pendingGuarantor})
+          </Typography>
+        ) : (
+          <Typography color="rgba(255,255,255,0.7)">אין התראות</Typography>
+        )}
+      </Popover>
 
       <Drawer
         anchor="right"
