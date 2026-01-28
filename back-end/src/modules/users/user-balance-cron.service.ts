@@ -30,7 +30,7 @@ export class UserBalanceCronService {
   ) {}
 
   // עדכון יתרות חודשיות
-  @Cron('04 23 * * *', { timeZone: 'Asia/Jerusalem' })
+  @Cron('07 23 * * *', { timeZone: 'Asia/Jerusalem' })
   async updateAllUsersBalances() {
     this.logger.log('🔄 Updating all users balances...');
     const users = await this.usersService.getAllUsers();
