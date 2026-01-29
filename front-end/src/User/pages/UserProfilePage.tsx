@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { formatILS } from "../../Admin/components/HomePage/HomePage";
 import { formatDate, parseDate } from "../../Admin/Hooks/genricFunction";
 import { AppDispatch, RootState } from "../../store/store";
+import { getAllMonthlyRanks } from "../../store/features/admin/adminRankSlice";
 import { getUserFinancialsByUserGuard } from "../../store/features/user/userFinancialSlice";
 import { getAllLoans } from "../../store/features/admin/adminLoanSlice";
 import { StatusGeneric } from "../../common/indexTypes";
@@ -33,12 +34,29 @@ const UserProfilePage = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const authUser = useSelector((s: RootState) => s.authslice.user);
+  const { monthlyRanks } = useSelector((s: RootState) => s.AdminRankSlice);
   const userFinancials = useSelector(
     (s: RootState) => s.UserFinancialSlice.data
   );
   const allLoans = useSelector((s: RootState) => s.AdminLoansSlice.allLoans);
 
   const user = authUser?.user;
+
+  const currentRoleId = user?.current_role?.id ?? null;
+  const currentRole = Array.isArray(monthlyRanks)
+    ? monthlyRanks.find((r) => r.id === currentRoleId) ?? null
+    : null;
+  const currentRoleRate = useMemo(() => {
+    if (!currentRole?.monthlyRates?.length) return null;
+    const now = new Date();
+    const sorted = [...currentRole.monthlyRates].sort(
+      (a, b) =>
+        new Date(b.effective_from).getTime() -
+        new Date(a.effective_from).getTime()
+    );
+    const active = sorted.find((r) => new Date(r.effective_from) <= now);
+    return active ?? sorted[0];
+  }, [currentRole]);
   const [editOpen, setEditOpen] = useState(false);
   const [notifyOpen, setNotifyOpen] = useState(false);
   const [formData, setFormData] = useState(() => ({
@@ -63,6 +81,7 @@ const UserProfilePage = () => {
   useEffect(() => {
     if (user?.id != null) {
       dispatch(getUserFinancialsByUserGuard());
+      dispatch(getAllMonthlyRanks());
       dispatch(getAllLoans({ status: StatusGeneric.ALL, userId: user.id }));
     }
   }, [dispatch, user?.id]);
@@ -403,6 +422,33 @@ const UserProfilePage = () => {
                   p: 2,
                   borderRadius: 3,
                   background: isDark
+                    ? "linear-gradient(135deg, rgba(14,116,144,0.25), rgba(30,41,59,0.9))"
+                    : "linear-gradient(135deg, rgba(14,116,144,0.12), rgba(224,242,254,0.7))",
+                  border: isDark
+                    ? "1px solid rgba(14,116,144,0.35)"
+                    : "1px solid rgba(14,116,144,0.2)",
+                }}
+              >
+                <Stack spacing={0.5}>
+                  <Typography variant="subtitle2" fontWeight={700}>
+                    הדרגה הנוכחית
+                  </Typography>
+                  <Typography variant="h6" fontWeight={800}>
+                    {currentRole?.name ?? "לא הוגדרה דרגה"}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {currentRoleRate?.amount != null
+                      ? `תשלום חודשי: ${formatILS(currentRoleRate.amount)}`
+                      : "תשלום חודשי: לא הוגדר"}
+                  </Typography>
+                </Stack>
+              </Paper>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  borderRadius: 3,
+                  background: isDark
                     ? "linear-gradient(135deg, rgba(34,197,94,0.2), rgba(30,41,59,0.9))"
                     : "linear-gradient(135deg, rgba(34,197,94,0.12), rgba(220,252,231,0.7))",
                   border: isDark
@@ -694,3 +740,14 @@ const UserProfilePage = () => {
 };
 
 export default UserProfilePage;
+
+
+
+
+
+
+
+
+
+
+

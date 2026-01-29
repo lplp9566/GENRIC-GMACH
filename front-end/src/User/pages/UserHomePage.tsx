@@ -17,6 +17,9 @@ import { formatILS } from "../../Admin/components/HomePage/HomePage";
 import { formatDate } from "../../Admin/Hooks/genricFunction";
 import { AppDispatch, RootState } from "../../store/store";
 import { getUserFinancialsByUserGuard } from "../../store/features/user/userFinancialSlice";
+import { getAllLoans } from "../../store/features/admin/adminLoanSlice";
+import { StatusGeneric } from "../../common/indexTypes";
+import { getAllMonthlyRanks } from "../../store/features/admin/adminRankSlice";
 
 const UserHomePage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,6 +39,8 @@ const UserHomePage = () => {
     },
   };
   const authUser = useSelector((s: RootState) => s.authslice.user);
+  const { allLoans } = useSelector((s: RootState) => s.AdminLoansSlice);
+  const { monthlyRanks } = useSelector((s: RootState) => s.AdminRankSlice);
   const userFinancials = useSelector(
     (s: RootState) => s.UserFinancialSlice.data
   );
@@ -47,6 +52,13 @@ const UserHomePage = () => {
   useEffect(() => {
     if (user?.id != null) {
       dispatch(getUserFinancialsByUserGuard());
+      dispatch(
+        getAllLoans({
+          status: StatusGeneric.ACTIVE,
+          userId: user.id,
+        })
+      );
+      dispatch(getAllMonthlyRanks());
     }
   }, [dispatch, user?.id]);
 
@@ -70,11 +82,49 @@ const UserHomePage = () => {
     }
     return candidate;
   }, [user?.payment_details?.charge_date]);
+  const nextLoanCharge = useMemo(() => {
+    if (!allLoans || allLoans.length === 0) return null;
+    const now = new Date();
+    const candidates = allLoans
+      .filter((loan) => loan?.isActive)
+      .map((loan) => {
+        const day = Number(loan?.payment_date ?? 0);
+        if (day < 1 || day > 31) return null;
+        const candidate = new Date(now.getFullYear(), now.getMonth(), day);
+        if (candidate < now) {
+          candidate.setMonth(candidate.getMonth() + 1);
+        }
+        return {
+          date: candidate,
+          amount: Number(loan?.monthly_payment ?? 0),
+        };
+      })
+      .filter(Boolean);
+    if (candidates.length === 0) return null;
+    candidates.sort((a, b) => a!.date.getTime() - b!.date.getTime());
+    return candidates[0];
+  }, [allLoans]);
+  const currentRoleId = user?.current_role?.id ?? null;
+  const currentRole = useMemo(() => {
+    if (!currentRoleId || !Array.isArray(monthlyRanks)) return null;
+    return monthlyRanks.find((r) => r.id === currentRoleId) ?? null;
+  }, [currentRoleId, monthlyRanks]);
+  const currentRoleRate = useMemo(() => {
+    if (!currentRole?.monthlyRates?.length) return null;
+    const now = new Date();
+    const sorted = [...currentRole.monthlyRates].sort(
+      (a, b) =>
+        new Date(b.effective_from).getTime() -
+        new Date(a.effective_from).getTime()
+    );
+    const active = sorted.find((r) => new Date(r.effective_from) <= now);
+    return active ?? sorted[0];
+  }, [currentRole]);
   const totalDonations = userFinancials?.total_donations ?? 0;
   const totalLoansTaken = userFinancials?.total_loans_taken_amount ?? 0;
   const totalLoansRepaid = userFinancials?.total_loans_repaid ?? 0;
   const totalStandingOrderReturn =
-    userFinancials?.total_standing_order_return_unpaid ?? 0;
+    userFinancials?.total_standing_order_return ?? 0;
   const standingOrdersDebt = totalStandingOrderReturn;
   const totalFixedDeposits =
     (userFinancials?.total_fixed_deposits_deposited ?? 0) -
@@ -135,7 +185,7 @@ const UserHomePage = () => {
             transform: "rotate(12deg)",
           }}
         />
-        <Stack spacing={1.5} position="relative" zIndex={1}>
+                <Stack spacing={1.5} position="relative" zIndex={1}>
           <Chip
             label='גמ"ח דיגיטלי'
             color="default"
@@ -150,7 +200,7 @@ const UserHomePage = () => {
             ברוך הבא{userName ? `, ${userName}` : ""}
           </Typography>
           <Typography variant="subtitle1" sx={{ opacity: 0.9, maxWidth: 640 }}>
-            כאן תוכל לראות את המצב הפיננסי שלך ולהמשיך לפעולות החשובות במהירות.
+            כאן אפשר לראות את המצב הפיננסי שלך ולהמשיך בקלות לפעולות החשובות.
           </Typography>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
             <Button
@@ -179,7 +229,7 @@ const UserHomePage = () => {
                 "&:hover": { borderColor: "#fff" },
               }}
             >
-              סקירה מלאה
+              לסקירה מלאה
             </Button>
           </Stack>
         </Stack>
@@ -187,7 +237,7 @@ const UserHomePage = () => {
 
       <Box sx={{ mt: 4, ...sectionSx }}>
         <Typography variant="h5" fontWeight={800} mb={2}>
-          מצב החובות שלך
+          מצב החוב שלך
         </Typography>
         <Paper
           elevation={0}
@@ -227,7 +277,7 @@ const UserHomePage = () => {
               </Box>
             </Stack>
             <Typography variant="body2" color="text.secondary">
-              פירוט החוב לפי סוג: דמי חבר, הלוואות, והחזרי הוראת קבע.
+              פירוט החוב לפי סוג: דמי חבר, הלוואות והחזרי הוראות קבע.
             </Typography>
             <Divider />
             <Grid container spacing={2}>
@@ -235,7 +285,7 @@ const UserHomePage = () => {
                 {
                   title: "חוב דמי חבר",
                   value: monthlyDebt,
-                  detail: "יתרת חיוב חודשי לגמ\"ח",
+                  detail: "יתרת חיוב חודשית לגמ\"ח",
                 },
                 {
                   title: "חוב הלוואות",
@@ -243,7 +293,7 @@ const UserHomePage = () => {
                   detail: `${openLoans.length} הלוואות פתוחות`,
                 },
                 {
-                  title: "חוב החזרי הוראת קבע",
+                  title: "חוב החזרי הוראות קבע",
                   value: standingOrdersDebt,
                   detail: "חיובים שחזרו",
                 },
@@ -280,7 +330,7 @@ const UserHomePage = () => {
                       </Typography>
                     </Stack>
                     <Typography variant="h6" fontWeight={800} mt={1.5}>
-                  {formatDebtILS(card.value)}
+                      {formatDebtILS(card.value)}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {card.detail}
@@ -291,12 +341,22 @@ const UserHomePage = () => {
             </Grid>
             <Stack spacing={1}>
               <Typography variant="subtitle2" fontWeight={700}>
-                מועד חיוב הבא
+                מועד החיוב הבא להלוואה
               </Typography>
               <Typography variant="body1" fontWeight={800}>
-                {nextChargeDate
-                  ? `${formatDate(nextChargeDate)} • ${formatILS(
-                      Math.abs(monthlyBalance)
+                {nextLoanCharge
+                  ? `${formatDate(nextLoanCharge.date)} • ${formatDebtILS(
+                      Math.abs(nextLoanCharge.amount)
+                    )}`
+                  : "אין הלוואות פעילות"}
+              </Typography>
+              <Typography variant="subtitle2" fontWeight={700}>
+                דמי חבר – החיוב הבא
+              </Typography>
+              <Typography variant="body1" fontWeight={800}>
+                {nextChargeDate && currentRoleRate
+                  ? `${formatDate(nextChargeDate)} • ${formatDebtILS(
+                      Math.abs(currentRoleRate.amount)
                     )}`
                   : "לא מוגדר"}
               </Typography>
@@ -336,7 +396,7 @@ const UserHomePage = () => {
 
       <Box sx={{ mt: 4, ...sectionSx }}>
         <Typography variant="h5" fontWeight={800} mb={2}>
-          נתונים קצרים עליך
+          נתונים קצרים עבורך
         </Typography>
         <Grid container spacing={{ xs: 2, md: 3 }}>
           {[
@@ -382,7 +442,7 @@ const UserHomePage = () => {
                     {card.title}
                   </Typography>
                   <Typography variant="h6" fontWeight={800}>
-                    {formatILS(card.value)}
+                    {card.value == null ? "לא הוגדר" : formatILS(card.value)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {card.detail}
@@ -412,7 +472,7 @@ const UserHomePage = () => {
                   רגולציה ונהלים
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  כללי הגמ"ח מוצגים כאן וניתן לצפות במסמכי הנהלים.
+                  כללי הגמ\"ח מוצגים כאן וניתן לצפות במסמכי הנהלים.
                 </Typography>
               </Box>
               <Button
@@ -430,12 +490,13 @@ const UserHomePage = () => {
                 sx={{ borderRadius: 3, fontWeight: 800 }}
                 onClick={() => setOpenRegulations(true)}
               >
-                תקנון הגמ"ח
+                תקנון הגמ\"ח
               </Button>
             </Box>
           </Stack>
         </Paper>
       </Box>
+
 
       {openRegulations && (
         <GemachRegulationsModal
@@ -448,3 +509,36 @@ const UserHomePage = () => {
 };
 
 export default UserHomePage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { Box, Grid, Paper, Stack, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { formatILS } from "../../Admin/components/HomePage/HomePage";
 import LoadingIndicator from "../../Admin/components/StatusComponents/LoadingIndicator";
 import ErrorMessage from "../../Admin/components/StatusComponents/ErrorMessage";
 import { AppDispatch, RootState } from "../../store/store";
+import { getAllMonthlyRanks } from "../../store/features/admin/adminRankSlice";
 import { getUserFinancialsByUserGuard } from "../../store/features/user/userFinancialSlice";
 
 const UserOverviewPage = () => {
@@ -14,11 +15,28 @@ const UserOverviewPage = () => {
   const { data, status, error } = useSelector(
     (s: RootState) => s.UserFinancialSlice
   );
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const { monthlyRanks } = useSelector((s: RootState) => s.AdminRankSlice);
 
   useEffect(() => {
     dispatch(getUserFinancialsByUserGuard());
+    dispatch(getAllMonthlyRanks());
   }, [dispatch]);
-
+  const currentRoleId = authUser?.user?.current_role?.id ?? null;
+  const currentRole = Array.isArray(monthlyRanks)
+    ? monthlyRanks.find((r) => r.id === currentRoleId) ?? null
+    : null;
+  const currentRoleRate = (() => {
+    if (!currentRole?.monthlyRates?.length) return null;
+    const now = new Date();
+    const sorted = [...currentRole.monthlyRates].sort(
+      (a, b) =>
+        new Date(b.effective_from).getTime() -
+        new Date(a.effective_from).getTime()
+    );
+    const active = sorted.find((r) => new Date(r.effective_from) <= now);
+    return active ?? sorted[0];
+  })();
   if (status === "pending") {
     return <LoadingIndicator />;
   }
@@ -28,7 +46,12 @@ const UserOverviewPage = () => {
   }
 
   const cards = [
-    { label: "סה״כ תרומות", value: data?.total_donations ?? 0, kind: "money" },
+    {
+      label: `דרגה נוכחית (${currentRole?.name ?? "לא הוגדרה"})`,
+      value: currentRoleRate?.amount ?? null,
+      kind: "money",
+    },
+    { label: "סה\"כ תרומות", value: data?.total_donations ?? 0, kind: "money" },
     {
       label: "תרומות רגילות",
       value: data?.total_equity_donations ?? 0,
@@ -40,7 +63,7 @@ const UserOverviewPage = () => {
       kind: "money",
     },
     {
-      label: "דמי חבר ",
+      label: "דמי חבר",
       value: data?.total_monthly_deposits ?? 0,
       kind: "money",
     },
@@ -110,7 +133,7 @@ const UserOverviewPage = () => {
       >
         <Stack spacing={1}>
           <Typography variant="h4" fontWeight={800} textAlign="center">
-            נתונים כלליים
+            ׳ ׳×׳•׳ ׳™׳ ׳›׳׳׳™׳™׳
           </Typography>
         </Stack>
       </Paper>
@@ -137,7 +160,7 @@ const UserOverviewPage = () => {
               <Typography variant="h5" fontWeight={800} mt={1} textAlign={"center"}>
                 {card.kind === "count"
                   ? Number(card.value ?? 0).toLocaleString("he-IL")
-                  : formatILS(card.value)}
+                   : (card.value == null ? "לא הוגדר" : formatILS(card.value))}
               </Typography>
             </Paper>
           </Grid>
@@ -148,3 +171,13 @@ const UserOverviewPage = () => {
 };
 
 export default UserOverviewPage;
+
+
+
+
+
+
+
+
+
+
