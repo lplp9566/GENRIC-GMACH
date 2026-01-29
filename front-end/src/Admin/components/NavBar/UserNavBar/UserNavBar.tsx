@@ -1,4 +1,4 @@
-import {
+﻿import {
   AppBar,
   Badge,
   Box,
@@ -34,15 +34,14 @@ const NAV_TXT = "#FFFFFF";
 const BP_MOBILE = 960;
 
 const links = [
-  { label: "דף הבית", path: "/u" },
-  { label: "איזור אישי", path: "/u/profile" },
-  { label: "הלוואות", path: "/u/loans" },
-  { label: "תרומות", path: "/u/donations" },
-  { label: "פקדנות", path: "/u/deposits" },
-  { label: "דמי חבר", path: "/u/payments" },
-  { label: "החזרי הוראת קבע", path: "/u/standing-orders" },
-  { label: "נתונים כללים", path: "/u/overview" },
-  { label: "סטטיסטיקה", path: "/u/statistics" },
+  { label: "׳“׳£ ׳”׳‘׳™׳×", path: "/u" },
+  { label: "׳׳™׳–׳•׳¨ ׳׳™׳©׳™", path: "/u/profile" },
+  { label: "׳”׳׳•׳•׳׳•׳×", path: "/u/loans" },
+  { label: "׳×׳¨׳•׳׳•׳×", path: "/u/donations" },
+  { label: "׳₪׳§׳“׳ ׳•׳×", path: "/u/deposits" },
+  { label: "׳“׳׳™ ׳—׳‘׳¨", path: "/u/payments" },
+  { label: "׳”׳—׳–׳¨׳™ ׳”׳•׳¨׳׳× ׳§׳‘׳¢", path: "/u/standing-orders" },
+  { label: "׳¡׳˜׳˜׳™׳¡׳˜׳™׳§׳”", path: "/u/statistics" },
 ];
 
 const UserNavbar = () => {
@@ -109,19 +108,19 @@ const UserNavbar = () => {
           )}
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, ml: "auto" }}>
-            <Tooltip title={mode === "dark" ? "מצב בהיר" : "מצב כהה"}>
+            <Tooltip title={mode === "dark" ? "׳׳¦׳‘ ׳‘׳”׳™׳¨" : "׳׳¦׳‘ ׳›׳”׳”"}>
               <IconButton sx={{ color: NAV_TXT }} onClick={toggle}>
                 {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
               </IconButton>
             </Tooltip>
-            <Tooltip title="התראות">
+            <Tooltip title="׳”׳×׳¨׳׳•׳×">
               <IconButton sx={{ color: NAV_TXT }} onClick={handleNotifOpen}>
                 <Badge badgeContent={pendingGuarantor} color="error">
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
             </Tooltip>
-            <Tooltip title="יציאה">
+            <Tooltip title="׳™׳¦׳™׳׳”">
               <IconButton
                 sx={{ color: NAV_TXT }}
                 onClick={() => dispatch(logoutServer())}
@@ -165,7 +164,7 @@ const UserNavbar = () => {
         {pendingGuarantor > 0 ? (
           <>
             <Typography fontWeight={600} sx={{ mb: 1 }}>
-              יש בקשת אישור ערבות ({pendingGuarantor})
+              ׳™׳© ׳‘׳§׳©׳× ׳׳™׳©׳•׳¨ ׳¢׳¨׳‘׳•׳× ({pendingGuarantor})
             </Typography>
             <Stack spacing={0.5}>
               {guarantorRequests
@@ -181,13 +180,13 @@ const UserNavbar = () => {
                 ))}
               {pendingGuarantor > 5 && (
                 <Typography sx={{ fontSize: "0.8rem", opacity: 0.7 }}>
-                  ועוד {pendingGuarantor - 5}
+                  ׳•׳¢׳•׳“ {pendingGuarantor - 5}
                 </Typography>
               )}
             </Stack>
           </>
         ) : (
-          <Typography color="rgba(255,255,255,0.7)">אין התראות</Typography>
+          <Typography color="rgba(255,255,255,0.7)">׳׳™׳ ׳”׳×׳¨׳׳•׳×</Typography>
         )}
       </Popover>
 

@@ -5,38 +5,19 @@ import { formatILS } from "../../Admin/components/HomePage/HomePage";
 import LoadingIndicator from "../../Admin/components/StatusComponents/LoadingIndicator";
 import ErrorMessage from "../../Admin/components/StatusComponents/ErrorMessage";
 import { AppDispatch, RootState } from "../../store/store";
-import { getAllMonthlyRanks } from "../../store/features/admin/adminRankSlice";
 import { getUserFinancialsByUserGuard } from "../../store/features/user/userFinancialSlice";
 
 const UserOverviewPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
-  const { data, status, error } = useSelector(
+  const { status, error } = useSelector(
     (s: RootState) => s.UserFinancialSlice
   );
-  const authUser = useSelector((s: RootState) => s.authslice.user);
-  const { monthlyRanks } = useSelector((s: RootState) => s.AdminRankSlice);
 
   useEffect(() => {
     dispatch(getUserFinancialsByUserGuard());
-    dispatch(getAllMonthlyRanks());
   }, [dispatch]);
-  const currentRoleId = authUser?.user?.current_role?.id ?? null;
-  const currentRole = Array.isArray(monthlyRanks)
-    ? monthlyRanks.find((r) => r.id === currentRoleId) ?? null
-    : null;
-  const currentRoleRate = (() => {
-    if (!currentRole?.monthlyRates?.length) return null;
-    const now = new Date();
-    const sorted = [...currentRole.monthlyRates].sort(
-      (a, b) =>
-        new Date(b.effective_from).getTime() -
-        new Date(a.effective_from).getTime()
-    );
-    const active = sorted.find((r) => new Date(r.effective_from) <= now);
-    return active ?? sorted[0];
-  })();
   if (status === "pending") {
     return <LoadingIndicator />;
   }
@@ -45,64 +26,7 @@ const UserOverviewPage = () => {
     return <ErrorMessage errorMessage={error || "שגיאה בטעינת הנתונים"} />;
   }
 
-  const cards = [
-    {
-      label: `דרגה נוכחית (${currentRole?.name ?? "לא הוגדרה"})`,
-      value: currentRoleRate?.amount ?? null,
-      kind: "money",
-    },
-    { label: "סה\"כ תרומות", value: data?.total_donations ?? 0, kind: "money" },
-    {
-      label: "תרומות רגילות",
-      value: data?.total_equity_donations ?? 0,
-      kind: "money",
-    },
-    {
-      label: "תרומות לקרנות מיוחדות",
-      value: data?.total_special_fund_donations ?? 0,
-      kind: "money",
-    },
-    {
-      label: "דמי חבר",
-      value: data?.total_monthly_deposits ?? 0,
-      kind: "money",
-    },
-    {
-      label: "סכום הלוואות שנלקחו",
-      value: data?.total_loans_taken_amount ?? 0,
-      kind: "money",
-    },
-    {
-      label: "כמות הלוואות",
-      value: data?.total_loans_taken ?? 0,
-      kind: "count",
-    },
-    {
-      label: "סכום הלוואות שנפרעו",
-      value: data?.total_loans_repaid ?? 0,
-      kind: "money",
-    },
-    {
-      label: "הפקדות קבועות",
-      value: data?.total_fixed_deposits_deposited ?? 0,
-      kind: "money",
-    },
-    {
-      label: "משיכות מהפקדות",
-      value: data?.total_fixed_deposits_withdrawn ?? 0,
-      kind: "money",
-    },
-    {
-      label: "החזרים בהוראות קבע",
-      value: data?.total_standing_order_return ?? 0,
-      kind: "money",
-    },
-    {
-      label: "אחזקה במזומן",
-      value: data?.total_cash_holdings ?? 0,
-      kind: "money",
-    },
-  ];
+  const cards: any[] = [];
 
   return (
     <Box
@@ -132,11 +56,13 @@ const UserOverviewPage = () => {
         }}
       >
         <Stack spacing={1}>
-          <Typography variant="h4" fontWeight={800} textAlign="center">
-            ׳ ׳×׳•׳ ׳™׳ ׳›׳׳׳™׳™׳
-          </Typography>
+          <Typography variant="h4" fontWeight={800} textAlign="center">נתונים כלליים</Typography>
         </Stack>
       </Paper>
+
+      <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ mb: 2 }}>
+        הנתונים הועברו לדף הבית.
+      </Typography>
 
       <Grid container spacing={3}>
         {cards.map((card) => (
@@ -171,6 +97,10 @@ const UserOverviewPage = () => {
 };
 
 export default UserOverviewPage;
+
+
+
+
 
 
 

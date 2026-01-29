@@ -123,13 +123,16 @@ const UserHomePage = () => {
   const totalDonations = userFinancials?.total_donations ?? 0;
   const totalLoansTaken = userFinancials?.total_loans_taken_amount ?? 0;
   const totalLoansRepaid = userFinancials?.total_loans_repaid ?? 0;
+  const totalEquityDonations = userFinancials?.total_equity_donations ?? 0;
+  const totalSpecialFundDonations = userFinancials?.total_special_fund_donations ?? 0;
+  const totalMemberFees = userFinancials?.total_monthly_deposits ?? 0;
+  const totalLoansCount = userFinancials?.total_loans_taken ?? 0;
+  const totalFixedDepositsDeposited = userFinancials?.total_fixed_deposits_deposited ?? 0;
+  const totalFixedDepositsWithdrawn = userFinancials?.total_fixed_deposits_withdrawn ?? 0;
+  const totalCashHoldings = userFinancials?.total_cash_holdings ?? 0;
   const totalStandingOrderReturn =
     userFinancials?.total_standing_order_return ?? 0;
   const standingOrdersDebt = totalStandingOrderReturn;
-  const totalFixedDeposits =
-    (userFinancials?.total_fixed_deposits_deposited ?? 0) -
-    (userFinancials?.total_fixed_deposits_withdrawn ?? 0);
-  const totalMonthlyDeposits = userFinancials?.total_monthly_deposits ?? 0;
   const formatDebtILS = (value: number) =>
     value > 0 ? `-${formatILS(value)}` : formatILS(0);
 
@@ -404,26 +407,67 @@ const UserHomePage = () => {
               title: "סה\"כ תרומות",
               value: totalDonations,
               detail: "מצטבר לכל התקופה",
+              kind: "money",
             },
             {
-              title: "הלוואות שנלקחו",
+              title: "תרומות רגילות",
+              value: totalEquityDonations,
+              detail: "תרומות רגילות מצטברות",
+              kind: "money",
+            },
+            {
+              title: "תרומות לקרנות מיוחדות",
+              value: totalSpecialFundDonations,
+              detail: "קרנות ייעודיות",
+              kind: "money",
+            },
+            {
+              title: "דמי חבר",
+              value: totalMemberFees,
+              detail: "סה\"כ דמי חבר",
+              kind: "money",
+            },
+            {
+              title: "סכום הלוואות שנלקחו",
               value: totalLoansTaken,
-              detail: "סה\"כ הלוואות לאורך זמן",
+              detail: "סכום הלוואות לאורך זמן",
+              kind: "money",
             },
             {
-              title: "הלוואות שהוחזרו",
+              title: "כמות הלוואות",
+              value: totalLoansCount,
+              detail: "מספר הלוואות מצטבר",
+              kind: "count",
+            },
+            {
+              title: "סכום הלוואות שנפרעו",
               value: totalLoansRepaid,
-              detail: "החזרי הלוואות מצטברים",
+              detail: "החזרים מצטברים",
+              kind: "money",
             },
             {
-              title: "פיקדונות נטו",
-              value: totalFixedDeposits + totalMonthlyDeposits,
-              detail: "פיקדונות קבועים וחודשיים",
+              title: "הפקדות קבועות",
+              value: totalFixedDepositsDeposited,
+              detail: "סה\"כ הפקדות",
+              kind: "money",
             },
             {
-              title: "הוראות קבע שחזרו",
+              title: "משיכות מהפקדות",
+              value: totalFixedDepositsWithdrawn,
+              detail: "סה\"כ משיכות",
+              kind: "money",
+            },
+            {
+              title: "החזרים בהוראות קבע",
               value: totalStandingOrderReturn,
-              detail: "סה\"כ חיובים חוזרים",
+              detail: "חיובים שחזרו",
+              kind: "money",
+            },
+            {
+              title: "אחזקה במזומן",
+              value: totalCashHoldings,
+              detail: "יתרה נוכחית",
+              kind: "money",
             },
           ].map((card) => (
             <Grid item xs={12} sm={6} md={4} key={card.title}>
@@ -442,7 +486,11 @@ const UserHomePage = () => {
                     {card.title}
                   </Typography>
                   <Typography variant="h6" fontWeight={800}>
-                    {card.value == null ? "לא הוגדר" : formatILS(card.value)}
+                    {card.value == null
+                      ? "לא הוגדר"
+                      : card.kind === "count"
+                      ? Number(card.value ?? 0).toLocaleString("he-IL")
+                      : formatILS(card.value)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {card.detail}
@@ -509,6 +557,13 @@ const UserHomePage = () => {
 };
 
 export default UserHomePage;
+
+
+
+
+
+
+
 
 
 
