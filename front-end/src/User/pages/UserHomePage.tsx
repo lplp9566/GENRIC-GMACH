@@ -80,6 +80,8 @@ const UserHomePage = () => {
     (userFinancials?.total_fixed_deposits_deposited ?? 0) -
     (userFinancials?.total_fixed_deposits_withdrawn ?? 0);
   const totalMonthlyDeposits = userFinancials?.total_monthly_deposits ?? 0;
+  const formatDebtILS = (value: number) =>
+    value > 0 ? `-${formatILS(value)}` : formatILS(0);
 
   return (
     <Box
@@ -220,7 +222,7 @@ const UserHomePage = () => {
                   סה"כ חובות פתוחים
                 </Typography>
                 <Typography variant="h4" fontWeight={800}>
-                  {formatILS(loansDebt + monthlyDebt)}
+                  {formatDebtILS(loansDebt + monthlyDebt)}
                 </Typography>
               </Box>
             </Stack>
@@ -278,7 +280,7 @@ const UserHomePage = () => {
                       </Typography>
                     </Stack>
                     <Typography variant="h6" fontWeight={800} mt={1.5}>
-                      {formatILS(card.value)}
+                  {formatDebtILS(card.value)}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {card.detail}
