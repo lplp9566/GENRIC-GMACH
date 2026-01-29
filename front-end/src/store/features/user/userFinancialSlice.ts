@@ -16,6 +16,8 @@ export interface UserFinancials {
   total_fixed_deposits_deposited: number;
   total_fixed_deposits_withdrawn: number;
   total_standing_order_return: number;
+  total_standing_order_return_paid: number;
+  total_standing_order_return_unpaid: number;
 }
 
 interface UserFinancialState {

@@ -30,11 +30,9 @@ export class UserFinancialViewEntity {
   @ViewColumn()
   total_special_fund_donations: number;
 
-  // ✅ חדש
   @ViewColumn()
   total_loans_taken: number;
 
-  // ✅ חדש
   @ViewColumn()
   total_loans_taken_amount: number;
 
@@ -47,6 +45,15 @@ export class UserFinancialViewEntity {
   @ViewColumn()
   total_fixed_deposits_withdrawn: number;
 
+  // ✅ חדש: שולם
+  @ViewColumn()
+  total_standing_order_return_paid: number;
+
+  // ✅ חדש: לא שולם
+  @ViewColumn()
+  total_standing_order_return_unpaid: number;
+
+  // ✅ להשאיר אם שמרת בעמודת ה־VIEW את הסה"כ (תאימות לאחור)
   @ViewColumn()
   total_standing_order_return: number;
 }

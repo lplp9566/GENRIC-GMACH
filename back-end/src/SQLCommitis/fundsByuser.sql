@@ -70,11 +70,12 @@ fixed_deposits_withdrawn_y AS (
   GROUP BY 1
 ),
 
-/* הוראות קבע */
+/* הוראות קבע - שולם / לא שולם */
 standing_order_y AS (
   SELECT
     orr."userId" AS user_id,
-    SUM(CASE WHEN orr.paid = true THEN orr.amount ELSE 0 END)::float AS total_standing_order_return
+    SUM(CASE WHEN orr.paid = true  THEN orr.amount ELSE 0 END)::float AS total_standing_order_return_paid,
+    SUM(CASE WHEN orr.paid = false OR orr.paid IS NULL THEN orr.amount ELSE 0 END)::float AS total_standing_order_return_unpaid
   FROM "order-return" orr
   GROUP BY 1
 )
@@ -94,7 +95,7 @@ SELECT
   COALESCE(d.total_equity_donations,0) AS total_equity_donations,
   COALESCE(d.total_special_fund_donations,0) AS total_special_fund_donations,
 
-  /* מזומן (נשאר 0 אצלך) */
+  /* מזומן */
   0::float AS total_cash_holdings,
 
   /* הלוואות */
@@ -102,7 +103,7 @@ SELECT
   COALESCE(lr.total_loans_repaid,0) AS total_loans_repaid,
   COALESCE(lt.total_loans_taken_amount,0) AS total_loans_taken_amount,
 
-  /* ✅ פקדונות קבועים – סה"כ הופקד = ראשוני + הוספות */
+  /* פקדונות קבועים – סה"כ הופקד = ראשוני + הוספות */
   (
     COALESCE(fdi.total_fixed_deposits_initial,0)
     + COALESCE(fda.total_fixed_deposits_added,0)
@@ -111,8 +112,13 @@ SELECT
   /* משיכות פקדונות */
   COALESCE(fw.total_fixed_deposits_withdrawn,0) AS total_fixed_deposits_withdrawn,
 
-  /* הוראות קבע */
-  COALESCE(so.total_standing_order_return,0) AS total_standing_order_return
+  /* ✅ הוראות קבע - שולם / לא שולם */
+  COALESCE(so.total_standing_order_return_paid,0)   AS total_standing_order_return_paid,
+  COALESCE(so.total_standing_order_return_unpaid,0) AS total_standing_order_return_unpaid,
+
+  /* (אופציונלי) סה"כ הוראות קבע - לשמירה על תאימות לאחור */
+  (COALESCE(so.total_standing_order_return_paid,0) + COALESCE(so.total_standing_order_return_unpaid,0))::float
+    AS total_standing_order_return
 
 FROM users u
 LEFT JOIN monthly_y m ON m.user_id = u.id
