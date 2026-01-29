@@ -72,6 +72,18 @@ const UserLoanRequestsPage: React.FC = () => {
     ADMIN_APPROVED: { label: "אושר", color: "success.main" },
     ADMIN_REJECTED: { label: "נדחה", color: "error.main" },
   };
+  const guarantorStatusMap: Record<string, string> = {
+    PENDING: "ממתין לאישור",
+    APPROVED: "אושר",
+    REJECTED: "נדחה",
+  };
+  const paymentMethodMap: Record<string, string> = {
+    direct_debit: "הוראת קבע",
+    credit_card: "כרטיס אשראי",
+    bank_transfer: "העברה בנקאית",
+    cash: "מזומן",
+    other: "אחר",
+  };
 
   useEffect(() => {
     if (!userId) return;
@@ -149,6 +161,9 @@ const UserLoanRequestsPage: React.FC = () => {
     await dispatch(
       addGuarantor({ id: activeRequestId, guarantorId: Number(guarantorId) })
     ).unwrap();
+    if (userId) {
+      await dispatch(fetchLoanRequests(userId));
+    }
     setCreateOpen(false);
   };
 
@@ -313,9 +328,15 @@ const UserLoanRequestsPage: React.FC = () => {
                         יום חיוב: {g.request?.payment_date ?? "-"}
                       </Typography>
                       <Typography>
-                        אמצעי חיוב: {g.request?.payment_method ?? "-"}
+                        אמצעי חיוב:{" "}
+                        {g.request?.payment_method
+                          ? paymentMethodMap[g.request.payment_method] ??
+                            g.request.payment_method
+                          : "-"}
                       </Typography>
-                      <Typography>סטטוס: {g.status}</Typography>
+                      <Typography>
+                        סטטוס: {guarantorStatusMap[g.status] ?? g.status}
+                      </Typography>
                       {g.status === "PENDING" && (
                         <Stack direction="row" spacing={1} mt={1}>
                           <Button

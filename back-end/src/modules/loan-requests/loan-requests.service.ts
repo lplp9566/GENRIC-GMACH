@@ -190,7 +190,7 @@ export class LoanRequestsService {
   async adminApprove(requestId: number) {
     const request = await this.requestsRepo.findOne({
       where: { id: requestId },
-      relations: ["user"],
+      relations: ["user", "guarantor_requests", "guarantor_requests.guarantor"],
     });
     if (!request) throw new BadRequestException("Request not found");
     const check = await this.checkLoan({
@@ -214,6 +214,18 @@ export class LoanRequestsService {
       payment_date: request.payment_date ?? 1,
       first_payment_date: null,
     };
+    const approvedGuarantors =
+      request.guarantor_requests?.filter(
+        (g) => g.status === GuarantorRequestStatus.APPROVED
+      ) ?? [];
+    if (approvedGuarantors[0]) {
+      const g = approvedGuarantors[0].guarantor;
+      loanPayload.guarantor1 = `${g.first_name} ${g.last_name}`;
+    }
+    if (approvedGuarantors[1]) {
+      const g = approvedGuarantors[1].guarantor;
+      loanPayload.guarantor2 = `${g.first_name} ${g.last_name}`;
+    }
     await this.loansService.createLoan(loanPayload as any);
     request.status = LoanRequestStatus.ADMIN_APPROVED;
     return this.requestsRepo.save(request);

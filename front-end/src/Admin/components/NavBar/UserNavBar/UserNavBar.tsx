@@ -10,8 +10,10 @@ import {
   ListItemButton,
   ListItemText,
   Popover,
+  Stack,
   Toolbar,
   Tooltip,
+  Typography,
   useMediaQuery,
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
@@ -161,9 +163,29 @@ const UserNavbar = () => {
         }}
       >
         {pendingGuarantor > 0 ? (
-          <Typography fontWeight={600}>
-            יש בקשת אישור ערבות ({pendingGuarantor})
-          </Typography>
+          <>
+            <Typography fontWeight={600} sx={{ mb: 1 }}>
+              יש בקשת אישור ערבות ({pendingGuarantor})
+            </Typography>
+            <Stack spacing={0.5}>
+              {guarantorRequests
+                .filter((r) => r.status === "PENDING")
+                .slice(0, 5)
+                .map((r) => (
+                  <Typography
+                    key={r.id}
+                    sx={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.85)" }}
+                  >
+                    {r.request?.user?.first_name} {r.request?.user?.last_name}
+                  </Typography>
+                ))}
+              {pendingGuarantor > 5 && (
+                <Typography sx={{ fontSize: "0.8rem", opacity: 0.7 }}>
+                  ועוד {pendingGuarantor - 5}
+                </Typography>
+              )}
+            </Stack>
+          </>
         ) : (
           <Typography color="rgba(255,255,255,0.7)">אין התראות</Typography>
         )}
