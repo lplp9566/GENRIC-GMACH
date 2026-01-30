@@ -17,13 +17,8 @@ import {
   useTheme,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { formatILS } from "../../Admin/components/HomePage/HomePage";
 import { formatDate, parseDate } from "../../Admin/Hooks/genricFunction";
 import { AppDispatch, RootState } from "../../store/store";
-import { getAllMonthlyRanks } from "../../store/features/admin/adminRankSlice";
-import { getUserFinancialsByUserGuard } from "../../store/features/user/userFinancialSlice";
-import { getAllLoans } from "../../store/features/admin/adminLoanSlice";
-import { StatusGeneric } from "../../common/indexTypes";
 import { editUser } from "../../store/features/admin/adminUsersSlice";
 import { setAuthUserData } from "../../store/features/auth/authSlice";
 import { toast } from "react-toastify";
@@ -34,29 +29,9 @@ const UserProfilePage = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const authUser = useSelector((s: RootState) => s.authslice.user);
-  const { monthlyRanks } = useSelector((s: RootState) => s.AdminRankSlice);
-  const userFinancials = useSelector(
-    (s: RootState) => s.UserFinancialSlice.data
-  );
-  const allLoans = useSelector((s: RootState) => s.AdminLoansSlice.allLoans);
 
   const user = authUser?.user;
 
-  const currentRoleId = user?.current_role?.id ?? null;
-  const currentRole = Array.isArray(monthlyRanks)
-    ? monthlyRanks.find((r) => r.id === currentRoleId) ?? null
-    : null;
-  const currentRoleRate = useMemo(() => {
-    if (!currentRole?.monthlyRates?.length) return null;
-    const now = new Date();
-    const sorted = [...currentRole.monthlyRates].sort(
-      (a, b) =>
-        new Date(b.effective_from).getTime() -
-        new Date(a.effective_from).getTime()
-    );
-    const active = sorted.find((r) => new Date(r.effective_from) <= now);
-    return active ?? sorted[0];
-  }, [currentRole]);
   const [editOpen, setEditOpen] = useState(false);
   const [notifyOpen, setNotifyOpen] = useState(false);
   const [formData, setFormData] = useState(() => ({
@@ -80,9 +55,6 @@ const UserProfilePage = () => {
 
   useEffect(() => {
     if (user?.id != null) {
-      dispatch(getUserFinancialsByUserGuard());
-      dispatch(getAllMonthlyRanks());
-      dispatch(getAllLoans({ status: StatusGeneric.ALL, userId: user.id }));
     }
   }, [dispatch, user?.id]);
 
@@ -108,32 +80,6 @@ const UserProfilePage = () => {
     });
   }, [user]);
 
-  const totalDonations = userFinancials?.total_donations ?? 0;
-  const totalMemberFees = userFinancials?.total_monthly_deposits ?? 0;
-  const totalContributions = totalDonations + totalMemberFees;
-
-  const activeLoans = allLoans.filter((loan) => loan.isActive);
-  const activeLoansCount = activeLoans.length;
-  const activeLoansTotalAmount = activeLoans.reduce(
-    (sum, loan) => sum + (loan.loan_amount ?? 0),
-    0
-  );
-  const activeLoansRemaining = activeLoans.reduce(
-    (sum, loan) => sum + (loan.remaining_balance ?? 0),
-    0
-  );
-
-  const totalLoansCount = allLoans.length;
-  const totalLoansAmount = allLoans.reduce(
-    (sum, loan) => sum + (loan.loan_amount ?? 0),
-    0
-  );
-
-  const loanUsageRatio =
-    totalContributions > 0
-      ? Math.min(1, activeLoansRemaining / totalContributions)
-      : 0;
-  const loanUsagePercent = Math.round(loanUsageRatio * 100);
   const joinDate = formatDate(parseDate(user?.join_date));
   const bankInfo = useMemo(
     () => ({
@@ -407,155 +353,6 @@ const UserProfilePage = () => {
                 עריכת התראות
               </Button>
             </Box>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={5}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 4, height: "100%" }}>
-            <Typography variant="h6" fontWeight={800} mb={2}>
-              מדדים אישיים
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Stack spacing={2}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  background: isDark
-                    ? "linear-gradient(135deg, rgba(14,116,144,0.25), rgba(30,41,59,0.9))"
-                    : "linear-gradient(135deg, rgba(14,116,144,0.12), rgba(224,242,254,0.7))",
-                  border: isDark
-                    ? "1px solid rgba(14,116,144,0.35)"
-                    : "1px solid rgba(14,116,144,0.2)",
-                }}
-              >
-                <Stack spacing={0.5}>
-                  <Typography variant="subtitle2" fontWeight={700}>
-                    הדרגה הנוכחית
-                  </Typography>
-                  <Typography variant="h6" fontWeight={800}>
-                    {currentRole?.name ?? "לא הוגדרה דרגה"}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {currentRoleRate?.amount != null
-                      ? `תשלום חודשי: ${formatILS(currentRoleRate.amount)}`
-                      : "תשלום חודשי: לא הוגדר"}
-                  </Typography>
-                </Stack>
-              </Paper>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  background: isDark
-                    ? "linear-gradient(135deg, rgba(34,197,94,0.2), rgba(30,41,59,0.9))"
-                    : "linear-gradient(135deg, rgba(34,197,94,0.12), rgba(220,252,231,0.7))",
-                  border: isDark
-                    ? "1px solid rgba(34,197,94,0.35)"
-                    : "1px solid rgba(34,197,94,0.2)",
-                }}
-              >
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
-                  <Box sx={{ flex: 1 }}>
-                    <Typography variant="subtitle2" fontWeight={700}>
-                      סך תרומות ודמי חבר
-                    </Typography>
-                    <Typography variant="h5" fontWeight={800} mt={0.5}>
-                      {formatILS(totalContributions)}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      כולל תרומות + דמי חבר מצטברים
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      position: "relative",
-                      width: 140,
-                      height: 140,
-                      borderRadius: "50%",
-                      background: `conic-gradient(${isDark ? "#38bdf8" : "#2563eb"} ${loanUsagePercent}%, ${isDark ? "rgba(148,163,184,0.25)" : "rgba(148,163,184,0.2)"} 0)`,
-                      transition: "background 1.2s ease",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        inset: 10,
-                        borderRadius: "50%",
-                        background: isDark ? "#0f172a" : "#ffffff",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexDirection: "column",
-                        textAlign: "center",
-                        animation: "pulseGlow 2.6s ease-in-out infinite",
-                        "@keyframes pulseGlow": {
-                          "0%": { boxShadow: "0 0 0 rgba(56,189,248,0.0)" },
-                          "50%": { boxShadow: "0 0 22px rgba(56,189,248,0.35)" },
-                          "100%": { boxShadow: "0 0 0 rgba(56,189,248,0.0)" },
-                        },
-                      }}
-                    >
-                      <Typography variant="h6" fontWeight={800}>
-                        {loanUsagePercent}%
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        מהתרומות בהלוואות
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Stack>
-              </Paper>
-
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  background: isDark
-                    ? "linear-gradient(135deg, rgba(59,130,246,0.2), rgba(30,41,59,0.9))"
-                    : "linear-gradient(135deg, rgba(59,130,246,0.12), rgba(224,242,254,0.7))",
-                  border: isDark
-                    ? "1px solid rgba(59,130,246,0.35)"
-                    : "1px solid rgba(59,130,246,0.2)",
-                }}
-              >
-                <Typography variant="subtitle2" fontWeight={700}>
-                  הלוואות פעילות
-                </Typography>
-                <Typography variant="h5" fontWeight={800} mt={0.5}>
-                  {activeLoansCount} הלוואות על סך {formatILS(activeLoansTotalAmount)}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  נותר להחזיר {formatILS(activeLoansRemaining)}
-                </Typography>
-              </Paper>
-
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  background: isDark
-                    ? "linear-gradient(135deg, rgba(244,63,94,0.2), rgba(30,41,59,0.9))"
-                    : "linear-gradient(135deg, rgba(244,63,94,0.12), rgba(255,228,230,0.7))",
-                  border: isDark
-                    ? "1px solid rgba(244,63,94,0.35)"
-                    : "1px solid rgba(244,63,94,0.2)",
-                }}
-              >
-                <Typography variant="subtitle2" fontWeight={700}>
-                  כל ההלוואות מאז ההצטרפות
-                </Typography>
-                <Typography variant="h5" fontWeight={800} mt={0.5}>
-                  {totalLoansCount} הלוואות על סך {formatILS(totalLoansAmount)}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  נתון מצטבר מיום ההצטרפות
-                </Typography>
-              </Paper>
-            </Stack>
           </Paper>
         </Grid>
       </Grid>

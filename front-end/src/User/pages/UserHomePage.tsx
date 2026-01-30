@@ -54,7 +54,7 @@ const UserHomePage = () => {
       dispatch(getUserFinancialsByUserGuard());
       dispatch(
         getAllLoans({
-          status: StatusGeneric.ACTIVE,
+          status: StatusGeneric.ALL,
           userId: user.id,
         })
       );
@@ -67,7 +67,7 @@ const UserHomePage = () => {
 
   const loanBalances = user?.payment_details?.loan_balances ?? [];
   const openLoans = loanBalances.filter((loan) => loan.balance < 0);
-  const loansDebt = loanBalances.reduce(
+  const loansDebt = openLoans.reduce(
     (sum, loan) => sum + Math.abs(loan.balance),
     0
   );
@@ -132,6 +132,27 @@ const UserHomePage = () => {
   const totalCashHoldings = userFinancials?.total_cash_holdings ?? 0;
   const totalStandingOrderReturn =
     userFinancials?.total_standing_order_return ?? 0;
+  const totalContributions = totalDonations + totalMemberFees;
+  const activeLoans = allLoans.filter((loan) => loan.isActive);
+  const activeLoansCount = activeLoans.length;
+  const activeLoansTotalAmount = activeLoans.reduce(
+    (sum, loan) => sum + (loan.loan_amount ?? 0),
+    0
+  );
+  const activeLoansRemaining = activeLoans.reduce(
+    (sum, loan) => sum + (loan.remaining_balance ?? 0),
+    0
+  );
+  const totalLoansAmount = allLoans.reduce(
+    (sum, loan) => sum + (loan.loan_amount ?? 0),
+    0
+  );
+  const totalLoansCountAll = allLoans.length;
+  const loanUsageRatio =
+    totalContributions > 0
+      ? Math.min(1, activeLoansRemaining / totalContributions)
+      : 0;
+  const loanUsagePercent = Math.round(loanUsageRatio * 100);
   const standingOrdersDebt = totalStandingOrderReturn;
   const formatDebtILS = (value: number) =>
     value > 0 ? `-${formatILS(value)}` : formatILS(0);
@@ -155,14 +176,12 @@ const UserHomePage = () => {
           p: { xs: 3, md: 4 },
           borderRadius: 5,
           background: isDark
-            ? "linear-gradient(135deg, rgba(13,71,161,0.9), rgba(15,23,42,0.96))"
-            : "linear-gradient(135deg, rgba(14,116,144,0.95), rgba(13,71,161,0.9))",
-          color: "#fff",
+            ? "linear-gradient(135deg, rgba(15,23,42,0.96), rgba(30,41,59,0.96))"
+            : "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(241,245,249,0.96))",
+          color: isDark ? "#f8fafc" : "#0f172a",
           position: "relative",
           overflow: "hidden",
-          border: isDark
-            ? "1px solid rgba(59,130,246,0.35)"
-            : "1px solid rgba(14,116,144,0.35)",
+          border: softBorder,
         }}
       >
         <Box
@@ -194,8 +213,8 @@ const UserHomePage = () => {
             color="default"
             sx={{
               alignSelf: "flex-start",
-              bgcolor: "rgba(255,255,255,0.24)",
-              color: "#fff",
+              bgcolor: isDark ? "rgba(255,255,255,0.16)" : "rgba(15,23,42,0.06)",
+              color: isDark ? "#fff" : "#0f172a",
               fontWeight: 700,
             }}
           />
@@ -213,9 +232,9 @@ const UserHomePage = () => {
               sx={{
                 borderRadius: 3,
                 fontWeight: 700,
-                bgcolor: "#fff",
-                color: "#0f172a",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
+                bgcolor: accent,
+                color: "#fff",
+                "&:hover": { bgcolor: accent },
               }}
             >
               פרופיל אישי
@@ -227,9 +246,9 @@ const UserHomePage = () => {
               sx={{
                 borderRadius: 3,
                 fontWeight: 700,
-                borderColor: "rgba(255,255,255,0.6)",
-                color: "#fff",
-                "&:hover": { borderColor: "#fff" },
+                borderColor: accent,
+                color: accent,
+                "&:hover": { borderColor: accent },
               }}
             >
               לסקירה מלאה
@@ -499,6 +518,159 @@ const UserHomePage = () => {
               </Paper>
             </Grid>
           ))}
+        </Grid>
+      </Box>
+
+      <Box sx={{ mt: 4, ...sectionSx }}>
+        <Typography variant="h5" fontWeight={800} mb={2}>
+          מדדים אישיים
+        </Typography>
+        <Grid container spacing={3} justifyContent="center">
+          <Grid item xs={12} md={6}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2.5,
+                borderRadius: 4,
+                background: isDark
+                  ? "linear-gradient(135deg, rgba(34,197,94,0.2), rgba(30,41,59,0.9))"
+                  : "linear-gradient(135deg, rgba(34,197,94,0.12), rgba(220,252,231,0.7))",
+                border: isDark
+                  ? "1px solid rgba(34,197,94,0.35)"
+                  : "1px solid rgba(34,197,94,0.2)",
+              }}
+            >
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="subtitle2" fontWeight={700}>
+                    סך תרומות ודמי חבר
+                  </Typography>
+                  <Typography variant="h5" fontWeight={800} mt={0.5}>
+                    {formatILS(totalContributions)}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    כולל תרומות + דמי חבר מצטברים
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    position: "relative",
+                    width: 140,
+                    height: 140,
+                    borderRadius: "50%",
+                    background: `conic-gradient(${isDark ? "#38bdf8" : "#2563eb"} ${loanUsagePercent}%, ${isDark ? "rgba(148,163,184,0.25)" : "rgba(148,163,184,0.2)"} 0)`,
+                    transition: "background 1.2s ease",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: 10,
+                      borderRadius: "50%",
+                      background: isDark ? "#0f172a" : "#ffffff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      textAlign: "center",
+                      animation: "pulseGlow 2.6s ease-in-out infinite",
+                      "@keyframes pulseGlow": {
+                        "0%": { boxShadow: "0 0 0 rgba(56,189,248,0.0)" },
+                        "50%": { boxShadow: "0 0 22px rgba(56,189,248,0.35)" },
+                        "100%": { boxShadow: "0 0 0 rgba(56,189,248,0.0)" },
+                      },
+                    }}
+                  >
+                    <Typography variant="h6" fontWeight={800}>
+                      {loanUsagePercent}%
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      מהתרומות בהלוואות
+                    </Typography>
+                  </Box>
+                </Box>
+              </Stack>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2.5,
+                borderRadius: 4,
+                background: isDark
+                  ? "linear-gradient(135deg, rgba(59,130,246,0.2), rgba(30,41,59,0.9))"
+                  : "linear-gradient(135deg, rgba(59,130,246,0.12), rgba(224,242,254,0.7))",
+                border: isDark
+                  ? "1px solid rgba(59,130,246,0.35)"
+                  : "1px solid rgba(59,130,246,0.2)",
+              }}
+            >
+              <Typography variant="subtitle2" fontWeight={700}>
+                הלוואות פעילות
+              </Typography>
+              <Typography variant="h5" fontWeight={800} mt={0.5}>
+                {activeLoansCount} הלוואות על סך {formatILS(activeLoansTotalAmount)}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                נותר להחזיר {formatILS(activeLoansRemaining)}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2.5,
+                borderRadius: 4,
+                background: isDark
+                  ? "linear-gradient(135deg, rgba(244,63,94,0.2), rgba(30,41,59,0.9))"
+                  : "linear-gradient(135deg, rgba(244,63,94,0.12), rgba(255,228,230,0.7))",
+                border: isDark
+                  ? "1px solid rgba(244,63,94,0.35)"
+                  : "1px solid rgba(244,63,94,0.2)",
+              }}
+            >
+              <Typography variant="subtitle2" fontWeight={700}>
+                כל ההלוואות מאז ההצטרפות
+              </Typography>
+              <Typography variant="h5" fontWeight={800} mt={0.5}>
+                {totalLoansCountAll} הלוואות על סך {formatILS(totalLoansAmount)}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                נתון מצטבר מיום ההצטרפות
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2.5,
+                borderRadius: 4,
+                background: isDark
+                  ? "linear-gradient(135deg, rgba(14,116,144,0.25), rgba(30,41,59,0.9))"
+                  : "linear-gradient(135deg, rgba(14,116,144,0.12), rgba(224,242,254,0.7))",
+                border: isDark
+                  ? "1px solid rgba(14,116,144,0.35)"
+                  : "1px solid rgba(14,116,144,0.2)",
+              }}
+            >
+              <Stack spacing={0.5}>
+                <Typography variant="subtitle2" fontWeight={700}>
+                  הדרגה הנוכחית
+                </Typography>
+                <Typography variant="h6" fontWeight={800}>
+                  {currentRole?.name ?? "לא הוגדרה דרגה"}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {currentRoleRate?.amount != null
+                    ? `תשלום חודשי: ${formatILS(currentRoleRate.amount)}`
+                    : "תשלום חודשי: לא הוגדר"}
+                </Typography>
+              </Stack>
+            </Paper>
+          </Grid>
         </Grid>
       </Box>
 
