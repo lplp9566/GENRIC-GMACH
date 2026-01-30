@@ -70,7 +70,7 @@ const UserHomePage = () => {
   const openLoansBalances = loanBalances.filter((loan) => loan.balance < 0);
   const loansDebt = openLoansBalances.reduce((sum, loan) => sum + Math.abs(loan.balance), 0);
 
-  const totalStandingOrderReturn = userFinancials?.total_standing_order_return ?? 0;
+  const totalStandingOrderReturn = userFinancials?.total_standing_order_return_unpaid ?? 0;
   const standingOrdersDebt = totalStandingOrderReturn;
 
   const totalDebt = loansDebt + monthlyDebt + standingOrdersDebt;

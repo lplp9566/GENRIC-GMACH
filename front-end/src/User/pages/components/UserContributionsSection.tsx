@@ -1,6 +1,6 @@
 ﻿import { Box, Paper, Stack, Typography } from "@mui/material";
 import SectionTitle from "./SectionTitle";
-import { formatILS } from "../../Admin/components/HomePage/HomePage";
+import { formatILS } from "../../../Admin/components/HomePage/HomePage";
 
 type Props = {
   totalContributions: number;

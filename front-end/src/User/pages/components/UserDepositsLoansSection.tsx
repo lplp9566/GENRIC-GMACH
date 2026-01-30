@@ -1,7 +1,7 @@
 ﻿import { Grid, Typography } from "@mui/material";
 import SectionTitle from "./SectionTitle";
 import UserStatCard from "./UserStatCard";
-import { formatILS } from "../../Admin/components/HomePage/HomePage";
+import { formatILS } from "../../../Admin/components/HomePage/HomePage";
 
 type Props = {
   depositsNowAmount: number;
