@@ -304,6 +304,12 @@ export const AdminLoansSlice = createSlice({
         if (idx !== undefined && idx !== -1 && state.loanDetails?.actions) {
           state.loanDetails.actions[idx] = payload;
         }
+        const idxAll = state.loanActions.findIndex(
+          (x) => Number(x.id) === Number(payload.id)
+        );
+        if (idxAll !== -1) {
+          state.loanActions[idxAll] = payload;
+        }
         state.error = null;
       })
       .addCase(editLoanAction.rejected, (state, action) => {

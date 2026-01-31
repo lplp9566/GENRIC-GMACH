@@ -27,9 +27,11 @@ type SortDirection = "asc" | "desc";
 
 interface ActionsTableProps {
   actions: ILoanAction[];
-  loanId: number;
+  loanId?: number;
   readOnly?: boolean;
   onCopyAction?: (action: ILoanAction) => void;
+  showLoanColumn?: boolean;
+  title?: string;
 }
 
 export const ActionsTable: React.FC<ActionsTableProps> = ({
@@ -37,6 +39,8 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
   loanId,
   readOnly,
   onCopyAction,
+  showLoanColumn,
+  title,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -63,11 +67,16 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
     LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
   ];
   const delateAction = () => {
-    toast.promise(dispatch(deleteLoanAction({ id: selected!.id, loanId })), {
-      pending: "Deleting action...",
-      success: "Action deleted.",
-      error: "Failed to delete action.",
-    });
+    const targetLoanId = loanId ?? selected?.loan?.id;
+    if (!selected || !targetLoanId) return;
+    toast.promise(
+      dispatch(deleteLoanAction({ id: selected.id, loanId: targetLoanId })),
+      {
+        pending: "Deleting action...",
+        success: "Action deleted.",
+        error: "Failed to delete action.",
+      }
+    );
     setDeleteModal(false);
   };
 
@@ -108,7 +117,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
         variant="h6"
         sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}
       >
-        פעולות על הלוואה
+        {title ?? "פעולות על הלוואה"}
       </Typography>
       {actions.length === 0 && <Typography>לא נמצאו פעולות</Typography>}
       {actions.length > 0 && (
@@ -122,6 +131,9 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                 },
               }}
             >
+              {showLoanColumn && (
+                <TableCell align="right">הלוואה</TableCell>
+              )}
               <TableCell
                 align="right"
                 onClick={() => handleHeaderClick("date")}
@@ -155,6 +167,18 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                 hover
                 sx={{ "& td": { border: "none" } }}
               >
+                {showLoanColumn && (
+                  <TableCell align="right">
+                    {action.loan ? (
+                      <>
+                        #{action.loan.id} - {action.loan.user?.first_name ?? ""} {" "}
+                        {action.loan.user?.last_name ?? ""}
+                      </>
+                    ) : (
+                      "—"
+                    )}
+                  </TableCell>
+                )}
                 <TableCell align="right">
                   {new Date(action.date).toLocaleDateString("he-IL")}
                 </TableCell>
@@ -243,7 +267,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
           open={editModal}
           action={selected}
           onClose={() => setEditModal(false)}
-          loanId={loanId}
+          loanId={loanId ?? selected.loan?.id ?? 0}
         />
       )}
       {deleteModal && !readOnly && (

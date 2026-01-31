@@ -34,9 +34,10 @@ import Actions from "../LoanActions/Actions";
 
 interface LoanCardProps {
   loan: ILoanWithUser;
-  onClick: () => void;
+  onClick?: () => void;
   readOnly?: boolean;
   onActionSuccess?: () => void;
+  hideViewButton?: boolean;
 }
 
 const LoanCard: React.FC<LoanCardProps> = ({
@@ -44,6 +45,7 @@ const LoanCard: React.FC<LoanCardProps> = ({
   onClick,
   readOnly,
   onActionSuccess,
+  hideViewButton,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -218,9 +220,11 @@ const LoanCard: React.FC<LoanCardProps> = ({
         </Grid>
 
         <Box display="flex" justifyContent="center">
-          <Button variant="outlined" onClick={onClick}>
+          {!hideViewButton && onClick && (
+            <Button variant="outlined" onClick={onClick}>
             הצג פרטי הלוואה
           </Button>
+          )}
           {!readOnly && (
             <Button
               variant="contained"

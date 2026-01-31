@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Container,
   Paper,
@@ -22,15 +22,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
 import {
   getAllLoans,
+  getAllLoanActions,
   getLoanDetails,
   setPage,
 } from "../../store/features/admin/adminLoanSlice";
 import SummaryCard from "../components/Loans/LoansDashboard/SummaryCard";
-import LoanCard from "../components/Loans/LoansDashboard/LoanCard";
+import LoanMiniCard from "../components/Loans/LoansDashboard/LoanMiniCard";
 import ActionsTable from "../components/Loans/LoanDetails/ActionsTable";
 import Actions from "../components/Loans/LoanActions/Actions";
-import LoanHeader from "../components/Loans/LoanDetails/LoanHeader";
-import { GeneralLoanInfoCard } from "../components/Loans/LoanDetails/GeneralLoanInfoCard";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
 import { useNavigate } from "react-router-dom";
 import { StatusGeneric } from "../../common/indexTypes";
@@ -46,12 +45,11 @@ export const LoansPage: React.FC = () => {
 
   const [filter, setFilter] = useState<StatusGeneric>(StatusGeneric.ACTIVE);
   const [selectedLoanId, setSelectedLoanId] = useState<number | null>(null);
-  const [expanded, setExpanded] = useState(false);
-  const [openView, setOpenView] = useState(false);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [initialAction, setInitialAction] =
     useState<ICreateLoanAction | null>(null);
-  const { allLoans, page, pageCount, status, total } = useSelector(
+  const [actionLoanId, setActionLoanId] = useState<number | null>(null);
+  const { allLoans, loanActions, page, pageCount, status, total } = useSelector(
     (s: RootState) => s.AdminLoansSlice
   );
   const loanDetails = useSelector(
@@ -71,21 +69,8 @@ export const LoansPage: React.FC = () => {
   }, [dispatch, page, filter, selectedUser]);
 
   useEffect(() => {
-    if (!openView) return;
-    if (allLoans.length === 0) {
-      setSelectedLoanId(null);
-      return;
-    }
-  }, [allLoans, openView, selectedLoanId]);
-
-  const prevOpenViewRef = useRef(openView);
-  useEffect(() => {
-    const wasOpen = prevOpenViewRef.current;
-    prevOpenViewRef.current = openView;
-    if (openView && !wasOpen && !selectedLoanId && allLoans.length > 0) {
-      setSelectedLoanId(allLoans[0].id);
-    }
-  }, [openView, selectedLoanId, allLoans]);
+    dispatch(getAllLoanActions());
+  }, [dispatch]);
 
   useEffect(() => {
     if (selectedLoanId) dispatch(getLoanDetails(selectedLoanId));
@@ -103,12 +88,24 @@ export const LoansPage: React.FC = () => {
   };
 
   const selectedLoan = allLoans.find((l) => l.id === selectedLoanId) || null;
-  const handleSubmit = useLoanSubmit(selectedLoanId ?? 0, () => {
+  const actionLoan = allLoans.find((l) => l.id === actionLoanId) || null;
+  const refreshLoans = () => {
+    const opts = selectedUser?.id
+      ? { page, limit, status: filter, userId: selectedUser.id }
+      : { page, limit, status: filter };
+    dispatch(getAllLoans(opts));
+  };
+
+  const refreshActions = () => {
+    dispatch(getAllLoanActions());
+  };
+
+  const handleSubmit = useLoanSubmit(actionLoanId ?? 0, () => {
     setActionsOpen(false);
     setInitialAction(null);
-    // const opts = selectedUser?.id
-    //   ? { page, limit, status: filter, userId: selectedUser.id }
-    //   : { page, limit, status: filter };
+    setActionLoanId(null);
+    refreshActions();
+    refreshLoans();
   });
   const totalAmount = useMemo(
     () => allLoans.reduce((sum, loan) => sum + loan.loan_amount, 0),
@@ -118,15 +115,37 @@ export const LoansPage: React.FC = () => {
     () => allLoans.reduce((sum, loan) => sum + loan.remaining_balance, 0),
     [allLoans]
   );
-  const handleOpenActions = (prefill?: ICreateLoanAction | null) => {
+  const loanIds = useMemo(
+    () => new Set(allLoans.map((loan) => loan.id)),
+    [allLoans]
+  );
+  const allActions = useMemo(
+    () =>
+      (loanActions ?? []).filter((action) =>
+        loanIds.has(action.loan?.id ?? -1)
+      ),
+    [loanActions, loanIds]
+  );
+  const visibleActions = useMemo(() => {
+    if (!selectedLoanId) return allActions;
+    if (loanDetails?.actions) return loanDetails.actions;
+    return allActions.filter((action) => action.loan?.id === selectedLoanId);
+  }, [allActions, loanDetails, selectedLoanId]);
+  const handleOpenActions = (
+    loanId: number,
+    prefill?: ICreateLoanAction | null
+  ) => {
+    setActionLoanId(loanId);
     setInitialAction(prefill ?? null);
     setActionsOpen(true);
   };
 
   const handleCopyAction = (action: ILoanAction) => {
-    if (!selectedLoanId) return;
-    handleOpenActions({
-      loanId: selectedLoanId,
+    const loanId = action.loan?.id ?? selectedLoanId;
+    if (!loanId) return;
+    setSelectedLoanId(loanId);
+    handleOpenActions(loanId, {
+      loanId,
       action_type: action.action_type,
       date: action.date,
       value: action.value,
@@ -244,172 +263,109 @@ export const LoansPage: React.FC = () => {
                 overflowX: "auto",
               }}
             >
-              {!openView && (
-                <Grid container spacing={2} justifyContent="center" mb={4}>
-                  <Grid item xs={12} sm={isSm ? 6 : 3}>
-                    <SummaryCard label="מספר הלוואות" value={total} />
-                  </Grid>
-                  <Grid item xs={12} sm={isSm ? 6 : 3}>
-                    <SummaryCard
-                      label="סכום הלוואות"
-                      value={`₪${totalAmount.toLocaleString("he-IL")}`}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={isSm ? 6 : 3}>
-                    <SummaryCard
-                      label="יתרה לתשלום"
-                      value={`₪${totalRepaid.toLocaleString("he-IL")}`}
-                    />
-                  </Grid>
+              <Grid container spacing={2} justifyContent="center" mb={4}>
+                <Grid item xs={12} sm={isSm ? 6 : 3}>
+                  <SummaryCard label="מספר הלוואות" value={total} />
                 </Grid>
-              )}
-
-              {openView && selectedLoan && loanDetails && (
-                <Box sx={{ mb: 4 }}>
-                  <LoanHeader
-                    firstName={selectedLoan.user.first_name}
-                    lastName={selectedLoan.user.last_name}
-                    principal={selectedLoan.loan_amount}
-                    remaining={loanDetails.remaining_balance}
-                    balance={loanDetails.balance}
-                    purpose={selectedLoan.purpose}
+                <Grid item xs={12} sm={isSm ? 6 : 3}>
+                  <SummaryCard
+                    label="סכום הלוואות"
+                    value={`\u20AA${totalAmount.toLocaleString("he-IL")}`}
                   />
-                </Box>
-              )}
-
-              {!openView && (
-                <Grid container spacing={4}>
-                  {allLoans.map((loan) => (
-                    <Grid item xs={12} sm={6} md={4} key={loan.id}>
-                      <LoanCard
-                        loan={loan}
-                        onClick={() => {
-                          setSelectedLoanId(loan.id);
-                          setOpenView(true);
-                        }}
-                        onActionSuccess={() => {
-                          const opts = selectedUser?.id
-                            ? { page, limit, status: filter, userId: selectedUser.id }
-                            : { page, limit, status: filter };
-                          dispatch(getAllLoans(opts));
-                        }}
-                      />
-                    </Grid>
-                  ))}
                 </Grid>
-              )}
+                <Grid item xs={12} sm={isSm ? 6 : 3}>
+                  <SummaryCard
+                    label="יתרה לתשלום"
+                    value={`\u20AA${totalRepaid.toLocaleString("he-IL")}`}
+                  />
+                </Grid>
+              </Grid>
 
-              {openView && (
-                <Grid container spacing={3} direction="row" sx={{ direction: "ltr" }}>
-                  {!expanded && (
-                    <Grid item xs={12} md={4}>
-                      <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            mb: 2,
-                          }}
-                        >
-                          <Typography variant="h6" fontWeight={600}>
-                            רשימת הלוואות
-                          </Typography>
-                          <Button
-                            variant="outlined"
-                            onClick={() => {
-                              setSelectedLoanId(null);
-                              setOpenView(false);
-                              setExpanded(false);
-                            }}
-                          >
-                            חזרה לכל ההלוואות
-                          </Button>
-                        </Box>
-                        {allLoans.length === 0 ? (
-                          <Typography>אין נתונים להצגה</Typography>
-                        ) : (
-                          <Box>
-                            {allLoans.map((loan) => {
-                              const isSelected = loan.id === selectedLoanId;
-                              return (
-                                <Box
-                                  key={loan.id}
-                                  sx={{
-                                    mb: 2,
-                                    border: isSelected
-                                      ? "2px solid #2a8c82"
-                                      : "1px solid rgba(0,0,0,0.08)",
-                                    borderRadius: 2,
-                                    overflow: "hidden",
-                                  }}
-                                >
-                                  <LoanCard
-                                    loan={loan}
-                                    onClick={() => setSelectedLoanId(loan.id)}
-                                    onActionSuccess={() => {
-                                      const opts = selectedUser?.id
-                                        ? { page, limit, status: filter, userId: selectedUser.id }
-                                        : { page, limit, status: filter };
-                                      dispatch(getAllLoans(opts));
-                                    }}
-                                  />
-                                </Box>
-                              );
-                            })}
-                          </Box>
-                        )}
-                      </Paper>
-                    </Grid>
-                  )}
-
-                  <Grid item xs={12} md={expanded ? 6 : 4}>
-                    <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          mb: 2,
-                        }}
-                      >
+              <Grid container spacing={3} sx={{ direction: "rtl" }}>
+                <Grid item xs={12} md={8}>
+                  <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        mb: 2,
+                      }}
+                    >
+                      <Box>
                         <Typography variant="h6" fontWeight={600}>
-                          פרטי הלוואה
+                          {"פעולות הלוואות"}
                         </Typography>
+                        {selectedLoan && (
+                          <Typography variant="body2" color="text.secondary">
+                            {"הלוואה"} #{selectedLoan.id} - {selectedLoan.user.first_name} {selectedLoan.user.last_name}
+                          </Typography>
+                        )}
+                      </Box>
+                      {selectedLoanId && (
                         <Button
                           variant="outlined"
-                          onClick={() => setExpanded((v) => !v)}
+                          onClick={() => setSelectedLoanId(null)}
                         >
-                          {expanded ? "הצג רשימת הלוואות" : "הרחב תצוגה"}
+                          {"הצג את כל הפעולות"}
                         </Button>
-                      </Box>
-                      {selectedLoan && loanDetails ? (
-                        <>
-                          <Box sx={{ mt: 2 }}>
-                            <GeneralLoanInfoCard loan={loanDetails} />
-                          </Box>
-                        </>
-                      ) : (
-                        <Typography>אין נתונים להצגה</Typography>
                       )}
-                    </Paper>
-                  </Grid>
-
-                  <Grid item xs={12} md={expanded ? 6 : 4}>
-                    <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-                      {selectedLoanId && loanDetails ? (
-                        <ActionsTable
-                          actions={loanDetails.actions ?? []}
-                          loanId={selectedLoanId}
-                          onCopyAction={handleCopyAction}
-                        />
-                      ) : (
-                        <Typography>אין נתונים להצגה</Typography>
-                      )}
-                    </Paper>
-                  </Grid>
+                    </Box>
+                    {visibleActions.length === 0 ? (
+                      <Typography>
+                        {"אין פעולות להצגה"}
+                      </Typography>
+                    ) : (
+                      <ActionsTable
+                        actions={visibleActions}
+                        loanId={selectedLoanId ?? undefined}
+                        onCopyAction={handleCopyAction}
+                        showLoanColumn={!selectedLoanId}
+                        title={
+                          selectedLoanId
+                            ? "פעולות על הלוואה"
+                            : "פעולות על כל ההלוואות"
+                        }
+                      />
+                    )}
+                  </Paper>
                 </Grid>
-              )}
+
+                <Grid item xs={12} md={4}>
+                  <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="h6" fontWeight={600}>
+                        {"הלוואות"}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {selectedLoanId
+                          ? "בחרת הלוואה להצגת פעולות."
+                          : "בחר הלוואה להצגת פעולות."}
+                      </Typography>
+                    </Box>
+                    {allLoans.length === 0 ? (
+                      <Typography>
+                        {"אין הלוואות להצגה"}
+                      </Typography>
+                    ) : (
+                      <Stack spacing={1.5}>
+                        {allLoans.map((loan) => (
+                          <LoanMiniCard
+                            key={loan.id}
+                            loan={loan}
+                            selected={loan.id === selectedLoanId}
+                            onSelect={() => setSelectedLoanId(loan.id)}
+                            onActionSuccess={() => {
+                              refreshLoans();
+                              refreshActions();
+                            }}
+                          />
+                        ))}
+                      </Stack>
+                    )}
+                  </Paper>
+                </Grid>
+              </Grid>
             </Box>
           )}
 
@@ -440,21 +396,27 @@ export const LoansPage: React.FC = () => {
               />
             </Box>
           )}
-        <Dialog
-          open={actionsOpen}
-          onClose={() => {
-            setActionsOpen(false);
-            setInitialAction(null);
-          }}
-          maxWidth="sm"
-          fullWidth
-        >
+
+          <Dialog
+            open={actionsOpen}
+            onClose={() => {
+              setActionsOpen(false);
+              setInitialAction(null);
+              setActionLoanId(null);
+            }}
+            maxWidth="sm"
+            fullWidth
+          >
           <DialogContent>
-            {selectedLoanId && loanDetails && (
+            {actionLoanId && (
               <Actions
-                loanId={selectedLoanId}
+                loanId={actionLoanId}
                 handleSubmit={handleSubmit}
-                max={loanDetails.remaining_balance}
+                max={
+                  actionLoan?.remaining_balance ??
+                  loanDetails?.remaining_balance ??
+                  0
+                }
                 initialAction={initialAction}
               />
             )}
