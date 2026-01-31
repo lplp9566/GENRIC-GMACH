@@ -1,9 +1,9 @@
-﻿import { Grid, Typography } from "@mui/material";
+﻿import { Grid } from "@mui/material";
 import SectionTitle from "./SectionTitle";
 import UserStatCard from "./UserStatCard";
-import { formatILS } from "../../../Admin/components/HomePage/HomePage";
+import { formatILS } from "../../../../Admin/components/HomePage/HomePage";
 
-type Props = {
+interface UserDepositsLoansSectionProps {
   depositsNowAmount: number;
   totalFixedDepositsDeposited: number;
   totalFixedDepositsWithdrawn: number;
@@ -29,7 +29,7 @@ const UserDepositsLoansSection = ({
   surface,
   softBorder,
   isDark,
-}: Props) => (
+}: UserDepositsLoansSectionProps) => (
   <>
     <SectionTitle>הפקדות והלוואות כרגע</SectionTitle>
 
@@ -66,10 +66,6 @@ const UserDepositsLoansSection = ({
         />
       </Grid>
     </Grid>
-
-    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
-      * "כסף בהלוואה כרגע" מחושב: סך הלוואות שנלקחו פחות סך שהוחזר (לפי בקשתך).
-    </Typography>
   </>
 );
 

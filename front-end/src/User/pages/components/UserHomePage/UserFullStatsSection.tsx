@@ -1,6 +1,6 @@
 ﻿import { Grid, Paper, Stack, Typography } from "@mui/material";
 import SectionTitle from "./SectionTitle";
-import { formatILS } from "../../../Admin/components/HomePage/HomePage";
+import { formatILS } from "../../../../Admin/components/HomePage/HomePage";
 
 type StatCard = {
   title: string;

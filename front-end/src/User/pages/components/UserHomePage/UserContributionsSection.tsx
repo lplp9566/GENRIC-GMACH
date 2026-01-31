@@ -1,8 +1,8 @@
 ﻿import { Box, Paper, Stack, Typography } from "@mui/material";
 import SectionTitle from "./SectionTitle";
-import { formatILS } from "../../../Admin/components/HomePage/HomePage";
+import { formatILS } from "../../../../Admin/components/HomePage/HomePage";
 
-type Props = {
+interface UserContributionsSectionProps {
   totalContributions: number;
   activeLoansRemaining: number;
   loanUsagePercent: number;
@@ -14,7 +14,7 @@ const UserContributionsSection = ({
   activeLoansRemaining,
   loanUsagePercent,
   isDark,
-}: Props) => (
+}: UserContributionsSectionProps) => (
   <>
     <SectionTitle>תרומות והלוואות</SectionTitle>
     <Paper

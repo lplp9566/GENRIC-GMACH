@@ -9,14 +9,14 @@ import { getUserFinancialsByUserGuard } from "../../store/features/user/userFina
 import { getAllLoans } from "../../store/features/admin/adminLoanSlice";
 import { StatusGeneric } from "../../common/indexTypes";
 import { getAllMonthlyRanks } from "../../store/features/admin/adminRankSlice";
-import UserHomeHero from "./components/UserHomeHero";
-import UserRoleSection from "./components/UserRoleSection";
-import UserNextChargesSection from "./components/UserNextChargesSection";
-import UserContributionsSection from "./components/UserContributionsSection";
-import UserDepositsLoansSection from "./components/UserDepositsLoansSection";
-import UserDebtsSection from "./components/UserDebtsSection";
-import UserFullStatsSection from "./components/UserFullStatsSection";
-import UserRegulations from "./components/UserRegulations";
+import UserHomeHero from "./components/UserHomePage/UserHomeHero";
+import UserNextChargesSection from "./components/UserHomePage/UserNextChargesSection";
+import UserContributionsSection from "./components/UserHomePage/UserContributionsSection";
+import UserDepositsLoansSection from "./components/UserHomePage/UserDepositsLoansSection";
+import UserFullStatsSection from "./components/UserHomePage/UserFullStatsSection";
+import UserRegulations from "./components/UserHomePage/UserRegulations";
+import UserRoleSection from "./components/UserHomePage/UserRoleSection";
+import UserDebtsSection from "./components/UserHomePage/UserDebtsSection";
 
 const UserHomePage = () => {
   const dispatch = useDispatch<AppDispatch>();

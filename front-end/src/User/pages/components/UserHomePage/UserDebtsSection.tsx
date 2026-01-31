@@ -2,7 +2,7 @@
 import SectionTitle from "./SectionTitle";
 import UserStatCard from "./UserStatCard";
 
-type Props = {
+interface UserDebtsSectionProps {
   totalDebt: number;
   monthlyDebt: number;
   loansDebt: number;
@@ -28,7 +28,7 @@ const UserDebtsSection = ({
   surface,
   softBorder,
   isDark,
-}: Props) => (
+}: UserDebtsSectionProps) => (
   <>
     <SectionTitle>החובות שלך</SectionTitle>
 

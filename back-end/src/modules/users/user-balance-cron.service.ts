@@ -7,8 +7,6 @@ import { Repository } from 'typeorm';
 import { PaymentDetailsEntity } from "../users/payment-details/payment_details.entity";
 import { LoanActionBalanceService } from '../loans/loan-actions/loan_action_balance.service';
 import { LoanEntity } from '../loans/Entity/loans.entity';
-
-// ⭐ נוסיף שירות שליחת הודעות
 import { WhatsappService } from '../whatsapp/whatsapp.service';
 import { MembershipType } from './userTypes';
 
@@ -25,12 +23,9 @@ export class UserBalanceCronService {
 
     @InjectRepository(PaymentDetailsEntity)
     private readonly paymentDetailsRepo: Repository<PaymentDetailsEntity>,
-
-    // ⭐ מוסיפים ל־constructor
     private readonly whatsappService: WhatsappService,
   ) {}
 
-  // עדכון יתרות חודשיות
   @Cron('00 00 * * *', { timeZone: 'Asia/Jerusalem' })
   async updateAllUsersBalances() {
     this.logger.log('🔄 Updating all users balances...');
