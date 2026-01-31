@@ -1,4 +1,4 @@
-// src/hooks/useLoanSubmit.ts
+﻿// src/hooks/useLoanSubmit.ts
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store/store";
@@ -14,7 +14,7 @@ const useLoanSubmit = (loanId: number, onSuccess?: () => void) => {
       // 1) שליחת העדכון/יצירה
       await dispatch(createLoanAction(dto)).unwrap();
       // 2) רענון הפרטים עם ה־id הנוכחי
-      await dispatch(getLoanDetails(loanId)).unwrap();
+      await dispatch(getLoanDetails(dto.loanId ?? loanId)).unwrap();
       onSuccess?.();
     },
     

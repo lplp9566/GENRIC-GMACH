@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import {
   Container,
   Paper,
   Typography,
-  Pagination,
   Box,
   FormControl,
   InputLabel,
@@ -49,14 +48,14 @@ export const LoansPage: React.FC = () => {
   const [initialAction, setInitialAction] =
     useState<ICreateLoanAction | null>(null);
   const [actionLoanId, setActionLoanId] = useState<number | null>(null);
-  const { allLoans, loanActions, page, pageCount, status, total } = useSelector(
+  const { allLoans, loanActions, page, status, total } = useSelector(
     (s: RootState) => s.AdminLoansSlice
   );
   const loanDetails = useSelector(
     (s: RootState) => s.AdminLoansSlice.loanDetails
   );
   const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
-  const limit = 10;
+  const limit = 1000;
 
   useEffect(() => {
     if (selectedUser?.id) {
@@ -75,6 +74,13 @@ export const LoansPage: React.FC = () => {
   useEffect(() => {
     if (selectedLoanId) dispatch(getLoanDetails(selectedLoanId));
   }, [dispatch, selectedLoanId]);
+
+  useEffect(() => {
+    if (!actionsOpen) return;
+    if (!actionLoanId && selectedLoanId) {
+      setActionLoanId(selectedLoanId);
+    }
+  }, [actionsOpen, actionLoanId, selectedLoanId]);
 
   useEffect(() => {
     if (selectedLoanId && !allLoans.some((l) => l.id === selectedLoanId)) {
@@ -151,6 +157,11 @@ export const LoansPage: React.FC = () => {
       value: action.value,
     });
   };
+  const handleActionLoanChange = (loanId: number) => {
+    setActionLoanId(loanId);
+    setSelectedLoanId(loanId);
+  };
+
 
   return (
     <>
@@ -369,34 +380,6 @@ export const LoansPage: React.FC = () => {
             </Box>
           )}
 
-          {pageCount > 1 && (
-            <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
-              <Pagination
-                count={pageCount}
-                page={page}
-                onChange={(_, v) => dispatch(setPage(v))}
-                sx={{
-                  "& .MuiPaginationItem-root": {
-                    color: "#424242",
-                    "&.Mui-selected": {
-                      bgcolor: "#2a8c82",
-                      color: "#ffffff",
-                      "&:hover": { bgcolor: "#1f645f" },
-                    },
-                    "&:hover:not(.Mui-selected)": {
-                      bgcolor: "#E0E0E0",
-                    },
-                  },
-                  "& .MuiPaginationItem-icon": { color: "#2a8c82" },
-                }}
-                showFirstButton
-                showLastButton
-                siblingCount={1}
-                boundaryCount={1}
-              />
-            </Box>
-          )}
-
           <Dialog
             open={actionsOpen}
             onClose={() => {
@@ -408,9 +391,9 @@ export const LoansPage: React.FC = () => {
             fullWidth
           >
           <DialogContent>
-            {actionLoanId && (
+            {(actionLoanId || selectedLoanId) && (
               <Actions
-                loanId={actionLoanId}
+                loanId={actionLoanId ?? selectedLoanId!}
                 handleSubmit={handleSubmit}
                 max={
                   actionLoan?.remaining_balance ??
@@ -418,6 +401,10 @@ export const LoansPage: React.FC = () => {
                   0
                 }
                 initialAction={initialAction}
+                loanOptions={allLoans}
+                selectedLoanId={actionLoanId ?? selectedLoanId ?? undefined}
+                onLoanChange={handleActionLoanChange}
+                showLoanSelect
               />
             )}
           </DialogContent>

@@ -105,20 +105,7 @@ const LoanMiniCard: React.FC<LoanMiniCardProps> = ({
           />
         </Box>
 
-        <Box
-          mt={1}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ direction: "rtl" }}
-        >
-          <Typography variant="caption" color="text.secondary">
-            יתרה לתשלום
-          </Typography>
-          <Typography variant="body2" fontWeight={700} color="#D35400">
-            ₪{loan.remaining_balance.toLocaleString("he-IL")}
-          </Typography>
-        </Box>
+
 
         <Box
           mt={0.5}
@@ -134,7 +121,20 @@ const LoanMiniCard: React.FC<LoanMiniCardProps> = ({
             ₪{loan.loan_amount.toLocaleString("he-IL")}
           </Typography>
         </Box>
-
+        <Box
+          mt={1}
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ direction: "rtl" }}
+        >
+          <Typography variant="caption" color="text.secondary">
+            יתרה לתשלום
+          </Typography>
+          <Typography variant="body2" fontWeight={700} color="#D35400">
+            ₪{loan.remaining_balance.toLocaleString("he-IL")}
+          </Typography>
+        </Box>
         <Box
           mt={1}
           display="flex"
