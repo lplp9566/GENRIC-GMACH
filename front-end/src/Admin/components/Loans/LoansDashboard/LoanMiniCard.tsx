@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -46,6 +46,9 @@ const LoanMiniCard: React.FC<LoanMiniCardProps> = ({
   const loanDetails = useSelector(
     (s: RootState) => s.AdminLoansSlice.loanDetails
   );
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const permission = authUser?.permission ?? authUser?.user?.permission;
+  const canWrite = Boolean(authUser?.is_admin || permission === "admin_write");
   const [editOpen, setEditOpen] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -142,21 +145,23 @@ const LoanMiniCard: React.FC<LoanMiniCardProps> = ({
           justifyContent="space-between"
           sx={{ direction: "rtl" }}
         >
-          <Tooltip title="הוספת פעולה">
-            <span>
-              <IconButton
-                size="small"
-                color="primary"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setActionsOpen(true);
-                }}
-                disabled={!loan.isActive}
-              >
-                <AddIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
+          {canWrite && (
+            <Tooltip title="הוספת פעולה">
+              <span>
+                <IconButton
+                  size="small"
+                  color="primary"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setActionsOpen(true);
+                  }}
+                  disabled={!loan.isActive}
+                >
+                  <AddIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
           <Tooltip title="פרטי הלוואה">
             <IconButton
               size="small"
@@ -169,33 +174,37 @@ const LoanMiniCard: React.FC<LoanMiniCardProps> = ({
               <VisibilityIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="עריכה">
-            <IconButton
-              size="small"
-              onClick={(event) => {
-                event.stopPropagation();
-                setEditOpen(true);
-              }}
-            >
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="מחיקה">
-            <IconButton
-              size="small"
-              color="error"
-              onClick={(event) => {
-                event.stopPropagation();
-                setDeleteMode(true);
-              }}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          {canWrite && (
+            <Tooltip title="עריכה">
+              <IconButton
+                size="small"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setEditOpen(true);
+                }}
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+          {canWrite && (
+            <Tooltip title="מחיקה">
+              <IconButton
+                size="small"
+                color="error"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setDeleteMode(true);
+                }}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       </CardContent>
 
-      {editOpen && (
+      {editOpen && canWrite && (
         <EditLoanModal
           open={editOpen}
           onClose={() => setEditOpen(false)}
@@ -203,7 +212,7 @@ const LoanMiniCard: React.FC<LoanMiniCardProps> = ({
         />
       )}
 
-      {deleteMode && (
+      {deleteMode && canWrite && (
         <ConfirmModal
           open={deleteMode}
           onClose={() => setDeleteMode(false)}
@@ -228,7 +237,7 @@ const LoanMiniCard: React.FC<LoanMiniCardProps> = ({
       </Dialog>
 
       <Dialog
-        open={actionsOpen}
+        open={actionsOpen && canWrite}
         onClose={() => setActionsOpen(false)}
         maxWidth="sm"
         fullWidth

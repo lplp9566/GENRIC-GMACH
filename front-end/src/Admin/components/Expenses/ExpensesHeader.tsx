@@ -1,7 +1,9 @@
-import { Paper, Stack, Box, Typography, Button } from "@mui/material";
+﻿import { Paper, Stack, Box, Typography, Button } from "@mui/material";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import AddExpensesCategoryModal from "./AddExpensesCategoryModal";
 import AddExpenseModal from "./AddExpenseModal";
+import { RootState } from "../../../store/store";
 
 // TODO: שנה נתיבים/שמות לפי הקומפוננטות אצלך
 // import AddExpenseModal from "./AddExpenseModal";
@@ -10,6 +12,9 @@ import AddExpenseModal from "./AddExpenseModal";
 const ExpensesHeader = () => {
   const [openAddExpense, setOpenAddExpense] = useState(false);
   const [openAddCategory, setOpenAddCategory] = useState(false);
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const permission = authUser?.permission ?? authUser?.user?.permission;
+  const canWrite = Boolean(authUser?.is_admin || permission === "admin_write");
 
   return (
     <Paper
@@ -53,7 +58,8 @@ const ExpensesHeader = () => {
             gap: 2,
           }}
         >
-          <Button
+          {canWrite && (
+            <Button
             variant="contained"
             onClick={() => setOpenAddExpense(true)}
             sx={{
@@ -65,25 +71,28 @@ const ExpensesHeader = () => {
           >
             הוסף הוצאה
           </Button>
+          )}
 
-          <Button
+          {canWrite && (
+            <Button
             variant="outlined"
             onClick={() => setOpenAddCategory(true)}
             sx={{ width: { xs: "100%", sm: "auto" } }}
           >
             הוסף קטגוריה
           </Button>
+          )}
         </Box>
       </Stack>
 
-      {openAddExpense && (
+      {canWrite && openAddExpense && (
         <AddExpenseModal
           open={openAddExpense}
           onClose={() => setOpenAddExpense(false)}
         />
       )}
 
-      {openAddCategory && (
+      {canWrite && openAddCategory && (
         <AddExpensesCategoryModal
           open={openAddCategory}
           onClose={() => setOpenAddCategory(false)}

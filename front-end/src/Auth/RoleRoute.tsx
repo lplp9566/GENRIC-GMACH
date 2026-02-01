@@ -13,6 +13,24 @@ import {
 import { useState } from "react";
 
 type PreferredView = "admin" | "user";
+const PREFERRED_VIEW_KEY = "preferred_view_choice";
+
+const getStoredView = (): PreferredView | null => {
+  try {
+    const v = sessionStorage.getItem(PREFERRED_VIEW_KEY);
+    return v === "admin" || v === "user" ? v : null;
+  } catch {
+    return null;
+  }
+};
+
+const setStoredView = (view: PreferredView) => {
+  try {
+    sessionStorage.setItem(PREFERRED_VIEW_KEY, view);
+  } catch {
+
+  }
+};
 
 const ChooseViewModal: React.FC<{
   open: boolean;
@@ -42,7 +60,9 @@ const ChooseViewModal: React.FC<{
 
 export function AdminOnlyRoute() {
   const { user } = useSelector((s: RootState) => s.authslice);
-  const [choice, setChoice] = useState<PreferredView | null>(null);
+  const [choice, setChoice] = useState<PreferredView | null>(() =>
+    getStoredView()
+  );
   if (!user) return null;
 
   const permission = user.user?.permission;
@@ -50,7 +70,15 @@ export function AdminOnlyRoute() {
   const needsChoice = !user.is_admin && hasAdminPermission;
 
   if (needsChoice && !choice) {
-    return <ChooseViewModal open onSelect={(v) => setChoice(v)} />;
+    return (
+      <ChooseViewModal
+        open
+        onSelect={(v) => {
+          setStoredView(v);
+          setChoice(v);
+        }}
+      />
+    );
   }
 
   const allowAdmin = user.is_admin || (needsChoice && choice === "admin");
@@ -60,14 +88,24 @@ export function AdminOnlyRoute() {
 export function UserOnlyRoute() {
   const { user } = useSelector((s: RootState) => s.authslice);
   if (!user) return null;
-  const [choice, setChoice] = useState<PreferredView | null>(null);
+  const [choice, setChoice] = useState<PreferredView | null>(() =>
+    getStoredView()
+  );
 
   const permission = user.user?.permission;
   const hasAdminPermission = permission === "admin_read" || permission === "admin_write";
   const needsChoice = !user.is_admin && hasAdminPermission;
 
   if (needsChoice && !choice) {
-    return <ChooseViewModal open onSelect={(v) => setChoice(v)} />;
+    return (
+      <ChooseViewModal
+        open
+        onSelect={(v) => {
+          setStoredView(v);
+          setChoice(v);
+        }}
+      />
+    );
   }
 
   if (user.is_admin) return <Navigate to="/home" replace />;

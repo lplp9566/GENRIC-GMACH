@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+﻿import { FC, useEffect, useMemo, useState } from "react";
 import { Box, Container, Grid, Alert } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
@@ -61,6 +61,10 @@ function toCategoryCards(categories: any[], expenses: any[]): CategoryCardData[]
 
 const ExpensesHomePage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const permission = authUser?.permission ?? authUser?.user?.permission;
+  const canWrite = Boolean(authUser?.is_admin || permission === "admin_write");
 
   const [openAddExpense, setOpenAddExpense] = useState(false);
   const [addExpenseDraft, setAddExpenseDraft] = useState<AddExpenseDraft | null>(
@@ -230,14 +234,16 @@ const ExpensesHomePage: FC = () => {
       <ExpensesHeader />
 
       {/* ✅ חובה: המודאל בפועל */}
-      <AddExpenseModal
-        open={openAddExpense}
-        draft={addExpenseDraft}
-        onClose={() => {
-          setOpenAddExpense(false);
-          setAddExpenseDraft(null);
-        }}
-      />
+      {canWrite && (
+        <AddExpenseModal
+          open={openAddExpense}
+          draft={addExpenseDraft}
+          onClose={() => {
+            setOpenAddExpense(false);
+            setAddExpenseDraft(null);
+          }}
+        />
+      )}
 
       <Box mt={6}>
         {isError && (
@@ -277,8 +283,10 @@ const ExpensesHomePage: FC = () => {
                 rows={rows}
                 sortBy={sortBy}
                 sortDir={sortDir}
+                readOnly={!canWrite}
                 onSortClick={handleSortClick}
                 onDuplicate={(row) => {
+                  if (!canWrite) return;
                   setAddExpenseDraft({
                     categoryId: row.categoryId ?? null,
                     amount: row.amount,

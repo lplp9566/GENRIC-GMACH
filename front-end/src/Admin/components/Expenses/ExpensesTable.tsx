@@ -1,4 +1,4 @@
-import {
+﻿import {
   Box,
   CircularProgress,
   IconButton,
@@ -40,7 +40,8 @@ interface ExpensesTableProps {
   sortBy: SortBy;
   sortDir: SortDir;
   onSortClick: (key: SortBy) => void;
-  onDuplicate: (row: ExpenseRow) => void; // ✅ חדש
+  onDuplicate: (row: ExpenseRow) => void;
+  readOnly?: boolean;
 }
 
 const ExpensesTable: FC<ExpensesTableProps> = ({
@@ -50,6 +51,7 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
   sortDir,
   onSortClick,
   onDuplicate,
+  readOnly,
 }) => {
   if (isLoading) {
     return (
@@ -138,7 +140,7 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
             </TableCell>
 
             <TableCell align="right">הערה</TableCell>
-  <TableCell align="right">פעולות</TableCell>
+  {!readOnly && <TableCell align="right">פעולות</TableCell>}
 
           </TableRow>
         </TableHead>
@@ -155,8 +157,11 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
               <TableRow
                 key={row.id}
                 hover
-                onClick={() => onClickEdit(row)}
-                sx={{ cursor: "pointer" }}
+                onClick={() => {
+                  if (readOnly) return;
+                  onClickEdit(row);
+                }}
+                sx={{ cursor: readOnly ? "default" : "pointer" }}
               >
                 <TableCell align="right">{row.category || "—"}</TableCell>
 
@@ -170,6 +175,7 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
                 <TableCell align="right">{row.date}</TableCell>
                 <TableCell align="right">{row.note || "—"}</TableCell>
 
+                {!readOnly && (
                 <TableCell align="right" onClick={(e) => e.stopPropagation()}>
                   <Tooltip title="שכפל הוצאה">
                     <IconButton
@@ -205,18 +211,19 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
                     </IconButton>
                   </Tooltip>
                 </TableCell>
+                )}
               </TableRow>
             ))
           )}
 
-          {editMode && (
+          {editMode && !readOnly && (
             <EditExpenseModal
               open={editMode}
               onClose={() => setEditMode(false)}
               expense={selectedExpense!}
             />
           )}
-          {delateMode && 
+          {delateMode && !readOnly && 
           <ConfirmModal
           open={delateMode}
           onClose={()=>setDelateMode(false)}

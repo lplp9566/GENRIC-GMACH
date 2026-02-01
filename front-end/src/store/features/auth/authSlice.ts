@@ -77,6 +77,11 @@ export const Authslice = createSlice({
       state.user = null;
       state.status = "rejected";
       state.error = null;
+      try {
+        sessionStorage.removeItem("preferred_view_choice");
+      } catch {
+        // no-op
+      }
     },
   },
   extraReducers: (builder) => {
@@ -108,6 +113,11 @@ export const Authslice = createSlice({
       s.user = null;
       s.status = "rejected";
       s.error = null;
+      try {
+        sessionStorage.removeItem("preferred_view_choice");
+      } catch {
+        // no-op
+      }
     });
   },
 });
