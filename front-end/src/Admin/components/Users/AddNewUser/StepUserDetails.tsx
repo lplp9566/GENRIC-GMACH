@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import { Box, TextField } from "@mui/material";
+import { Box, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { UserDetailsStepProps } from "./AddUserStepsProps";
 
 const StepUserDetails: React.FC<UserDetailsStepProps> = ({ data, onUserChange }) => {
@@ -34,6 +34,23 @@ const StepUserDetails: React.FC<UserDetailsStepProps> = ({ data, onUserChange })
         onChange={onUserChange("email_address")}
         fullWidth
       />
+      <FormControl fullWidth dir="rtl">
+        <InputLabel id="permission-label">הרשאה</InputLabel>
+        <Select
+          labelId="permission-label"
+          label="הרשאה"
+          value={data.userData.permission ?? "user"}
+          onChange={(e) =>
+            onUserChange("permission")(
+              e as unknown as React.ChangeEvent<HTMLInputElement>
+            )
+          }
+        >
+          <MenuItem value="user">משתמש</MenuItem>
+          <MenuItem value="admin_read">מנהל צפייה</MenuItem>
+          <MenuItem value="admin_write">מנהל עריכה</MenuItem>
+        </Select>
+      </FormControl>
     </Box>
   );
 };

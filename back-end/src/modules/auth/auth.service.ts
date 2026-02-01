@@ -30,6 +30,7 @@ export class AuthService {
       sub: user.id,
       email: user.email_address,
       is_admin: user.is_admin,
+      permission: user.permission,
       user: user,
     };
     return this.jwtService.sign(payload);

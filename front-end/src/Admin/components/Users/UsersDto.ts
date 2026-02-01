@@ -8,6 +8,7 @@
   phone_number: string;
   email_address: string;
   iS_admin: boolean;
+  permission?: "user" | "admin_read" | "admin_write";
   is_member: boolean;
   notify_account?: boolean | null;
   notify_receipts?: boolean | null;
@@ -54,6 +55,7 @@ export interface ICreateUser {
   email_address: string;
   phone_number: string;
   is_admin: boolean;
+  permission?: "user" | "admin_read" | "admin_write";
   current_role: number | null;
   membership_type: MembershipType;
   spouse_first_name?: string | null;

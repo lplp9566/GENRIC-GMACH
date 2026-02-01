@@ -81,7 +81,12 @@ const StepSummary: React.FC<Props> = ({ data }) => {
                 <strong>טלפון:</strong> {data.userData.phone_number}
               </Typography>
               <Typography align={"center"}>
-                <strong>הרשאה:</strong> {data.userData.is_admin ? "אדמין" : "משתמש"}
+                <strong>הרשאה:</strong>{" "}
+                {data.userData.permission === "admin_read"
+                  ? "מנהל צפייה"
+                  : data.userData.permission === "admin_write"
+                  ? "מנהל עריכה"
+                  : "משתמש"}
               </Typography>
               <Typography align={"center"}>
                 <strong>דרגה:</strong> {rankName}

@@ -59,6 +59,12 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
       is_member: event.target.value === "true",
     }));
   };
+  const handlePermissionChange = (event: SelectChangeEvent<string>) => {
+    setFormData((prev) => ({
+      ...prev,
+      permission: event.target.value as any,
+    }));
+  };
 
   const handleNext = () => {
     if (activeStep < 2) setActiveStep((prev) => prev + 1);
@@ -139,6 +145,16 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
                   >
                     <MenuItem value="true">חבר</MenuItem>
                     <MenuItem value="false">לא חבר</MenuItem>
+                  </Select>
+                  <Select
+                    dir="rtl"
+                    value={formData.permission ?? "user"}
+                    onChange={handlePermissionChange}
+                    sx={{ width: "49.5%", marginTop: 2 }}
+                  >
+                    <MenuItem value="user">משתמש</MenuItem>
+                    <MenuItem value="admin_read">מנהל צפייה</MenuItem>
+                    <MenuItem value="admin_write">מנהל עריכה</MenuItem>
                   </Select>
                   <TextField
                     label="אימייל"

@@ -10,6 +10,7 @@ export interface AuthUser {
   iat?: number;
   exp?: number;
   is_admin?: boolean;
+  permission?: "user" | "admin_read" | "admin_write";
   user: IUser;
 }
 

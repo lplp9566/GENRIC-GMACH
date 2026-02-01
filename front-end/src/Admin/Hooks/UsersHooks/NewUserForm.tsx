@@ -18,20 +18,21 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
 
   const [activeStep, setActiveStep] = useState(0);
   const [data, setData] = useState<IAddUserFormData>({
-    userData: {
-      first_name: "",
-      last_name: "",
-      id_number: "",
-      join_date: null,
-      password: "",
-      email_address: "",
-      phone_number: "",
-      is_admin: false,
-      current_role: null,
-      membership_type: MembershipType.MEMBER,
-      spouse_first_name: "",
-      spouse_last_name: "",
-      spouse_id_number: "",
+      userData: {
+        first_name: "",
+        last_name: "",
+        id_number: "",
+        join_date: null,
+        password: "",
+        email_address: "",
+        phone_number: "",
+        is_admin: false,
+        permission: "user",
+        current_role: null,
+        membership_type: MembershipType.MEMBER,
+        spouse_first_name: "",
+        spouse_last_name: "",
+        spouse_id_number: "",
     },
     paymentData: {
       bank_number: null,
@@ -174,6 +175,7 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
             email_address: "",
             phone_number: "",
             is_admin: false,
+            permission: "user",
             current_role: 1,
             membership_type: MembershipType.FRIEND,
             spouse_first_name: "",
