@@ -19,7 +19,7 @@ import { DonationsEntity } from '../donations/Entity/donations.entity';
 import { DepositsEntity } from '../deposits/Entity/deposits.entity';
 import { UserRoleHistoryEntity } from '../user_role_history/Entity/user_role_history.entity';
 import { MembershipRoleEntity } from '../membership_roles/Entity/membership_rols.entity';
-import { MembershipType } from './userTypes';
+import { MembershipType, userPermission } from './userTypes';
 // cSpell:ignore Financials
 @Entity('users')
 export class UserEntity {
@@ -73,6 +73,9 @@ export class UserEntity {
   notify_general: boolean;
   @Column({ type: 'boolean', default: false })
   is_admin: boolean;
+  @Column({ type: 'enum', enum: ['user', 'admin_read', 'admin_write'], default: 'user' })
+  permission: userPermission;
+  
   @OneToOne(
     () => PaymentDetailsEntity,
     (paymentDetails) => paymentDetails.user,

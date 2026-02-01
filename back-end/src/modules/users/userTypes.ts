@@ -37,6 +37,7 @@ bank_account_number: number
 charge_date: string
 payment_method: payment_method
 }
+ export type userPermission =  'user' |'admin_read' | 'admin_write'
 
 export class UpdateUserWithPaymentDto {
   @IsOptional()
