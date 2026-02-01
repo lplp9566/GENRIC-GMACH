@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -57,6 +57,9 @@ export const formatILS = (value?: number | string | null) => {
 
 const HomePage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const permission = authUser?.permission ?? authUser?.user?.permission;
+  const canWrite = Boolean(authUser?.is_admin || permission === "admin_write");
   useEffect(() => {
     dispatch(getFundsOverview());
     dispatch(getAllUsers({ isAdmin: false }));
@@ -354,7 +357,7 @@ const HomePage: React.FC = () => {
                           {s.subValue}
                         </Typography>
                       )}
-                      {"isBankCard" in s && s.isBankCard && (
+                      {"isBankCard" in s && s.isBankCard && canWrite && (
                         <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
                           {!latestBankCurrent ? (
                             <Button

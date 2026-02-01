@@ -1,4 +1,4 @@
-// src/pages/LoanDetailsPage.tsx
+﻿// src/pages/LoanDetailsPage.tsx
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,6 +19,10 @@ const LoanDetailsPage: React.FC = () => {
   const loanId = Number(id);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const permission = authUser?.permission ?? authUser?.user?.permission;
+  const canWrite = Boolean(authUser?.is_admin || permission === "admin_write");
 
   const loan = useSelector((s: RootState) =>
     s.AdminLoansSlice.allLoans?.find((l) => l.id === loanId)
@@ -94,14 +98,16 @@ const LoanDetailsPage: React.FC = () => {
         purpose={loan.purpose}
       />
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-        <Button
-          variant="contained"
-          onClick={() => handleOpenActions(null)}
-          disabled={!loanDetails.isActive}
-          sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
-        >
-          פעולות להלוואה
-        </Button>
+        {canWrite && (
+          <Button
+            variant="contained"
+            onClick={() => handleOpenActions(null)}
+            disabled={!loanDetails.isActive}
+            sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
+          >
+            פעולות להלוואה
+          </Button>
+        )}
       </Box>
       <Divider />
       <Grid
@@ -120,6 +126,7 @@ const LoanDetailsPage: React.FC = () => {
           <ActionsTable
             actions={loanDetails.actions ?? []}
             loanId={loanId}
+            readOnly={!canWrite}
             onCopyAction={handleCopyAction}
           />
         </Grid>

@@ -1,4 +1,6 @@
 ﻿import { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
 import { IUser, MembershipType } from "./UsersDto";
 import {
   Avatar,
@@ -32,6 +34,9 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
   const [expanded, setExpanded] = useState(false);
   const [editModal, seteditModal] = useState(false);
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const permission = authUser?.permission ?? authUser?.user?.permission;
+  const canWrite = Boolean(authUser?.is_admin || permission === "admin_write");
 
   const mb = user.payment_details.monthly_balance!;
   if (mb === null) return null;
@@ -57,15 +62,16 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
   const spouseId = user.spouse_id_number ?? "";
 
   const hasSpouse = Boolean(spouseFirst || spouseLast || spouseId);
-  const lastDisplay = hasSpouse && spouseLast && spouseLast !== primaryLast
-    ? `${primaryLast} / ${spouseLast}`
-    : primaryLast;
-  const firstDisplay = hasSpouse && spouseFirst
-    ? `${primaryFirst} + ${spouseFirst}`
-    : primaryFirst;
-  const idsDisplay = hasSpouse && spouseId
-    ? `${user.id_number} / ${spouseId}`
-    : user.id_number;
+  const lastDisplay =
+    hasSpouse && spouseLast && spouseLast !== primaryLast
+      ? `${primaryLast} / ${spouseLast}`
+      : primaryLast;
+  const firstDisplay =
+    hasSpouse && spouseFirst
+      ? `${primaryFirst} + ${spouseFirst}`
+      : primaryFirst;
+  const idsDisplay =
+    hasSpouse && spouseId ? `${user.id_number} / ${spouseId}` : user.id_number;
 
   const StyledCard = styled(Card)(({ theme }) => ({
     borderRadius: theme.spacing(2),
@@ -110,9 +116,7 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
         )}
         <CardHeader
           avatar={
-            <Avatar sx={{ bgcolor: "primary.main" }}>
-              {primaryFirst[0]}
-            </Avatar>
+            <Avatar sx={{ bgcolor: "primary.main" }}>{primaryFirst[0]}</Avatar>
           }
           title={
             <Stack direction="row" alignItems="center" spacing={1}>
@@ -155,7 +159,9 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
                 variant="outlined"
               />
               <Chip
-                icon={anyLoanNeg ? <WarningAmberIcon /> : <AccountBalanceIcon />}
+                icon={
+                  anyLoanNeg ? <WarningAmberIcon /> : <AccountBalanceIcon />
+                }
                 label={`${loans.length} הלווא${loans.length !== 1 ? "ות" : "ה"}`}
                 size="small"
                 sx={{ minWidth: 100 }}
@@ -167,7 +173,7 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
         )}
         {user.membership_type == MembershipType.FRIEND && (
           <Button variant="outlined" size="small">
-            משתמש חבר
+            משתמש ידיד
           </Button>
         )}
         <Divider />
@@ -218,7 +224,11 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
                               bgcolor: neg ? "error.main" : "success.main",
                             }}
                           >
-                            {neg ? <WarningAmberIcon /> : <AccountBalanceIcon />}
+                            {neg ? (
+                              <WarningAmberIcon />
+                            ) : (
+                              <AccountBalanceIcon />
+                            )}
                           </Avatar>
                         </ListItemAvatar>
                         <ListItemText
@@ -261,16 +271,17 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
               <strong>אמצעי תשלום:</strong>{" "}
               {revertPaymentMethod(user.payment_details.payment_method)}
             </Typography>
-
-            <Box mt={2} textAlign="right">
-              <Button variant="contained" size="small" onClick={onEdit}>
-                עריכת משתמש
-              </Button>
-            </Box>
+            {canWrite && (
+              <Box mt={2} textAlign="right">
+                <Button variant="contained" size="small" onClick={onEdit}>
+                  עריכת משתמש
+                </Button>
+              </Box>
+            )}
           </CardContent>
         </Collapse>
       </StyledCard>
-      {editModal && (
+      {editModal && canWrite && (
         <EditUser
           open={editModal}
           user={user}

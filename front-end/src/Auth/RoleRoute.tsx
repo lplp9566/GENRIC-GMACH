@@ -77,3 +77,11 @@ export function UserOnlyRoute() {
 
   return allowUser ? <Outlet /> : <Navigate to="/home" replace />;
 }
+
+export function AdminWriteRoute() {
+  const { user } = useSelector((s: RootState) => s.authslice);
+  if (!user) return null;
+  const permission = user.permission ?? user.user?.permission;
+  const canWrite = user.is_admin || permission === "admin_write";
+  return canWrite ? <Outlet /> : <Navigate to="/users" replace />;
+}

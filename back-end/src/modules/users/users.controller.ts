@@ -9,7 +9,7 @@ import { MembershipType, UpdateUserWithPaymentDto } from './userTypes';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-  // @UseGuards(AdminGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post()
   async createUserWithPayment(
     @Body()
@@ -62,7 +62,8 @@ async getAllUsers(
   ){
     return this.usersService.createYearSummary(2025)
   }
- @Patch(':id')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch(':id')
   async updateUserAndPayment(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateUserWithPaymentDto,

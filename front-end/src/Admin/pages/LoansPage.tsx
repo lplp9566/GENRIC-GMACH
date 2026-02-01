@@ -39,7 +39,9 @@ export const LoansPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const theme = useTheme();
-
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const permission = authUser?.permission ?? authUser?.user?.permission;
+  const canWrite = Boolean(authUser?.is_admin || permission === "admin_write");
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [filter, setFilter] = useState<StatusGeneric>(StatusGeneric.ACTIVE);
@@ -212,6 +214,7 @@ export const LoansPage: React.FC = () => {
                   spacing={1}
                   sx={{ width: { xs: "100%", sm: "auto" } }}
                 >
+                  {canWrite && (
                   <Button
                     variant="contained"
                     onClick={() => navigate("/loans/new")}
@@ -223,6 +226,7 @@ export const LoansPage: React.FC = () => {
                   >
                     הוספת הלוואה
                   </Button>
+                  )}
                   <Button
                     variant="outlined"
                     onClick={() => navigate("/loan-requests")}
@@ -330,6 +334,7 @@ export const LoansPage: React.FC = () => {
                       <ActionsTable
                         actions={visibleActions}
                         loanId={selectedLoanId ?? undefined}
+                        readOnly={!canWrite}
                         onCopyAction={handleCopyAction}
                         showLoanColumn={!selectedLoanId}
                         title={

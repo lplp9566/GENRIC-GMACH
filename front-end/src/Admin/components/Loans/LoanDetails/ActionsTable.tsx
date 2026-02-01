@@ -53,7 +53,6 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
 
   const handleHeaderClick = (field: SortField) => {
     if (field === currentSortField) {
-      // Toggle direction
       setCurrentSortDirection((dir) => (dir === "asc" ? "desc" : "asc"));
     } else {
       setCurrentSortField(field);

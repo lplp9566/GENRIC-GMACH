@@ -45,7 +45,6 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
                 textAlign: "center",     // ממורכז
               }}
             >
-              {/* אייקון רקע ענק עדין */}
               <Box
                 sx={{
                   position: "absolute",

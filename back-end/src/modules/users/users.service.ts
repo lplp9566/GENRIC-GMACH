@@ -479,7 +479,7 @@ export class UsersService {
 
       // 8) מחזירים את התוצאה; אם בשלב כלשהו הייתה שגיאה – TypeORM יעשה rollback אוטומטי
       return updated!;
-    }); // סוף הטרנזקציה (commit אם הכול עבר, אחרת rollback)
+    });
   }
   async searchUsers(query: string, limit = 5): Promise<UserEntity[]> {
     const q = `%${query}%`;

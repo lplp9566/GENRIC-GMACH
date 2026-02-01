@@ -1,4 +1,4 @@
-import {
+﻿import {
   Box,
   Button,
   FormControl,
@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import { FC } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
 interface UsersHeaderProps {
   filter: "all" | "members" | "friends";
   setFilter: React.Dispatch<
@@ -21,6 +23,9 @@ interface UsersHeaderProps {
 }
 const UsersHeader: FC<UsersHeaderProps> = ({ filter, setFilter }) => {
   const navigate = useNavigate();
+  const { user } = useSelector((s: RootState) => s.authslice);
+  const permission = user?.permission ?? user?.user?.permission;
+  const canWrite = Boolean(user?.is_admin || permission === "admin_write");
 
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down("sm"));
@@ -83,22 +88,23 @@ const UsersHeader: FC<UsersHeaderProps> = ({ filter, setFilter }) => {
               <MenuItem value="friends">ידידים</MenuItem>
             </Select>
           </FormControl>
-
-          <Button
-            variant="contained"
-            onClick={() => navigate("/users/new")}
-            sx={{
-              bgcolor: "#2a8c82",
-              color: "#fff",
-              width: { xs: "100%", sm: "auto" },
-              "&:hover": {
-                bgcolor: "#1f645f",
-              },
-            }}
-          >
-            הוסף משתמש
-          </Button>
-
+          {canWrite && (
+            <Button
+              variant="contained"
+              onClick={() => navigate("/users/new")}
+              sx={{
+                bgcolor: "#2a8c82",
+                color: "#fff",
+                width: { xs: "100%", sm: "auto" },
+                "&:hover": {
+                  bgcolor: "#1f645f",
+                },
+              }}
+            >
+              הוסף משתמש
+            </Button>
+          )}
+          {canWrite && (
           <Button
             variant="outlined"
             // onClick={}
@@ -114,6 +120,7 @@ const UsersHeader: FC<UsersHeaderProps> = ({ filter, setFilter }) => {
           >
             ניהול דרגת משתמש
           </Button>
+          )}
         </Box>
       </Stack>
     </Paper>

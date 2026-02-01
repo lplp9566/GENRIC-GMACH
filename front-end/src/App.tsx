@@ -33,7 +33,7 @@ import UserOverviewPage from "./User/pages/UserOverviewPage";
 
 import { MatomoTracker } from "./MatomoTracker";
 import AuthGuard from "./Auth/AuthGuard";
-import { AdminOnlyRoute, UserOnlyRoute } from "./Auth/RoleRoute";
+import { AdminOnlyRoute, UserOnlyRoute, AdminWriteRoute } from "./Auth/RoleRoute";
 
 export default function App() {
   return (
@@ -62,7 +62,9 @@ export default function App() {
                 element={<FundsOverviewByYearPage />}
               />
               <Route path="/users" element={<UsersPage />} />
-              <Route path="/users/new" element={<AddNewUser />} />
+              <Route element={<AdminWriteRoute />}>
+                <Route path="/users/new" element={<AddNewUser />} />
+              </Route>
               <Route path="/paymentsPage" element={<PaymentsPage />} />
               <Route path="/rankPage" element={<RankPage />} />
               <Route path="/donations" element={<DonationsPage />} />

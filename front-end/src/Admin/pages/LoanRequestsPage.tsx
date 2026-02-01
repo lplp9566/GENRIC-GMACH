@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -34,6 +34,9 @@ import { ICreateLoan } from "../components/Loans/LoanDto";
 const LoanRequestsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { requests } = useSelector((s: RootState) => s.LoanRequestsSlice);
+  const authUser = useSelector((s: RootState) => s.authslice.user);
+  const permission = authUser?.permission ?? authUser?.user?.permission;
+  const canWrite = Boolean(authUser?.is_admin || permission === "admin_write");
   const [selected, setSelected] = React.useState<number | null>(null);
   const [checkOpen, setCheckOpen] = useState(false);
   const [checkLoan, setCheckLoan] = useState<ICreateLoan | null>(null);
@@ -92,7 +95,7 @@ const LoanRequestsPage: React.FC = () => {
     setEditMonthly(selectedRequest.monthly_payment ?? "");
   }, [selectedRequest]);
 
-  const canEditRequest = selectedRequest?.status === "ADMIN_PENDING";
+  const canEditRequest = canWrite && selectedRequest?.status === "ADMIN_PENDING";
 
   return (
     <Box sx={{ minHeight: "100vh", py: 4, direction: "rtl" }}>
@@ -162,14 +165,18 @@ const LoanRequestsPage: React.FC = () => {
                       align="right"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <Button
-                        size="small"
-                        variant="contained"
-                        disabled={req.status !== "ADMIN_PENDING"}
-                        onClick={() => openCheckModal(req.id)}
-                      >
-                        אישור
-                      </Button>
+                      {canWrite ? (
+                        <Button
+                          size="small"
+                          variant="contained"
+                          disabled={req.status !== "ADMIN_PENDING"}
+                          onClick={() => openCheckModal(req.id)}
+                        >
+                          אישור
+                        </Button>
+                      ) : (
+                        <Typography color="text.secondary">-</Typography>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -265,40 +272,44 @@ const LoanRequestsPage: React.FC = () => {
                     {selectedRequest.error_message}
                   </Typography>
                 )}
-                <Stack direction="row" spacing={1}>
-                  <Button
-                    variant="outlined"
-                    disabled={!canEditRequest}
-                    onClick={() =>
-                      dispatch(
-                        updateLoanRequestDetails({
-                          id: selectedRequest.id,
-                          purpose: editPurpose,
-                          amount: Number(editAmount),
-                          monthly_payment: Number(editMonthly),
-                          payment_date: Number(editPaymentDate),
-                          payment_method: editPaymentMethod,
-                        })
-                      )
-                    }
-                  >
-                    שמירת פרטים
-                  </Button>
-                  <Button
-                    variant="contained"
-                    disabled={selectedRequest.status !== "ADMIN_PENDING"}
-                    onClick={() => openCheckModal(selectedRequest.id)}
-                  >
-                    אישור
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    disabled={selectedRequest.status !== "ADMIN_PENDING"}
-                    onClick={() => dispatch(adminRejectRequest({ id: selectedRequest.id }))}
-                  >
-                    דחייה
-                  </Button>
-                </Stack>
+                {canWrite && (
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="outlined"
+                      disabled={!canEditRequest}
+                      onClick={() =>
+                        dispatch(
+                          updateLoanRequestDetails({
+                            id: selectedRequest.id,
+                            purpose: editPurpose,
+                            amount: Number(editAmount),
+                            monthly_payment: Number(editMonthly),
+                            payment_date: Number(editPaymentDate),
+                            payment_method: editPaymentMethod,
+                          })
+                        )
+                      }
+                    >
+                      שמירת פרטים
+                    </Button>
+                    <Button
+                      variant="contained"
+                      disabled={selectedRequest.status !== "ADMIN_PENDING"}
+                      onClick={() => openCheckModal(selectedRequest.id)}
+                    >
+                      אישור
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      disabled={selectedRequest.status !== "ADMIN_PENDING"}
+                      onClick={() =>
+                        dispatch(adminRejectRequest({ id: selectedRequest.id }))
+                      }
+                    >
+                      דחייה
+                    </Button>
+                  </Stack>
+                )}
               </Stack>
             )}
           </DialogContent>
