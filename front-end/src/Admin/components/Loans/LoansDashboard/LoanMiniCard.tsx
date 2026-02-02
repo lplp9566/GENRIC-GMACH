@@ -14,6 +14,8 @@ import AddIcon from "@mui/icons-material/Add";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { ILoanWithUser } from "../LoanDto";
@@ -49,6 +51,8 @@ const LoanMiniCard: React.FC<LoanMiniCardProps> = ({
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const permission = authUser?.permission ?? authUser?.user?.permission;
   const canWrite = Boolean(authUser?.is_admin || permission === "admin_write");
+  const balance = loan.balance ?? 0;
+  const balancePositive = balance >= 0;
   const [editOpen, setEditOpen] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -83,29 +87,54 @@ const LoanMiniCard: React.FC<LoanMiniCardProps> = ({
       <CardContent sx={{ p: 2 }}>
         <Box
           display="flex"
-          justifyContent="space-between"
           alignItems="center"
+          gap={1}
           sx={{ direction: "rtl" }}
         >
-          <Box textAlign="right">
-            <Typography variant="subtitle2" fontWeight={700}>
-              הלוואה #{loan.id}
-            </Typography>
+          <Box textAlign="right" flex={1}>
+            <Box display="flex" alignItems="center" gap={0.5}>
+              <Typography variant="subtitle2" fontWeight={700}>
+                הלוואה #{loan.id}
+              </Typography>
+              {loan.purpose && (
+                <Typography variant="caption" color="text.secondary">
+                  • {loan.purpose}
+                </Typography>
+              )}
+            </Box>
             <Typography variant="caption" color="text.secondary">
               {(loan.user?.first_name ?? "").trim()}{" "}
               {(loan.user?.last_name ?? "").trim()}
             </Typography>
           </Box>
-          <Chip
-            label={loan.isActive ? "פעיל" : "לא פעיל"}
-            size="small"
-            sx={{
-              backgroundColor: loan.isActive ? "#D2F7E1" : "#F0F0F0",
-              color: loan.isActive ? "#28A960" : "#6B6B6B",
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
+          <Box display="flex" justifyContent="center" flex={1}>
+            <Box display="flex" alignItems="center" gap={0.5}>
+              {balancePositive ? (
+                <TrendingUpIcon fontSize="small" sx={{ color: "#28A960" }} />
+              ) : (
+                <TrendingDownIcon fontSize="small" sx={{ color: "#D35400" }} />
+              )}
+              <Typography
+                variant="body2"
+                fontWeight={700}
+                color={balancePositive ? "#28A960" : "#D35400"}
+              >
+                ₪{Math.abs(balance).toLocaleString("he-IL")}
+              </Typography>
+            </Box>
+          </Box>
+          <Box display="flex" justifyContent="flex-end" flex={1}>
+            <Chip
+              label={loan.isActive ? "פעיל" : "לא פעיל"}
+              size="small"
+              sx={{
+                backgroundColor: loan.isActive ? "#D2F7E1" : "#F0F0F0",
+                color: loan.isActive ? "#28A960" : "#6B6B6B",
+                fontWeight: 600,
+                fontSize: "0.75rem",
+              }}
+            />
+          </Box>
         </Box>
 
 
