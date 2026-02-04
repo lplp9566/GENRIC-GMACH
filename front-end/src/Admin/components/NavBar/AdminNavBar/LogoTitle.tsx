@@ -2,7 +2,10 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 
-export const LogoTitle: React.FC = () => (
+export const LogoTitle: React.FC = () => {
+const logoUrl = import.meta.env.VITE_LOGO_URL
+
+  return(
   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
     <Box
       sx={{
@@ -16,7 +19,7 @@ export const LogoTitle: React.FC = () => (
         boxShadow: "0 2px 5px rgba(0,0,0,.2)",
       }}
     >
-      <img src="/לוגו.png" alt="לוגו" style={{ height: 36 }} />
+      <img src= {logoUrl} alt="לוגו" style={{ height: 36 }} />
     </Box>
     <Typography
       variant="h6"
@@ -27,4 +30,5 @@ export const LogoTitle: React.FC = () => (
       אהבת חסד
     </Typography>
   </Box>
-);
+  )
+};
