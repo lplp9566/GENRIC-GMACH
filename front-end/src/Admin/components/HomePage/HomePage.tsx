@@ -65,7 +65,8 @@ const HomePage: React.FC = () => {
     dispatch(getAllUsers({ isAdmin: false }));
     dispatch(getBankCurrent());
   }, [dispatch]);
-
+const name = import.meta.env.VITE_NAME 
+  const family = import.meta.env.VITE_FAMILY
   const paymentModal = useSelector(
     (state: RootState) => state.mapModeSlice.MonthlyPaymentModalMode
   );
@@ -269,15 +270,15 @@ const HomePage: React.FC = () => {
               gutterBottom
               sx={{ fontSize: { xs: 22, sm: 28, md: 34 } }}
             >
-              מערכת ניהול גמ"ח אהבת חסד  משפחת פסיקוב
+              ברוכים הבאים למערכת {name} של משפחת {family}
             </Typography>
-            <Button
+            {/* <Button
               variant="contained"
               sx={{ mt: 2, borderRadius: 3, fontWeight: 900 }}
               onClick={() => setChatOpen(true)}
             >
               פתח צ׳אט AI
-            </Button>
+            </Button> */}
           </Box>
 
           {/* STATS */}

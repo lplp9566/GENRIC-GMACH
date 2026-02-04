@@ -2,10 +2,8 @@
 import PublicLayout from "./layouts/PublicLayout";
 import AdminLayout from "./layouts/AdminLayout";
 import UserLayout from "./layouts/UserLayout";
-
 import LoginPage from "./Admin/pages/LoginPage";
 import ForgotPasswordPage from "./Auth/ForgotPasswordPage";
-
 import HomePage from "./Admin/components/HomePage/HomePage";
 import LoansPage from "./Admin/pages/LoansPage";
 import LoanRequestsPage from "./Admin/pages/LoanRequestsPage";
@@ -30,7 +28,6 @@ import UserLoanRequestsPage from "./User/pages/UserLoanRequestsPage";
 import UserDepositsPage from "./User/pages/UserDepositsPage";
 import UserProfilePage from "./User/pages/UserProfilePage";
 import UserOverviewPage from "./User/pages/UserOverviewPage";
-
 import { MatomoTracker } from "./MatomoTracker";
 import AuthGuard from "./Auth/AuthGuard";
 import { AdminOnlyRoute, UserOnlyRoute, AdminWriteRoute } from "./Auth/RoleRoute";

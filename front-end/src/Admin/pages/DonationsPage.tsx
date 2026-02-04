@@ -99,7 +99,7 @@ const DonationsHomePage: FC = () => {
     if (donationsStatus !== "idle") return;
 
     // לא אדמין -> מביאים רק את התרומות של המשתמש המחובר
-    if (!isAdmin) {
+    if (!isAdmin && authUser?.user.permission === "user") {
       if (myUserId != null) dispatch(getDonationByUserId(Number(myUserId)));
       return;
     }

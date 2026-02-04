@@ -35,7 +35,6 @@ const selectedUser = useSelector((s: RootState) => s.AdminUsers.selectedUser);
 
   return (
     <Box sx={{ flexGrow: 1, marginBottom: 0 }}>
-// ... בתוך Navbar
 
 <AppBar
   position="fixed"
