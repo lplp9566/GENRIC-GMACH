@@ -31,7 +31,7 @@ export class DonationsController {
   async createDonation(@Body() dto: CreateDonationDto) {
     return this.donationsService.createDonation(dto);
   }
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getDonations() {
     return this.donationsService.getDonations();
