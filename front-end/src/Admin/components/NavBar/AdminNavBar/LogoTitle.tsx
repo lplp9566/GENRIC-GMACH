@@ -27,7 +27,7 @@ const logoUrl = import.meta.env.VITE_LOGO_URL
       to="/"
       sx={{ color: "#FFF", textDecoration: "none", fontWeight: 700 }}
     >
-      אהבת חסד
+      {import.meta.env.VITE_NAME}
     </Typography>
   </Box>
   )

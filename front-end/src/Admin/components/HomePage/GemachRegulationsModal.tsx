@@ -82,7 +82,7 @@ const GemachRegulationsModal: React.FC<{
         }}
       >
         <Typography variant="h6" fontWeight={700}>
-          תקנון גמח אהבת חסד
+          תקנון הגמח  
         </Typography>
         <IconButton onClick={onClose}>
           <CloseIcon />

@@ -142,8 +142,8 @@ export class UsersService {
     const count = await this.usersRepository.count();
     if (count > 0) return;
 
-    // const email = this.config.get<string>('ADMIN_EMAIL');
-    // const password = this.config.get<string>('ADMIN_PASSWORD');
+    const email = this.config.get<string>('ADMIN_EMAIL_ADDRESS');
+    const password = this.config.get<string>('ADMIN_PASSWORD');
     // if (!email || !password) return;
 
     // תפקיד ברירת מחדל אם נדרש ע"י הסכמה
@@ -154,8 +154,8 @@ export class UsersService {
       {
         first_name: 'מנהל',
         last_name: 'מערכת',
-        email_address: 'chesedgmach@gmail.com',
-        password: '1234',
+        email_address: email,
+        password: password,
         is_admin: true,
         id_number: '123456789',
         phone_number: '0501234567',

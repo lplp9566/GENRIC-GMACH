@@ -6,12 +6,12 @@ import puppeteer = require('puppeteer');
 import * as os from 'os';
 import { HDate } from 'hebcal';
 import { YearSummaryPdfStyleData } from './dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MailService {
   private transporter: nodemailer.Transporter;
-
-  constructor() {
+  constructor(private readonly config: ConfigService) {
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -70,10 +70,7 @@ export class MailService {
     const fmt = (n: number) =>
       new Intl.NumberFormat('he-IL', { maximumFractionDigits: 2 }).format(n) + ' ₪';
 
-    const logoPath = path.join(process.cwd(), 'public', 'logo.png');
-    const logoDataUrl = fs.existsSync(logoPath)
-      ? `data:image/png;base64,${fs.readFileSync(logoPath).toString('base64')}`
-      : '';
+    const logoDataUrl =  this.config.get<string>('LOGO_URL')
 
     const fontPath = path.join(
       process.cwd(),
