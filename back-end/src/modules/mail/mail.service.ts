@@ -226,19 +226,23 @@ export class MailService {
   }
 
   private async renderHtmlToPdf(html: string): Promise<Buffer> {
-    const executablePath =
+    const candidatePath =
       process.env.PUPPETEER_EXECUTABLE_PATH ||
       process.env.PUPPETEER_CHROME_PATH ||
       this.resolveChromeFromCache() ||
       puppeteer.executablePath();
-    if (executablePath) {
-      console.log(`[pdf] executablePath=${executablePath} exists=${fs.existsSync(executablePath)}`);
+    const executablePath =
+      candidatePath && fs.existsSync(candidatePath) ? candidatePath : undefined;
+    if (candidatePath) {
+      console.log(
+        `[pdf] candidatePath=${candidatePath} exists=${Boolean(executablePath)}`,
+      );
     } else {
-      console.log('[pdf] executablePath is undefined');
+      console.log('[pdf] candidatePath is undefined');
     }
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath,
+      ...(executablePath ? { executablePath } : {}),
     });
     try {
       const page = await browser.newPage();
