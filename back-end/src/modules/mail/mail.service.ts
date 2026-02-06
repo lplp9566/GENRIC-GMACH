@@ -231,6 +231,7 @@ export class MailService {
       process.env.PUPPETEER_CHROME_PATH ||
       this.resolveChromeFromCache() ||
       puppeteer.executablePath();
+      
     const executablePath =
       candidatePath && fs.existsSync(candidatePath) ? candidatePath : undefined;
     if (candidatePath) {
