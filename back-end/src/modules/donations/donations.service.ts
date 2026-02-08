@@ -10,7 +10,7 @@ import { CreateDonationDto } from '../funds/fundsDto';
 import { FundsService } from '../funds/funds.service';
 import { FundYearStatsEntity } from '../funds/Entity/fund-year-stats.entity';
 import { FundEntity } from '../funds/Entity/funds.entity';
-import { log } from 'console';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class DonationsService {
@@ -19,6 +19,7 @@ export class DonationsService {
     private donationsRepository: Repository<DonationsEntity>,
     private readonly usersService: UsersService,
     private readonly fundsService: FundsService,
+    private readonly mailService: MailService,
   ) {}
 
   async getDonations() {
@@ -90,9 +91,13 @@ export class DonationsService {
 
     if (donation.action === DonationActionType.donation) {
       if (String(donation.donation_reason).trim().toLowerCase() === 'equity') {
-        return this.createEquityDonation(donation);
+        const saved = await this.createEquityDonation(donation);
+        await this.maybeSendDonationReceipt(saved);
+        return saved;
       } else {
-        return this.createFundDonation(donation);
+        const saved = await this.createFundDonation(donation);
+        await this.maybeSendDonationReceipt(saved);
+        return saved;
       }
     }
 
@@ -101,6 +106,34 @@ export class DonationsService {
     }
 
     throw new BadRequestException('Invalid action');
+  }
+
+  private async maybeSendDonationReceipt(donation: DonationsEntity | null) {
+    console.log({donation});
+    
+    if (!donation || donation.action !== DonationActionType.donation) return;
+    const user = donation.user;
+    if (!user) return;
+    if (user.notify_receipts === false) return;
+    if (!user.email_address) return;
+
+    const isEquity =
+      String(donation.donation_reason ?? '').trim().toLowerCase() === 'equity';
+    const fundLabel = isEquity
+      ? 'קרן הגמ"ח'
+      : `קרן ${String(
+          donation.fund?.name ?? donation.donation_reason ?? '',
+        ).trim()}`;
+
+    const fullName = `${user.first_name} ${user.last_name}`.trim();
+
+    await this.mailService.sendDonationReceipt({
+      to: user.email_address,
+      fullName: fullName || 'תורם יקר',
+      idNumber: user.id_number ?? '',
+      amount: Number(donation.amount ?? 0),
+      fundLabel,
+    });
   }
 
   async withdrawSpecialFund(donation: DonationsEntity) {

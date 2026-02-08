@@ -1,4 +1,4 @@
-﻿export interface YearSummaryPdfStyleData {
+export interface YearSummaryPdfStyleData {
   reportDate: string;
   hebrewReportDate?: string;
   year: number;
@@ -27,4 +27,13 @@
   standingOrderReturnDebt?: number;
 
   cashboxTotal?: number;
+}
+
+export interface DonationReceiptEmailData {
+  to: string;
+  fullName: string;
+  idNumber: string;
+  amount: number;
+  fundLabel: string;
+  logoUrl?: string;
 }

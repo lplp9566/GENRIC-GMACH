@@ -5,8 +5,10 @@ import * as path from 'path';
 import puppeteer = require('puppeteer');
 import * as os from 'os';
 import { HDate } from 'hebcal';
-import { YearSummaryPdfStyleData } from './dto';
+import { DonationReceiptEmailData, YearSummaryPdfStyleData } from './dto';
 import { ConfigService } from '@nestjs/config';
+import { render } from '@react-email/render';
+import { DonationReceiptEmail } from './templates/donation-receipt';
 
 @Injectable()
 export class MailService {
@@ -28,6 +30,10 @@ export class MailService {
     text?: string,
     attachments?: nodemailer.Attachment[],
   ) {
+    if (!this.isEmailEnabled()) {
+      console.log('[mail] SEND_EMAIL disabled - skipping send');
+      return { messageId: 'email-disabled' };
+    }
     const mailOptions: nodemailer.SendMailOptions = {
       from: process.env.EMAIL_ADDRESS,
       to,
@@ -40,6 +46,28 @@ export class MailService {
     const info = await this.transporter.sendMail(mailOptions);
     console.log('Email sent:', info.messageId);
     return info;
+  }
+
+  async sendDonationReceipt(data: DonationReceiptEmailData) {
+    console.log(data);
+    
+    const amountText = this.formatCurrency(data.amount);
+    const logoUrl = data.logoUrl ?? this.config.get<string>('LOGO_URL');
+    const html = await render(
+      DonationReceiptEmail({
+        fullName: data.fullName,
+        idNumber: data.idNumber,
+        amountText,
+        fundLabel: data.fundLabel,
+        logoUrl,
+      }),
+      { pretty: true },
+    );
+
+    const subject = `אישור תרומה - ${amountText}`;
+    const text = `שלום לך ${data.fullName}\nמספר זהות: ${data.idNumber}\nברצוננו להודות לך על תרומתך של סך ${amountText} ל${data.fundLabel}.\nבזכותך הגדלנו את הקרן ונוכל לסייע לעוד משפחות.`;
+
+    return this.sendMail(data.to, subject, html, text);
   }
 
   async sendYearSummaryPdfStyle(to: string, data: YearSummaryPdfStyleData) {
@@ -67,10 +95,9 @@ export class MailService {
 
   private buildYearSummaryHtml(data: YearSummaryPdfStyleData) {
     const orgName = 'מזכירות הגמ"ח';
-    const fmt = (n: number) =>
-      new Intl.NumberFormat('he-IL', { maximumFractionDigits: 2 }).format(n) + ' ₪';
+    const fmt = (n: number) => this.formatCurrency(n);
 
-    const logoDataUrl =  this.config.get<string>('LOGO_URL')
+    const logoDataUrl = this.config.get<string>('LOGO_URL');
 
     const fontPath = path.join(
       process.cwd(),
@@ -287,5 +314,18 @@ export class MailService {
     }
 
     return undefined;
+  }
+
+  private isEmailEnabled(): boolean {
+    const raw =
+      this.config.get<string>('SEND_EMAIL') ?? process.env.SEND_EMAIL ?? '';
+    return String(raw).trim().toLowerCase() === 'true';
+  }
+
+  private formatCurrency(value: number) {
+    return (
+      new Intl.NumberFormat('he-IL', { maximumFractionDigits: 2 }).format(value) +
+      ' ₪'
+    );
   }
 }

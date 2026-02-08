@@ -62,7 +62,7 @@ async getAllUsers(
   ){
     return this.usersService.createYearSummary(2025)
   }
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async updateUserAndPayment(
     @Param('id', ParseIntPipe) id: number,

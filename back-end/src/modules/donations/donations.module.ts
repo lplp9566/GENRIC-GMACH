@@ -11,6 +11,7 @@ import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overv
 import { DonationsEntity } from './Entity/donations.entity';
 import { FundsModule } from '../funds/funds.module';
 import { FundYearStatsEntity } from '../funds/Entity/fund-year-stats.entity';
+import { MailModule } from '../mail/mail.module';
 
 
 @Module({
@@ -25,7 +26,8 @@ import { FundYearStatsEntity } from '../funds/Entity/fund-year-stats.entity';
     UserFinancialsModule,
     FundsOverviewModule, 
     FundsOverviewByYearModule,
-    FundsModule
+    FundsModule,
+    MailModule
   ],
   controllers: [DonationsController],
   providers: [
