@@ -24,6 +24,7 @@ import { FundsOverviewByYearService } from '../../funds-overview-by-year/funds-o
 import { LoanActionBalanceService } from './loan_action_balance.service';
 import { PaymentDetailsService } from '../../users/payment-details/payment-details.service';
 import { log } from 'console';
+import { MailService } from '../../mail/mail.service';
 
 // cSpell:ignore Financials
 
@@ -45,6 +46,7 @@ export class LoanActionsService {
 
     @Inject(forwardRef(() => LoanActionBalanceService))
     private readonly LoanActionBalanceService: LoanActionBalanceService,
+    private readonly mailService: MailService,
   ) {}
   async handleLoanAction(dto: LoanActionDto): Promise<LoanActionEntity> {
     try {
@@ -85,6 +87,7 @@ export class LoanActionsService {
       if (dto.value > loan.remaining_balance) {
         throw new BadRequestException('Payment exceeds remaining balance');
       }
+      const oldRemaining = Number(loan.remaining_balance);
       const newPayment = this.paymentsRepo.create({
         loan: loan,
         date: dto.date,
@@ -110,10 +113,43 @@ export class LoanActionsService {
       }
       await this.loansRepo.save(loan);
 
+      let userWithPayments = loan.user;
+      try {
+        const fetched = await this.usersService.getUserById(loan.user.id);
+        if (fetched) userWithPayments = fetched;
+      } catch {
+        // fallback to loan.user if fetch fails
+      }
+      const remainingPayments = Math.max(
+        0,
+        Math.ceil(loan.total_installments) - Number(loan.total_remaining_payments || 0),
+      );
+
       const year = getYearFromDate(dto.date);
       await Promise.all([
       ]);
       await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
+
+      await this.maybeSendReceiptEmail(
+        userWithPayments ?? loan.user,
+        'תשלום הלוואה',
+        [
+          `הלוואה מספר ${loan.id}.`,
+          `התקבל תשלום הלוואה בסך ${this.mailService.formatCurrency(
+            dto.value,
+          )}.`,
+          `יתרה להחזר: ${this.mailService.formatCurrency(
+            loan.remaining_balance,
+          )}.`,
+          `תשלומים נותרו: ${remainingPayments}.`,
+        ],
+      );
+
+      if (oldRemaining > 0 && loan.remaining_balance === 0) {
+        await this.maybeSendReceiptEmail(loan.user, 'סיום הלוואה', [
+          'ההלוואה נסגרה במלואה. תודה.',
+        ]);
+      }
 
       return newPayment;
     } catch (error) {
@@ -152,7 +188,7 @@ export class LoanActionsService {
       throw new Error(error.message);
     }
   }
-  async editPayment(
+async editPayment(
   actionId: number,
   payload: { date?: Date; value?: number },
 ): Promise<LoanActionEntity> {
@@ -179,7 +215,8 @@ export class LoanActionsService {
     const delta = newValue - oldValue;
 
     // יתרה חדשה = יתרה נוכחית - delta
-    const newRemaining = Number(loan.remaining_balance) - delta;
+    const oldRemaining = Number(loan.remaining_balance);
+    const newRemaining = oldRemaining - delta;
     if (newRemaining < 0) {
       throw new BadRequestException('Edited payment exceeds remaining balance');
     }
@@ -208,6 +245,36 @@ export class LoanActionsService {
 
     await this.loansRepo.save(loan);
     await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);    
+      let userWithPayments = loan.user;
+      try {
+        const fetched = await this.usersService.getUserById(loan.user.id);
+        if (fetched) userWithPayments = fetched;
+      } catch {
+        // fallback to loan.user if fetch fails
+      }
+    const remainingPayments = Math.max(
+      0,
+      Math.ceil(loan.total_installments) - Number(loan.total_remaining_payments || 0),
+    );
+    await this.maybeSendReceiptEmail(
+      userWithPayments ?? loan.user,
+      'עדכון תשלום הלוואה',
+      [
+        `הלוואה מספר ${loan.id}.`,
+        `תשלום ההלוואה עודכן לסך ${this.mailService.formatCurrency(
+          newValue,
+        )}.`,
+        `יתרה להחזר: ${this.mailService.formatCurrency(
+          loan.remaining_balance,
+        )}.`,
+        `תשלומים נותרו: ${remainingPayments}.`,
+      ],
+    );
+    if (oldRemaining > 0 && loan.remaining_balance === 0) {
+      await this.maybeSendReceiptEmail(loan.user, 'סיום הלוואה', [
+        'ההלוואה נסגרה במלואה. תודה.',
+      ]);
+    }
     return action;
   } catch (error) {
     console.error('❌ Error in editPayment:', error.message);
@@ -280,5 +347,33 @@ async deleteAllPaymentsForLoan(loanId: number): Promise<{ deleted: true }> {
     console.error('❌ Error in deleteAllPaymentsForLoan:', error.message);
     throw new BadRequestException(error.message);
   }
+}
+
+private async maybeSendReceiptEmail(
+  user: any,
+  title: string,
+  lines: string[],
+) {
+  if (!user) return;
+  if (user.notify_receipts === false) return;
+  if (!user.email_address) return;
+
+  const extraLines = [...lines];
+  const monthlyBalance = user.payment_details?.monthly_balance;
+  if (typeof monthlyBalance === 'number' && monthlyBalance < 0) {
+    extraLines.push(
+      `יתרת חוב: ${this.mailService.formatCurrency(Math.abs(monthlyBalance))}.`,
+      'יש להסדיר את תשלום החוב בהקדם.',
+    );
+  }
+
+  const fullName = `${user.first_name} ${user.last_name}`.trim();
+  await this.mailService.sendReceiptNotification({
+    to: user.email_address,
+    fullName: fullName || 'לקוח יקר',
+    idNumber: user.id_number ?? '',
+    title,
+    lines: extraLines,
+  });
 }
 }

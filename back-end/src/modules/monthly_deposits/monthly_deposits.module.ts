@@ -9,6 +9,7 @@ import { UserFinancialByYearModule } from '../users/user-financials-by-year/user
 import { FundsOverviewModule } from '../funds-overview/funds-overview.module';
 import { UserFinancialsModule } from '../users/user-financials/user-financials.module';
 import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overview-by-year.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overv
     UserFinancialByYearModule,
     UserFinancialsModule,
     FundsOverviewModule,
-    FundsOverviewByYearModule
+    FundsOverviewByYearModule,
+    MailModule
   ],
   controllers: [MonthlyDepositsController],
   providers: [MonthlyDepositsService],

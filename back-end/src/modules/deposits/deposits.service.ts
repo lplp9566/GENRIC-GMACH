@@ -11,6 +11,7 @@ import { DepositsEntity } from './Entity/deposits.entity';
 import { FindOpts, LoanStatus, PaginatedResult } from '../../common/index';
 import { DepositsActionsEntity } from './deposits-actions/Entity/deposits-actions.entity';
 import { DepositActionsType } from './deposits-actions/depostits-actions-dto';
+import { MailService } from '../mail/mail.service';
 
 
 @Injectable()
@@ -25,6 +26,7 @@ export class DepositsService {
     private readonly userFinancialService: UserFinancialService,
     // private readonly fundsOverviewService: FundsOverviewService,
     private readonly fundsOverviewServiceByYear: FundsOverviewByYearService,
+    private readonly mailService: MailService,
   ) {}
   async getDeposits(opts:FindOpts):Promise<PaginatedResult<DepositsEntity>> {
     const page = opts.page > 0 ? opts.page : 1;
@@ -84,6 +86,19 @@ export class DepositsService {
         date: saved.start_date,
       });
       await this.depositsActionsRepo.save(initialAction);
+
+      await this.maybeSendReceiptEmail(
+        user,
+        'אישור הקמת הפקדה',
+        [
+          `נפתחה הפקדה מספר ${saved.id}.`,
+          `על סך ${this.mailService.formatCurrency(saved.initialDeposit)}.`,
+          `תאריך ההחזר: ${saved.end_date ? new Date(saved.end_date).toLocaleDateString('he-IL') : '-'}.`,
+          'תודה רבה.',
+          'בזכות ההפקדה התזרים של הגמ"ח גדל.',
+          'ואנו נעשה מאמץ להחזיר את ההפקדה בתאריך ההחזר.',
+        ],
+      );
       return saved;
     } catch (error) {
         throw new BadRequestException(error.message);
@@ -119,6 +134,21 @@ export class DepositsService {
       // await this.userFinancialByYearService.recordFixedDepositWithdrawn(user, year, amount);
       // await this.userFinancialService.recordFixedDepositWithdrawn(user, amount);
        await this.depositsRepo.save(deposit);
+       await this.maybeSendReceiptEmail(
+         deposit.user,
+         'משיכה מהפקדה',
+         [
+           `בוצעה משיכה מהפקדה בסך ${this.mailService.formatCurrency(amount)}.`,
+           `יתרת הפקדה: ${this.mailService.formatCurrency(
+             deposit.current_balance,
+           )}.`,
+         ],
+       );
+       if (!deposit.isActive) {
+         await this.maybeSendReceiptEmail(deposit.user, 'סגירת הפקדה', [
+           'ההפקדה נסגרה והיתרה הגיעה לאפס.',
+         ]);
+       }
        return this.getDepositsActive();
        ;
     } catch (error) {
@@ -135,9 +165,38 @@ export class DepositsService {
       // await this.userFinancialByYearService.recordFixedDepositAdded(user, year, amount);
       // await this.userFinancialService.recordFixedDepositAdded(user, amount);
        await this.depositsRepo.save(deposit);
+       await this.maybeSendReceiptEmail(
+         deposit.user,
+         'הוספה להפקדה',
+         [
+           `בוצעה הוספה להפקדה בסך ${this.mailService.formatCurrency(amount)}.`,
+           `יתרת הפקדה: ${this.mailService.formatCurrency(
+             deposit.current_balance,
+           )}.`,
+         ],
+       );
        return this.getDepositsActive();
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  private async maybeSendReceiptEmail(
+    user: any,
+    title: string,
+    lines: string[],
+  ) {
+    if (!user) return;
+    if (user.notify_receipts === false) return;
+    if (!user.email_address) return;
+
+    const fullName = `${user.first_name} ${user.last_name}`.trim();
+    await this.mailService.sendReceiptNotification({
+      to: user.email_address,
+      fullName: fullName || 'לקוח יקר',
+      idNumber: user.id_number ?? '',
+      title,
+      lines,
+    });
   }
 }

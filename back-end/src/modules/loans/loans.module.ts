@@ -15,6 +15,7 @@ import { DepositsModule } from '../deposits/deposits.module';
 import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates.module';
 import { PaymentDetailsModule } from '../users/payment-details/payment-details.module';
 import { LoanActionsModule } from './loan-actions/loan-actions.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { LoanActionsModule } from './loan-actions/loan-actions.module';
     PaymentDetailsModule,
     forwardRef(() => UsersModule),
     forwardRef(() => LoanActionsModule),
+    MailModule,
 
 
   ],

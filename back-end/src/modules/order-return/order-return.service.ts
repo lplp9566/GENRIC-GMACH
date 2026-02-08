@@ -10,6 +10,7 @@ import { getYearFromDate } from '../../services/services';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { log } from 'console';
 import { CreateOrdersReturnDto } from './new-order-return-dto';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class OrderReturnService {
@@ -21,6 +22,7 @@ export class OrderReturnService {
         private readonly userFinancialsService: UserFinancialService,
         private readonly fundsOverviewService: FundsOverviewService,
         private readonly fundsOverviewByYearService: FundsOverviewByYearService,
+        private readonly mailService: MailService,
   ) {}
   async getOrderReturns() {
     return await this.orderReturnRepository.find({relations: ['user']});
@@ -48,7 +50,17 @@ export class OrderReturnService {
   });
 
 
-  return this.orderReturnRepository.save(newOrderReturn);
+  const saved = await this.orderReturnRepository.save(newOrderReturn);
+  await this.maybeSendReceiptEmail(
+    user,
+    'אישור החזר הוראת קבע',
+    [
+      `נוצר החזר הוראת קבע בסך ${this.mailService.formatCurrency(
+        saved.amount,
+      )}.`,
+    ],
+  );
+  return saved;
 }
 
   async payOrderReturn(id: number,paid_at: Date): Promise<OrderReturnEntity> {
@@ -56,7 +68,17 @@ export class OrderReturnService {
     if (!orderReturn) throw new BadRequestException('Order return not found');    ;
     orderReturn.paid = true;
     orderReturn.paid_at = paid_at;
-    return await this.orderReturnRepository.save(orderReturn);
+    const saved = await this.orderReturnRepository.save(orderReturn);
+    await this.maybeSendReceiptEmail(
+      saved.user,
+      'תשלום החזר הוראת קבע',
+      [
+        `שולם החזר הוראת קבע בסך ${this.mailService.formatCurrency(
+          saved.amount,
+        )}.`,
+      ],
+    );
+    return saved;
   }
   async deleteOrderReturn(id: number): Promise<void> {
     await this.orderReturnRepository.delete(id);
@@ -66,5 +88,24 @@ export class OrderReturnService {
     if (!orderReturn) throw new BadRequestException('Order return not found');
     Object.assign(orderReturn, updateData);
     return await this.orderReturnRepository.save(orderReturn);
+  }
+
+  private async maybeSendReceiptEmail(
+    user: any,
+    title: string,
+    lines: string[],
+  ) {
+    if (!user) return;
+    if (user.notify_receipts === false) return;
+    if (!user.email_address) return;
+
+    const fullName = `${user.first_name} ${user.last_name}`.trim();
+    await this.mailService.sendReceiptNotification({
+      to: user.email_address,
+      fullName: fullName || 'לקוח יקר',
+      idNumber: user.id_number ?? '',
+      title,
+      lines,
+    });
   }
 }

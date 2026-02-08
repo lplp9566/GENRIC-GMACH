@@ -16,6 +16,7 @@ import { EditLoanDto } from './loan-dto/editLoanDto';
 import { LoanActionBalanceService } from './loan-actions/loan_action_balance.service';
 import { LoanActionsService } from './loan-actions/loan_actions.service';
 import { log } from 'console';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class LoansService {
@@ -32,6 +33,7 @@ export class LoansService {
     private readonly LoanActionsService: LoanActionsService,
       @Inject(forwardRef(() => LoanActionBalanceService))
           private readonly LoanActionBalanceService: LoanActionBalanceService,
+    private readonly mailService: MailService,
         )
         
          {}
@@ -142,6 +144,30 @@ qb.setParameter("todayDay", new Date().getDate());
      const result = await this.loansRepository.save(loanRecord);
             await this.LoanActionBalanceService.computeLoanNetBalance(result.id);
 
+      await this.maybeSendReceiptEmail(
+        user,
+        'אישור הקמת הלוואה',
+        [
+          `הלוואה מספר ${result.id} נוצרה בהצלחה.`,
+          `מספר תשלומים: ${Math.ceil(loanRecord.total_installments)}.`,
+          `סכום הלוואה: ${this.mailService.formatCurrency(
+            loanRecord.loan_amount,
+          )}.`,
+          `סכום ההחזר החודשי: ${this.mailService.formatCurrency(
+            loanRecord.monthly_payment,
+          )}.`,
+          `יום התשלום: ${loanRecord.payment_date ?? '-'} בחודש.`,
+          ...(loanRecord.first_payment_date
+            ? [
+                `תשלום ראשון בתאריך ${new Date(
+                  loanRecord.first_payment_date,
+                ).toLocaleDateString('he-IL')}.`,
+              ]
+            : []),
+          'בוא נצעד יחד לעבר היעד.',
+        ],
+      );
+
       return result;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -189,6 +215,16 @@ qb.setParameter("todayDay", new Date().getDate());
         note: dto.note || `שינוי סכום הלוואה ל-${dto.value}`,
       })
       await this.LoanActionBalanceService.computeLoanNetBalance(dto.loanId);
+      await this.maybeSendReceiptEmail(
+        loan.user,
+        'עדכון סכום הלוואה',
+        [
+          `סכום ההלוואה עודכן ב-${this.mailService.formatCurrency(dto.value)}.`,
+          `יתרה חדשה להחזר: ${this.mailService.formatCurrency(
+            loan.remaining_balance,
+          )}.`,
+        ],
+      );
       return result;
       }
     catch (error) {
@@ -201,6 +237,7 @@ qb.setParameter("todayDay", new Date().getDate());
     const loanId = Number(dto.loanId);
     const loan = await this.loansRepository.findOne({
       where: { id: loanId },
+      relations: ['user'],
     });
     if (!loan) throw new BadRequestException('Loan not found');
     if (!loan.isActive) {
@@ -219,6 +256,15 @@ qb.setParameter("todayDay", new Date().getDate());
 
       });
         await this.LoanActionBalanceService.computeLoanNetBalance(loanId)
+      await this.maybeSendReceiptEmail(
+        loan.user,
+        'עדכון תשלום חודשי',
+        [
+          `התשלום החודשי עודכן לסך ${this.mailService.formatCurrency(
+            dto.value,
+          )}.`,
+        ],
+      );
       return result;
     } catch (error) {
       throw new Error(error.message);
@@ -228,6 +274,7 @@ qb.setParameter("todayDay", new Date().getDate());
     try {
       const loan = await this.loansRepository.findOne({
         where: { id: dto.loanId },
+        relations: ['user'],
       });
       if (!loan) throw new BadRequestException('Loan not found');
       if (!loan.isActive) {
@@ -246,6 +293,11 @@ qb.setParameter("todayDay", new Date().getDate());
         // note: dto.note || `שינוי תאריך תשלום ל-${dto.value}`,
       })
       await this.LoanActionBalanceService.computeLoanNetBalance(result.id)
+      await this.maybeSendReceiptEmail(
+        loan.user,
+        'עדכון יום תשלום',
+        [`יום התשלום עודכן ל-${dto.value} בחודש.`],
+      );
       return result;
     } catch (error) {
       console.error('❌ Error in editDateOfPyment:', error.message);
@@ -279,6 +331,7 @@ qb.setParameter("todayDay", new Date().getDate());
 
   if (!loan) throw new BadRequestException('Loan not found');
   if (!loan.isActive) throw new BadRequestException('Loan not active');
+  const changes: string[] = [];
   // שינוי סכום הלוואה
   if (dto.loan_amount !== undefined && dto.loan_amount !== loan.loan_amount) {
     const oldAmount = Number(loan.loan_amount);
@@ -293,15 +346,29 @@ qb.setParameter("todayDay", new Date().getDate());
     }
     loan.loan_amount = newAmount;
     loan.remaining_balance = Number(loan.remaining_balance) + diff;
+    changes.push(
+      `סכום ההלוואה עודכן מ-${this.mailService.formatCurrency(
+        oldAmount,
+      )} ל-${this.mailService.formatCurrency(newAmount)}.`,
+    );
   }
 
   // שינוי תשלום חודשי
   if (dto.monthly_payment !== undefined && dto.monthly_payment !== loan.monthly_payment) {    
-    loan.initial_monthly_payment = Number(dto.monthly_payment);
+    const oldPayment = Number(loan.monthly_payment);
+    const newPayment = Number(dto.monthly_payment);
+    loan.initial_monthly_payment = newPayment;
+    changes.push(
+      `התשלום החודשי עודכן מ-${this.mailService.formatCurrency(
+        oldPayment,
+      )} ל-${this.mailService.formatCurrency(newPayment)}.`,
+    );
     
   }
   if (dto.payment_date !== undefined && dto.payment_date !== loan.payment_date) {
+    const oldDate = loan.payment_date;
     loan.payment_date = dto.payment_date;
+    changes.push(`יום התשלום עודכן מ-${oldDate} ל-${dto.payment_date}.`);
   }
   // חישובים סופיים
   loan.loan_date =  toDate(dto.loan_date) || loan.loan_date;
@@ -317,10 +384,33 @@ qb.setParameter("todayDay", new Date().getDate());
   const result = await this.loansRepository.save(loan);
    if (result) await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
 
+  if (changes.length) {
+    await this.maybeSendReceiptEmail(loan.user, 'עדכון הלוואה', changes);
+  }
+
   return result;
 }
   async deleteLoanSimple(loanId: number) {
     await this.LoanActionsService.deleteAllPaymentsForLoan(loanId);
     return this.loansRepository.delete(loanId);
+  }
+
+  private async maybeSendReceiptEmail(
+    user: any,
+    title: string,
+    lines: string[],
+  ) {
+    if (!user) return;
+    if (user.notify_receipts === false) return;
+    if (!user.email_address) return;
+
+    const fullName = `${user.first_name} ${user.last_name}`.trim();
+    await this.mailService.sendReceiptNotification({
+      to: user.email_address,
+      fullName: fullName || 'לקוח יקר',
+      idNumber: user.id_number ?? '',
+      title,
+      lines,
+    });
   }
 }

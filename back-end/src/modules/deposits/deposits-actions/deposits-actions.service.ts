@@ -5,6 +5,7 @@ import { DepositsActionsEntity } from './Entity/deposits-actions.entity';
 import { DepositsService } from '../deposits.service';
 import { DepositActionsType, IDepositAction } from './depostits-actions-dto';
 import { DepositsEntity } from '../Entity/deposits.entity';
+import { MailService } from '../../mail/mail.service';
 
 @Injectable()
 export class DepositsActionsService {
@@ -14,6 +15,7 @@ export class DepositsActionsService {
     @InjectRepository(DepositsEntity)
     private readonly depositsRepo: Repository<DepositsEntity>,
     private readonly depositsService: DepositsService,
+    private readonly mailService: MailService,
   ) {}
   async getDepositsActions() {
     return await this.depositsActionsRepo.find();
@@ -59,6 +61,11 @@ export class DepositsActionsService {
           });
           console.log(newAction,"new")
            await this.depositsActionsRepo.save(newAction);
+           await this.maybeSendReceiptEmail(
+             deposit.user,
+             'עדכון יום החזר הפקדה',
+             [`יום ההחזר עודכן לתאריך ${depositAction.update_date}.`],
+           );
            return this.depositsService.getDepositsActive();
            break
         case DepositActionsType.RemoveFromDeposit:
@@ -102,6 +109,25 @@ export class DepositsActionsService {
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  private async maybeSendReceiptEmail(
+    user: any,
+    title: string,
+    lines: string[],
+  ) {
+    if (!user) return;
+    if (user.notify_receipts === false) return;
+    if (!user.email_address) return;
+
+    const fullName = `${user.first_name} ${user.last_name}`.trim();
+    await this.mailService.sendReceiptNotification({
+      to: user.email_address,
+      fullName: fullName || 'לקוח יקר',
+      idNumber: user.id_number ?? '',
+      title,
+      lines,
+    });
   }
   
 }

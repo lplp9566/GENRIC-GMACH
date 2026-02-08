@@ -37,3 +37,12 @@ export interface DonationReceiptEmailData {
   fundLabel: string;
   logoUrl?: string;
 }
+
+export interface ReceiptNotificationEmailData {
+  to: string;
+  fullName: string;
+  idNumber: string;
+  title: string;
+  lines: string[];
+  logoUrl?: string;
+}

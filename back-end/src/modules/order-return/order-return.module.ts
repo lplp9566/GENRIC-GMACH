@@ -8,10 +8,11 @@ import { FundsOverviewModule } from '../funds-overview/funds-overview.module';
 import { UserFinancialsModule } from '../users/user-financials/user-financials.module';
 import { UsersModule } from '../users/users.module';
 import { FundsOverviewByYearModule } from '../funds-overview-by-year/funds-overview-by-year.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports:[TypeOrmModule.forFeature([OrderReturnEntity]),
-  UserFinancialByYearModule,FundsOverviewModule,UserFinancialsModule,UsersModule,FundsOverviewByYearModule
+  UserFinancialByYearModule,FundsOverviewModule,UserFinancialsModule,UsersModule,FundsOverviewByYearModule,MailModule
 ],
   controllers: [OrderReturnController],
   providers: [OrderReturnService],

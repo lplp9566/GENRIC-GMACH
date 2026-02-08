@@ -12,6 +12,7 @@ import { LoanActionsController } from './loan_actions.controller';
 import { UserFinancialByYearModule } from '../../users/user-financials-by-year/user-financial-by-year.module';
 import { FundsOverviewByYearModule } from '../../funds-overview-by-year/funds-overview-by-year.module';
 import { LoanActionBalanceService } from './loan_action_balance.service';
+import { MailModule } from '../../mail/mail.module';
 // cSpell:ignore Financials
 
 @Module({
@@ -25,6 +26,7 @@ import { LoanActionBalanceService } from './loan_action_balance.service';
     UserFinancialByYearModule,
     FundsOverviewModule,
     FundsOverviewByYearModule,
+    MailModule,
    
   ],
   providers: [LoanActionsService,LoanActionBalanceService],

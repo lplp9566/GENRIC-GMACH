@@ -5,10 +5,15 @@ import * as path from 'path';
 import puppeteer = require('puppeteer');
 import * as os from 'os';
 import { HDate } from 'hebcal';
-import { DonationReceiptEmailData, YearSummaryPdfStyleData } from './dto';
+import {
+  DonationReceiptEmailData,
+  ReceiptNotificationEmailData,
+  YearSummaryPdfStyleData,
+} from './dto';
 import { ConfigService } from '@nestjs/config';
 import { render } from '@react-email/render';
 import { DonationReceiptEmail } from './templates/donation-receipt';
+import { ReceiptNotificationEmail } from './templates/receipt-notification';
 
 @Injectable()
 export class MailService {
@@ -68,6 +73,28 @@ export class MailService {
     const text = `שלום לך ${data.fullName}\nמספר זהות: ${data.idNumber}\nברצוננו להודות לך על תרומתך של סך ${amountText} ל${data.fundLabel}.\nבזכותך הגדלנו את הקרן ונוכל לסייע לעוד משפחות.`;
 
     return this.sendMail(data.to, subject, html, text);
+  }
+
+  async sendReceiptNotification(data: ReceiptNotificationEmailData) {
+    const logoUrl = data.logoUrl ?? this.config.get<string>('LOGO_URL');
+    const html = await render(
+      ReceiptNotificationEmail({
+        fullName: data.fullName,
+        idNumber: data.idNumber,
+        title: data.title,
+        lines: data.lines,
+        logoUrl,
+      }),
+      { pretty: true },
+    );
+
+    const textLines = [
+      data.title,
+      `שלום לך ${data.fullName}`,
+      `מספר זהות: ${data.idNumber}`,
+      ...data.lines,
+    ];
+    return this.sendMail(data.to, data.title, html, textLines.join('\n'));
   }
 
   async sendYearSummaryPdfStyle(to: string, data: YearSummaryPdfStyleData) {
@@ -322,10 +349,11 @@ export class MailService {
     return String(raw).trim().toLowerCase() === 'true';
   }
 
-  private formatCurrency(value: number) {
-    return (
-      new Intl.NumberFormat('he-IL', { maximumFractionDigits: 2 }).format(value) +
-      ' ₪'
-    );
+  formatCurrency(value: number) {
+    const formatted = new Intl.NumberFormat('he-IL', {
+      maximumFractionDigits: 2,
+    }).format(value);
+    // Force correct RTL/LTR display for currency
+    return `\u00A0₪${formatted}\u200F`;
   }
 }

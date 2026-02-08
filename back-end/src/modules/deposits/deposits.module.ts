@@ -12,6 +12,7 @@ import { DepositsEntity } from './Entity/deposits.entity';
 import { RoleMonthlyRatesModule } from '../role_monthly_rates/role_monthly_rates.module';
 import { DepositsFlowService } from './DepositsFlow.service';
 import { LoansModule } from '../loans/loans.module';
+import { MailModule } from '../mail/mail.module';
 
 
 
@@ -24,7 +25,8 @@ import { LoansModule } from '../loans/loans.module';
     UserFinancialsModule,
     FundsOverviewModule,
     FundsOverviewByYearModule,
-    RoleMonthlyRatesModule
+    RoleMonthlyRatesModule,
+    MailModule
   ],
   controllers: [DepositsController],
   providers: [DepositsService, DepositsFlowService],

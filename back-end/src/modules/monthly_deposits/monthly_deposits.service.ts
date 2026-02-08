@@ -10,6 +10,7 @@ import { UserFinancialService } from '../users/user-financials/user-financials.s
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
 import { updateMonthlyDepositDto } from './monthly_deposits.controller';
 import { log } from 'console';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class MonthlyDepositsService {
@@ -22,6 +23,7 @@ export class MonthlyDepositsService {
     private readonly fundsOverviewService: FundsOverviewService,
     private readonly userFinancialsService: UserFinancialService,
     private readonly fundsOverviewByYearService: FundsOverviewByYearService,
+    private readonly mailService: MailService,
   ) {}
 
   async getAllDeposits(): Promise<MonthlyDepositsEntity[]> {
@@ -64,7 +66,6 @@ export class MonthlyDepositsService {
   }
   async recordMonthlyDeposit(payment_details: Partial<MonthlyDepositsEntity>) {
     try {
-      // ✅ בדיקת תקינות
       if (!payment_details.amount || !payment_details.deposit_date || !payment_details.user) {
         throw new Error('Missing required fields');
       }
@@ -87,14 +88,25 @@ export class MonthlyDepositsService {
         month: month
       });
       await this.monthlyDepositsRepository.save(newDeposit);
-      await Promise.all([
-        // this.userFinancialByYearService.recordMonthlyDeposit(user, year, payment_details.amount),
-        // this.userFinancialsService.recordMonthlyDeposit(user, payment_details.amount),
-        // this.fundsOverviewService.addMonthlyDeposit(payment_details.amount),
+      const monthlyBalance = await this.usersService.updateUserMonthlyBalance(user);
 
-        // this.fundsOverviewByYearService.recordMonthlyDeposit(year, payment_details.amount),
-      ]);
-      await this.usersService.updateUserMonthlyBalance(user);
+      const lines = [
+        `התקבל תשלום דמי חבר בסך ${this.mailService.formatCurrency(
+          payment_details.amount,
+        )} לחודש ${month}/${year}.`,
+      ];
+      if (monthlyBalance != null && monthlyBalance < 0) {
+        lines.push(
+          `יתרת חוב: ${this.mailService.formatCurrency(Math.abs(monthlyBalance))}.`,
+          'יש להסדיר את תשלום החוב בהקדם.',
+        );
+      }
+
+      await this.maybeSendReceiptEmail(
+        user,
+        'אישור תשלום דמי חבר',
+        lines,
+      );
 
       return { message: `Deposit recorded successfully.` };
   
@@ -135,22 +147,6 @@ export class MonthlyDepositsService {
       existing.month = getMonthFromDate(newDate);
       existing.description = payment_details.description;
       existing.payment_method = payment_details.payment_method;
-
-      // עדכונים נלווים
-      // await this.userFinancialsService.recordMonthlyDeposit(user, deltaAmount);
-      // await this.fundsOverviewService.addMonthlyDeposit(deltaAmount);
-
-      if (newYear === oldYear) {
-        // await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, deltaAmount);
-        // await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, deltaAmount);
-      } else {
-        // await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
-        // await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
-
-        // await this.userFinancialByYearService.recordMonthlyDeposit(user, newYear, newAmount);
-        // await this.fundsOverviewByYearService.recordMonthlyDeposit(newYear, newAmount);
-      }
-
       // שומרים בתוך הטרנזקציה
       await manager.save(existing);
 
@@ -169,6 +165,25 @@ export class MonthlyDepositsService {
   });
 }
 
+  private async maybeSendReceiptEmail(
+    user: any,
+    title: string,
+    lines: string[],
+  ) {
+    if (!user) return;
+    if (user.notify_receipts === false) return;
+    if (!user.email_address) return;
+
+    const fullName = `${user.first_name} ${user.last_name}`.trim();
+    await this.mailService.sendReceiptNotification({
+      to: user.email_address,
+      fullName: fullName || 'לקוח יקר',
+      idNumber: user.id_number ?? '',
+      title,
+      lines,
+    });
+  }
+
 async deleteMonthlyDeposit(id: number) {
   // 1) טרנזקציה למחיקה + עדכוני סכומים
   const deletedUser = await this.monthlyDepositsRepository.manager.transaction(
@@ -177,28 +192,18 @@ async deleteMonthlyDeposit(id: number) {
         where: { id },
         relations: { user: true },
       });
-
       if (!existing) throw new BadRequestException('Deposit not found');
-
       const oldAmount = existing.amount;
       const oldYear = getYearFromDate(existing.deposit_date);
       const user = existing.user;
-
-      // await this.userFinancialsService.recordMonthlyDeposit(user, -oldAmount);
-      // await this.fundsOverviewService.addMonthlyDeposit(-oldAmount);
-      // await this.fundsOverviewByYearService.recordMonthlyDeposit(oldYear, -oldAmount);
-      // await this.userFinancialByYearService.recordMonthlyDeposit(user, oldYear, -oldAmount);
-
       await manager.delete(MonthlyDepositsEntity, { id });
 
-      return user; // נחזיר את המשתמש כדי לחשב בלאנס אחרי commit
+      return user; 
     },
   );
 
-  // 2) אחרי commit: מחשבים בלאנס
   await this.usersService.updateUserMonthlyBalance(deletedUser);
 
   return { message: 'Deposit deleted successfully.' };
 }
-
 }  
