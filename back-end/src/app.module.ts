@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -30,18 +29,18 @@ import { UserRoleHistoryService } from './modules/user_role_history/user_role_hi
 import { UserRoleHistoryController } from './modules/user_role_history/user_role_history.controller';
 import { UserRoleHistoryModule } from './modules/user_role_history/user_role_history.module';
 
-import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
+// import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
 import { FundsModule } from './modules/funds/funds.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { ExpensesCategoryModule } from './modules/expenses-category/expenses-category.module';
 import { BankCurrentModule } from './modules/bank-current/bank-current.module';
 
-
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
-      isGlobal: true,}),
+      isGlobal: true,
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -49,16 +48,16 @@ import { BankCurrentModule } from './modules/bank-current/bank-current.module';
         type: 'postgres',
         url: configService.get<string>('DATABASE_URL'),
         autoLoadEntities: true,
-         synchronize: true,  
-           migrationsRun: false,         // ✅ יריץ migrations אוטומטית בעלייה
-  migrations: [__dirname + '/migrations/*{.ts,.js}'],
-        ssl: process.env.NODE_ENV === 'production'
-          ? { rejectUnauthorized: false } 
-          : false, // ללא SSL בלוקאלי
+        synchronize: true,
+        migrationsRun: false, // ✅ יריץ migrations אוטומטית בעלייה
+        migrations: [__dirname + '/migrations/*{.ts,.js}'],
+        ssl:
+          process.env.NODE_ENV === 'production'
+            ? { rejectUnauthorized: false }
+            : false, // ללא SSL בלוקאלי
       }),
     }),
-    
-    
+
     UsersModule,
     LoansModule,
     LoanActionsModule,
@@ -71,8 +70,9 @@ import { BankCurrentModule } from './modules/bank-current/bank-current.module';
     DonationsModule,
     MailModule,
     UserFinancialsModule,
-    InvestmentsModule, 
-    InvestmentTransactionsModule, RequestsModule,
+    InvestmentsModule,
+    InvestmentTransactionsModule,
+    RequestsModule,
     AuthModule,
     DepositsModule,
     DepositsActionsModule,
@@ -83,16 +83,12 @@ import { BankCurrentModule } from './modules/bank-current/bank-current.module';
     MembershipRolesModule,
     RoleMonthlyRatesModule,
     UserRoleHistoryModule,
-    WhatsappModule,
+    // WhatsappModule,
     FundsModule,
     ExpensesCategoryModule,
     BankCurrentModule,
-    AiAgentModule,
   ],
-  providers: [ UserRoleHistoryService],
-  controllers: [UserRoleHistoryController,],
-
-
-
+  providers: [UserRoleHistoryService],
+  controllers: [UserRoleHistoryController],
 })
 export class AppModule {}
