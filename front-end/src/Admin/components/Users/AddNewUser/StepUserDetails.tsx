@@ -34,6 +34,14 @@ const StepUserDetails: React.FC<UserDetailsStepProps> = ({ data, onUserChange })
         onChange={onUserChange("email_address")}
         fullWidth
       />
+      <TextField
+        dir="rtl"
+        label="טלפון"
+        type="tel"
+        value={data.userData.phone_number}
+        onChange={onUserChange("phone_number")}
+        fullWidth
+      />
       <FormControl fullWidth dir="rtl">
         <InputLabel id="permission-label">הרשאה</InputLabel>
         <Select

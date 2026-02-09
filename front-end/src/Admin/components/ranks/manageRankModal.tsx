@@ -66,14 +66,14 @@ const manageRankModal: React.FC<IManageRankModalProps> = ({
           component: Paper,
           sx: {
             borderRadius: 3,
-            bgcolor: "#e6f9ec",
+            // bgcolor: "#e6f9ec",
           },
         }}
       >
         <DialogTitle
           sx={{
             bgcolor: "#2a8c82",
-            color: "#fff",
+            // color: "#fff",
             textAlign: "center",
             py: 2,
           }}

@@ -55,14 +55,11 @@ const AddRankModal: React.FC<AddRankModalProps> = ({ open, onClose }) => {
           component: Paper,
           sx: {
             borderRadius: 3,
-            bgcolor: "#e6f9ec",
           },
         }}
       >
         <DialogTitle
           sx={{
-            bgcolor: "#2a8c82",
-            color: "#fff",
             textAlign: "center",
             py: 2,
             // position: "relative",
@@ -78,7 +75,6 @@ const AddRankModal: React.FC<AddRankModalProps> = ({ open, onClose }) => {
               position: "absolute",
               left: 8,
               top: 8,
-              color: "#fff",
             }}
           >
             <CloseIcon />
@@ -124,10 +120,9 @@ const AddRankModal: React.FC<AddRankModalProps> = ({ open, onClose }) => {
             variant="contained"
             disabled={!name.trim()}
             sx={{
-              bgcolor: "#2a8c82",
-              color: "#fff",
-              "&:hover": { bgcolor: "#276f54" },
-              "&.Mui-disabled": { bgcolor: "#c8e6c9", color: "#9e9e9e" },
+              // bgcolor: "#2a8c82",
+              // "&:hover": { bgcolor: "#276f54" },
+              // "&.Mui-disabled": { bgcolor: "#c8e6c9", color: "#9e9e9e" },
             }}
           >
             הוסף דרגה

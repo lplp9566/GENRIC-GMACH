@@ -50,7 +50,7 @@ const AllRanks: FC<AllRanksProps> = ({ ranks }) => {
             sx={{
               width: "100%",
               maxWidth: 600,
-              bgcolor: "#f6f7f7",
+              // bgcolor: "#f6f7f7",
               boxShadow: 1,
               borderRadius: 2,
               mx: "auto",
@@ -68,7 +68,7 @@ const AllRanks: FC<AllRanksProps> = ({ ranks }) => {
               expandIcon={<ExpandMoreIcon sx={{ color: "#fff" }} />}
               sx={{
                 bgcolor: "#5f7d7b",
-                color: "#fff",
+                // color: "#fff",
                 px: 2,
                 py: 1,
                 "& .MuiAccordionSummary-content": {

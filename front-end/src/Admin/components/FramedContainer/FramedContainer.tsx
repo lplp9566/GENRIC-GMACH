@@ -6,7 +6,7 @@ const FramedContainer: any = ({ children }: { children: React.ReactNode }) => {
       elevation={0}
       sx={{
         p: 3,                                  
-        bgcolor: "#ffffff",                      
+        // bgcolor: "#ffffff",                      
         border: "1px solid rgba(0, 0, 0, 0.08)",  
         borderRadius: "16px",                     
         maxWidth: 800,                            

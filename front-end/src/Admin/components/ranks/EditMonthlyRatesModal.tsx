@@ -17,8 +17,8 @@ interface Props {
   open: boolean;
   onClose: () => void;
   defaultAmount: number;
-  defaultDate: string; 
-  id:number
+  defaultDate: string;
+  id: number;
 }
 
 const EditMonthlyRatesModal: FC<Props> = ({
@@ -26,11 +26,11 @@ const EditMonthlyRatesModal: FC<Props> = ({
   onClose,
   defaultAmount,
   defaultDate,
-  id
+  id,
 }) => {
   const [amount, setAmount] = useState<number>(defaultAmount);
   const [date, setDate] = useState<string>(defaultDate);
-      const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
 
   const submit = async () => {
     onClose();
@@ -39,36 +39,42 @@ const EditMonthlyRatesModal: FC<Props> = ({
         updateMembershipRank({
           id,
           amount,
-          effective_from: date
-        })
+          effective_from: date,
+        }),
       ).unwrap(),
       {
         pending: "מעדכן תרומה... ",
         success: "התרומה עודכנה בהצלחה! 👌",
         error: "שגיאה בעדכון התרומה 💥",
-      }
-    )
+      },
+    );
   };
-console.log(date);
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs" sx={{ direction: "rtl" }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="xs"
+      sx={{ direction: "rtl" }}
+    >
       <DialogTitle>עריכת סכום חודשי</DialogTitle>
 
       <DialogContent>
         <Stack spacing={2} pt={1}>
-<TextField
-  label="סכום חודשי"
-  type="number"
-  value={amount}
-  onChange={(e) => setAmount(e.target.value === "" ? 0 : parseFloat(e.target.value))}
-  fullWidth
-  inputProps={{
-    step: "0.01",   // מאפשר עשרוני
-    min: "0",
-  }}
-/>
-
+          <TextField
+            label="סכום חודשי"
+            type="number"
+            value={amount}
+            onChange={(e) =>
+              setAmount(e.target.value === "" ? 0 : parseFloat(e.target.value))
+            }
+            fullWidth
+            inputProps={{
+              step: "0.01", // מאפשר עשרוני
+              min: "0",
+            }}
+          />
 
           <TextField
             type="date"
