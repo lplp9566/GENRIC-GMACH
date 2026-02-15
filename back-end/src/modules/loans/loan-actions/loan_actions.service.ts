@@ -328,6 +328,11 @@ async deleteAction(actionId: number): Promise<{ deleted: true }> {
       return { deleted: true };
     }
 
+    if (action.action_type === LoanPaymentActionType.LOAN_CREATED) {
+      await this.paymentsRepo.remove(action);
+      return { deleted: true };
+    }
+
     throw new BadRequestException('Unsupported action type for delete');
   } catch (error) {
     console.error('? Error in deleteAction:', error.message);

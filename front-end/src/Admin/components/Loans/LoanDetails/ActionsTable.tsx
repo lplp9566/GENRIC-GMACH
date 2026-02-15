@@ -60,6 +60,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
     }
   };
   const ACTION_ORDER: LoanPaymentActionType[] = [
+    LoanPaymentActionType.LOAN_CREATED,
     LoanPaymentActionType.PAYMENT,
     LoanPaymentActionType.AMOUNT_CHANGE,
     LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
@@ -190,7 +191,9 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                     }
                     size="small"
                     color={
-                      action.action_type === "PAYMENT"
+                      action.action_type === "LOAN_CREATED"
+                        ? "secondary"
+                        : action.action_type === "PAYMENT"
                         ? "success"
                         : action.action_type === "AMOUNT_CHANGE"
                         ? "warning"

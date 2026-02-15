@@ -142,7 +142,13 @@ qb.setParameter("todayDay", new Date().getDate());
         loanRecord.guarantor2 = loanData.guarantor2;
       }
      const result = await this.loansRepository.save(loanRecord);
-            await this.LoanActionBalanceService.computeLoanNetBalance(result.id);
+     await this.paymentsRepository.save({
+       loan: result,
+       date: loanRecord.loan_date ?? new Date(),
+       value: loanRecord.loan_amount,
+       action_type: LoanPaymentActionType.LOAN_CREATED,
+     });
+     await this.LoanActionBalanceService.computeLoanNetBalance(result.id);
 
       await this.maybeSendReceiptEmail(
         user,

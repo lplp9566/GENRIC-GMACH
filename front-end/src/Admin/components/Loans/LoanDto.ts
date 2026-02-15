@@ -50,6 +50,7 @@ export interface ILoanCheckResponse {
   butten: boolean; 
 }
 export enum LoanPaymentActionType {
+  LOAN_CREATED = "LOAN_CREATED",
   PAYMENT = "PAYMENT",
   AMOUNT_CHANGE = "AMOUNT_CHANGE",
   MONTHLY_PAYMENT_CHANGE = "MONTHLY_PAYMENT_CHANGE",
@@ -68,6 +69,10 @@ export interface ILoanWithPayment extends ILoanBase {
 // }
 
 export const ActionTypes = [
+  {
+    label:'פתיחת הלוואה',
+    value:LoanPaymentActionType.LOAN_CREATED
+  },
   {
     label:'תשלום הלוואה',
     value:LoanPaymentActionType.PAYMENT

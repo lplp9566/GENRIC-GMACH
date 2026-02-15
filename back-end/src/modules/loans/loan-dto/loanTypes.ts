@@ -12,6 +12,7 @@ export interface PaymentEvent {
   }
 
 export enum LoanPaymentActionType {
+    LOAN_CREATED = 'LOAN_CREATED',
     PAYMENT = 'PAYMENT', 
     AMOUNT_CHANGE = 'AMOUNT_CHANGE', 
     MONTHLY_PAYMENT_CHANGE = 'MONTHLY_PAYMENT_CHANGE',
