@@ -96,11 +96,12 @@ export class MailService {
       { pretty: true },
     );
 
+    const cleanLine = (line: string) => line.replace(/^\[red\]\s*/, '');
     const textLines = [
       data.title,
       `שלום לך ${data.fullName}`,
       `מספר זהות: ${data.idNumber}`,
-      ...data.lines,
+      ...data.lines.map(cleanLine),
     ];
     return this.sendMail(data.to, data.title, html, textLines.join('\n'));
   }

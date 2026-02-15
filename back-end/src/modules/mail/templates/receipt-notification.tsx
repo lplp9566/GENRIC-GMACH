@@ -42,11 +42,15 @@ export const ReceiptNotificationEmail = ({
             <Text style={styles.meta}>
               שלום לך {fullName}, מספר זהות: {idNumber}
             </Text>
-            {lines.map((line, idx) => (
-              <Text key={idx} style={styles.line}>
-                {line}
-              </Text>
-            ))}
+            {lines.map((line, idx) => {
+              const isRed = line.startsWith('[red]');
+              const text = isRed ? line.replace(/^\[red\]\s*/, '') : line;
+              return (
+                <Text key={idx} style={isRed ? styles.redLine : styles.line}>
+                  {text}
+                </Text>
+              );
+            })}
           </Section>
         </Container>
       </Body>
@@ -96,6 +100,13 @@ const styles = {
     fontSize: '15px',
     margin: '0 0 12px',
     color: '#222222',
+    lineHeight: '1.6',
+  },
+  redLine: {
+    fontSize: '15px',
+    margin: '0 0 12px',
+    color: '#d32f2f',
+    fontWeight: 700,
     lineHeight: '1.6',
   },
 };
