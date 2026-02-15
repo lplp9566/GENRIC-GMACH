@@ -31,11 +31,13 @@ import UserOverviewPage from "./User/pages/UserOverviewPage";
 import { MatomoTracker } from "./MatomoTracker";
 import AuthGuard from "./Auth/AuthGuard";
 import { AdminOnlyRoute, UserOnlyRoute, AdminWriteRoute } from "./Auth/RoleRoute";
+import { ClarityRouteTracker } from "./ClarityRouteTracker";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <MatomoTracker />
+          <ClarityRouteTracker />
+
       <Routes>
         {/* Public */}
         <Route element={<PublicLayout />}>
