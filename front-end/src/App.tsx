@@ -28,7 +28,6 @@ import UserLoanRequestsPage from "./User/pages/UserLoanRequestsPage";
 import UserDepositsPage from "./User/pages/UserDepositsPage";
 import UserProfilePage from "./User/pages/UserProfilePage";
 import UserOverviewPage from "./User/pages/UserOverviewPage";
-import { MatomoTracker } from "./MatomoTracker";
 import AuthGuard from "./Auth/AuthGuard";
 import { AdminOnlyRoute, UserOnlyRoute, AdminWriteRoute } from "./Auth/RoleRoute";
 import { ClarityRouteTracker } from "./ClarityRouteTracker";
