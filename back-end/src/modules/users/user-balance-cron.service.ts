@@ -64,41 +64,41 @@ export class UserBalanceCronService {
     this.logger.log('✅ Daily loan balances update complete.');
   }
 
-  @Cron('36 22 * * *', { timeZone: 'Asia/Jerusalem' })
-  async sendDailyLoanReminders() {
-    const today = new Date().getDate();
+//   @Cron('36 22 * * *', { timeZone: 'Asia/Jerusalem' })
+//   async sendDailyLoanReminders() {
+//     const today = new Date().getDate();
 
-    this.logger.log(`📢 Sending WhatsApp reminders for loans due today (${today})...`);
+//     this.logger.log(`📢 Sending WhatsApp reminders for loans due today (${today})...`);
 
-    const loans = await this.loansRepo.find({
-      where: { payment_date: today, isActive: true },
-      relations: ['user'],
-    });
+//     const loans = await this.loansRepo.find({
+//       where: { payment_date: today, isActive: true },
+//       relations: ['user'],
+//     });
 
-    if (!loans.length) {
-      this.logger.log('ℹ️ No loans due today.');
-      return;
-    }
+//     if (!loans.length) {
+//       this.logger.log('ℹ️ No loans due today.');
+//       return;
+//     }
 
-    for (const loan of loans) {
-      try {
-        const user = loan.user;
-        if (!user?.phone_number) continue;
+//     for (const loan of loans) {
+//       try {
+//         const user = loan.user;
+//         if (!user?.phone_number) continue;
 
-        const message = 
-`תזכורת תשלום הלוואה:
-היום יש חיוב על הלוואה שלך.
-סכום תשלום: ${loan.monthly_payment} ₪
-מספר הלוואה: ${loan.id}
+//         const message = 
+// `תזכורת תשלום הלוואה:
+// היום יש חיוב על הלוואה שלך.
+// סכום תשלום: ${loan.monthly_payment} ₪
+// מספר הלוואה: ${loan.id}
 
-אם יש שאלה או בעיה — תמיד כאן לעזרה. 🙏`;
+// אם יש שאלה או בעיה — תמיד כאן לעזרה. 🙏`;
 
-        await this.whatsappService.sendText("972533161790", message);
+//         await this.whatsappService.sendText("972533161790", message);
 
-        this.logger.log(`📨 Reminder sent to ${user.phone_number} for loan ${loan.id}`);
-      } catch (err) {
-        this.logger.error(`❌ Failed sending reminder for loan ${loan.id}: ${err.message}`);
-      }
-    }
-  }
+//         this.logger.log(`📨 Reminder sent to ${user.phone_number} for loan ${loan.id}`);
+//       } catch (err) {
+//         this.logger.error(`❌ Failed sending reminder for loan ${loan.id}: ${err.message}`);
+//       }
+//     }
+//   }
 }

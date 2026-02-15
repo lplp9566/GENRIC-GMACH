@@ -338,6 +338,7 @@ qb.setParameter("todayDay", new Date().getDate());
   if (!loan) throw new BadRequestException('Loan not found');
   if (!loan.isActive) throw new BadRequestException('Loan not active');
   const changes: string[] = [];
+  const pendingActions: { action_type: LoanPaymentActionType; value: number }[] = [];
   // שינוי סכום הלוואה
   if (dto.loan_amount !== undefined && dto.loan_amount !== loan.loan_amount) {
     const oldAmount = Number(loan.loan_amount);
@@ -352,6 +353,10 @@ qb.setParameter("todayDay", new Date().getDate());
     }
     loan.loan_amount = newAmount;
     loan.remaining_balance = Number(loan.remaining_balance) + diff;
+    pendingActions.push({
+      action_type: LoanPaymentActionType.AMOUNT_CHANGE,
+      value: diff,
+    });
     changes.push(
       `סכום ההלוואה עודכן מ-${this.mailService.formatCurrency(
         oldAmount,
@@ -364,6 +369,10 @@ qb.setParameter("todayDay", new Date().getDate());
     const oldPayment = Number(loan.monthly_payment);
     const newPayment = Number(dto.monthly_payment);
     loan.initial_monthly_payment = newPayment;
+    pendingActions.push({
+      action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
+      value: newPayment,
+    });
     changes.push(
       `התשלום החודשי עודכן מ-${this.mailService.formatCurrency(
         oldPayment,
@@ -374,6 +383,10 @@ qb.setParameter("todayDay", new Date().getDate());
   if (dto.payment_date !== undefined && dto.payment_date !== loan.payment_date) {
     const oldDate = loan.payment_date;
     loan.payment_date = dto.payment_date;
+    pendingActions.push({
+      action_type: LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
+      value: dto.payment_date,
+    });
     changes.push(`יום התשלום עודכן מ-${oldDate} ל-${dto.payment_date}.`);
   }
   // חישובים סופיים
@@ -389,6 +402,16 @@ qb.setParameter("todayDay", new Date().getDate());
   // אם balance אצלך אמור להיות היתרה הנוכחית
   const result = await this.loansRepository.save(loan);
    if (result) await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
+   if (pendingActions.length) {
+     for (const action of pendingActions) {
+       await this.paymentsRepository.save({
+         loan,
+         date: new Date(),
+         value: action.value,
+         action_type: action.action_type,
+       });
+     }
+   }
 
   if (changes.length) {
     await this.maybeSendReceiptEmail(loan.user, 'עדכון הלוואה', changes);

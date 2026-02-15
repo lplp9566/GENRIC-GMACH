@@ -54,8 +54,12 @@ export class MailService {
   }
 
   async sendDonationReceipt(data: DonationReceiptEmailData) {
+    return { messageId: 'deferred' };
+  }
+
+  async sendDonationReceiptNow(data: DonationReceiptEmailData) {
     console.log(data);
-    
+
     const amountText = this.formatCurrency(data.amount);
     const logoUrl = data.logoUrl ?? this.config.get<string>('LOGO_URL');
     const html = await render(
@@ -76,6 +80,10 @@ export class MailService {
   }
 
   async sendReceiptNotification(data: ReceiptNotificationEmailData) {
+    return { messageId: 'deferred' };
+  }
+
+  async sendReceiptNotificationNow(data: ReceiptNotificationEmailData) {
     const logoUrl = data.logoUrl ?? this.config.get<string>('LOGO_URL');
     const html = await render(
       ReceiptNotificationEmail({
@@ -356,4 +364,5 @@ export class MailService {
     // Force correct RTL/LTR display for currency
     return `\u00A0₪${formatted}\u200F`;
   }
+
 }
