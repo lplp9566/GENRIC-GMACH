@@ -1,13 +1,11 @@
 ﻿import React, { useMemo, useState } from "react";
 import {
   Box,
-  Paper,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   SelectChangeEvent,
-  Typography,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { useSelector } from "react-redux";
