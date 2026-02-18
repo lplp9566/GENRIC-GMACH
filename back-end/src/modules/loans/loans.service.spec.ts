@@ -11,6 +11,7 @@ import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-over
 import { FundsFlowService } from './calcelete.service';
 import { LoanActionsService } from './loan-actions/loan_actions.service';
 import { LoanActionBalanceService } from './loan-actions/loan_action_balance.service';
+import { MailService } from '../mail/mail.service';
 
 const mockRepo = () => ({
   create: jest.fn(),
@@ -41,6 +42,13 @@ describe('LoansService', () => {
         {
           provide: LoanActionBalanceService,
           useValue: { computeLoanNetBalance: jest.fn() },
+        },
+        {
+          provide: MailService,
+          useValue: {
+            formatCurrency: jest.fn((v: number) => String(v)),
+            sendReceiptNotification: jest.fn(),
+          },
         },
       ],
     }).compile();

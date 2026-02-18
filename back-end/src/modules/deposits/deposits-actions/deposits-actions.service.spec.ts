@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { DepositsService } from '../deposits.service';
 import { DepositActionsType, IDepositAction } from './depostits-actions-dto';
 import { DepositsEntity } from '../Entity/deposits.entity';
+import { MailService } from '../../mail/mail.service';
 
 function createMockDepositAction(partial: Partial<DepositsActionsEntity> = {}): DepositsActionsEntity {
   return {
@@ -51,6 +52,13 @@ describe('DepositsActionsService', () => {
             getDepositsActive: jest.fn().mockResolvedValue([
               { id: 1, current_balance: 1000, isActive: true } as DepositsEntity,
             ]),
+          },
+        },
+        {
+          provide: MailService,
+          useValue: {
+            formatCurrency: jest.fn((v: number) => String(v)),
+            sendReceiptNotification: jest.fn(),
           },
         },
       ],

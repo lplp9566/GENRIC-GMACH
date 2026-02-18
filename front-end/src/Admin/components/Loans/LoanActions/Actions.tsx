@@ -9,6 +9,7 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import { useSelector } from "react-redux";
 import { ICreateLoanAction, ILoanWithUser, LoanPaymentActionType } from "../LoanDto";
 import { RootState } from "../../../../store/store";
@@ -76,17 +77,52 @@ export const Actions: React.FC<ActionsProps> = ({
   const submitWithLoan = (dto: ICreateLoanAction) =>
     handleSubmit({ ...dto, loanId: loanIdLocal });
   return (
-    <Box dir="rtl">
-      <Paper elevation={2} sx={{ p: 2, borderRadius: 2 }}>
-        {shouldShowLoanSelect && resolvedLoanOptions.length > 0 && (
-          <FormControl
-            fullWidth
-            size="small"
-            sx={{
-              mb: 2,
-              "& .MuiInputLabel-root": { color: "text.secondary" },
-            }}
+    <Box
+      dir="rtl"
+      sx={(theme) => ({
+        bgcolor:
+          theme.palette.mode === "dark"
+            ? "#0f172a"
+            : theme.palette.background.paper,
+        borderRadius: "42px",
+        border: `1px solid ${alpha(theme.palette.divider, 0.7)}`,
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? "0 28px 70px rgba(2,6,23,0.7)"
+            : "0 20px 44px rgba(15,23,42,0.14)",
+        overflow: "hidden",
+        p: 3,
+      })}
+    >
+          <Box
+            sx={(theme) => ({
+              mx: -3,
+              mt: -3,
+              mb: 3,
+              py: 2.2,
+              borderRadius: "32px 32px 18px 18px",
+              textAlign: "center",
+              background:
+                theme.palette.mode === "dark"
+                  ? "linear-gradient(180deg, #1f8f45 0%, #17823b 100%)"
+                  : "linear-gradient(180deg, #219963 0%, #1a8a56 100%)",
+              color: "#ffffff",
+              fontWeight: 800,
+              fontSize: 20,
+              letterSpacing: 0.2,
+            })}
           >
+            פעולות להלוואה
+          </Box>
+          {shouldShowLoanSelect && resolvedLoanOptions.length > 0 && (
+            <FormControl
+              fullWidth
+              size="small"
+              sx={(theme) => ({
+                mb: 2,
+                "& .MuiInputLabel-root": { color: theme.palette.text.secondary },
+              })}
+            >
             <InputLabel id="loan-select-label">מספר הלוואה</InputLabel>
             <Select
               labelId="loan-select-label"
@@ -97,19 +133,22 @@ export const Actions: React.FC<ActionsProps> = ({
                 setLoanIdLocal(nextId);
                 onLoanChange?.(nextId);
               }}
-              sx={{
-                borderRadius: 3,
-                backgroundColor: "rgba(15, 23, 42, 0.25)",
+              sx={(theme) => ({
+                borderRadius: 999,
+                bgcolor:
+                  theme.palette.mode === "dark"
+                    ? "rgba(15, 23, 42, 0.6)"
+                    : theme.palette.background.paper,
                 "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgba(148, 163, 184, 0.25)",
+                  borderColor: alpha(theme.palette.divider, 0.7),
                 },
                 "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgba(148, 163, 184, 0.5)",
+                  borderColor: theme.palette.success.main,
                 },
                 "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgba(96, 165, 250, 0.8)",
+                  borderColor: theme.palette.success.main,
                 },
-              }}
+              })}
             >
               {resolvedLoanOptions.map((loan) => (
                 <MenuItem key={loan.id} value={loan.id}>
@@ -119,9 +158,6 @@ export const Actions: React.FC<ActionsProps> = ({
             </Select>
           </FormControl>
         )}
-        <Typography variant="h6" sx={{ textAlign: "center", paddingBottom: 2 }}>
-          פעולות להלוואה
-        </Typography>
         <FormControl fullWidth size="small">
           <InputLabel id="action-select-label">בחר פעולה</InputLabel>
           <Select
@@ -129,7 +165,22 @@ export const Actions: React.FC<ActionsProps> = ({
             value={mode}
             label="בחר פעולה"
             onChange={handleModeChange}
-            sx={{ borderRadius: 1 }}
+            sx={(theme) => ({
+              borderRadius: 999,
+              bgcolor:
+                theme.palette.mode === "dark"
+                  ? "rgba(15, 23, 42, 0.6)"
+                  : theme.palette.background.paper,
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: alpha(theme.palette.divider, 0.7),
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: theme.palette.success.main,
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: theme.palette.success.main,
+              },
+            })}
           >
             <MenuItem value={LoanPaymentActionType.PAYMENT}>
               תשלום הלוואה
@@ -179,7 +230,6 @@ export const Actions: React.FC<ActionsProps> = ({
             initialValue={initialValue}
           />
         )}
-      </Paper>
     </Box>
   );
 };

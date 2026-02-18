@@ -9,6 +9,7 @@ import { FundsOverviewService } from '../funds-overview/funds-overview.service';
 import { UserFinancialService } from '../users/user-financials/user-financials.service';
 import { UserEntity } from '../users/user.entity';
 import { FundsOverviewByYearService } from '../funds-overview-by-year/funds-overview-by-year.service';
+import { MailService } from '../mail/mail.service';
 
 const mockRepo = () => ({
   find: jest.fn(),
@@ -59,6 +60,13 @@ describe('MonthlyDepositsService', () => {
         {
           provide: FundsOverviewByYearService,
           useValue: { recordMonthlyDeposit: jest.fn() },
+        },
+        {
+          provide: MailService,
+          useValue: {
+            formatCurrency: jest.fn((v: number) => String(v)),
+            sendReceiptNotification: jest.fn(),
+          },
         },
       ],
     }).compile();

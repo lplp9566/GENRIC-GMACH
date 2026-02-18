@@ -139,8 +139,14 @@ const LoanDetailsPage: React.FC = () => {
         }}
         maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: "transparent",
+            boxShadow: "none",
+          },
+        }}
       >
-        <DialogContent>
+        <DialogContent sx={{ p: 0, background: "transparent" }}>
           <Actions
             loanId={loanId}
             handleSubmit={handleSubmit}

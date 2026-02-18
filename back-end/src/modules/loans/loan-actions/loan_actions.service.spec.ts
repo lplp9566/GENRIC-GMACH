@@ -13,6 +13,7 @@ import { FundsOverviewByYearService } from '../../funds-overview-by-year/funds-o
 import { PaymentDetailsService } from '../../users/payment-details/payment-details.service';
 import { LoanActionBalanceService } from './loan_action_balance.service';
 import { LoanActionDto, LoanPaymentActionType } from '../loan-dto/loanTypes';
+import { MailService } from '../../mail/mail.service';
 
 const mockRepo = () => ({
   create: jest.fn(),
@@ -46,6 +47,13 @@ describe('LoanActionsService', () => {
         {
           provide: LoanActionBalanceService,
           useValue: { computeLoanNetBalance: jest.fn() },
+        },
+        {
+          provide: MailService,
+          useValue: {
+            formatCurrency: jest.fn((v: number) => String(v)),
+            sendReceiptNotification: jest.fn(),
+          },
         },
       ],
     }).compile();
