@@ -43,6 +43,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ConfirmModal from "../genricComponents/confirmModal";
 import AiChatDialog from "./AiChatDialog";
+import { RtlThemeProvider } from "../../../Theme/rtl";
 
 export const formatILS = (value?: number | string | null) => {
   const n = typeof value === "string" ? Number(value) : value ?? 0;
@@ -409,14 +410,64 @@ const name = import.meta.env.VITE_NAME
             onClose={() => setBankDialogOpen(false)}
             fullWidth
             maxWidth="sm"
+            PaperProps={{
+              sx: (theme) => ({
+                borderRadius: 6,
+                overflow: "hidden",
+                bgcolor: theme.palette.background.paper,
+                color: theme.palette.text.primary,
+                border: `1px solid ${alpha(theme.palette.divider, 0.7)}`,
+                boxShadow:
+                  theme.palette.mode === "dark"
+                    ? "0 24px 80px rgba(0,0,0,0.7)"
+                    : "0 18px 40px rgba(0,0,0,0.15)",
+              }),
+            }}
           >
-            <DialogTitle>
+            <DialogTitle
+              sx={(theme) => ({
+                textAlign: "center",
+                bgcolor: theme.palette.success.main,
+                color: theme.palette.getContrastText(theme.palette.success.main),
+                fontWeight: 800,
+                fontSize: 22,
+                py: 2.5,
+              })}
+            >
               {bankDialogMode === "create"
                 ? "הוספת חשבון בנק"
                 : "עריכת חשבון בנק"}
             </DialogTitle>
-            <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+            <RtlThemeProvider>
+            <DialogContent
+              sx={(theme) => ({
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                mt: 0,
+                direction: "rtl",
+                p: 3,
+                bgcolor: theme.palette.background.paper,
+              })}
+            >
               <TextField
+                sx={(theme) => ({
+                  mt: 1,
+                  "& .MuiInputLabel-root": { color: theme.palette.text.secondary },
+                  "& .MuiOutlinedInput-root": {
+                    color: theme.palette.text.primary,
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette.common.white, 0.04)
+                        : alpha(theme.palette.common.black, 0.02),
+                    borderRadius: 3,
+                    "& fieldset": { borderColor: alpha(theme.palette.divider, 0.5) },
+                    "&:hover fieldset": { borderColor: alpha(theme.palette.divider, 0.9) },
+                    "&.Mui-focused fieldset": {
+                      borderColor: theme.palette.success.main,
+                    },
+                  },
+                })}
                 label="שם הבנק"
                 value={bankForm.bank_name}
                 onChange={(e) =>
@@ -425,6 +476,22 @@ const name = import.meta.env.VITE_NAME
                 fullWidth
               />
               <TextField
+                sx={(theme) => ({
+                  "& .MuiInputLabel-root": { color: theme.palette.text.secondary },
+                  "& .MuiOutlinedInput-root": {
+                    color: theme.palette.text.primary,
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette.common.white, 0.04)
+                        : alpha(theme.palette.common.black, 0.02),
+                    borderRadius: 3,
+                    "& fieldset": { borderColor: alpha(theme.palette.divider, 0.5) },
+                    "&:hover fieldset": { borderColor: alpha(theme.palette.divider, 0.9) },
+                    "&.Mui-focused fieldset": {
+                      borderColor: theme.palette.success.main,
+                    },
+                  },
+                })}
                 label="תאריך"
                 type="date"
                 value={bankForm.date}
@@ -433,6 +500,22 @@ const name = import.meta.env.VITE_NAME
                 fullWidth
               />
               <TextField
+                sx={(theme) => ({
+                  "& .MuiInputLabel-root": { color: theme.palette.text.secondary },
+                  "& .MuiOutlinedInput-root": {
+                    color: theme.palette.text.primary,
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette.common.white, 0.04)
+                        : alpha(theme.palette.common.black, 0.02),
+                    borderRadius: 3,
+                    "& fieldset": { borderColor: alpha(theme.palette.divider, 0.5) },
+                    "&:hover fieldset": { borderColor: alpha(theme.palette.divider, 0.9) },
+                    "&.Mui-focused fieldset": {
+                      borderColor: theme.palette.success.main,
+                    },
+                  },
+                })}
                 label="סכום"
                 inputMode="numeric"
                 value={bankForm.amount}
@@ -440,10 +523,36 @@ const name = import.meta.env.VITE_NAME
                 fullWidth
               />
             </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setBankDialogOpen(false)}>ביטול</Button>
-              <Button variant="contained" onClick={handleSubmitBankDialog}>
+            </RtlThemeProvider>
+            <DialogActions
+              sx={(theme) => ({
+                px: 3,
+                pb: 3,
+                pt: 1,
+                bgcolor: theme.palette.background.paper,
+                display: "flex",
+                justifyContent: "space-between",
+              })}
+            >
+
+              <Button
+                variant="contained"
+                onClick={handleSubmitBankDialog}
+                sx={(theme) => ({
+                  bgcolor: theme.palette.success.main,
+                  color: theme.palette.getContrastText(theme.palette.success.main),
+                  borderRadius: 3,
+                  px: 4,
+                  "&:hover": { bgcolor: theme.palette.success.dark },
+                })}
+              >
                 שמירה
+              </Button>
+                            <Button
+                onClick={() => setBankDialogOpen(false)}
+                sx={(theme) => ({ color: theme.palette.text.secondary })}
+              >
+                ביטול
               </Button>
             </DialogActions>
           </Dialog>
@@ -451,9 +560,6 @@ const name = import.meta.env.VITE_NAME
 
           {/* QUICK ACTIONS */}
           <Box mt={{ xs: 6, sm: 10 }}>
-            {/* <Typography variant="h5" fontWeight={900} mb={2} textAlign="center">
-              פעולות מהירות
-            </Typography> */}
             <DebtCards
               monthlyDebt={totalNegativeBalance}
               loansDebt={totalLoansDebt}
@@ -530,7 +636,6 @@ const name = import.meta.env.VITE_NAME
             </Grid> */}
           </Box>
 
-          {/* REGULATIONS */}
           <Box
             mt={{ xs: 6, sm: 10 }}
             textAlign="center"
