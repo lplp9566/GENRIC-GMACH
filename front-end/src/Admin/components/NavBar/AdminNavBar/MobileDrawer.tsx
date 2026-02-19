@@ -1,29 +1,30 @@
 import React from "react";
 import {
-  Drawer,
   Box,
-  Typography,
+  Drawer,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
+  Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { NavLink, useLocation } from "react-router-dom";
 import { UserSelect } from "./UserSelect";
 
 const navItems = [
-  { label: "דף הבית", path: "/Home" },
-  { label: "דמי חבר ", path: "/paymentsPage" },
+  { label: "דף הבית", path: "/home" },
+  { label: "דמי חבר", path: "/paymentsPage" },
   { label: "הלוואות", path: "/loans" },
   { label: "תרומות", path: "/donations" },
   { label: "פקדונות", path: "/deposits" },
+  { label: "נדרים פלוס", path: "/nedarim-plus" },
   { label: "הוצאות", path: "/expenses" },
   { label: "השקעות", path: "/investments" },
   { label: "משתמשים", path: "/users" },
-  { label: "נתונים כללים", path: "/funds" },
+  { label: "נתונים כלליים", path: "/funds" },
   { label: "סטטיסטיקה", path: "/FundsOverviewByYear" },
-  { label: `החזרי הו"ק`, path: "/standing-orders" },
+  { label: "החזרי הו\"ק", path: "/standing-orders" },
 ];
 
 const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({
@@ -54,8 +55,6 @@ const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({
           background: NAV_BG,
           color: NAV_TXT,
           width: 250,
-
-          // �?. ?`???\u0007?`?T?T??: ?'?\u0007?`?" ???\u0007?'?" + ?'???T???"
           height: { xs: "calc(100dvh - 64px)", md: "auto" },
           overflowY: { xs: "auto", md: "visible" },
           WebkitOverflowScrolling: "touch",
@@ -64,7 +63,7 @@ const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({
     >
       <Box sx={{ p: 2, textAlign: "center" }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
-          תפריט ניווט{" "}
+          תפריט ניווט
         </Typography>
 
         <UserSelect fullWidth />
@@ -98,4 +97,5 @@ const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({
     </Drawer>
   );
 };
+
 export default MobileDrawer;

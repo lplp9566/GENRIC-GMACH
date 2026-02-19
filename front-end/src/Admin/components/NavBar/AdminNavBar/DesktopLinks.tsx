@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  Badge,
   Box,
   Button,
   IconButton,
-  Badge,
-  MenuItem,
   Menu,
+  MenuItem,
   Popover,
   Stack,
   Tooltip,
@@ -22,17 +22,17 @@ import { fetchLoanRequests } from "../../../../store/features/loanRequests/loanR
 const NAV_TXT = "#FFFFFF";
 
 const navItems = [
-  { label: "דף הבית", path: "/Home" },
+  { label: "דף הבית", path: "/home" },
   { label: "הלוואות", path: "/loans" },
   { label: "משתמשים", path: "/users" },
   { label: "תרומות", path: "/donations" },
   { label: "השקעות", path: "/investments" },
   { label: "פקדונות", path: "/deposits" },
-  { label: "נתונים כללים", path: "/funds" },
+  { label: "נתונים כלליים", path: "/funds" },
   { label: "סטטיסטיקה", path: "/FundsOverviewByYear" },
   { label: "דמי חבר", path: "/paymentsPage" },
-  // { label: "הוצאות", path: "/expenses" },
 ];
+
 export const DesktopLinks: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { pathname } = useLocation();
@@ -77,15 +77,16 @@ export const DesktopLinks: React.FC = () => {
             "&:hover": { backgroundColor: "rgba(255,255,255,.15)" },
             ...(isActive(it.path)
               ? {
-              backgroundColor: "rgba(255,255,255,.22)",
-              fontWeight: 700,
-            }
+                  backgroundColor: "rgba(255,255,255,.22)",
+                  fontWeight: 700,
+                }
               : {}),
           }}
         >
           {it.label}
         </Button>
       ))}
+
       <Button
         sx={{
           color: NAV_TXT,
@@ -122,6 +123,14 @@ export const DesktopLinks: React.FC = () => {
 
         <MenuItem
           component={Link}
+          to="/nedarim-plus"
+          onClick={() => setExpensesAnchorEl(null)}
+        >
+          נדרים פלוס
+        </MenuItem>
+
+        <MenuItem
+          component={Link}
           to="/cash-expenses"
           onClick={() => setExpensesAnchorEl(null)}
         >
@@ -138,6 +147,7 @@ export const DesktopLinks: React.FC = () => {
           </Badge>
         </IconButton>
       </Tooltip>
+
       <IconButton
         sx={{ color: NAV_TXT }}
         onClick={() => dispatch(logoutServer())}
@@ -194,7 +204,6 @@ export const DesktopLinks: React.FC = () => {
           <Typography color="rgba(255,255,255,0.7)">אין התראות</Typography>
         )}
       </Popover>
-      
     </Box>
   );
 };

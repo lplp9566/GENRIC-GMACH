@@ -18,6 +18,7 @@ import RankPage from "./Admin/pages/RankPage";
 import DonationsPage from "./Admin/pages/DonationsPage";
 import ExpensesPage from "./Admin/pages/ExpensesPage";
 import DepositsPage from "./Admin/pages/DepositsPage";
+import NedarimPlusPage from "./Admin/pages/NedarimPlusPage";
 import DepositDetailsPage from "./Admin/components/Deposits/DepositsDetails/DepositDetailsPage";
 import Investments from "./Admin/pages/InvestmentsPage";
 import InvestmentDetailsPage from "./Admin/components/Investments/InvestmentDetails/InvestmentDetailsPage";
@@ -68,6 +69,7 @@ export default function App() {
               <Route path="/donations" element={<DonationsPage />} />
               <Route path="/expenses" element={<ExpensesPage />} />
               <Route path="/deposits" element={<DepositsPage />} />
+              <Route path="/nedarim-plus" element={<NedarimPlusPage />} />
               <Route path="/deposit/:id" element={<DepositDetailsPage />} />
               <Route path="/investments" element={<Investments />} />
               <Route
