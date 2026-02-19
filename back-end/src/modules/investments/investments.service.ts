@@ -241,4 +241,51 @@ export class InvestmentsService {
     const investments = await this.investmentRepo.find({ where: { is_active: true } });
     return investments;
   }
+
+  async updateInvestment(
+    id: number,
+    dto: Partial<
+      Pick<
+        InvestmentInit,
+        | 'investment_name'
+        | 'investment_by'
+        | 'company_name'
+        | 'investment_portfolio_number'
+        | 'start_date'
+      >
+    >,
+  ): Promise<InvestmentEntity> {
+    const investment = await this.investmentRepo.findOne({ where: { id } });
+    if (!investment) {
+      throw new NotFoundException('investment not found');
+    }
+
+    if (dto.investment_name !== undefined) {
+      investment.investment_name = dto.investment_name;
+    }
+    if (dto.investment_by !== undefined) {
+      investment.investment_by = dto.investment_by;
+    }
+    if (dto.company_name !== undefined) {
+      investment.company_name = dto.company_name;
+    }
+    if (dto.investment_portfolio_number !== undefined) {
+      investment.investment_portfolio_number = dto.investment_portfolio_number;
+    }
+    if (dto.start_date !== undefined) {
+      investment.start_date = dto.start_date;
+    }
+
+    investment.last_update = new Date();
+    return this.investmentRepo.save(investment);
+  }
+
+  async deleteInvestment(id: number): Promise<{ deleted: true; id: number }> {
+    const investment = await this.investmentRepo.findOne({ where: { id } });
+    if (!investment) {
+      throw new NotFoundException('investment not found');
+    }
+    await this.investmentRepo.remove(investment);
+    return { deleted: true, id };
+  }
 }

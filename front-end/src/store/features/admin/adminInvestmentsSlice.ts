@@ -9,14 +9,18 @@ import { api } from "../../axiosInstance";
 
 interface AdminInvestmentType {
   allInvestments: InvestmentDto[];
+  allInvestmentTransactions: TransactionDto[];
   getAllInvestmentsStatus: Status;
   getInvestmentByIdStatus: Status;
   getTransactionsByInvestmentIdStatus: Status;
+  getAllInvestmentTransactionsStatus: Status;
   createInvestmentStatus: Status;
   addToInvestmentStatus: Status;
   updateInvestmentValueStatus: Status;
   withdrawFromInvestmentStatus: Status;
   applyManagementFeeStatus: Status;
+  editInvestmentStatus: Status;
+  deleteInvestmentStatus: Status;
   error: string | null;
   page: number;
   pageCount: number;
@@ -26,6 +30,7 @@ interface AdminInvestmentType {
 }
 const initialState: AdminInvestmentType = {
   allInvestments: [],
+  allInvestmentTransactions: [],
   error: null,
   page: 1,
   pageCount: 1,
@@ -33,11 +38,14 @@ const initialState: AdminInvestmentType = {
   getAllInvestmentsStatus: "idle",
   getInvestmentByIdStatus: "idle",
   getTransactionsByInvestmentIdStatus: "idle",
+  getAllInvestmentTransactionsStatus: "idle",
   createInvestmentStatus: "idle",
   addToInvestmentStatus: "idle",
   updateInvestmentValueStatus: "idle",
   withdrawFromInvestmentStatus: "idle",
   applyManagementFeeStatus: "idle",
+  editInvestmentStatus: "idle",
+  deleteInvestmentStatus: "idle",
   investmentDetails: null,
   investmentTransactions: [],
 };
@@ -65,6 +73,12 @@ export const getTransactionsByInvestmentId = createAsyncThunk
         { investmentId }
     );
     return response.data;
+});
+export const getAllInvestmentTransactions = createAsyncThunk<
+  TransactionDto[]
+>("admin/getAllInvestmentTransactions", async () => {
+  const response = await api.get<TransactionDto[]>(`/investment-transactions/all`);
+  return response.data;
 });
 export const createInitialInvestment = createAsyncThunk(
   "admin/createInitialInvestment",
@@ -116,6 +130,30 @@ export const applyManagementFee = createAsyncThunk(
     return response.data;
   }
 );
+export const updateInvestmentById = createAsyncThunk(
+  "admin/updateInvestmentById",
+  async (
+    data: {
+      id: number;
+      investment_name?: string;
+      investment_by?: string;
+      company_name?: string;
+      investment_portfolio_number?: string;
+      start_date?: Date;
+    }
+  ) => {
+    const { id, ...payload } = data;
+    const response = await api.patch<InvestmentDto>(`/investments/${id}`, payload);
+    return response.data;
+  }
+);
+export const deleteInvestmentById = createAsyncThunk(
+  "admin/deleteInvestmentById",
+  async (id: number) => {
+    await api.delete(`/investments/${id}`);
+    return id;
+  }
+);
 export const AdminInvestmentsSlice = createSlice({
     name: "adminInvestments",
     initialState,
@@ -163,7 +201,67 @@ export const AdminInvestmentsSlice = createSlice({
             state.getTransactionsByInvestmentIdStatus = "rejected";
             state.error = action.error.message || "Failed to fetch investment transactions";
         }
-        );
+        )
+        .addCase(getAllInvestmentTransactions.pending, (state) => {
+            state.getAllInvestmentTransactionsStatus = "idle";
+        })
+        .addCase(getAllInvestmentTransactions.fulfilled, (state, action) => {
+            state.getAllInvestmentTransactionsStatus = "fulfilled";
+            state.allInvestmentTransactions = action.payload;
+        })
+        .addCase(getAllInvestmentTransactions.rejected, (state, action) => {
+            state.getAllInvestmentTransactionsStatus = "rejected";
+            state.error = action.error.message || "Failed to fetch all investment transactions";
+        })
+        .addCase(createInitialInvestment.pending, (state) => {
+            state.createInvestmentStatus = "pending";
+            state.error = null;
+        })
+        .addCase(createInitialInvestment.fulfilled, (state, action) => {
+            state.createInvestmentStatus = "fulfilled";
+            state.allInvestments.unshift(action.payload);
+        })
+        .addCase(createInitialInvestment.rejected, (state, action) => {
+            state.createInvestmentStatus = "rejected";
+            state.error = action.error.message || "Failed to create investment";
+        })
+        .addCase(updateInvestmentById.pending, (state) => {
+            state.editInvestmentStatus = "pending";
+            state.error = null;
+        })
+        .addCase(updateInvestmentById.fulfilled, (state, action) => {
+            state.editInvestmentStatus = "fulfilled";
+            const updated = action.payload;
+            const idx = state.allInvestments.findIndex((x) => x.id === updated.id);
+            if (idx !== -1) state.allInvestments[idx] = updated;
+            if (state.investmentDetails?.id === updated.id) {
+              state.investmentDetails = updated;
+            }
+        })
+        .addCase(updateInvestmentById.rejected, (state, action) => {
+            state.editInvestmentStatus = "rejected";
+            state.error = action.error.message || "Failed to update investment";
+        })
+        .addCase(deleteInvestmentById.pending, (state) => {
+            state.deleteInvestmentStatus = "pending";
+            state.error = null;
+        })
+        .addCase(deleteInvestmentById.fulfilled, (state, action) => {
+            state.deleteInvestmentStatus = "fulfilled";
+            const id = action.payload;
+            state.allInvestments = state.allInvestments.filter((x) => x.id !== id);
+            if (state.investmentDetails?.id === id) {
+              state.investmentDetails = null;
+            }
+            state.investmentTransactions = state.investmentTransactions.filter(
+              (tx) => tx.investment?.id !== id
+            );
+        })
+        .addCase(deleteInvestmentById.rejected, (state, action) => {
+            state.deleteInvestmentStatus = "rejected";
+            state.error = action.error.message || "Failed to delete investment";
+       } )
+
     },
 });
 export default AdminInvestmentsSlice.reducer;

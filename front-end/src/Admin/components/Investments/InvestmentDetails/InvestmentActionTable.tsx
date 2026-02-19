@@ -16,21 +16,26 @@ type SortDirection = "asc" | "desc";
 
 interface InvestmentActionTableProps {
   actions: TransactionDto[];
+  title?: string;
+  showInvestmentColumn?: boolean;
 }
 
-// מיפוי סוגי הפעולות להשקעות (תוכל לשנות טקסטים/צבעים איך שבא לך)
 const INVESTMENT_ACTION_TYPES: {
   value: InvestmentTransactionType;
   label: string;
 }[] = [
-  { value: InvestmentTransactionType.INITIAL_INVESTMENT, label: "השקעה ראשונית" },
-  { value: InvestmentTransactionType.ADDITIONAL_INVESTMENT, label: "הוספת השקעה" },
+  { value: InvestmentTransactionType.INITIAL_INVESTMENT, label: "פתיחת השקעה" },
+  { value: InvestmentTransactionType.ADDITIONAL_INVESTMENT, label: "הוספה להשקעה" },
   { value: InvestmentTransactionType.VALUE_UPDATE, label: "עדכון ערך" },
-  { value: InvestmentTransactionType.WITHDRAWAL, label: "משיכה" },
+  { value: InvestmentTransactionType.WITHDRAWAL, label: "משיכה מהשקעה" },
   { value: InvestmentTransactionType.MANAGEMENT_FEE, label: "דמי ניהול" },
 ];
 
-const InvestmentActionTable: React.FC<InvestmentActionTableProps> = ({ actions }) => {
+const InvestmentActionTable: React.FC<InvestmentActionTableProps> = ({
+  actions,
+  title,
+  showInvestmentColumn,
+}) => {
   const [currentSortField, setCurrentSortField] = useState<SortField>("date");
   const [currentSortDirection, setCurrentSortDirection] =
     useState<SortDirection>("asc");
@@ -52,27 +57,29 @@ const InvestmentActionTable: React.FC<InvestmentActionTableProps> = ({ actions }
     }
   };
 
-const sortedActions = useMemo(() => {
-  const dir = currentSortDirection === "asc" ? 1 : -1;
-  const orderMap = new Map(ACTION_ORDER.map((t, i) => [t, i]));
-  const copy = [...actions];
-  copy.sort((a, b) => {
-    let cmp = 0;
-    if (currentSortField === "date") {
-      cmp =
-        new Date(a.transaction_date).getTime() -
-        new Date(b.transaction_date).getTime();
-    } else if (currentSortField === "amount") {
-      cmp = Number(a.amount) - Number(b.amount);
-    } else {
-      const idxA = orderMap.get(a.transaction_type as InvestmentTransactionType) ?? 0;
-      const idxB = orderMap.get(b.transaction_type as InvestmentTransactionType) ?? 0;
-      cmp = idxA - idxB;
-    }
-    return cmp * dir;
-  });
-  return copy;
-}, [actions, currentSortField, currentSortDirection]);
+  const sortedActions = useMemo(() => {
+    const dir = currentSortDirection === "asc" ? 1 : -1;
+    const orderMap = new Map(ACTION_ORDER.map((t, i) => [t, i]));
+    const copy = [...actions];
+    copy.sort((a, b) => {
+      let cmp = 0;
+      if (currentSortField === "date") {
+        cmp =
+          new Date(a.transaction_date).getTime() -
+          new Date(b.transaction_date).getTime();
+      } else if (currentSortField === "amount") {
+        cmp = Number(a.amount) - Number(b.amount);
+      } else {
+        const idxA =
+          orderMap.get(a.transaction_type as InvestmentTransactionType) ?? 0;
+        const idxB =
+          orderMap.get(b.transaction_type as InvestmentTransactionType) ?? 0;
+        cmp = idxA - idxB;
+      }
+      return cmp * dir;
+    });
+    return copy;
+  }, [actions, currentSortField, currentSortDirection]);
 
   const renderSortIndicator = (field: SortField) =>
     currentSortField === field
@@ -83,11 +90,8 @@ const sortedActions = useMemo(() => {
 
   return (
     <Paper elevation={3} sx={{ p: 3, borderRadius: 2, width: "100%" }}>
-      <Typography
-        variant="h6"
-        sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}
-      >
-        פעולות על ההשקעה
+      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}>
+        {title ?? "פעולות על השקעות"}
       </Typography>
 
       {actions.length === 0 && <Typography>לא נמצאו פעולות</Typography>}
@@ -103,22 +107,14 @@ const sortedActions = useMemo(() => {
                 },
               }}
             >
-              <TableCell
-                align="right"
-                onClick={() => handleHeaderClick("date")}
-              >
+              {showInvestmentColumn && <TableCell align="right">השקעה</TableCell>}
+              <TableCell align="right" onClick={() => handleHeaderClick("date")}>
                 תאריך{renderSortIndicator("date")}
               </TableCell>
-              <TableCell
-                align="center"
-                onClick={() => handleHeaderClick("action_type")}
-              >
+              <TableCell align="center" onClick={() => handleHeaderClick("action_type")}>
                 סוג פעולה{renderSortIndicator("action_type")}
               </TableCell>
-              <TableCell
-                align="left"
-                onClick={() => handleHeaderClick("amount")}
-              >
+              <TableCell align="left" onClick={() => handleHeaderClick("amount")}>
                 סכום{renderSortIndicator("amount")}
               </TableCell>
             </TableRow>
@@ -126,17 +122,17 @@ const sortedActions = useMemo(() => {
 
           <TableBody>
             {sortedActions.map((action) => (
-              <TableRow
-                key={action.id}
-                hover
-                sx={{ "& td": { border: "none" } }}
-              >
-                {/* תאריך */}
+              <TableRow key={action.id} hover sx={{ "& td": { border: "none" } }}>
+                {showInvestmentColumn && (
+                  <TableCell align="right">
+                    {action.investment
+                      ? `#${action.investment.id} - ${action.investment.investment_name ?? ""}`
+                      : "—"}
+                  </TableCell>
+                )}
                 <TableCell align="right">
                   {new Date(action.transaction_date).toLocaleDateString("he-IL")}
                 </TableCell>
-
-                {/* סוג פעולה */}
                 <TableCell align="center">
                   <Chip
                     label={
@@ -147,31 +143,22 @@ const sortedActions = useMemo(() => {
                     size="small"
                     color={
                       action.transaction_type ===
-                      InvestmentTransactionType.INITIAL_INVESTMENT
+                        InvestmentTransactionType.INITIAL_INVESTMENT ||
+                      action.transaction_type ===
+                        InvestmentTransactionType.ADDITIONAL_INVESTMENT
                         ? "success"
-                        : action.transaction_type ===
-                          InvestmentTransactionType.ADDITIONAL_INVESTMENT
-                        ? "success"
-                        : action.transaction_type ===
-                          InvestmentTransactionType.VALUE_UPDATE
+                        : action.transaction_type === InvestmentTransactionType.VALUE_UPDATE
                         ? "info"
-                        : action.transaction_type ===
-                          InvestmentTransactionType.WITHDRAWAL
+                        : action.transaction_type === InvestmentTransactionType.WITHDRAWAL
                         ? "error"
-                        : action.transaction_type ===
-                          InvestmentTransactionType.MANAGEMENT_FEE
+                        : action.transaction_type === InvestmentTransactionType.MANAGEMENT_FEE
                         ? "warning"
                         : "default"
                     }
                   />
                 </TableCell>
-
-                {/* סכום */}
-                <TableCell
-                  align="left"
-                  sx={{ fontWeight: 600, color: "#007BFF" }}
-                >
-                  ₪{action.amount.toLocaleString()}
+                <TableCell align="left" sx={{ fontWeight: 600, color: "#007BFF" }}>
+                  ₪{Number(action.amount ?? 0).toLocaleString("he-IL")}
                 </TableCell>
               </TableRow>
             ))}
@@ -183,3 +170,4 @@ const sortedActions = useMemo(() => {
 };
 
 export default InvestmentActionTable;
+

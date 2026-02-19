@@ -394,8 +394,14 @@ export const LoansPage: React.FC = () => {
             }}
             maxWidth="sm"
             fullWidth
+            PaperProps={{
+              sx: {
+                bgcolor: "transparent",
+                boxShadow: "none",
+              },
+            }}
           >
-          <DialogContent>
+          <DialogContent sx={{ p: 0, background: "transparent" }}>
             {(actionLoanId || selectedLoanId) && (
               <Actions
                 loanId={actionLoanId ?? selectedLoanId!}

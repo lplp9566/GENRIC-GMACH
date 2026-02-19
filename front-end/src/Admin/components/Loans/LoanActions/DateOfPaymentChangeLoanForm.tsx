@@ -30,8 +30,8 @@ const DateOfPaymentChangeLoanForm: React.FC<Props> = ({
 
   const handleDayOfPayment = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
-    if (value > 28 || value < 0)
-      return toast.error("אנא הכנס יום תשלום בין 1-28");
+    if (value > 31 || value < 1)
+      return toast.error("אנא הכנס יום תשלום בין 1-31");
     setDay(value);
   };
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,3 +99,4 @@ const DateOfPaymentChangeLoanForm: React.FC<Props> = ({
   );
 };
 export default DateOfPaymentChangeLoanForm;
+

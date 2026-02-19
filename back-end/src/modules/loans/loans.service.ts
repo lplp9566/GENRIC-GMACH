@@ -286,7 +286,7 @@ qb.setParameter("todayDay", new Date().getDate());
       if (!loan.isActive) {
         throw new BadRequestException('Cannot operate on a closed loan');
       }
-      if (dto.value > 31 || dto.value < 0) {
+      if (dto.value > 31 || dto.value < 1) {
         throw new Error('Invalid payment date');
       }
       loan.payment_date = dto.value;
@@ -298,7 +298,7 @@ qb.setParameter("todayDay", new Date().getDate());
         action_type: LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
         // note: dto.note || `שינוי תאריך תשלום ל-${dto.value}`,
       })
-      await this.LoanActionBalanceService.computeLoanNetBalance(result.id)
+      await this.LoanActionBalanceService.computeLoanNetBalance(dto.loanId)
       await this.maybeSendReceiptEmail(
         loan.user,
         'עדכון יום תשלום',

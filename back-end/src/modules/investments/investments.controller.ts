@@ -1,7 +1,15 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { InvestmentsService } from './investments.service';
 import { InvestmentInit } from './investments_dto';
-import { log } from 'console';
 
 @Controller('investments')
 export class InvestmentsController {
@@ -68,5 +76,28 @@ export class InvestmentsController {
   @Get('active_investments')
   async getActiveInvestments() {
     return this.investmentsService.getActiveInvestments();
+  }
+
+  @Patch(':id')
+  async updateInvestment(
+    @Param('id', ParseIntPipe) id: number,
+    @Body()
+    body: Partial<
+      Pick<
+        InvestmentInit,
+        | 'investment_name'
+        | 'investment_by'
+        | 'company_name'
+        | 'investment_portfolio_number'
+        | 'start_date'
+      >
+    >,
+  ) {
+    return this.investmentsService.updateInvestment(id, body);
+  }
+
+  @Delete(':id')
+  async deleteInvestment(@Param('id', ParseIntPipe) id: number) {
+    return this.investmentsService.deleteInvestment(id);
   }
 }

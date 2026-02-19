@@ -209,12 +209,13 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                   align="left"
                   sx={{ fontWeight: 600, color: "#007BFF" }}
                 >
-                  {action.action_type !=
-                    LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE &&
-                    action.value.toLocaleString("he-IL", {
-                      style: "currency",
-                      currency: "ILS",
-                    })}
+                  {action.action_type ===
+                  LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE
+                    ? `יום ${action.value} בחודש`
+                    : action.value.toLocaleString("he-IL", {
+                        style: "currency",
+                        currency: "ILS",
+                      })}
                 </TableCell>
 
                 {!readOnly && (
@@ -226,7 +227,14 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                       alignItems="center"
                     >
                       <Tooltip title="העתקה">
-                        <IconButton size="small" onClick={() => handleCopy(action)}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleCopy(action)}
+                          disabled={
+                            action.action_type ===
+                            LoanPaymentActionType.LOAN_CREATED
+                          }
+                        >
                           <ContentCopyIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
@@ -236,7 +244,10 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                           <IconButton
                             size="small"
                             onClick={() => handleEdit(action)}
-                            // disabled={!onEdit}
+                            disabled={
+                              action.action_type ===
+                              LoanPaymentActionType.LOAN_CREATED
+                            }
                           >
                             <EditIcon fontSize="small" />
                           </IconButton>
@@ -251,6 +262,10 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
                               setDeleteModal(true);
                               setSelected(action);
                             }}
+                            disabled={
+                              action.action_type ===
+                              LoanPaymentActionType.LOAN_CREATED
+                            }
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
@@ -275,7 +290,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
       {deleteModal && !readOnly && (
         <ConfirmModal
           open={deleteModal}
-          text="Delete this action?"
+          text="מחק פעולה זו?"
           onSubmit={delateAction}
           onClose={() => setDeleteModal(false)}
         />

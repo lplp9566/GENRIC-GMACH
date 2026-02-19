@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import type { AppDispatch } from "../../store/store";
 import { login, selectAuth, validate } from "../../store/features/auth/authSlice";
 import { toast } from "react-toastify";
+import { RtlThemeProvider } from "../../Theme/rtl";
 
 const LoginPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -33,6 +34,7 @@ const LoginPage = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center", p: 2 }}>
+      <RtlThemeProvider>
       <Card sx={{ width: "100%", maxWidth: 420 }}>
         <Typography variant="h4" fontWeight={700} textAlign="center">
           ברוכים הבאים למערכת הגמ"ח
@@ -77,6 +79,7 @@ const LoginPage = () => {
           </Box>
         </CardContent>
       </Card>
+      </RtlThemeProvider>
     </Box>
   );
 };
