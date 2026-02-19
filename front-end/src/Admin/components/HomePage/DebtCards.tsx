@@ -42,7 +42,7 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
                 boxShadow: "0 14px 32px rgba(0,0,0,0.25)",
                 position: "relative",
                 overflow: "hidden",
-                textAlign: "center",     // ממורכז
+                textAlign: "center",     
               }}
             >
               <Box

@@ -336,6 +336,7 @@ const name = import.meta.env.VITE_NAME
                           borderRadius: 3,
                           display: "grid",
                           placeItems: "center",
+                          alignItems:"center",
                           backgroundColor: alpha(
                             main,
                             theme.palette.mode === "dark" ? 0.18 : 0.12
@@ -347,11 +348,11 @@ const name = import.meta.env.VITE_NAME
                       {s.icon}
                     </Box>
 
-                    <Box>
-                      <Typography variant="body2" color="text.secondary">
+                    <Box >
+                      <Typography   sx={{textAlign:"center"}}variant="body2" color="text.secondary">
                         {s.label}
                       </Typography>
-                      <Typography variant="h5" fontWeight={900}>
+                      <Typography sx={{textAlign:"center"}} variant="h5" fontWeight={900}>
                         {s.value}
                       </Typography>
                       {"subValue" in s && s.subValue && (

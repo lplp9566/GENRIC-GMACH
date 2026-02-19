@@ -14,6 +14,7 @@ interface AdminDepositType {
   allDeposits: IDeposit[];
   currentDeposit: IDeposit | null;
   depositActions: IDepositAction[];
+  allDepositActions: IDepositAction[];
   allDepositsStatus: Status;
   depositCheckStatus: Status; 
   depositCheck:{
@@ -33,6 +34,7 @@ const initialState: AdminDepositType = {
   allDeposits: [],
   currentDeposit: null,
   depositActions: [],
+  allDepositActions: [],
   depositCheckStatus: "idle",
   allDepositsStatus: "idle",
   createDepositStatus: "idle",
@@ -67,6 +69,13 @@ export const getDepositActions = createAsyncThunk<IDepositAction[], number>(
     const { data } = await api.get<IDepositAction[]>(
       `/deposits-actions/${depositId}`
     );
+    return data;
+  }
+);
+export const getAllDepositActions = createAsyncThunk<IDepositAction[]>(
+  "admin/getAllDepositActions",
+  async () => {
+    const { data } = await api.get<IDepositAction[]>(`/deposits-actions`);
     return data;
   }
 );
@@ -189,6 +198,17 @@ export const AdminDepositsSlice = createSlice({
         state.depositActionsStatus = "rejected";
         state.error = action.error.message || "Failed to fetch deposit actions";
       })
+      .addCase(getAllDepositActions.pending, (state) => {
+        state.depositActionsStatus = "pending";
+      })
+      .addCase(getAllDepositActions.fulfilled, (state, action) => {
+        state.depositActionsStatus = "fulfilled";
+        state.allDepositActions = action.payload;
+      })
+      .addCase(getAllDepositActions.rejected, (state, action) => {
+        state.depositActionsStatus = "rejected";
+        state.error = action.error.message || "Failed to fetch all deposit actions";
+      })
 
       // create action
       .addCase(createDepositAction.pending, (state) => {
@@ -208,9 +228,14 @@ export const AdminDepositsSlice = createSlice({
       })
       .addCase(getDepositDetails.fulfilled, (state, action) => {
         state.allDepositsStatus = "fulfilled";
-        state.currentDeposit = action.payload;
         const idx = state.allDeposits.findIndex(d => d.id === action.payload.id);
-        if (idx !== -1) state.allDeposits[idx] = action.payload;
+        const existing = idx !== -1 ? state.allDeposits[idx] : null;
+        const merged = {
+          ...action.payload,
+          user: action.payload.user ?? existing?.user,
+        };
+        state.currentDeposit = merged as IDeposit;
+        if (idx !== -1) state.allDeposits[idx] = merged as IDeposit;
       })
       .addCase(getDepositDetails.rejected, (state, action) => {
         state.allDepositsStatus = "rejected";

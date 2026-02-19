@@ -8,12 +8,18 @@ import {
   Dialog,
   DialogContent,
   Grid,
+  IconButton,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EventIcon from "@mui/icons-material/Event";
+import AddIcon from "@mui/icons-material/Add";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { IDeposit, IDepositActionCreate } from "../depositsDto";
 import DepositsActions from "../DepositsAction/DepositsActions";
 import { useDispatch } from "react-redux";
@@ -24,9 +30,23 @@ interface DepositCardProps {
   deposit: IDeposit;
   onClick: () => void;
   readOnly?: boolean;
+  compactActions?: boolean;
+  onAddAction?: () => void;
+  onView?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
-const DepositCard: React.FC<DepositCardProps> = ({ deposit, onClick, readOnly }) => {
+const DepositCard: React.FC<DepositCardProps> = ({
+  deposit,
+  onClick,
+  readOnly,
+  compactActions,
+  onAddAction,
+  onView,
+  onEdit,
+  onDelete,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
   const [actionsOpen, setActionsOpen] = useState(false);
 
@@ -38,15 +58,16 @@ const DepositCard: React.FC<DepositCardProps> = ({ deposit, onClick, readOnly })
     [dispatch]
   );
 
-  const userName = `${deposit.user?.first_name ?? ""} ${
-    deposit.user?.last_name ?? ""
-  }`.trim();
+  const userName = `${deposit.user?.first_name ?? ""} ${deposit.user?.last_name ?? ""}`.trim();
+  const depositTitle = userName ? `הפקדה #${deposit.id} • ${userName}` : `הפקדה #${deposit.id}`;
 
   return (
     <Card
+      onClick={onClick}
       sx={{
         borderRadius: 2,
         boxShadow: 2,
+        cursor: "pointer",
         transition: "transform 0.2s, box-shadow 0.2s",
         "&:hover": { transform: "translateY(-4px)", boxShadow: 6 },
       }}
@@ -54,14 +75,9 @@ const DepositCard: React.FC<DepositCardProps> = ({ deposit, onClick, readOnly })
       <CardContent sx={{ pt: 2, pb: 3, px: 3, direction: "rtl" }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Box textAlign="right">
-            <Typography variant="body2" color="text.secondary" mt={0.2}>
-              הפקדה #{deposit.id}
+            <Typography variant="subtitle1" fontWeight={700} color="#1C3C3C">
+              {depositTitle}
             </Typography>
-            {userName && (
-              <Typography variant="subtitle1" fontWeight={700} color="#1C3C3C">
-                {userName}
-              </Typography>
-            )}
           </Box>
 
           <Chip
@@ -135,30 +151,99 @@ const DepositCard: React.FC<DepositCardProps> = ({ deposit, onClick, readOnly })
           </Grid>
         </Grid>
 
-        <Box display="flex" justifyContent="center" gap={1}>
-          <Button variant="outlined" onClick={onClick}>
-            הצג פרטי הפקדה
-          </Button>
-          {!readOnly && (
-            <Button
-              variant="contained"
-              onClick={() => setActionsOpen(true)}
-              disabled={!deposit.isActive}
-              sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
-            >
-              הוסף פעולה
+        {compactActions ? (
+          <Box
+            mt={1}
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{ direction: "rtl" }}
+          >
+            {!readOnly && (
+              <Tooltip title="הוספת פעולה">
+                <span>
+                  <IconButton
+                    size="small"
+                    color="primary"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      if (onAddAction) return onAddAction();
+                      setActionsOpen(true);
+                    }}
+                    disabled={!deposit.isActive}
+                  >
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+            <Tooltip title="פרטי הפקדה">
+              <IconButton
+                size="small"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  if (onView) return onView();
+                  onClick();
+                }}
+              >
+                <VisibilityIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            {!readOnly && (
+              <Tooltip title="עריכה">
+                <span>
+                  <IconButton
+                    size="small"
+                    disabled={!deposit.isActive}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onEdit?.();
+                    }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+            {!readOnly && (
+              <Tooltip title="מחיקה">
+                <span>
+                  <IconButton
+                    size="small"
+                    color="error"
+                    disabled={!deposit.isActive}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onDelete?.();
+                    }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+          </Box>
+        ) : (
+          <Box display="flex" justifyContent="center" gap={1}>
+            <Button variant="outlined" onClick={onClick}>
+              הצג פרטי הפקדה
             </Button>
-          )}
-        </Box>
+            {!readOnly && (
+              <Button
+                variant="contained"
+                onClick={() => setActionsOpen(true)}
+                disabled={!deposit.isActive}
+                sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
+              >
+                הוסף פעולה
+              </Button>
+            )}
+          </Box>
+        )}
       </CardContent>
 
       {!readOnly && (
-        <Dialog
-          open={actionsOpen}
-          onClose={() => setActionsOpen(false)}
-          maxWidth="sm"
-          fullWidth
-        >
+        <Dialog open={actionsOpen} onClose={() => setActionsOpen(false)} maxWidth="sm" fullWidth>
           <DialogContent>
             <DepositsActions
               depositId={deposit.id}
