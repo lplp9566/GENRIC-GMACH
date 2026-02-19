@@ -7,9 +7,12 @@ export class NedarimPlusController {
 
   @Get('actions')
   async getActions(
+    @Query('source') source?: 'credit' | 'standing-order',
     @Query('lastId') lastId?: string,
     @Query('maxId') maxId?: string,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
   ) {
-    return this.nedarimPlusService.getActions({ lastId, maxId });
+    return this.nedarimPlusService.getActions({ source, lastId, maxId, from, to });
   }
 }

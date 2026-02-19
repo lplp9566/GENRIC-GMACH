@@ -28,14 +28,13 @@ type NedarimRow = {
   currency?: string;
   actionNumber: string;
 };
+type NedarimSource = "credit" | "standing-order";
 
 const MAX_ID = import.meta.env.VITE_NEDARIM_MAX_ID ?? "2000";
 
 const parseDate = (value: string) => {
   if (!value) return null;
-  const direct = new Date(value);
-  if (!Number.isNaN(direct.getTime())) return direct;
-
+  // Prefer explicit day-first formats to avoid locale-dependent inversion.
   const dmy = value.match(/^(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})/);
   if (dmy) {
     const d = new Date(Number(dmy[3]), Number(dmy[2]) - 1, Number(dmy[1]));
@@ -47,6 +46,9 @@ const parseDate = (value: string) => {
     const d = new Date(Number(ymd[1]), Number(ymd[2]) - 1, Number(ymd[3]));
     if (!Number.isNaN(d.getTime())) return d;
   }
+
+  const direct = new Date(value);
+  if (!Number.isNaN(direct.getTime())) return direct;
   return null;
 };
 
@@ -80,16 +82,61 @@ const NedarimPlusPage: FC = () => {
   const [rows, setRows] = useState<NedarimRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [source, setSource] = useState<NedarimSource>("credit");
   const [yearFilter, setYearFilter] = useState<string>("all");
   const [monthFilter, setMonthFilter] = useState<string>("all");
+
+  const getRangeForStandingOrder = (year: string, month: string) => {
+    const today = new Date();
+    const toDdMmYyyy = (d: Date) => {
+      const dd = `${d.getDate()}`.padStart(2, "0");
+      const mm = `${d.getMonth() + 1}`.padStart(2, "0");
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    };
+
+    if (year === "all") {
+      return {
+        from: "01/01/2000",
+        to: toDdMmYyyy(today),
+      };
+    }
+
+    const y = Number(year);
+    if (month === "all") {
+      return {
+        from: `01/01/${y}`,
+        to: `31/12/${y}`,
+      };
+    }
+
+    const m = Number(month);
+    const start = new Date(y, m - 1, 1);
+    const end = new Date(y, m, 0);
+    return {
+      from: toDdMmYyyy(start),
+      to: toDdMmYyyy(end),
+    };
+  };
 
   const loadData = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const response = await api.get("/nedarim-plus/actions", {
-        params: { maxId: MAX_ID },
-      });
+      const baseParams: Record<string, string> =
+        source === "standing-order"
+          ? yearFilter === "all"
+            ? { source }
+            : {
+                source,
+                ...getRangeForStandingOrder(yearFilter, monthFilter),
+              }
+          : {
+              source,
+              maxId: MAX_ID,
+            };
+
+      const response = await api.get("/nedarim-plus/actions", { params: baseParams });
       const data = ((response.data as any)?.data ?? []) as NedarimRow[];
       setRows(data);
     } catch {
@@ -98,7 +145,7 @@ const NedarimPlusPage: FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [source, yearFilter, monthFilter]);
 
   useEffect(() => {
     loadData();
@@ -143,6 +190,9 @@ const NedarimPlusPage: FC = () => {
   const handleMonthChange = (event: SelectChangeEvent) => {
     setMonthFilter(event.target.value);
   };
+  const handleSourceChange = (event: SelectChangeEvent) => {
+    setSource(event.target.value as NedarimSource);
+  };
 
   return (
     <Box sx={{ minHeight: "100vh", py: 4 }}>
@@ -172,6 +222,19 @@ const NedarimPlusPage: FC = () => {
           </Box>
 
           <Box sx={{ display: "flex", gap: 2, mb: 2, flexWrap: "wrap" }}>
+            <FormControl size="small" sx={{ minWidth: 180 }}>
+              <InputLabel id="source-filter-label">קטגוריה</InputLabel>
+              <Select
+                labelId="source-filter-label"
+                value={source}
+                label="קטגוריה"
+                onChange={handleSourceChange}
+              >
+                <MenuItem value="credit">פעולות אשראי</MenuItem>
+                <MenuItem value="standing-order">הוראת קבע</MenuItem>
+              </Select>
+            </FormControl>
+
             <FormControl size="small" sx={{ minWidth: 140 }}>
               <InputLabel id="year-filter-label">שנה</InputLabel>
               <Select
@@ -232,7 +295,7 @@ const NedarimPlusPage: FC = () => {
                       סכום
                     </TableCell>
                     <TableCell align="right" sx={{ fontWeight: 700 }}>
-                      מספר פעולה
+                      {source === "standing-order" ? "מזהה הוראת קבע" : "מספר פעולה"}
                     </TableCell>
                   </TableRow>
                 </TableHead>

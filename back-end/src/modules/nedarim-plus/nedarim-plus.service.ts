@@ -6,15 +6,19 @@ interface RawItem {
 }
 
 interface GetActionsOptions {
+  source?: 'credit' | 'standing-order';
   lastId?: string;
   maxId?: string;
+  from?: string;
+  to?: string;
 }
 
 @Injectable()
 export class NedarimPlusService {
-  private readonly apiUrl =
-    process.env.NEDARIM_PLUS_URL ??
+  private readonly creditApiUrl =
     'https://matara.pro/nedarimplus/Reports/Manage3.aspx';
+  private readonly standingOrderApiUrl =
+    'https://matara.pro/nedarimplus/Reports/Masav3.aspx';
 
   async getActions(options: GetActionsOptions) {
     const mosadId = process.env.NEDARIM_MOSAD_ID ?? process.env.MOSADID;
@@ -27,7 +31,29 @@ export class NedarimPlusService {
       );
     }
 
-    const response = await axios.get(this.apiUrl, {
+    const source = options.source ?? 'credit';
+    const isStandingOrder = source === 'standing-order';
+
+    const items = isStandingOrder
+      ? await this.fetchStandingOrderItems(mosadId, apiPassword, options)
+      : await this.fetchCreditItems(mosadId, apiPassword, options);
+    return {
+      source,
+      total: items.length,
+      data: items.map((item, index) =>
+        isStandingOrder
+          ? this.mapStandingOrderRow(item, index)
+          : this.mapCreditRow(item, index),
+      ),
+    };
+  }
+
+  private async fetchCreditItems(
+    mosadId: string,
+    apiPassword: string,
+    options: GetActionsOptions,
+  ) {
+    const response = await axios.get(this.creditApiUrl, {
       params: {
         Action: 'GetHistoryJson',
         MosadId: mosadId,
@@ -36,12 +62,55 @@ export class NedarimPlusService {
         MaxId: options.maxId ?? '2000',
       },
     });
+    return this.extractItems(response.data);
+  }
 
-    const items = this.extractItems(response.data);
-    return {
-      total: items.length,
-      data: items.map((item, index) => this.mapRow(item, index)),
-    };
+  private async fetchStandingOrderItems(
+    mosadId: string,
+    apiPassword: string,
+    options: GetActionsOptions,
+  ) {
+    if (options.from || options.to) {
+      const response = await axios.get(this.standingOrderApiUrl, {
+        params: {
+          Action: 'GetMasavHistoryNew',
+          MosadId: mosadId,
+          ApiPassword: apiPassword,
+          From: options.from ?? '01/01/2000',
+          To: options.to ?? this.todayDdMmYyyy(),
+        },
+      });
+      return this.extractItems(response.data);
+    }
+
+    // "הכל" -> שליפה שנתית כדי להימנע מטווח גדול שמחזיר ריק.
+    const currentYear = new Date().getFullYear();
+    const fromYear = 2018;
+    const all: RawItem[] = [];
+
+    for (let year = currentYear; year >= fromYear; year -= 1) {
+      const response = await axios.get(this.standingOrderApiUrl, {
+        params: {
+          Action: 'GetMasavHistoryNew',
+          MosadId: mosadId,
+          ApiPassword: apiPassword,
+          From: `01/01/${year}`,
+          To: `31/12/${year}`,
+        },
+      });
+      all.push(...this.extractItems(response.data));
+    }
+
+    // הסרת כפילויות בסיסית.
+    const seen = new Set<string>();
+    const deduped: RawItem[] = [];
+    for (const item of all) {
+      const key = `${this.readStr(item, ['2', 'CallId', 'TransactionId', 'Id'])}|${this.readStr(item, ['4', 'TransactionTime', 'Date'])}|${this.readStr(item, ['5', 'Amount'])}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      deduped.push(item);
+    }
+    return deduped;
   }
 
   private extractItems(raw: unknown): RawItem[] {
@@ -123,7 +192,7 @@ export class NedarimPlusService {
     return '';
   }
 
-  private mapRow(item: RawItem, index: number) {
+  private mapCreditRow(item: RawItem, index: number) {
     const date = this.readStr(item, [
       'TransactionTime',
       'transactionTime',
@@ -158,5 +227,41 @@ export class NedarimPlusService {
       currency,
       actionNumber,
     };
+  }
+
+  private mapStandingOrderRow(item: RawItem, index: number) {
+    const date =
+      this.readStr(item, ['4', 'TransactionTime', 'Date', 'date']) ||
+      this.readStr(item, ['CreationDate', 'creationDate']);
+    const user = this.readStr(item, ['3', 'ClientName', 'clientName', 'Name', 'name']);
+    const amount = this.readStr(item, ['5', 'Amount', 'amount', 'Sum', 'sum']);
+    const actionNumber = this.readStr(item, [
+      '2',
+      'Masul',
+      'masul',
+      'CallId',
+      'callId',
+      'TransactionId',
+      'transactionId',
+      'Id',
+      'id',
+    ]);
+
+    return {
+      id: `${actionNumber || 'standing-order'}-${index}`,
+      date,
+      user,
+      amount,
+      currency: '1',
+      actionNumber,
+    };
+  }
+
+  private todayDdMmYyyy() {
+    const now = new Date();
+    const dd = `${now.getDate()}`.padStart(2, '0');
+    const mm = `${now.getMonth() + 1}`.padStart(2, '0');
+    const yyyy = now.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
   }
 }
