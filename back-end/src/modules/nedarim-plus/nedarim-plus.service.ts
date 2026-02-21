@@ -53,8 +53,12 @@ interface StandingOrderRawItem {
   Id?: string;
 }
 
-type RawItem = CreditRawItem & StandingOrderRawItem;
-type RawItemKey = keyof RawItem;
+interface StandingOrderApiResponse {
+  Result?: string;
+  Message?: string;
+  Maslul?: string;
+  data?: StandingOrderRawItem[];
+}
 
 interface GetActionsOptions {
   source?: 'credit' | 'standing-order';
@@ -64,7 +68,7 @@ interface GetActionsOptions {
   to?: string;
 }
 
-interface MappedAction {
+export interface MappedAction {
   id: string;
   date: string;
   user: string;
@@ -74,6 +78,7 @@ interface MappedAction {
   transactionType?: string;
   category?: string;
   comments?: string;
+  solek?: string;
 }
 
 @Injectable()
@@ -95,27 +100,30 @@ export class NedarimPlusService {
     }
 
     const source = options.source ?? 'credit';
-    const isStandingOrder = source === 'standing-order';
 
-    const items = isStandingOrder
-      ? await this.fetchStandingOrderItems(mosadId, apiPassword, options)
-      : await this.fetchCreditItems(mosadId, apiPassword, options);
-    const data = items.map((item, index) =>
-      isStandingOrder
-        ? this.mapStandingOrderRow(item, index)
-        : this.mapCreditRow(item, index),
-    );
+    if (source === 'standing-order') {
+      const items = await this.fetchStandingOrderItems(mosadId, apiPassword, options);
+      const data = items.map((item, index) => this.mapStandingOrderRow(item, index));
+
+      return {
+        source,
+        total: data.length,
+        data,
+        paging: {
+          hasMore: false,
+          currentLastId: '',
+          nextLastId: '',
+        },
+      };
+    }
+
+    const items = await this.fetchCreditItems(mosadId, apiPassword, options);
+    const data = items.map((item, index) => this.mapCreditRow(item, index));
     const maxItems = Number(options.maxId ?? '2000');
-    const nextLastId =
-      !isStandingOrder && data.length > 0
-        ? this.resolveLastIdCursor(data[data.length - 1], items[items.length - 1])
-        : '';
-    const hasMore =
-      !isStandingOrder &&
-      Number.isFinite(maxItems) &&
-      maxItems > 0 &&
-      data.length >= maxItems &&
-      nextLastId !== '';
+    const hasMore = Number.isFinite(maxItems) && maxItems > 0 && data.length >= maxItems;
+    const nextLastId = hasMore
+      ? this.resolveLastIdCursor(data[data.length - 1], items[items.length - 1])
+      : '';
 
     return {
       source,
@@ -133,7 +141,7 @@ export class NedarimPlusService {
     mosadId: string,
     apiPassword: string,
     options: GetActionsOptions,
-  ) {
+  ): Promise<CreditRawItem[]> {
     const response = await axios.get(this.creditApiUrl, {
       params: {
         Action: 'GetHistoryJson',
@@ -143,14 +151,22 @@ export class NedarimPlusService {
         MaxId: options.maxId ?? '2000',
       },
     });
-    return this.extractItems(response.data);
+
+    const payload = this.parseApiPayload(response.data);
+    if (Array.isArray(payload)) return this.toCreditItems(payload);
+
+    if (this.isRecord(payload) && Array.isArray(payload.data)) {
+      return this.toCreditItems(payload.data as unknown[]);
+    }
+
+    return [];
   }
 
   private async fetchStandingOrderItems(
     mosadId: string,
     apiPassword: string,
     options: GetActionsOptions,
-  ) {
+  ): Promise<StandingOrderRawItem[]> {
     if (options.from || options.to) {
       const response = await axios.get(this.standingOrderApiUrl, {
         params: {
@@ -161,13 +177,12 @@ export class NedarimPlusService {
           To: options.to ?? this.todayDdMmYyyy(),
         },
       });
-      return this.extractItems(response.data);
+      return this.extractStandingOrderItems(response.data);
     }
 
-    // "הכל" -> שליפה שנתית כדי להימנע מטווח גדול שמחזיר ריק.
     const currentYear = new Date().getFullYear();
     const fromYear = 2018;
-    const all: RawItem[] = [];
+    const all: StandingOrderRawItem[] = [];
 
     for (let year = currentYear; year >= fromYear; year -= 1) {
       const response = await axios.get(this.standingOrderApiUrl, {
@@ -179,12 +194,11 @@ export class NedarimPlusService {
           To: `31/12/${year}`,
         },
       });
-      all.push(...this.extractItems(response.data));
+      all.push(...this.extractStandingOrderItems(response.data));
     }
 
-    // הסרת כפילויות בסיסית.
     const seen = new Set<string>();
-    const deduped: RawItem[] = [];
+    const deduped: StandingOrderRawItem[] = [];
     for (const item of all) {
       const key = `${this.readStr(item, ['2', 'CallId', 'TransactionId', 'Id'])}|${this.readStr(item, ['4', 'TransactionTime', 'Date'])}|${this.readStr(item, ['5', 'Amount'])}`;
       if (seen.has(key)) continue;
@@ -194,75 +208,51 @@ export class NedarimPlusService {
     return deduped;
   }
 
-  private extractItems(raw: unknown): RawItem[] {
-    if (Array.isArray(raw)) return this.toRawItems(raw);
+  private extractStandingOrderItems(raw: unknown): StandingOrderRawItem[] {
+    const payload = this.parseApiPayload(raw);
+    if (Array.isArray(payload)) return this.toStandingOrderItems(payload);
 
-    if (typeof raw === 'string') {
-      try {
-        const parsed = JSON.parse(raw);
-        return this.extractItems(parsed);
-      } catch {
-        return [];
+    if (this.isRecord(payload)) {
+      const response = payload as StandingOrderApiResponse;
+      if (Array.isArray(response.data)) {
+        return this.toStandingOrderItems(response.data);
       }
     }
 
-    if (!raw || typeof raw !== 'object') return [];
-    const obj = raw as Record<string, unknown>;
-
-    const preferred = [obj.data, obj.items, obj.results, obj.response, obj.d]
-      .filter(Array.isArray)
-      .map((v) => this.toRawItems(v as unknown[]));
-    if (preferred.length > 0) {
-      return preferred.sort((a, b) => this.scoreArray(b) - this.scoreArray(a))[0];
-    }
-
-    const arrays = this.collectArrays(obj);
-    if (arrays.length === 0) return [];
-    return arrays.sort((a, b) => this.scoreArray(b) - this.scoreArray(a))[0];
+    return [];
   }
 
-  private collectArrays(node: unknown, depth = 0): RawItem[][] {
-    if (!node || typeof node !== 'object' || depth > 6) return [];
-    const out: RawItem[][] = [];
-    const obj = node as Record<string, unknown>;
-    for (const value of Object.values(obj)) {
-      if (Array.isArray(value)) {
-        out.push(this.toRawItems(value));
-        for (const item of value) {
-          if (item && typeof item === 'object') {
-            out.push(...this.collectArrays(item, depth + 1));
-          }
-        }
-      } else if (value && typeof value === 'object') {
-        out.push(...this.collectArrays(value, depth + 1));
-      }
+  private parseApiPayload(raw: unknown): unknown {
+    if (typeof raw !== 'string') return raw;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
     }
-    return out;
   }
 
-  private scoreArray(arr: RawItem[]): number {
-    if (!Array.isArray(arr) || arr.length === 0) return 0;
-    let score = arr.length;
-    for (const item of arr.slice(0, 20)) {
-      if (!item || typeof item !== 'object') continue;
-      const obj = item as Record<string, unknown>;
-      if (
-        obj.ClientName !== undefined ||
-        obj.Amount !== undefined ||
-        obj.TransactionTime !== undefined ||
-        obj.CreationDate !== undefined ||
-        obj.Currency !== undefined ||
-        obj.LastNum !== undefined
-      ) {
-        score += 100;
-      }
-    }
-    return score;
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return !!value && typeof value === 'object' && !Array.isArray(value);
   }
 
-  private readStr(item: RawItem, keys: RawItemKey[]): string {
+  private toCreditItems(input: unknown[]): CreditRawItem[] {
+    return input.filter(
+      (item): item is CreditRawItem =>
+        !!item && typeof item === 'object' && !Array.isArray(item),
+    );
+  }
+
+  private toStandingOrderItems(input: unknown[]): StandingOrderRawItem[] {
+    return input.filter(
+      (item): item is StandingOrderRawItem =>
+        !!item && typeof item === 'object' && !Array.isArray(item),
+    );
+  }
+
+  private readStr<T extends object>(item: T, keys: string[]): string {
+    const row = item as Record<string, unknown>;
     for (const key of keys) {
-      const value = item[key];
+      const value = row[key];
       if (value !== undefined && value !== null) {
         const str = String(value).trim();
         if (str !== '') return str;
@@ -271,14 +261,7 @@ export class NedarimPlusService {
     return '';
   }
 
-  private toRawItems(input: unknown[]): RawItem[] {
-    return input.filter(
-      (item): item is RawItem =>
-        !!item && typeof item === 'object' && !Array.isArray(item),
-    );
-  }
-
-  private mapCreditRow(item: RawItem, index: number) {
+  private mapCreditRow(item: CreditRawItem, index: number): MappedAction {
     const date = this.readStr(item, ['TransactionTime']);
     const user = this.readStr(item, ['ClientName']);
     const amount = this.readStr(item, ['Amount']);
@@ -303,11 +286,16 @@ export class NedarimPlusService {
       transactionType: this.readStr(item, ['TransactionType']),
       category: this.readStr(item, ['Groupe']),
       comments: this.readStr(item, ['Comments']),
+      solek: this.readStr(item, ['Solek']),
     };
   }
 
-  private resolveLastIdCursor(lastRow: MappedAction, lastRawItem?: RawItem) {
-    const rawCursor = lastRawItem
+  private resolveLastIdCursor(lastRow: MappedAction, lastRawItem?: CreditRawItem) {
+    // כלל פשוט: הלאסט איי.די לעמוד הבא הוא המזהה של הרשומה האחרונה שהוחזרה.
+    const fromRow = (lastRow.actionNumber ?? '').trim();
+    if (fromRow) return fromRow;
+
+    return lastRawItem
       ? this.readStr(lastRawItem, [
           'LastNum',
           'Confirmation',
@@ -318,10 +306,12 @@ export class NedarimPlusService {
           'Id',
         ])
       : '';
-    return rawCursor || lastRow.actionNumber || '';
   }
 
-  private mapStandingOrderRow(item: RawItem, index: number) {
+  private mapStandingOrderRow(
+    item: StandingOrderRawItem,
+    index: number,
+  ): MappedAction {
     const date =
       this.readStr(item, ['4', 'TransactionTime', 'Date']) ||
       this.readStr(item, ['CreationDate']);
@@ -345,6 +335,7 @@ export class NedarimPlusService {
       transactionType: this.readStr(item, ['6']),
       category: this.readStr(item, ['8']),
       comments: this.readStr(item, ['7']),
+      solek: '',
     };
   }
 
