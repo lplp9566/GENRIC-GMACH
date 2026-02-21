@@ -30,6 +30,9 @@ type NedarimRow = {
   amount: string;
   currency?: string;
   actionNumber: string;
+  transactionType?: string;
+  category?: string;
+  comments?: string;
 };
 
 type NedarimSource = "credit" | "standing-order";
@@ -359,6 +362,15 @@ const NedarimPlusPage: FC = () => {
                       סכום
                     </TableCell>
                     <TableCell align="right" sx={{ fontWeight: 700 }}>
+                      סוג עסקה
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 700 }}>
+                      קטגוריה
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 700 }}>
+                      הערות
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 700 }}>
                       {source === "standing-order" ? "מזהה הוראת קבע" : "מספר פעולה"}
                     </TableCell>
                   </TableRow>
@@ -366,7 +378,7 @@ const NedarimPlusPage: FC = () => {
                 <TableBody>
                   {filteredRows.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4} align="center">
+                      <TableCell colSpan={7} align="center">
                         אין נתונים להצגה
                       </TableCell>
                     </TableRow>
@@ -376,6 +388,9 @@ const NedarimPlusPage: FC = () => {
                         <TableCell align="right">{toDateLabel(row.date)}</TableCell>
                         <TableCell align="right">{row.user || "-"}</TableCell>
                         <TableCell align="right">{toAmountLabel(row.amount, row.currency)}</TableCell>
+                        <TableCell align="right">{row.transactionType || "-"}</TableCell>
+                        <TableCell align="right">{row.category || "-"}</TableCell>
+                        <TableCell align="right">{row.comments || "-"}</TableCell>
                         <TableCell align="right">{row.actionNumber || "-"}</TableCell>
                       </TableRow>
                     ))

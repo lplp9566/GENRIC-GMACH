@@ -1,9 +1,60 @@
 ﻿import { BadRequestException, Injectable } from '@nestjs/common';
 import axios from 'axios';
 
-interface RawItem {
-  [key: string]: unknown;
+interface CreditRawItem {
+  Shovar?: string;
+  Zeout?: string;
+  ClientName?: string;
+  Adresse?: string;
+  Phone?: string;
+  Mail?: string;
+  Amount?: string | number;
+  Currency?: string;
+  TransactionTime?: string;
+  Confirmation?: string;
+  LastNum?: string;
+  TransactionType?: string;
+  Groupe?: string;
+  Comments?: string;
+  Tashloumim?: string;
+  FirstTashloum?: string | number;
+  NextTashloum?: string | number;
+  CallId?: string;
+  AsRecord?: string;
+  MasofId?: string;
+  MasofName?: string;
+  TransactionId?: string;
+  CompagnyCard?: string;
+  Solek?: string;
+  Tayar?: string;
+  Kabalald?: string;
+  Kevald?: string;
+  ActionNumber?: string;
+  Id?: string;
+  LastId?: string;
 }
+
+interface StandingOrderRawItem {
+  '2'?: string;
+  '3'?: string;
+  '4'?: string;
+  '5'?: string | number;
+  '6'?: string;
+  '7'?: string;
+  '8'?: string;
+  TransactionTime?: string;
+  Date?: string;
+  CreationDate?: string;
+  ClientName?: string;
+  Amount?: string | number;
+  Masul?: string;
+  CallId?: string;
+  TransactionId?: string;
+  Id?: string;
+}
+
+type RawItem = CreditRawItem & StandingOrderRawItem;
+type RawItemKey = keyof RawItem;
 
 interface GetActionsOptions {
   source?: 'credit' | 'standing-order';
@@ -20,6 +71,9 @@ interface MappedAction {
   amount: string;
   currency?: string;
   actionNumber: string;
+  transactionType?: string;
+  category?: string;
+  comments?: string;
 }
 
 @Injectable()
@@ -141,7 +195,7 @@ export class NedarimPlusService {
   }
 
   private extractItems(raw: unknown): RawItem[] {
-    if (Array.isArray(raw)) return raw as RawItem[];
+    if (Array.isArray(raw)) return this.toRawItems(raw);
 
     if (typeof raw === 'string') {
       try {
@@ -157,7 +211,7 @@ export class NedarimPlusService {
 
     const preferred = [obj.data, obj.items, obj.results, obj.response, obj.d]
       .filter(Array.isArray)
-      .map((v) => v as RawItem[]);
+      .map((v) => this.toRawItems(v as unknown[]));
     if (preferred.length > 0) {
       return preferred.sort((a, b) => this.scoreArray(b) - this.scoreArray(a))[0];
     }
@@ -173,7 +227,7 @@ export class NedarimPlusService {
     const obj = node as Record<string, unknown>;
     for (const value of Object.values(obj)) {
       if (Array.isArray(value)) {
-        out.push(value as RawItem[]);
+        out.push(this.toRawItems(value));
         for (const item of value) {
           if (item && typeof item === 'object') {
             out.push(...this.collectArrays(item, depth + 1));
@@ -194,9 +248,7 @@ export class NedarimPlusService {
       const obj = item as Record<string, unknown>;
       if (
         obj.ClientName !== undefined ||
-        obj.clientName !== undefined ||
         obj.Amount !== undefined ||
-        obj.amount !== undefined ||
         obj.TransactionTime !== undefined ||
         obj.CreationDate !== undefined ||
         obj.Currency !== undefined ||
@@ -208,7 +260,7 @@ export class NedarimPlusService {
     return score;
   }
 
-  private readStr(item: RawItem, keys: string[]): string {
+  private readStr(item: RawItem, keys: RawItemKey[]): string {
     for (const key of keys) {
       const value = item[key];
       if (value !== undefined && value !== null) {
@@ -219,31 +271,26 @@ export class NedarimPlusService {
     return '';
   }
 
+  private toRawItems(input: unknown[]): RawItem[] {
+    return input.filter(
+      (item): item is RawItem =>
+        !!item && typeof item === 'object' && !Array.isArray(item),
+    );
+  }
+
   private mapCreditRow(item: RawItem, index: number) {
-    const date = this.readStr(item, [
-      'TransactionTime',
-      'transactionTime',
-      'CreationDate',
-      'creationDate',
-      'Date',
-      'date',
-    ]);
-    const user = this.readStr(item, ['ClientName', 'clientName', 'Name', 'name']);
-    const amount = this.readStr(item, ['Amount', 'amount', 'Sum', 'sum']);
-    const currency = this.readStr(item, ['Currency', 'currency']);
+    const date = this.readStr(item, ['TransactionTime']);
+    const user = this.readStr(item, ['ClientName']);
+    const amount = this.readStr(item, ['Amount']);
+    const currency = this.readStr(item, ['Currency']);
     const actionNumber = this.readStr(item, [
+      'Shovar',
+      'Confirmation',
       'ActionNumber',
-      'actionNumber',
-      'TransactionId',
-      'transactionId',
-      'OperationId',
-      'operationId',
       'LastNum',
-      'lastNum',
+      'TransactionId',
       'Id',
-      'id',
       'Zeout',
-      'zeout',
     ]);
 
     return {
@@ -253,18 +300,22 @@ export class NedarimPlusService {
       amount,
       currency,
       actionNumber,
+      transactionType: this.readStr(item, ['TransactionType']),
+      category: this.readStr(item, ['Groupe']),
+      comments: this.readStr(item, ['Comments']),
     };
   }
 
   private resolveLastIdCursor(lastRow: MappedAction, lastRawItem?: RawItem) {
     const rawCursor = lastRawItem
       ? this.readStr(lastRawItem, [
-          'LastId',
           'LastNum',
-          'Id',
+          'Confirmation',
+          'Shovar',
           'TransactionId',
-          'ActionNumber',
-          'OperationId',
+          'Zeout',
+          'LastId',
+          'Id',
         ])
       : '';
     return rawCursor || lastRow.actionNumber || '';
@@ -272,20 +323,16 @@ export class NedarimPlusService {
 
   private mapStandingOrderRow(item: RawItem, index: number) {
     const date =
-      this.readStr(item, ['4', 'TransactionTime', 'Date', 'date']) ||
-      this.readStr(item, ['CreationDate', 'creationDate']);
-    const user = this.readStr(item, ['3', 'ClientName', 'clientName', 'Name', 'name']);
-    const amount = this.readStr(item, ['5', 'Amount', 'amount', 'Sum', 'sum']);
+      this.readStr(item, ['4', 'TransactionTime', 'Date']) ||
+      this.readStr(item, ['CreationDate']);
+    const user = this.readStr(item, ['3', 'ClientName']);
+    const amount = this.readStr(item, ['5', 'Amount']);
     const actionNumber = this.readStr(item, [
       '2',
       'Masul',
-      'masul',
       'CallId',
-      'callId',
       'TransactionId',
-      'transactionId',
       'Id',
-      'id',
     ]);
 
     return {
@@ -295,6 +342,9 @@ export class NedarimPlusService {
       amount,
       currency: '1',
       actionNumber,
+      transactionType: this.readStr(item, ['6']),
+      category: this.readStr(item, ['8']),
+      comments: this.readStr(item, ['7']),
     };
   }
 
