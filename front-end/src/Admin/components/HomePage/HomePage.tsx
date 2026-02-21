@@ -89,6 +89,10 @@ const name = import.meta.env.VITE_NAME
       .filter((u) => u.payment_details.monthly_balance < 0)
       .reduce((sum, u) => sum + Math.abs(u.payment_details.monthly_balance), 0);
   }, [allUsers]);
+  const totalNegtivUsers = useMemo(() => {
+    return allUsers.filter((u) => u.payment_details.monthly_balance < 0).length;
+  }, [allUsers]);
+  
 
   const totalLoansDebt = useMemo(() => {
     return allUsers.reduce((usersSum, user) => {
@@ -564,6 +568,7 @@ const name = import.meta.env.VITE_NAME
             <DebtCards
               monthlyDebt={totalNegativeBalance}
               loansDebt={totalLoansDebt}
+              monthlyNegtiveBalanceUsers={totalNegtivUsers}
             />
 
             {/* <Grid container spacing={3} justifyContent="center">

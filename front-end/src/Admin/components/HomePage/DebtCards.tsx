@@ -2,9 +2,17 @@ import React from "react";
 import { Box, Grid, Paper, Typography } from "@mui/material";
 import { formatILS } from "./HomePage";
 
-type Props = { monthlyDebt: number; loansDebt: number };
+type Props = {
+  monthlyDebt: number;
+  loansDebt: number;
+  monthlyNegtiveBalanceUsers: number;
+};
 
-const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
+const DebtCards: React.FC<Props> = ({
+  monthlyDebt,
+  loansDebt,
+  monthlyNegtiveBalanceUsers,
+}) => {
   const cards = [
     {
       title: "חוב בדמי חבר",
@@ -36,13 +44,13 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
               elevation={0}
               sx={{
                 p: { xs: 2, sm: 2.5 },
-                borderRadius: 4,         
+                borderRadius: 4,
                 background: hasDebt ? c.debtBg : c.okBg,
                 color: "#fff",
                 boxShadow: "0 14px 32px rgba(0,0,0,0.25)",
                 position: "relative",
                 overflow: "hidden",
-                textAlign: "center",     
+                textAlign: "center",
               }}
             >
               <Box
@@ -55,13 +63,12 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
                   transform: "scale(2.2)",
                   pointerEvents: "none",
                 }}
-              >
-              </Box>
+              ></Box>
 
               <Box
                 sx={{
                   position: "relative",
-                  minHeight: { xs: 96, sm: 120 }, 
+                  minHeight: { xs: 96, sm: 120 },
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -74,12 +81,25 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
                 </Typography>
 
                 <Typography
-                  variant="h4"          
+                  variant="h4"
                   fontWeight={1000}
                   sx={{ lineHeight: 1, fontSize: { xs: 22, sm: 28 } }}
                 >
                   {hasDebt ? formatILS(c.value) : "אין חוב"}
                 </Typography>
+                {monthlyNegtiveBalanceUsers > 0  && (
+                  <Typography
+                    variant="h6"
+                    fontWeight={1000}
+                    sx={{
+                      lineHeight: 1,
+                      direction: "ltr",
+                      fontSize: { xs: 22, sm: 28 },
+                    }}
+                  >
+                    {` ${monthlyNegtiveBalanceUsers} משתמשים חייבים`}
+                  </Typography>
+                )}
               </Box>
             </Paper>
           </Grid>
@@ -90,4 +110,3 @@ const DebtCards: React.FC<Props> = ({ monthlyDebt, loansDebt }) => {
 };
 
 export default DebtCards;
-
