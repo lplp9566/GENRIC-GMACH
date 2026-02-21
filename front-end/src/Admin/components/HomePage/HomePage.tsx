@@ -106,6 +106,13 @@ const name = import.meta.env.VITE_NAME
     }, 0);
   }, [allUsers]);
 
+  const totalNegativeLoans = useMemo(() => {
+    return allUsers.reduce((count, user) => {
+      const loans = user.payment_details?.loan_balances ?? [];
+      return count + loans.filter((loan) => loan.balance < 0).length;
+    }, 0);
+  }, [allUsers]);
+
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [bankDialogOpen, setBankDialogOpen] = useState(false);
@@ -569,6 +576,7 @@ const name = import.meta.env.VITE_NAME
               monthlyDebt={totalNegativeBalance}
               loansDebt={totalLoansDebt}
               monthlyNegtiveBalanceUsers={totalNegtivUsers}
+              loansNegativeCount={totalNegativeLoans}
             />
 
             {/* <Grid container spacing={3} justifyContent="center">

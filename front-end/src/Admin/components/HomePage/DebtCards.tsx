@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Box, Grid, Paper, Typography } from "@mui/material";
 import { formatILS } from "./HomePage";
 
@@ -6,25 +6,33 @@ type Props = {
   monthlyDebt: number;
   loansDebt: number;
   monthlyNegtiveBalanceUsers: number;
+  loansNegativeCount: number;
 };
 
 const DebtCards: React.FC<Props> = ({
   monthlyDebt,
   loansDebt,
   monthlyNegtiveBalanceUsers,
+  loansNegativeCount,
 }) => {
   const cards = [
     {
+      key: "monthly" as const,
       title: "חוב בדמי חבר",
       value: monthlyDebt,
       debtBg: "linear-gradient(135deg, #ff3b5c, #ff7a59)",
       okBg: "linear-gradient(135deg, #1dbf73, #6ee7b7)",
+      count: monthlyNegtiveBalanceUsers,
+      countLabel: "משתמשים חייבים",
     },
     {
+      key: "loans" as const,
       title: "חוב בהלוואות",
       value: loansDebt,
       debtBg: "linear-gradient(135deg, #ff2d55, #b5179e)",
       okBg: "linear-gradient(135deg, #1dbf73, #6ee7b7)",
+      count: loansNegativeCount,
+      countLabel: "הלוואות בחוב",
     },
   ];
 
@@ -39,7 +47,7 @@ const DebtCards: React.FC<Props> = ({
         const hasDebt = c.value > 0;
 
         return (
-          <Grid item xs={12} sm={6} md={4} key={c.title}>
+          <Grid item xs={12} sm={6} md={4} key={c.key}>
             <Paper
               elevation={0}
               sx={{
@@ -87,7 +95,7 @@ const DebtCards: React.FC<Props> = ({
                 >
                   {hasDebt ? formatILS(c.value) : "אין חוב"}
                 </Typography>
-                {monthlyNegtiveBalanceUsers > 0  && (
+                {c.count > 0 && (
                   <Typography
                     variant="h6"
                     fontWeight={1000}
@@ -97,7 +105,7 @@ const DebtCards: React.FC<Props> = ({
                       fontSize: { xs: 22, sm: 28 },
                     }}
                   >
-                    {` ${monthlyNegtiveBalanceUsers} משתמשים חייבים`}
+                    {` ${c.countLabel} ${c.count}`}
                   </Typography>
                 )}
               </Box>
