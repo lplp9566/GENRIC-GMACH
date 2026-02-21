@@ -6,6 +6,7 @@ import {
   CircularProgress,
   Container,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Paper,
@@ -18,6 +19,8 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { api } from "../../store/axiosInstance";
 
 type NedarimRow = {
@@ -28,13 +31,13 @@ type NedarimRow = {
   currency?: string;
   actionNumber: string;
 };
+
 type NedarimSource = "credit" | "standing-order";
 
 const MAX_ID = import.meta.env.VITE_NEDARIM_MAX_ID ?? "2000";
 
 const parseDate = (value: string) => {
   if (!value) return null;
-  // Prefer explicit day-first formats to avoid locale-dependent inversion.
   const dmy = value.match(/^(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})/);
   if (dmy) {
     const d = new Date(Number(dmy[3]), Number(dmy[2]) - 1, Number(dmy[1]));
@@ -86,6 +89,11 @@ const NedarimPlusPage: FC = () => {
   const [yearFilter, setYearFilter] = useState<string>("all");
   const [monthFilter, setMonthFilter] = useState<string>("all");
 
+  const [creditCursorHistory, setCreditCursorHistory] = useState<string[]>([""]);
+  const [creditPageIndex, setCreditPageIndex] = useState(0);
+  const [creditHasMore, setCreditHasMore] = useState(false);
+  const [creditNextLastId, setCreditNextLastId] = useState("");
+
   const getRangeForStandingOrder = (year: string, month: string) => {
     const today = new Date();
     const toDdMmYyyy = (d: Date) => {
@@ -122,7 +130,9 @@ const NedarimPlusPage: FC = () => {
   const loadData = useCallback(async () => {
     setLoading(true);
     setError("");
+
     try {
+      const currentCreditLastId = creditCursorHistory[creditPageIndex] ?? "";
       const baseParams: Record<string, string> =
         source === "standing-order"
           ? yearFilter === "all"
@@ -134,22 +144,42 @@ const NedarimPlusPage: FC = () => {
           : {
               source,
               maxId: MAX_ID,
+              lastId: currentCreditLastId,
             };
 
       const response = await api.get("/nedarim-plus/actions", { params: baseParams });
       const data = ((response.data as any)?.data ?? []) as NedarimRow[];
+      const paging = (response.data as any)?.paging ?? {};
+
       setRows(data);
+
+      if (source === "credit") {
+        setCreditHasMore(Boolean(paging?.hasMore));
+        setCreditNextLastId(String(paging?.nextLastId ?? ""));
+      } else {
+        setCreditHasMore(false);
+        setCreditNextLastId("");
+      }
     } catch {
       setRows([]);
+      setCreditHasMore(false);
+      setCreditNextLastId("");
       setError("שליפת נתוני נדרים פלוס נכשלה.");
     } finally {
       setLoading(false);
     }
-  }, [source, yearFilter, monthFilter]);
+  }, [source, yearFilter, monthFilter, creditCursorHistory, creditPageIndex]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    setCreditCursorHistory([""]);
+    setCreditPageIndex(0);
+    setCreditHasMore(false);
+    setCreditNextLastId("");
+  }, [source]);
 
   const years = useMemo(() => {
     const set = new Set<number>();
@@ -190,8 +220,20 @@ const NedarimPlusPage: FC = () => {
   const handleMonthChange = (event: SelectChangeEvent) => {
     setMonthFilter(event.target.value);
   };
+
   const handleSourceChange = (event: SelectChangeEvent) => {
     setSource(event.target.value as NedarimSource);
+  };
+
+  const handleCreditNextPage = () => {
+    if (loading || !creditHasMore || !creditNextLastId) return;
+    setCreditCursorHistory((prev) => [...prev.slice(0, creditPageIndex + 1), creditNextLastId]);
+    setCreditPageIndex((prev) => prev + 1);
+  };
+
+  const handleCreditPrevPage = () => {
+    if (loading || creditPageIndex <= 0) return;
+    setCreditPageIndex((prev) => Math.max(0, prev - 1));
   };
 
   return (
@@ -269,6 +311,28 @@ const NedarimPlusPage: FC = () => {
               </Select>
             </FormControl>
           </Box>
+
+          {source === "credit" && (creditPageIndex > 0 || creditHasMore) && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+              <IconButton
+                onClick={handleCreditPrevPage}
+                disabled={loading || creditPageIndex === 0}
+                size="small"
+                aria-label="עמוד קודם"
+              >
+                <ChevronRightIcon />
+              </IconButton>
+              <Typography variant="body2">עמוד {creditPageIndex + 1}</Typography>
+              <IconButton
+                onClick={handleCreditNextPage}
+                disabled={loading || !creditHasMore || !creditNextLastId}
+                size="small"
+                aria-label="עמוד הבא"
+              >
+                <ChevronLeftIcon />
+              </IconButton>
+            </Box>
+          )}
 
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>

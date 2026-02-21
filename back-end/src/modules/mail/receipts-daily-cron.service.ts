@@ -108,14 +108,14 @@ export class ReceiptsDailyCronService {
               fullName: this.userFullName(user),
               idNumber: user.id_number ?? '',
               title: 'סיום הלוואה',
-              lines: ['ההלוואה נסגרה במלואה. תודה.'],
+              lines: ['ההלוואה  מס ' + loan.id + 'נסגרה במלואה. תודה'],
             });
           }
           break;
         }
         case LoanPaymentActionType.AMOUNT_CHANGE: {
           const lines = [
-            `סכום ההלוואה עודכן ב-${this.mailService.formatCurrency(
+            `סכום ההלוואה  מס ${loan.id}עודכן ב-${this.mailService.formatCurrency(
               action.value,
             )}.`,
             `יתרה חדשה להחזר: ${this.mailService.formatCurrency(
@@ -133,7 +133,7 @@ export class ReceiptsDailyCronService {
         }
         case LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE: {
           const lines = [
-            `התשלום החודשי עודכן לסך ${this.mailService.formatCurrency(
+            `התשלום החודשי  להלוואה מס ${loan.id}עודכן לסך ${this.mailService.formatCurrency(
               action.value,
             )}.`,
           ];
@@ -148,13 +148,13 @@ export class ReceiptsDailyCronService {
         }
         case LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE: {
           const lines = [
-            `יום התשלום עודכן ל-${action.value} בחודש.`,
+            `יום התשלום להלוואה מס ${loan.id}עודכן ל-${action.value} בחודש.`,
           ];
           await this.mailService.sendReceiptNotificationNow({
             to: user.email_address,
             fullName: this.userFullName(user),
             idNumber: user.id_number ?? '',
-            title: 'עדכון יום תשלום',
+            title: 'עדכון יום תשלום הלוואה',
             lines,
           });
           break;

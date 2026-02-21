@@ -13,6 +13,15 @@ interface GetActionsOptions {
   to?: string;
 }
 
+interface MappedAction {
+  id: string;
+  date: string;
+  user: string;
+  amount: string;
+  currency?: string;
+  actionNumber: string;
+}
+
 @Injectable()
 export class NedarimPlusService {
   private readonly creditApiUrl =
@@ -37,14 +46,32 @@ export class NedarimPlusService {
     const items = isStandingOrder
       ? await this.fetchStandingOrderItems(mosadId, apiPassword, options)
       : await this.fetchCreditItems(mosadId, apiPassword, options);
+    const data = items.map((item, index) =>
+      isStandingOrder
+        ? this.mapStandingOrderRow(item, index)
+        : this.mapCreditRow(item, index),
+    );
+    const maxItems = Number(options.maxId ?? '2000');
+    const nextLastId =
+      !isStandingOrder && data.length > 0
+        ? this.resolveLastIdCursor(data[data.length - 1], items[items.length - 1])
+        : '';
+    const hasMore =
+      !isStandingOrder &&
+      Number.isFinite(maxItems) &&
+      maxItems > 0 &&
+      data.length >= maxItems &&
+      nextLastId !== '';
+
     return {
       source,
-      total: items.length,
-      data: items.map((item, index) =>
-        isStandingOrder
-          ? this.mapStandingOrderRow(item, index)
-          : this.mapCreditRow(item, index),
-      ),
+      total: data.length,
+      data,
+      paging: {
+        hasMore,
+        currentLastId: options.lastId ?? '',
+        nextLastId,
+      },
     };
   }
 
@@ -227,6 +254,20 @@ export class NedarimPlusService {
       currency,
       actionNumber,
     };
+  }
+
+  private resolveLastIdCursor(lastRow: MappedAction, lastRawItem?: RawItem) {
+    const rawCursor = lastRawItem
+      ? this.readStr(lastRawItem, [
+          'LastId',
+          'LastNum',
+          'Id',
+          'TransactionId',
+          'ActionNumber',
+          'OperationId',
+        ])
+      : '';
+    return rawCursor || lastRow.actionNumber || '';
   }
 
   private mapStandingOrderRow(item: RawItem, index: number) {
