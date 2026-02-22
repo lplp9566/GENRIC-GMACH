@@ -30,4 +30,7 @@ export class MonthlyDepositsEntity {
   month: number;
   @Column({ type: 'int' })
   year: number;
+
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  updated_at: Date | null;
 }

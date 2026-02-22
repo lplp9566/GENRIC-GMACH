@@ -1,4 +1,4 @@
-import {
+﻿import {
   Column,
   Entity,
   ManyToOne,
@@ -16,21 +16,24 @@ export class DepositsEntity {
   @ManyToOne(() => UserEntity, (user) => user.donations)
   user: UserEntity;
 
-  @Column({type: 'date'})
+  @Column({ type: 'date' })
   start_date: Date;
 
-  @Column({type: 'date'})
+  @Column({ type: 'date' })
   end_date: Date;
 
   @Column({ type: 'float' })
   initialDeposit: number;
-  
+
   @Column({ type: 'float' })
   current_balance: number;
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @OneToMany(() => DepositsActionsEntity, action => action.deposit, { cascade: true })
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  updated_at: Date | null;
+
+  @OneToMany(() => DepositsActionsEntity, (action) => action.deposit, { cascade: true })
   actions: DepositsActionsEntity[];
 }

@@ -1,12 +1,12 @@
-import {
+﻿import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  OneToMany,
 } from 'typeorm';
 import { LoanPaymentActionType } from '../../loan-dto/loanTypes';
 import { LoanEntity } from '../../Entity/loans.entity';
+
 @Entity('loan_actions')
 export class LoanActionEntity {
   @PrimaryGeneratedColumn()
@@ -20,9 +20,13 @@ export class LoanActionEntity {
     enum: LoanPaymentActionType,
   })
   action_type: LoanPaymentActionType;
+
   @Column({ type: 'date', nullable: false })
   date: Date;
 
   @Column({ type: 'float' })
   value: number;
+
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  updated_at: Date | null;
 }
