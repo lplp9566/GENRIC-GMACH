@@ -41,11 +41,13 @@ export class ReceiptsDailyCronService {
   }
 
   private async sendLoanActionReceipts(targetDate: string) {
-    const actions = await this.loanActionsRepo.find({
-      where: { date: targetDate as any },
-      relations: ['loan', 'loan.user'],
-      order: { id: 'ASC' },
-    });
+    const actions = await this.loanActionsRepo
+      .createQueryBuilder('action')
+      .leftJoinAndSelect('action.loan', 'loan')
+      .leftJoinAndSelect('loan.user', 'user')
+      .where('DATE(action.updated_at) = :targetDate', { targetDate })
+      .orderBy('action.id', 'ASC')
+      .getMany();
 
     for (const action of actions) {
       const loan = action.loan;
@@ -167,7 +169,7 @@ export class ReceiptsDailyCronService {
 
   private async sendDepositActionReceipts(targetDate: string) {
     const actions = await this.depositsActionsRepo.find({
-      where: { date: targetDate as any },
+      where: { update_date: targetDate as any },
       relations: ['deposit', 'deposit.user'],
       order: { id: 'ASC' },
     });
@@ -264,11 +266,13 @@ export class ReceiptsDailyCronService {
   }
 
   private async sendMonthlyDepositReceipts(targetDate: string) {
-    const deposits = await this.monthlyDepositsRepo.find({
-      where: { deposit_date: targetDate as any },
-      relations: ['user', 'user.payment_details'],
-      order: { id: 'ASC' },
-    });
+    const deposits = await this.monthlyDepositsRepo
+      .createQueryBuilder('deposit')
+      .leftJoinAndSelect('deposit.user', 'user')
+      .leftJoinAndSelect('user.payment_details', 'payment_details')
+      .where('DATE(deposit.updated_at) = :targetDate', { targetDate })
+      .orderBy('deposit.id', 'ASC')
+      .getMany();
 
     for (const deposit of deposits) {
       const user = deposit.user;
@@ -301,11 +305,13 @@ export class ReceiptsDailyCronService {
   }
 
   private async sendOrderReturnReceipts(targetDate: string) {
-    const created = await this.orderReturnRepo.find({
-      where: { date: targetDate as any },
-      relations: ['user'],
-      order: { id: 'ASC' },
-    });
+    const created = await this.orderReturnRepo
+      .createQueryBuilder('record')
+      .leftJoinAndSelect('record.user', 'user')
+      .where('DATE(record.updated_at) = :targetDate', { targetDate })
+      .andWhere('record.paid = :paid', { paid: false })
+      .orderBy('record.id', 'ASC')
+      .getMany();
 
     for (const record of created) {
       const user = record.user;
@@ -324,11 +330,13 @@ export class ReceiptsDailyCronService {
       });
     }
 
-    const paid = await this.orderReturnRepo.find({
-      where: { paid: true, paid_at: targetDate as any },
-      relations: ['user'],
-      order: { id: 'ASC' },
-    });
+    const paid = await this.orderReturnRepo
+      .createQueryBuilder('record')
+      .leftJoinAndSelect('record.user', 'user')
+      .where('record.paid = :paid', { paid: true })
+      .andWhere('DATE(record.updated_at) = :targetDate', { targetDate })
+      .orderBy('record.id', 'ASC')
+      .getMany();
 
     for (const record of paid) {
       const user = record.user;
@@ -349,10 +357,16 @@ export class ReceiptsDailyCronService {
   }
 
   private async sendDonationReceipts(targetDate: string) {
-    const donations = await this.donationsRepo.find({
-      where: { date: targetDate as any, action: DonationActionType.donation },
-      order: { id: 'ASC' },
-    });
+    const donations = await this.donationsRepo
+      .createQueryBuilder('donation')
+      .leftJoinAndSelect('donation.user', 'user')
+      .leftJoinAndSelect('donation.fund', 'fund')
+      .where('donation.action = :action', {
+        action: DonationActionType.donation,
+      })
+      .andWhere('DATE(donation.updated_at) = :targetDate', { targetDate })
+      .orderBy('donation.id', 'ASC')
+      .getMany();
 
     for (const donation of donations) {
       const user = donation.user;
