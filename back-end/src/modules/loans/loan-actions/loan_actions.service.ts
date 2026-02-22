@@ -93,6 +93,7 @@ export class LoanActionsService {
         date: dto.date,
         value: dto.value,
         action_type: LoanPaymentActionType.PAYMENT,
+        updated_at: new Date(),
       });
 
       await this.loansRepo.save(loan);
@@ -104,6 +105,7 @@ export class LoanActionsService {
       if (loan.remaining_balance < 0) loan.remaining_balance = 0;
 
       loan.total_installments = loan.remaining_balance / loan.monthly_payment;
+      loan.updated_at = new Date();
       if (loan.remaining_balance === 0) {
         loan.isActive = false;
         await this.paymentDetailsService.deleteLoanBalance(
@@ -224,11 +226,13 @@ async editPayment(
     // עדכון פעולה
     if (payload.date) action.date = payload.date;
     action.value = newValue;
+    action.updated_at = new Date();
 
     await this.paymentsRepo.save(action);
 
     // עדכון הלוואה
     loan.remaining_balance = newRemaining;
+    loan.updated_at = new Date();
 
     // סגירה/פתיחה בהתאם ליתרה
     if (loan.remaining_balance === 0) {

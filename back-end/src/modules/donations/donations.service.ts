@@ -82,6 +82,7 @@ export class DonationsService {
     donation.action = dto.action;
     donation.donation_reason = dto.donation_reason;
     donation.note = dto.note?.trim() || undefined;
+    donation.updated_at = new Date();
 
     // אם נשלח userId – נטען משתמש
     if (dto.user != null) {
@@ -242,6 +243,7 @@ export class DonationsService {
       // 1) מעדכנים את רשומת התרומה עצמה
       existing.amount = newAmount;
       existing.date = newDate;
+      existing.updated_at = new Date();
 
       await manager.save(existing);
 

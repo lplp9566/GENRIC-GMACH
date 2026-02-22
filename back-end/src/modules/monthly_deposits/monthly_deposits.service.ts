@@ -85,7 +85,8 @@ export class MonthlyDepositsService {
         amount: payment_details.amount,
         deposit_date: payment_details.deposit_date,
         year: year,
-        month: month
+        month: month,
+        updated_at: new Date(),
       });
       await this.monthlyDepositsRepository.save(newDeposit);
       const monthlyBalance = await this.usersService.updateUserMonthlyBalance(user);
@@ -147,6 +148,7 @@ export class MonthlyDepositsService {
       existing.month = getMonthFromDate(newDate);
       existing.description = payment_details.description;
       existing.payment_method = payment_details.payment_method;
+      existing.updated_at = new Date();
       // שומרים בתוך הטרנזקציה
       await manager.save(existing);
 

@@ -27,6 +27,7 @@ export type DonationRow = {
   userName: string;
   amount: number;
   date: string;
+  updatedAt?: string;
   action: string;
   donation_reason: string;
   note?: string;
@@ -124,6 +125,7 @@ const DonationsTable: FC<DonationsTableProps> = ({
                 תאריך
               </TableSortLabel>
             </TableCell>
+            <TableCell align="right">תאריך עדכון</TableCell>
             <TableCell align="right">פעולה</TableCell>
             <TableCell align="right">קרן/תרומה רגילה</TableCell>
             <TableCell align="right">הערות</TableCell>
@@ -133,7 +135,7 @@ const DonationsTable: FC<DonationsTableProps> = ({
         <TableBody>
           {rows.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} align="center">
+              <TableCell colSpan={isAdmin ? 8 : 7} align="center">
                 אין תרומות להצגה
               </TableCell>
             </TableRow>
@@ -161,6 +163,7 @@ const DonationsTable: FC<DonationsTableProps> = ({
                   })}
                 </TableCell>
                 <TableCell align="right">{donationRow.date}</TableCell>
+                <TableCell align="right">{donationRow.updatedAt || "-"}</TableCell>
                 <TableCell align="right">
                   {donationRow.action == "donation" ? "תרומה" : "משיכה"}
                 </TableCell>

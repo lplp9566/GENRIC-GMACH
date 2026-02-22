@@ -49,6 +49,7 @@ export interface InvestmentDto {
   management_fees_total: string;
   start_date: Date;
   last_update: Date;
+  updated_at?: Date | null;
   is_active: boolean;
 }
 export interface TransactionDto {

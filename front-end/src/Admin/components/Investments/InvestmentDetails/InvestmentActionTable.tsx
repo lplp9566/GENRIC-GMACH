@@ -111,6 +111,7 @@ const InvestmentActionTable: React.FC<InvestmentActionTableProps> = ({
               <TableCell align="right" onClick={() => handleHeaderClick("date")}>
                 תאריך{renderSortIndicator("date")}
               </TableCell>
+              <TableCell align="right">תאריך עדכון</TableCell>
               <TableCell align="center" onClick={() => handleHeaderClick("action_type")}>
                 סוג פעולה{renderSortIndicator("action_type")}
               </TableCell>
@@ -132,6 +133,11 @@ const InvestmentActionTable: React.FC<InvestmentActionTableProps> = ({
                 )}
                 <TableCell align="right">
                   {new Date(action.transaction_date).toLocaleDateString("he-IL")}
+                </TableCell>
+                <TableCell align="right">
+                  {action.investment?.updated_at
+                    ? new Date(action.investment.updated_at).toLocaleDateString("he-IL")
+                    : "-"}
                 </TableCell>
                 <TableCell align="center">
                   <Chip

@@ -75,6 +75,7 @@ export class DepositsService {
       this.depositsRepo.create(deposit);
       deposit.current_balance = deposit.initialDeposit;
       deposit.isActive = true;
+      deposit.updated_at = new Date();
       const year = getYearFromDate(deposit.start_date);
       const user = await this.usersService.getUserById(Number(deposit.user));
       if(!user) throw new Error('User not found');
@@ -111,6 +112,7 @@ export class DepositsService {
         throw new Error('Deposit not found');
       }
       deposit.end_date = end_date;
+      deposit.updated_at = new Date();
       await this.depositsRepo.save(deposit);
       return deposit;
     } catch (error) {
@@ -127,6 +129,7 @@ export class DepositsService {
       if(deposit.current_balance == 0){
         deposit.isActive = false;
       }
+      deposit.updated_at = new Date();
       const year = getYearFromDate(date);
       const user = deposit.user;
       // await this.fundsOverviewService.decreaseUserDepositsTotal(amount);
@@ -158,6 +161,7 @@ export class DepositsService {
   async addToDeposit(deposit: DepositsEntity, amount: number, date: Date) {
     try {
       deposit.current_balance += amount;
+      deposit.updated_at = new Date();
       // await this.fundsOverviewService.increaseUserDepositsTotal(amount);
       const year = getYearFromDate(date);
       const user = deposit.user;

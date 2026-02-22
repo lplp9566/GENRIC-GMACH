@@ -48,6 +48,9 @@ export class InvestmentEntity {
   @Column({ type: 'timestamp' })
   last_update: Date; // מתי העדכון האחרון היה
 
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  updated_at: Date | null;
+
   @Column({ type: 'boolean', default: true })
   is_active: boolean;
   @OneToMany(

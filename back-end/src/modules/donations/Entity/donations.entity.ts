@@ -29,4 +29,7 @@ export class DonationsEntity {
 
   @Column({ type: 'text', nullable: true })
   note?: string;
+
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  updated_at: Date | null;
 }

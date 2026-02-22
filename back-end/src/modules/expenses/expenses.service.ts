@@ -24,6 +24,7 @@ export class ExpensesService {
     const expense = this.expensesRepository.create({
       ...rest,
       category: category_id ? ({ id: category_id } as any) : null,
+      updated_at: new Date(),
     });
 
     return this.expensesRepository.save(expense);
@@ -56,6 +57,7 @@ export class ExpensesService {
       throw new NotFoundException(`Expense with id ${id} not found`);
 
     Object.assign(expense, data);
+    expense.updated_at = new Date();
     const saved = await this.expensesRepository.save(expense);
     return saved;
   }

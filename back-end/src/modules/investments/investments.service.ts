@@ -39,6 +39,7 @@ export class InvestmentsService {
         investment_portfolio_number,
         start_date,
         last_update: start_date,
+        updated_at: new Date(),
         is_active: true,
       });
       await this.investmentRepo.save(investment);
@@ -67,6 +68,7 @@ export class InvestmentsService {
       investment.principal_remaining = +investment.principal_remaining + amount;
       investment.current_value = +investment.current_value + amount;
       investment.last_update = date;
+      investment.updated_at = new Date();
       await this.investmentRepo.save(investment);
       await this.transactionService.createTransaction({
         investmentId: investment.id,
@@ -95,6 +97,7 @@ export class InvestmentsService {
       investment.current_value = new_value;
       investment.profit_realized = profit_realized;
       investment.last_update = date;
+      investment.updated_at = new Date();
 
       await this.investmentRepo.save(investment);
       await this.transactionService.createTransaction({
@@ -141,6 +144,7 @@ export class InvestmentsService {
 
       investment.profit_realized = investment.current_value - principalRemaining;
       investment.last_update = date;
+      investment.updated_at = new Date();
 
       await this.investmentRepo.save(investment);
 
@@ -198,6 +202,7 @@ export class InvestmentsService {
     investment.profit_realized = profitRealized;
     investment.principal_remaining = principalRemaining;
     investment.last_update = date;
+    investment.updated_at = new Date();
 
     await this.investmentRepo.save(investment);
 
@@ -277,6 +282,7 @@ export class InvestmentsService {
     }
 
     investment.last_update = new Date();
+    investment.updated_at = new Date();
     return this.investmentRepo.save(investment);
   }
 

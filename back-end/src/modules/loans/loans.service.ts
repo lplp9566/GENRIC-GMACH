@@ -135,6 +135,7 @@ qb.setParameter("todayDay", new Date().getDate());
       loanRecord.initial_monthly_payment = loanData.monthly_payment!;
       loanRecord.initial_loan_amount = loanData.loan_amount!;
       loanRecord.total_remaining_payments = 0;
+      loanRecord.updated_at = new Date();
       if (loanData.guarantor1) {
         loanRecord.guarantor1 = loanData.guarantor1;
       }
@@ -147,6 +148,7 @@ qb.setParameter("todayDay", new Date().getDate());
        date: loanRecord.loan_date ?? new Date(),
        value: loanRecord.loan_amount,
        action_type: LoanPaymentActionType.LOAN_CREATED,
+       updated_at: new Date(),
      });
      await this.LoanActionBalanceService.computeLoanNetBalance(result.id);
 
@@ -211,6 +213,7 @@ qb.setParameter("todayDay", new Date().getDate());
       const diff = dto.value;
       loan.loan_amount += dto.value;
       loan.remaining_balance += dto.value;
+      loan.updated_at = new Date();
       (loan.total_installments = loan.remaining_balance / loan.monthly_payment),
         await this.loansRepository.save(loan);
       const result = await this.paymentsRepository.save({
@@ -218,6 +221,7 @@ qb.setParameter("todayDay", new Date().getDate());
         date: dto.date,
         value: diff,
         action_type: LoanPaymentActionType.AMOUNT_CHANGE,
+        updated_at: new Date(),
         note: dto.note || `שינוי סכום הלוואה ל-${dto.value}`,
       })
       await this.LoanActionBalanceService.computeLoanNetBalance(dto.loanId);
@@ -251,6 +255,7 @@ qb.setParameter("todayDay", new Date().getDate());
     }
     try {
       loan.monthly_payment = dto.value;
+      loan.updated_at = new Date();
       (loan.total_installments = loan.remaining_balance / loan.monthly_payment),
         await this.loansRepository.save(loan);
       const result  =  await this.paymentsRepository.save({
@@ -258,6 +263,7 @@ qb.setParameter("todayDay", new Date().getDate());
         date: dto.date,
         value: dto.value,
         action_type: LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE,
+        updated_at: new Date(),
         // note: dto.note || `שינוי תשלום חודשי ל-${dto.value}`,
 
       });
@@ -290,12 +296,14 @@ qb.setParameter("todayDay", new Date().getDate());
         throw new Error('Invalid payment date');
       }
       loan.payment_date = dto.value;
+      loan.updated_at = new Date();
       await this.loansRepository.save(loan);
       const result = await this.paymentsRepository.save({
         loan,
         date: dto.date,
         value: dto.value,
         action_type: LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE,
+        updated_at: new Date(),
         // note: dto.note || `שינוי תאריך תשלום ל-${dto.value}`,
       })
       await this.LoanActionBalanceService.computeLoanNetBalance(dto.loanId)
@@ -317,6 +325,7 @@ qb.setParameter("todayDay", new Date().getDate());
       });
       if (!loan) throw new BadRequestException('Loan not found');
       loan.balance = balance;
+      loan.updated_at = new Date();
       await this.loansRepository.save(loan);
     } catch (error) {
       throw new Error(error.message);
@@ -395,6 +404,7 @@ qb.setParameter("todayDay", new Date().getDate());
   loan.purpose = dto.purpose !== undefined ? dto.purpose : loan.purpose;
   loan.guarantor1 = dto.guarantor1 !== undefined ? dto.guarantor1 : loan.guarantor1;
   loan.guarantor2 = dto.guarantor2 !== undefined ? dto.guarantor2 : loan.guarantor2;
+  loan.updated_at = new Date();
   loan.total_installments =
     Number(loan.monthly_payment) > 0
       ? Number(loan.remaining_balance) / Number(loan.monthly_payment)
@@ -404,12 +414,13 @@ qb.setParameter("todayDay", new Date().getDate());
    if (result) await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
    if (pendingActions.length) {
      for (const action of pendingActions) {
-       await this.paymentsRepository.save({
-         loan,
-         date: new Date(),
-         value: action.value,
-         action_type: action.action_type,
-       });
+        await this.paymentsRepository.save({
+          loan,
+          date: new Date(),
+          value: action.value,
+          action_type: action.action_type,
+          updated_at: new Date(),
+        });
      }
    }
 

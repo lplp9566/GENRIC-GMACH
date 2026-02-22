@@ -228,6 +228,9 @@ const DonationsHomePage: FC = () => {
         userId: Number(d?.user?.id ?? d?.userId ?? d?.user_id ?? 0),
         amount: Number(d?.amount) || 0,
         date: formatDate(dt),
+        updatedAt: formatDate(
+          parseDate(d?.updated_at ?? d?.updatedAt ?? null)
+        ),
         action: d?.action ?? "—",
         donation_reason: d?.donation_reason ?? "—",
         note: d?.note ?? "",

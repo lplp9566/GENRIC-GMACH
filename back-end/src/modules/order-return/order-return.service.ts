@@ -47,6 +47,7 @@ export class OrderReturnService {
     note: orderReturn.note?? orderReturn.note ?? '',
     paid: false,
     paid_at: null,
+    updated_at: new Date(),
   });
 
 
@@ -68,6 +69,7 @@ export class OrderReturnService {
     if (!orderReturn) throw new BadRequestException('Order return not found');    ;
     orderReturn.paid = true;
     orderReturn.paid_at = paid_at;
+    orderReturn.updated_at = new Date();
     const saved = await this.orderReturnRepository.save(orderReturn);
     await this.maybeSendReceiptEmail(
       saved.user,
@@ -87,6 +89,7 @@ export class OrderReturnService {
     const orderReturn = await this.orderReturnRepository.findOne({ where: { id } });
     if (!orderReturn) throw new BadRequestException('Order return not found');
     Object.assign(orderReturn, updateData);
+    orderReturn.updated_at = new Date();
     return await this.orderReturnRepository.save(orderReturn);
   }
 
