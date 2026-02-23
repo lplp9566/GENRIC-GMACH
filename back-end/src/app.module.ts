@@ -35,6 +35,7 @@ import { ExpensesModule } from './modules/expenses/expenses.module';
 import { ExpensesCategoryModule } from './modules/expenses-category/expenses-category.module';
 import { BankCurrentModule } from './modules/bank-current/bank-current.module';
 import { NedarimPlusModule } from './modules/nedarim-plus/nedarim-plus.module';
+import { AnnouncementsModule } from './modules/announcements/announcements.module';
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { NedarimPlusModule } from './modules/nedarim-plus/nedarim-plus.module';
     ExpensesCategoryModule,
     BankCurrentModule,
     NedarimPlusModule,
+    AnnouncementsModule,
   ],
   providers: [UserRoleHistoryService],
   controllers: [UserRoleHistoryController],
