@@ -9,25 +9,22 @@
   ListItem,
   ListItemButton,
   ListItemText,
-  Popover,
-  Stack,
   Toolbar,
   Tooltip,
-  Typography,
   useMediaQuery,
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MenuIcon from "@mui/icons-material/Menu";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutServer } from "../../../../store/features/auth/authSlice";
 import type { AppDispatch, RootState } from "../../../../store/store";
 import { LogoTitle } from "../AdminNavBar/LogoTitle";
 import { useAppTheme } from "../../../../Theme/ThemeProvider";
-import { fetchGuarantorRequests } from "../../../../store/features/loanRequests/loanRequestsSlice";
+import { api } from "../../../../store/axiosInstance";
 
 const NAV_BG = "#0D2233";
 const NAV_TXT = "#FFFFFF";
@@ -42,19 +39,15 @@ const links = [
   { label: "דמי חבר", path: "/u/payments" },
   { label: "החזרי הוראת קבע", path: "/u/standing-orders" },
   { label: "סטטיסטיקה", path: "/u/statistics" },
+  { label: "הודעות", path: "/u/announcements" },
 ];
 
 const UserNavbar = () => {
   const dispatch = useDispatch<AppDispatch>();
   const authUser = useSelector((s: RootState) => s.authslice.user);
-  const userId = authUser?.user?.id;
-  const guarantorRequests = useSelector(
-    (s: RootState) => s.LoanRequestsSlice.guarantorRequests
-  );
-  const pendingGuarantor = guarantorRequests.filter(
-    (r) => r.status === "PENDING"
-  ).length;
-  const [notifAnchor, setNotifAnchor] = useState<null | HTMLElement>(null);
+  const userId = authUser?.user?.id ?? null;
+  const navigate = useNavigate();
+  const [unreadAnnouncements, setUnreadAnnouncements] = useState(0);
   const isMobile = useMediaQuery(`(max-width:${BP_MOBILE}px)`);
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
@@ -68,14 +61,18 @@ const UserNavbar = () => {
 
   useEffect(() => {
     if (!userId) return;
-    dispatch(fetchGuarantorRequests(userId));
-  }, [dispatch, userId]);
-
-  const openNotif = Boolean(notifAnchor);
-  const handleNotifOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setNotifAnchor(event.currentTarget);
-  };
-  const handleNotifClose = () => setNotifAnchor(null);
+    const loadUnread = async () => {
+      try {
+        const { data } = await api.get<{ unreadCount: number }>(
+          "/announcements/my"
+        );
+        setUnreadAnnouncements(Number(data?.unreadCount ?? 0));
+      } catch {
+        setUnreadAnnouncements(0);
+      }
+    };
+    loadUnread();
+  }, [userId]);
 
   return (
     <>
@@ -113,9 +110,12 @@ const UserNavbar = () => {
                 {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
               </IconButton>
             </Tooltip>
-            <Tooltip title="התראות">
-              <IconButton sx={{ color: NAV_TXT }} onClick={handleNotifOpen}>
-                <Badge badgeContent={pendingGuarantor} color="error">
+            <Tooltip title="הודעות מערכת">
+              <IconButton
+                sx={{ color: NAV_TXT }}
+                onClick={() => navigate("/u/announcements")}
+              >
+                <Badge badgeContent={unreadAnnouncements} color="error">
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
@@ -144,51 +144,6 @@ const UserNavbar = () => {
           </Box>
         </Toolbar>
       </AppBar>
-
-      <Popover
-        open={openNotif}
-        anchorEl={notifAnchor}
-        onClose={handleNotifClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        transformOrigin={{ vertical: "top", horizontal: "left" }}
-        PaperProps={{
-          sx: {
-            p: 2,
-            minWidth: 220,
-            borderRadius: 2,
-            bgcolor: NAV_BG,
-            color: NAV_TXT,
-          },
-        }}
-      >
-        {pendingGuarantor > 0 ? (
-          <>
-            <Typography fontWeight={600} sx={{ mb: 1 }}>
-              יש בקשת אישור ערבות ({pendingGuarantor})
-            </Typography>
-            <Stack spacing={0.5}>
-              {guarantorRequests
-                .filter((r) => r.status === "PENDING")
-                .slice(0, 5)
-                .map((r) => (
-                  <Typography
-                    key={r.id}
-                    sx={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.85)" }}
-                  >
-                    {r.request?.user?.first_name} {r.request?.user?.last_name}
-                  </Typography>
-                ))}
-              {pendingGuarantor > 5 && (
-                <Typography sx={{ fontSize: "0.8rem", opacity: 0.7 }}>
-                  ועוד {pendingGuarantor - 5}
-                </Typography>
-              )}
-            </Stack>
-          </>
-        ) : (
-          <Typography color="rgba(255,255,255,0.7)">אין התראות</Typography>
-        )}
-      </Popover>
 
       <Drawer
         anchor="right"

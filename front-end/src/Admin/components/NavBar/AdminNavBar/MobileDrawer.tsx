@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import {
   Box,
   Drawer,
@@ -25,6 +25,7 @@ const navItems = [
   { label: "נתונים כלליים", path: "/funds" },
   { label: "סטטיסטיקה", path: "/FundsOverviewByYear" },
   { label: "החזרי הו\"ק", path: "/standing-orders" },
+  { label: "הודעות מערכת", path: "/announcements" },
 ];
 
 const MobileDrawer: React.FC<{ open: boolean; onClose: () => void }> = ({

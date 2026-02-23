@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import {
   Badge,
   Box,
@@ -131,6 +131,14 @@ export const DesktopLinks: React.FC = () => {
 
         <MenuItem
           component={Link}
+          to="/announcements"
+          onClick={() => setExpensesAnchorEl(null)}
+        >
+          הודעות מערכת
+        </MenuItem>
+
+        <MenuItem
+          component={Link}
           to="/cash-expenses"
           onClick={() => setExpensesAnchorEl(null)}
         >
@@ -207,3 +215,5 @@ export const DesktopLinks: React.FC = () => {
     </Box>
   );
 };
+
+export default DesktopLinks;

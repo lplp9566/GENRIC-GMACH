@@ -23,6 +23,7 @@ import DepositDetailsPage from "./Admin/components/Deposits/DepositsDetails/Depo
 import Investments from "./Admin/pages/InvestmentsPage";
 import InvestmentDetailsPage from "./Admin/components/Investments/InvestmentDetails/InvestmentDetailsPage";
 import StandingOrdersReturnPage from "./Admin/pages/StandingOrdersReturnPage";
+import AnnouncementsPage from "./Admin/pages/AnnouncementsPage";
 import UserHomePage from "./User/pages/UserHomePage";
 import UserLoansPage from "./User/pages/UserLoansPage";
 import UserLoanRequestsPage from "./User/pages/UserLoanRequestsPage";
@@ -80,6 +81,7 @@ export default function App() {
                 path="/standing-orders"
                 element={<StandingOrdersReturnPage />}
               />
+              <Route path="/announcements" element={<AnnouncementsPage />} />
             </Route>
           </Route>
 
@@ -102,6 +104,7 @@ export default function App() {
                 path="/u/statistics"
                 element={<FundsOverviewByYearPage />}
               />
+              <Route path="/u/announcements" element={<AnnouncementsPage />} />
             </Route>
           </Route>
         </Route>
