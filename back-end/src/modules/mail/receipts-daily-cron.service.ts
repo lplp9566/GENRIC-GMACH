@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -57,40 +57,35 @@ export class ReceiptsDailyCronService {
       switch (action.action_type) {
         case LoanPaymentActionType.LOAN_CREATED: {
           const lines = [
-            `הלוואה מספר ${loan.id} נוצרה בהצלחה.`,
-            `מספר תשלומים: ${Math.ceil(loan.total_installments)}.`,
-            `סכום ההלוואה: ${this.mailService.formatCurrency(loan.loan_amount)}.`,
-            `סכום ההחזר החודשי: ${this.mailService.formatCurrency(
+            `׳”׳׳•׳•׳׳” ׳׳¡׳₪׳¨ ${loan.id} ׳ ׳•׳¦׳¨׳” ׳‘׳”׳¦׳׳—׳”.`,
+            `׳׳¡׳₪׳¨ ׳×׳©׳׳•׳׳™׳: ${Math.ceil(loan.total_installments)}.`,
+            `׳¡׳›׳•׳ ׳”׳”׳׳•׳•׳׳”: ${this.mailService.formatCurrency(loan.loan_amount)}.`,
+            `׳¡׳›׳•׳ ׳”׳”׳—׳–׳¨ ׳”׳—׳•׳“׳©׳™: ${this.mailService.formatCurrency(
               loan.monthly_payment,
             )}.`,
-            `יום התשלום: ${loan.payment_date ?? '-'} בחודש.`,
+            `׳™׳•׳ ׳”׳×׳©׳׳•׳: ${loan.payment_date ?? '-'} ׳‘׳—׳•׳“׳©.`,
           ];
           if (loan.first_payment_date) {
             lines.push(
-              `תשלום ראשון בתאריך ${this.formatDate(loan.first_payment_date)}.`,
+              `׳×׳©׳׳•׳ ׳¨׳׳©׳•׳ ׳‘׳×׳׳¨׳™׳ ${this.formatDate(loan.first_payment_date)}.`,
             );
           }
-          lines.push('בוא נצעד יחד לעבר היעד.');
+          lines.push('׳‘׳•׳ ׳ ׳¦׳¢׳“ ׳™׳—׳“ ׳׳¢׳‘׳¨ ׳”׳™׳¢׳“.');
           await this.mailService.sendReceiptNotificationNow({
             to: user.email_address,
             fullName: this.userFullName(user),
             idNumber: user.id_number ?? '',
-            title: 'אישור הקמת הלוואה',
+            title: '׳׳™׳©׳•׳¨ ׳”׳§׳׳× ׳”׳׳•׳•׳׳”',
             lines,
           });
           break;
         }
         case LoanPaymentActionType.PAYMENT: {
-          const remainingPayments = Math.max(
-            0,
-            Math.ceil(loan.total_installments) -
-              Number(loan.total_remaining_payments || 0),
-          );
+          const remainingPayments = loan.total_remaining_payments
           const lines = [
-            `הלוואה מספר ${loan.id}.`,
-            `התקבל תשלום הלוואה בסך ${this.mailService.formatCurrency(
+            `התקבל תשלום בסך ${this.mailService.formatCurrency(
               action.value,
-            )}.`,
+            )} עבור הלוואה מספר ${loan.id}.`,
             `יתרה להחזר: ${this.mailService.formatCurrency(
               loan.remaining_balance,
             )}.`,
@@ -100,7 +95,7 @@ export class ReceiptsDailyCronService {
             to: user.email_address,
             fullName: this.userFullName(user),
             idNumber: user.id_number ?? '',
-            title: 'תשלום הלוואה',
+            title: '׳×׳©׳׳•׳ ׳”׳׳•׳•׳׳”',
             lines,
           });
 
@@ -109,18 +104,18 @@ export class ReceiptsDailyCronService {
               to: user.email_address,
               fullName: this.userFullName(user),
               idNumber: user.id_number ?? '',
-              title: 'סיום הלוואה',
-              lines: ['ההלוואה  מס ' + loan.id + 'נסגרה במלואה. תודה'],
+              title: '׳¡׳™׳•׳ ׳”׳׳•׳•׳׳”',
+              lines: ['׳”׳”׳׳•׳•׳׳”  ׳׳¡ ' + loan.id + '׳ ׳¡׳’׳¨׳” ׳‘׳׳׳•׳׳”. ׳×׳•׳“׳”'],
             });
           }
           break;
         }
         case LoanPaymentActionType.AMOUNT_CHANGE: {
           const lines = [
-            `סכום ההלוואה  מס ${loan.id}עודכן ב-${this.mailService.formatCurrency(
+            `׳¡׳›׳•׳ ׳”׳”׳׳•׳•׳׳”  ׳׳¡ ${loan.id}׳¢׳•׳“׳›׳ ׳‘-${this.mailService.formatCurrency(
               action.value,
             )}.`,
-            `יתרה חדשה להחזר: ${this.mailService.formatCurrency(
+            `׳™׳×׳¨׳” ׳—׳“׳©׳” ׳׳”׳—׳–׳¨: ${this.mailService.formatCurrency(
               loan.remaining_balance,
             )}.`,
           ];
@@ -128,14 +123,14 @@ export class ReceiptsDailyCronService {
             to: user.email_address,
             fullName: this.userFullName(user),
             idNumber: user.id_number ?? '',
-            title: 'עדכון סכום הלוואה',
+            title: '׳¢׳“׳›׳•׳ ׳¡׳›׳•׳ ׳”׳׳•׳•׳׳”',
             lines,
           });
           break;
         }
         case LoanPaymentActionType.MONTHLY_PAYMENT_CHANGE: {
           const lines = [
-            `התשלום החודשי  להלוואה מס ${loan.id}עודכן לסך ${this.mailService.formatCurrency(
+            `׳”׳×׳©׳׳•׳ ׳”׳—׳•׳“׳©׳™  ׳׳”׳׳•׳•׳׳” ׳׳¡ ${loan.id}׳¢׳•׳“׳›׳ ׳׳¡׳ ${this.mailService.formatCurrency(
               action.value,
             )}.`,
           ];
@@ -143,20 +138,20 @@ export class ReceiptsDailyCronService {
             to: user.email_address,
             fullName: this.userFullName(user),
             idNumber: user.id_number ?? '',
-            title: 'עדכון תשלום חודשי',
+            title: '׳¢׳“׳›׳•׳ ׳×׳©׳׳•׳ ׳—׳•׳“׳©׳™',
             lines,
           });
           break;
         }
         case LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE: {
           const lines = [
-            `יום התשלום להלוואה מס ${loan.id}עודכן ל-${action.value} בחודש.`,
+            `׳™׳•׳ ׳”׳×׳©׳׳•׳ ׳׳”׳׳•׳•׳׳” ׳׳¡ ${loan.id}׳¢׳•׳“׳›׳ ׳-${action.value} ׳‘׳—׳•׳“׳©.`,
           ];
           await this.mailService.sendReceiptNotificationNow({
             to: user.email_address,
             fullName: this.userFullName(user),
             idNumber: user.id_number ?? '',
-            title: 'עדכון יום תשלום הלוואה',
+            title: '׳¢׳“׳›׳•׳ ׳™׳•׳ ׳×׳©׳׳•׳ ׳”׳׳•׳•׳׳”',
             lines,
           });
           break;
@@ -168,11 +163,15 @@ export class ReceiptsDailyCronService {
   }
 
   private async sendDepositActionReceipts(targetDate: string) {
-    const actions = await this.depositsActionsRepo.find({
-      where: { update_date: targetDate as any },
-      relations: ['deposit', 'deposit.user'],
-      order: { id: 'ASC' },
-    });
+    const actions = await this.depositsActionsRepo
+      .createQueryBuilder('action')
+      .leftJoinAndSelect('action.deposit', 'deposit')
+      .leftJoinAndSelect('deposit.user', 'user')
+      .where('DATE(COALESCE(action.update_date, action.date)) = :targetDate', {
+        targetDate,
+      })
+      .orderBy('action.id', 'ASC')
+      .getMany();
 
     for (const action of actions) {
       const deposit = action.deposit;
@@ -181,20 +180,20 @@ export class ReceiptsDailyCronService {
 
       if (action.action_type === DepositActionsType.InitialDeposit) {
         const lines = [
-          `נפתחה הפקדה מספר ${deposit.id}.`,
-          `על סך ${this.mailService.formatCurrency(deposit.initialDeposit)}.`,
-          `תאריך החזר: ${
+          `׳ ׳₪׳×׳—׳” ׳”׳₪׳§׳“׳” ׳׳¡׳₪׳¨ ${deposit.id}.`,
+          `׳¢׳ ׳¡׳ ${this.mailService.formatCurrency(deposit.initialDeposit)}.`,
+          `׳×׳׳¨׳™׳ ׳”׳—׳–׳¨: ${
             deposit.end_date ? this.formatDate(deposit.end_date) : '-'
           }.`,
-          'תודה רבה.',
-          'בזכות ההפקדה התזרים של הגמ"ח גדל.',
-          'ואנו נעשה מאמץ להחזיר את ההפקדה בתאריך ההחזר.',
+          '׳×׳•׳“׳” ׳¨׳‘׳”.',
+          '׳‘׳–׳›׳•׳× ׳”׳”׳₪׳§׳“׳” ׳”׳×׳–׳¨׳™׳ ׳©׳ ׳”׳’׳"׳— ׳’׳“׳.',
+          '׳•׳׳ ׳• ׳ ׳¢׳©׳” ׳׳׳׳¥ ׳׳”׳—׳–׳™׳¨ ׳׳× ׳”׳”׳₪׳§׳“׳” ׳‘׳×׳׳¨׳™׳ ׳”׳”׳—׳–׳¨.',
         ];
         await this.mailService.sendReceiptNotificationNow({
           to: user.email_address,
           fullName: this.userFullName(user),
           idNumber: user.id_number ?? '',
-          title: 'אישור הקמת הפקדה',
+          title: '׳׳™׳©׳•׳¨ ׳”׳§׳׳× ׳”׳₪׳§׳“׳”',
           lines,
         });
         continue;
@@ -202,10 +201,10 @@ export class ReceiptsDailyCronService {
 
       if (action.action_type === DepositActionsType.AddToDeposit) {
         const lines = [
-          `בוצעה הוספה להפקדה בסך ${this.mailService.formatCurrency(
+          `׳‘׳•׳¦׳¢׳” ׳”׳•׳¡׳₪׳” ׳׳”׳₪׳§׳“׳” ׳‘׳¡׳ ${this.mailService.formatCurrency(
             action.amount ?? 0,
           )}.`,
-          `יתרת ההפקדה: ${this.mailService.formatCurrency(
+          `׳™׳×׳¨׳× ׳”׳”׳₪׳§׳“׳”: ${this.mailService.formatCurrency(
             deposit.current_balance,
           )}.`,
         ];
@@ -213,7 +212,7 @@ export class ReceiptsDailyCronService {
           to: user.email_address,
           fullName: this.userFullName(user),
           idNumber: user.id_number ?? '',
-          title: 'הוספה להפקדה',
+          title: '׳”׳•׳¡׳₪׳” ׳׳”׳₪׳§׳“׳”',
           lines,
         });
         continue;
@@ -221,10 +220,10 @@ export class ReceiptsDailyCronService {
 
       if (action.action_type === DepositActionsType.RemoveFromDeposit) {
         const lines = [
-          `בוצעה משיכה מהפקדה בסך ${this.mailService.formatCurrency(
+          `׳‘׳•׳¦׳¢׳” ׳׳©׳™׳›׳” ׳׳”׳₪׳§׳“׳” ׳‘׳¡׳ ${this.mailService.formatCurrency(
             action.amount ?? 0,
           )}.`,
-          `יתרת ההפקדה: ${this.mailService.formatCurrency(
+          `׳™׳×׳¨׳× ׳”׳”׳₪׳§׳“׳”: ${this.mailService.formatCurrency(
             deposit.current_balance,
           )}.`,
         ];
@@ -232,7 +231,7 @@ export class ReceiptsDailyCronService {
           to: user.email_address,
           fullName: this.userFullName(user),
           idNumber: user.id_number ?? '',
-          title: 'משיכה מהפקדה',
+          title: '׳׳©׳™׳›׳” ׳׳”׳₪׳§׳“׳”',
           lines,
         });
 
@@ -241,8 +240,8 @@ export class ReceiptsDailyCronService {
             to: user.email_address,
             fullName: this.userFullName(user),
             idNumber: user.id_number ?? '',
-            title: 'סגירת הפקדה',
-            lines: ['ההפקדה נסגרה והיתרה הגיעה לאפס.'],
+            title: '׳¡׳’׳™׳¨׳× ׳”׳₪׳§׳“׳”',
+            lines: ['׳”׳”׳₪׳§׳“׳” ׳ ׳¡׳’׳¨׳” ׳•׳”׳™׳×׳¨׳” ׳”׳’׳™׳¢׳” ׳׳׳₪׳¡.'],
           });
         }
         continue;
@@ -250,7 +249,7 @@ export class ReceiptsDailyCronService {
 
       if (action.action_type === DepositActionsType.ChangeReturnDate) {
         const lines = [
-          `יום ההחזר עודכן לתאריך ${this.formatDate(
+          `׳™׳•׳ ׳”׳”׳—׳–׳¨ ׳¢׳•׳“׳›׳ ׳׳×׳׳¨׳™׳ ${this.formatDate(
             action.update_date ?? action.date,
           )}.`,
         ];
@@ -258,7 +257,7 @@ export class ReceiptsDailyCronService {
           to: user.email_address,
           fullName: this.userFullName(user),
           idNumber: user.id_number ?? '',
-          title: 'עדכון יום החזר הפקדה',
+          title: '׳¢׳“׳›׳•׳ ׳™׳•׳ ׳”׳—׳–׳¨ ׳”׳₪׳§׳“׳”',
           lines,
         });
       }
@@ -279,18 +278,18 @@ export class ReceiptsDailyCronService {
       if (!this.canSendToUser(user)) continue;
 
       const lines = [
-        `התקבל תשלום דמי חבר בסך ${this.mailService.formatCurrency(
+        `׳”׳×׳§׳‘׳ ׳×׳©׳׳•׳ ׳“׳׳™ ׳—׳‘׳¨ ׳‘׳¡׳ ${this.mailService.formatCurrency(
           deposit.amount,
-        )} לחודש ${deposit.month}/${deposit.year}.`,
+        )} ׳׳—׳•׳“׳© ${deposit.month}/${deposit.year}.`,
       ];
 
       const monthlyBalance = user?.payment_details?.monthly_balance;
       if (typeof monthlyBalance === 'number' && monthlyBalance < 0) {
         lines.push(
-          `יתרת חוב: ${this.mailService.formatCurrency(
+          `׳™׳×׳¨׳× ׳—׳•׳‘: ${this.mailService.formatCurrency(
             Math.abs(monthlyBalance),
           )}.`,
-          'יש להסדיר את תשלום החוב בהקדם.',
+          '׳™׳© ׳׳”׳¡׳“׳™׳¨ ׳׳× ׳×׳©׳׳•׳ ׳”׳—׳•׳‘ ׳‘׳”׳§׳“׳.',
         );
       }
 
@@ -298,7 +297,7 @@ export class ReceiptsDailyCronService {
         to: user.email_address,
         fullName: this.userFullName(user),
         idNumber: user.id_number ?? '',
-        title: 'אישור תשלום דמי חבר',
+        title: '׳׳™׳©׳•׳¨ ׳×׳©׳׳•׳ ׳“׳׳™ ׳—׳‘׳¨',
         lines,
       });
     }
@@ -317,7 +316,7 @@ export class ReceiptsDailyCronService {
       const user = record.user;
       if (!this.canSendToUser(user)) continue;
       const lines = [
-        `נוצר החזר הוראת קבע בסך ${this.mailService.formatCurrency(
+        `׳ ׳•׳¦׳¨ ׳”׳—׳–׳¨ ׳”׳•׳¨׳׳× ׳§׳‘׳¢ ׳‘׳¡׳ ${this.mailService.formatCurrency(
           record.amount,
         )}.`,
       ];
@@ -325,7 +324,7 @@ export class ReceiptsDailyCronService {
         to: user.email_address,
         fullName: this.userFullName(user),
         idNumber: user.id_number ?? '',
-        title: 'אישור החזר הוראת קבע',
+        title: '׳׳™׳©׳•׳¨ ׳”׳—׳–׳¨ ׳”׳•׳¨׳׳× ׳§׳‘׳¢',
         lines,
       });
     }
@@ -342,7 +341,7 @@ export class ReceiptsDailyCronService {
       const user = record.user;
       if (!this.canSendToUser(user)) continue;
       const lines = [
-        `שולם החזר הוראת קבע בסך ${this.mailService.formatCurrency(
+        `׳©׳•׳׳ ׳”׳—׳–׳¨ ׳”׳•׳¨׳׳× ׳§׳‘׳¢ ׳‘׳¡׳ ${this.mailService.formatCurrency(
           record.amount,
         )}.`,
       ];
@@ -350,7 +349,7 @@ export class ReceiptsDailyCronService {
         to: user.email_address,
         fullName: this.userFullName(user),
         idNumber: user.id_number ?? '',
-        title: 'תשלום החזר הוראת קבע',
+        title: '׳×׳©׳׳•׳ ׳”׳—׳–׳¨ ׳”׳•׳¨׳׳× ׳§׳‘׳¢',
         lines,
       });
     }
@@ -375,8 +374,8 @@ export class ReceiptsDailyCronService {
       const reason = String(donation.donation_reason ?? '').trim();
       const isEquity = reason.toLowerCase() === 'equity';
       const fundLabel = isEquity
-        ? 'קרן הגמ"ח'
-        : `קרן ${String(donation.fund?.name ?? reason).trim()}`;
+        ? '׳§׳¨׳ ׳”׳’׳"׳—'
+        : `׳§׳¨׳ ${String(donation.fund?.name ?? reason).trim()}`;
 
       await this.mailService.sendDonationReceiptNow({
         to: user.email_address,
@@ -396,7 +395,7 @@ export class ReceiptsDailyCronService {
   }
 
   private userFullName(user: UserEntity) {
-    return `${user.first_name} ${user.last_name}`.trim() || 'לקוח יקר';
+    return `${user.first_name} ${user.last_name}`.trim() || '׳׳§׳•׳— ׳™׳§׳¨';
   }
 
   private formatDate(date: Date | string) {
@@ -417,3 +416,4 @@ export class ReceiptsDailyCronService {
     return base.toISOString().slice(0, 10);
   }
 }
+
