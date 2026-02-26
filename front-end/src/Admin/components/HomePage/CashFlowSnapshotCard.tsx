@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Box, Button, Card, CardContent, Grid, Stack, Typography } from "@mui/material";
+﻿import React, { useEffect, useMemo, useState } from "react";
+import { Box, Button, Card, CardContent, Grid, Stack, Typography, alpha } from "@mui/material";
 import { Pie, PieChart, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../store/store";
@@ -184,40 +184,130 @@ const CashFlowSnapshotCard: React.FC = () => {
   }, [donations, expenses, loanActions, depositActions, standingOrders, investmentTransactions, cutoffDate]);
 
   const pieData = [
-    { name: "נכנס", value: incomeTotal, color: "#16a34a" },
-    { name: "יצא", value: expenseTotal, color: "#dc2626" },
+    { name: "נכנס", value: incomeTotal, color: "#18a957" },
+    { name: "יצא", value: expenseTotal, color: "#e02424" },
   ];
 
+  const net = incomeTotal - expenseTotal;
+
   return (
-    <Card sx={{ mt: 4, borderRadius: 4 }}>
-      <CardContent>
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          justifyContent="space-between"
-          spacing={2}
-          sx={{ mb: 2 }}
-        >
-          <Typography variant="h6" fontWeight={900}>
+    <Card
+      sx={(theme) => ({
+        mt: 4,
+        borderRadius: 6,
+        border: `1px solid ${alpha(theme.palette.divider, 0.8)}`,
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? "0 18px 48px rgba(0,0,0,0.38)"
+            : "0 18px 48px rgba(15,23,42,0.12)",
+        background:
+          theme.palette.mode === "dark"
+            ? `linear-gradient(180deg, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(
+                theme.palette.background.paper,
+                0.78
+              )})`
+            : "linear-gradient(180deg, #ffffff, #f9fbff)",
+      })}
+    >
+      <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+        <Stack alignItems="center" spacing={1.2} sx={{ mb: 2.5 }}>
+          <Typography variant="h6" fontWeight={900} textAlign="center">
             תזרים נכנס/יצא
           </Typography>
-          <Stack direction="row" spacing={1}>
+          <Typography variant="body2" color="text.secondary" textAlign="center">
+            {mode === "month" ? "סיכום חודש אחרון" : "סיכום שנה אחרונה"}
+          </Typography>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={(theme) => ({
+              p: 0.6,
+              borderRadius: 999,
+              border: `1px solid ${alpha(theme.palette.divider, 0.8)}`,
+              bgcolor: alpha(theme.palette.background.default, 0.5),
+            })}
+          >
             <Button
-              variant={mode === "month" ? "contained" : "outlined"}
+              size="small"
+              variant={mode === "month" ? "contained" : "text"}
               onClick={() => setMode("month")}
+              sx={{ borderRadius: 999, px: 2.5, fontWeight: 800 }}
             >
               חודש אחרון
             </Button>
             <Button
-              variant={mode === "year" ? "contained" : "outlined"}
+              size="small"
+              variant={mode === "year" ? "contained" : "text"}
               onClick={() => setMode("year")}
+              sx={{ borderRadius: 999, px: 2.5, fontWeight: 800 }}
             >
               שנה אחרונה
             </Button>
           </Stack>
         </Stack>
 
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6} sx={{ height: 240 }}>
+        <Grid container spacing={2.5} alignItems="center" sx={{ direction: "ltr" }}>
+          <Grid item xs={12} md={6}>
+            <Grid container spacing={1.5} sx={{ direction: "rtl" }}>
+              <Grid item xs={12}>
+                <Box
+                  sx={(theme) => ({
+                    p: 2,
+                    borderRadius: 3,
+                    background: alpha("#18a957", theme.palette.mode === "dark" ? 0.16 : 0.1),
+                  })}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    נכנס
+                  </Typography>
+                  <Typography variant="h6" fontWeight={900} sx={{ color: "#18a957" }}>
+                    {formatILS(incomeTotal)}
+                  </Typography>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Box
+                  sx={(theme) => ({
+                    p: 2,
+                    borderRadius: 3,
+                    background: alpha("#e02424", theme.palette.mode === "dark" ? 0.18 : 0.09),
+                  })}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    יצא
+                  </Typography>
+                  <Typography variant="h6" fontWeight={900} sx={{ color: "#e02424" }}>
+                    {formatILS(expenseTotal)}
+                  </Typography>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Box
+                  sx={(theme) => ({
+                    p: 2,
+                    borderRadius: 3,
+                    border: `1px dashed ${alpha(theme.palette.divider, 0.9)}`,
+                    bgcolor: alpha(theme.palette.background.default, 0.45),
+                  })}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    נטו תזרימי
+                  </Typography>
+                  <Typography
+                    variant="h5"
+                    fontWeight={900}
+                    sx={{ color: net >= 0 ? "#18a957" : "#e02424" }}
+                  >
+                    {formatILS(net)}
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Grid item xs={12} md={6} sx={{ height: 250 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -226,9 +316,9 @@ const CashFlowSnapshotCard: React.FC = () => {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  outerRadius={84}
-                  innerRadius={48}
-                  paddingAngle={3}
+                  outerRadius={90}
+                  innerRadius={52}
+                  paddingAngle={4}
                 >
                   {pieData.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
@@ -237,17 +327,6 @@ const CashFlowSnapshotCard: React.FC = () => {
                 <Tooltip formatter={(value: number) => formatILS(Number(value))} />
               </PieChart>
             </ResponsiveContainer>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Stack spacing={1}>
-              <Typography sx={{ color: "#16a34a", fontWeight: 700 }}>
-                נכנס: {formatILS(incomeTotal)}
-              </Typography>
-              <Typography sx={{ color: "#dc2626", fontWeight: 700 }}>
-                יצא: {formatILS(expenseTotal)}
-              </Typography>
-              <Typography fontWeight={900}>נטו: {formatILS(incomeTotal - expenseTotal)}</Typography>
-            </Stack>
           </Grid>
         </Grid>
       </CardContent>
