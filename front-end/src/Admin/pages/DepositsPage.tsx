@@ -156,7 +156,18 @@ const DepositsPage: FC = () => {
     [allDeposits]
   );
 
-  const tableActions = selectedDepositId ? actions ?? [] : allActions ?? [];
+  const tableActions = useMemo(() => {
+    if (selectedDepositId) return actions ?? [];
+
+    if (selectedUser?.id != null) {
+      return (allActions ?? []).filter((a: any) => {
+        const actionUserId = Number(a?.deposit?.user?.id);
+        return Number.isInteger(actionUserId) && actionUserId === Number(selectedUser.id);
+      });
+    }
+
+    return allActions ?? [];
+  }, [selectedDepositId, actions, allActions, selectedUser?.id]);
 
   const refreshAfterAction = async () => {
     if (selectedDepositId) {
@@ -367,9 +378,6 @@ const DepositsPage: FC = () => {
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="h6" fontWeight={600}>
                       הפקדות
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      לחיצה על כרטיס תסנן פעולות לפי הפקדה. כברירת מחדל מוצגות כל הפעולות.
                     </Typography>
                   </Box>
 

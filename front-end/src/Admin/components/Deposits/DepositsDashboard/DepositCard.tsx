@@ -75,7 +75,7 @@ const DepositCard: React.FC<DepositCardProps> = ({
       <CardContent sx={{ pt: 2, pb: 3, px: 3, direction: "rtl" }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Box textAlign="right">
-            <Typography variant="subtitle1" fontWeight={700} color="#1C3C3C">
+            <Typography variant="subtitle1" fontWeight={700} color="#E6F4FF">
               {depositTitle}
             </Typography>
           </Box>
@@ -121,12 +121,12 @@ const DepositCard: React.FC<DepositCardProps> = ({
           </Grid>
           <Grid item xs={6}>
             <Box display="flex" alignItems="center" gap={1} sx={{ flexDirection: "row-reverse" }}>
-              <CalendarTodayIcon fontSize="small" sx={{ color: "#1C3C3C" }} />
+              <CalendarTodayIcon fontSize="small" sx={{ color: "#7CCBFF" }} />
               <Box textAlign="right">
                 <Typography variant="body2" color="text.secondary">
                   תאריך התחלה
                 </Typography>
-                <Typography variant="subtitle1" fontWeight={700} color="#1C3C3C">
+                <Typography variant="subtitle1" fontWeight={700} color="#BFE6FF">
                   {deposit.start_date
                     ? new Date(deposit.start_date).toLocaleDateString("he-IL")
                     : "-"}
