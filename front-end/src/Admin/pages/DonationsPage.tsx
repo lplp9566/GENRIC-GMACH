@@ -94,12 +94,11 @@ const DonationsHomePage: FC = () => {
   const donations = Array.isArray(allDonations) ? allDonations : [];
   const donationsBase = donations; // השרת כבר מחזיר מסונן לפי הצורך
 
-  // ---- טעינה ראשונית/שינוי משתמש ----
   useEffect(() => {
     if (donationsStatus !== "idle") return;
 
     // לא אדמין -> מביאים רק את התרומות של המשתמש המחובר
-    if (!isAdmin && authUser?.user.permission === "user") {
+    if (!isAdmin && sessionStorage.getItem("preferred_view_choice") === "user") {
       if (myUserId != null) dispatch(getDonationByUserId(Number(myUserId)));
       return;
     }
