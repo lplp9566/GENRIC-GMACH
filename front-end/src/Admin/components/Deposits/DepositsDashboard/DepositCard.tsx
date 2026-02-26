@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+﻿import React, { useCallback, useState } from "react";
 import {
   Box,
   Button,
@@ -25,6 +25,7 @@ import DepositsActions from "../DepositsAction/DepositsActions";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../store/store";
 import { createDepositAction } from "../../../../store/features/admin/adminDepositsSlice";
+import { useTheme } from "@mui/material/styles";
 
 interface DepositCardProps {
   deposit: IDeposit;
@@ -48,7 +49,9 @@ const DepositCard: React.FC<DepositCardProps> = ({
   onDelete,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme();
   const [actionsOpen, setActionsOpen] = useState(false);
+  const isDark = theme.palette.mode === "dark";
 
   const handleSubmit = useCallback(
     async (dto: IDepositActionCreate) => {
@@ -75,7 +78,11 @@ const DepositCard: React.FC<DepositCardProps> = ({
       <CardContent sx={{ pt: 2, pb: 3, px: 3, direction: "rtl" }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Box textAlign="right">
-            <Typography variant="subtitle1" fontWeight={700} color="#E6F4FF">
+            <Typography
+              variant="subtitle1"
+              fontWeight={700}
+              color={isDark ? "#E6F4FF" : "#1C3C3C"}
+            >
               {depositTitle}
             </Typography>
           </Box>
@@ -121,12 +128,19 @@ const DepositCard: React.FC<DepositCardProps> = ({
           </Grid>
           <Grid item xs={6}>
             <Box display="flex" alignItems="center" gap={1} sx={{ flexDirection: "row-reverse" }}>
-              <CalendarTodayIcon fontSize="small" sx={{ color: "#7CCBFF" }} />
+              <CalendarTodayIcon
+                fontSize="small"
+                sx={{ color: isDark ? "#7CCBFF" : "#2A8CCF" }}
+              />
               <Box textAlign="right">
                 <Typography variant="body2" color="text.secondary">
                   תאריך התחלה
                 </Typography>
-                <Typography variant="subtitle1" fontWeight={700} color="#BFE6FF">
+                <Typography
+                  variant="subtitle1"
+                  fontWeight={700}
+                  color={isDark ? "#BFE6FF" : "#1C3C3C"}
+                >
                   {deposit.start_date
                     ? new Date(deposit.start_date).toLocaleDateString("he-IL")
                     : "-"}
@@ -258,3 +272,4 @@ const DepositCard: React.FC<DepositCardProps> = ({
 };
 
 export default DepositCard;
+

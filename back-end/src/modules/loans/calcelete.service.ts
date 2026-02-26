@@ -33,14 +33,12 @@ async calculateTotalInflows(
     throw new BadRequestException('End date must be on or after start date');
   }
 
-  // console.log(`🔄 Calculating expected payments from ${startDate.toISOString().slice(0,10)} to ${endDate.toISOString().slice(0,10)}`);
 
   // 1. Load all monthly rates
   const allRates = await this.rateRepository.find({
     relations: ['role'],
     order: { effective_from: 'ASC' },
   });
-  // console.log(`📊 Retrieved ${allRates.length} monthly rates`);
 
   // 2. Load all users
   const users = await this.usersRepo.find({

@@ -4,6 +4,7 @@ import {
   IDeposit,
   IDepositAction,
   IDepositActionCreate,
+  IDepositActionUpdate,
 } from "../../../Admin/components/Deposits/depositsDto";
 import { Status } from "../../../Admin/components/Users/UsersDto";
 import { FindOptionsGeneric, PaginatedResult } from "../../../common/indexTypes";
@@ -16,11 +17,11 @@ interface AdminDepositType {
   depositActions: IDepositAction[];
   allDepositActions: IDepositAction[];
   allDepositsStatus: Status;
-  depositCheckStatus: Status; 
-  depositCheck:{
+  depositCheckStatus: Status;
+  depositCheck: {
     ok: boolean;
     error?: string;
-  }
+  };
   createDepositStatus: Status;
   depositActionsStatus: Status;
   createDepositActionStatus: Status;
@@ -50,28 +51,24 @@ const initialState: AdminDepositType = {
   total: 0,
 };
 
-
 export const getAllDeposits = createAsyncThunk<
   PaginatedResult<IDeposit>,
   FindOptionsGeneric
 >("admin/getAllDeposits", async (opts) => {
-  const { data } = await api.get<PaginatedResult<IDeposit>>(
-    `/deposits`,
-    { params: opts }
-  );
+  const { data } = await api.get<PaginatedResult<IDeposit>>(`/deposits`, {
+    params: opts,
+  });
   return data;
 });
 
 export const getDepositActions = createAsyncThunk<IDepositAction[], number>(
   "admin/getDepositActions",
   async (depositId) => {
-    console.log(depositId, "getDepositActions");
-    const { data } = await api.get<IDepositAction[]>(
-      `/deposits-actions/${depositId}`
-    );
+    const { data } = await api.get<IDepositAction[]>(`/deposits-actions/${depositId}`);
     return data;
   }
 );
+
 export const getAllDepositActions = createAsyncThunk<IDepositAction[]>(
   "admin/getAllDepositActions",
   async () => {
@@ -84,8 +81,6 @@ export const getDepositDetails = createAsyncThunk<IDeposit, number>(
   "admin/getDepositDetails",
   async (depositId) => {
     const { data } = await api.get<IDeposit>(`/deposits/${depositId}`);
-    console.log("Deposit details fetched:", data);
-    
     return data;
   }
 );
@@ -113,17 +108,13 @@ export const bringForwardCheck = createAsyncThunk(
   }
 );
 
-
 export const createDepositAction = createAsyncThunk<
   IDepositAction,
   IDepositActionCreate,
   { dispatch: AppDispatch }
 >("admin/createDepositAction", async (dto, { dispatch, rejectWithValue }) => {
   try {
-    const { data } = await api.post<IDepositAction>(
-      `/deposits-actions`,
-      dto
-    );
+    const { data } = await api.post<IDepositAction>(`/deposits-actions`, dto);
 
     await Promise.all([
       dispatch(getDepositActions(dto.deposit)),
@@ -136,7 +127,29 @@ export const createDepositAction = createAsyncThunk<
   }
 });
 
-// --- Slice ---
+export const updateDepositAction = createAsyncThunk<
+  IDepositAction,
+  { id: number; payload: IDepositActionUpdate }
+>("admin/updateDepositAction", async ({ id, payload }, { rejectWithValue }) => {
+  try {
+    const { data } = await api.patch<IDepositAction>(`/deposits-actions/${id}`, payload);
+    return data;
+  } catch (err: any) {
+    return rejectWithValue(err?.response?.data ?? err?.message ?? "Request failed");
+  }
+});
+
+export const deleteDepositActionById = createAsyncThunk<
+  { id: number; deleted: boolean },
+  number
+>("admin/deleteDepositActionById", async (id, { rejectWithValue }) => {
+  try {
+    const { data } = await api.delete<{ id: number; deleted: boolean }>(`/deposits-actions/${id}`);
+    return data;
+  } catch (err: any) {
+    return rejectWithValue(err?.response?.data ?? err?.message ?? "Request failed");
+  }
+});
 
 export const AdminDepositsSlice = createSlice({
   name: "adminDeposits",
@@ -148,7 +161,6 @@ export const AdminDepositsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // allDeposits
       .addCase(getAllDeposits.pending, (state) => {
         state.allDepositsStatus = "pending";
       })
@@ -162,8 +174,6 @@ export const AdminDepositsSlice = createSlice({
         state.allDepositsStatus = "rejected";
         state.error = action.error.message || "Failed to fetch deposits";
       })
-
-      // createDeposit
       .addCase(createDeposit.pending, (state) => {
         state.createDepositStatus = "pending";
       })
@@ -177,7 +187,7 @@ export const AdminDepositsSlice = createSlice({
       .addCase(bringForwardCheck.pending, (state) => {
         state.depositCheckStatus = "pending";
       })
-      .addCase(bringForwardCheck.fulfilled, (state, action) => {    
+      .addCase(bringForwardCheck.fulfilled, (state, action) => {
         state.depositCheckStatus = "fulfilled";
         state.depositCheck = action.payload;
       })
@@ -185,8 +195,6 @@ export const AdminDepositsSlice = createSlice({
         state.depositCheckStatus = "rejected";
         state.error = action.error.message || "Failed to check deposit";
       })
-
-      // actions
       .addCase(getDepositActions.pending, (state) => {
         state.depositActionsStatus = "pending";
       })
@@ -209,8 +217,6 @@ export const AdminDepositsSlice = createSlice({
         state.depositActionsStatus = "rejected";
         state.error = action.error.message || "Failed to fetch all deposit actions";
       })
-
-      // create action
       .addCase(createDepositAction.pending, (state) => {
         state.createDepositActionStatus = "pending";
       })
@@ -221,14 +227,32 @@ export const AdminDepositsSlice = createSlice({
         state.createDepositActionStatus = "rejected";
         state.error = action.error.message || "Failed to create deposit action";
       })
-
-      // deposit details (נשמר ל-currentDeposit ומסונכרן ל-allDeposits אם קיים)
+      .addCase(updateDepositAction.pending, (state) => {
+        state.createDepositActionStatus = "pending";
+      })
+      .addCase(updateDepositAction.fulfilled, (state) => {
+        state.createDepositActionStatus = "fulfilled";
+      })
+      .addCase(updateDepositAction.rejected, (state, action) => {
+        state.createDepositActionStatus = "rejected";
+        state.error = action.error.message || "Failed to update deposit action";
+      })
+      .addCase(deleteDepositActionById.pending, (state) => {
+        state.createDepositActionStatus = "pending";
+      })
+      .addCase(deleteDepositActionById.fulfilled, (state) => {
+        state.createDepositActionStatus = "fulfilled";
+      })
+      .addCase(deleteDepositActionById.rejected, (state, action) => {
+        state.createDepositActionStatus = "rejected";
+        state.error = action.error.message || "Failed to delete deposit action";
+      })
       .addCase(getDepositDetails.pending, (state) => {
         state.allDepositsStatus = "pending";
       })
       .addCase(getDepositDetails.fulfilled, (state, action) => {
         state.allDepositsStatus = "fulfilled";
-        const idx = state.allDeposits.findIndex(d => d.id === action.payload.id);
+        const idx = state.allDeposits.findIndex((d) => d.id === action.payload.id);
         const existing = idx !== -1 ? state.allDeposits[idx] : null;
         const merged = {
           ...action.payload,

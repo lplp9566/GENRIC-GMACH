@@ -1,14 +1,19 @@
 ﻿import { FC, useMemo, useState } from "react";
 import {
   Chip,
+  IconButton,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from "@mui/material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { DepositActionsType, IDepositAction } from "../depositsDto";
 
 type SortField = "date" | "action_type" | "result";
@@ -16,6 +21,10 @@ type SortDirection = "asc" | "desc";
 
 interface DepositActionTableProps {
   actions: IDepositAction[];
+  canWrite?: boolean;
+  onCopy?: (action: IDepositAction) => void;
+  onEdit?: (action: IDepositAction) => void;
+  onDelete?: (action: IDepositAction) => void;
 }
 
 const ACTION_LABELS: Record<DepositActionsType, string> = {
@@ -32,10 +41,18 @@ const ACTION_ORDER: DepositActionsType[] = [
   DepositActionsType.ChangeReturnDate,
 ];
 
-const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
+const isMutable = (type: DepositActionsType) =>
+  type === DepositActionsType.AddToDeposit || type === DepositActionsType.RemoveFromDeposit;
+
+const DepositActionTable: FC<DepositActionTableProps> = ({
+  actions,
+  canWrite = false,
+  onCopy,
+  onEdit,
+  onDelete,
+}) => {
   const [currentSortField, setCurrentSortField] = useState<SortField>("date");
-  const [currentSortDirection, setCurrentSortDirection] =
-    useState<SortDirection>("asc");
+  const [currentSortDirection, setCurrentSortDirection] = useState<SortDirection>("asc");
 
   const handleHeaderClick = (field: SortField) => {
     if (field === currentSortField) {
@@ -52,8 +69,8 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
     const copy = [...actions];
 
     copy.sort((a, b) => {
-      const typeA = (a as any).action_type ?? (a as any).actionType;
-      const typeB = (b as any).action_type ?? (b as any).actionType;
+      const typeA = ((a as any).action_type ?? (a as any).actionType) as DepositActionsType;
+      const typeB = ((b as any).action_type ?? (b as any).actionType) as DepositActionsType;
 
       let cmp = 0;
       if (currentSortField === "date") {
@@ -61,7 +78,7 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
       } else if (currentSortField === "action_type") {
         cmp = (orderMap.get(typeA) ?? 0) - (orderMap.get(typeB) ?? 0);
       } else {
-        cmp = (a.amount ?? 0) - (b.amount ?? 0);
+        cmp = Number(a.amount ?? 0) - Number(b.amount ?? 0);
       }
       return cmp * dir;
     });
@@ -72,8 +89,8 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
   const renderSortIndicator = (field: SortField) =>
     currentSortField === field
       ? currentSortDirection === "asc"
-        ? " ?"
-        : " ?"
+        ? " ↑"
+        : " ↓"
       : "";
 
   const getDepositOwnerLabel = (action: IDepositAction) => {
@@ -89,10 +106,7 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
 
   return (
     <Paper elevation={3} sx={{ p: 3, borderRadius: 2, width: "100%" }}>
-      <Typography
-        variant="h6"
-        sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}
-      >
+      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}>
         פעולות בהפקדה
       </Typography>
 
@@ -106,32 +120,26 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
               <TableCell align="right" onClick={() => handleHeaderClick("date")}>
                 תאריך{renderSortIndicator("date")}
               </TableCell>
-              <TableCell
-                align="center"
-                onClick={() => handleHeaderClick("action_type")}
-              >
+              <TableCell align="center" onClick={() => handleHeaderClick("action_type")}>
                 סוג פעולה{renderSortIndicator("action_type")}
               </TableCell>
-              <TableCell
-                align="left"
-                onClick={() => handleHeaderClick("result")}
-              >
+              <TableCell align="left" onClick={() => handleHeaderClick("result")}>
                 תוצאה{renderSortIndicator("result")}
               </TableCell>
+              {canWrite && <TableCell align="center">פעולות</TableCell>}
             </TableRow>
           </TableHead>
 
           <TableBody>
             {sortedActions.map((action) => {
-              const type = (action as any).action_type ?? (action as any).actionType;
-              const label = ACTION_LABELS[type as DepositActionsType] ?? String(type);
+              const type = ((action as any).action_type ?? (action as any).actionType) as DepositActionsType;
+              const label = ACTION_LABELS[type] ?? String(type);
+              const mutable = isMutable(type);
 
               return (
                 <TableRow key={action.id} hover sx={{ "& td": { border: "none" } }}>
                   <TableCell align="right">{getDepositOwnerLabel(action)}</TableCell>
-                  <TableCell align="right">
-                    {new Date(action.date).toLocaleDateString("he-IL")}
-                  </TableCell>
+                  <TableCell align="right">{new Date(action.date).toLocaleDateString("he-IL")}</TableCell>
                   <TableCell align="center">
                     <Chip
                       label={label}
@@ -154,8 +162,38 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
                       ? new Date(action.update_date).toLocaleDateString("he-IL")
                       : null}
                     {type !== DepositActionsType.ChangeReturnDate && "₪"}
-                    {action.amount}
+                    {type !== DepositActionsType.ChangeReturnDate ? Number(action.amount ?? 0) : ""}
                   </TableCell>
+                  {canWrite && (
+                    <TableCell align="center">
+                      <Tooltip title="העתקה">
+                        <span>
+                          <IconButton size="small" onClick={() => onCopy?.(action)} disabled={!mutable}>
+                            <ContentCopyIcon fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="עריכה">
+                        <span>
+                          <IconButton size="small" onClick={() => onEdit?.(action)} disabled={!mutable}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="מחיקה">
+                        <span>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => onDelete?.(action)}
+                            disabled={!mutable}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </TableCell>
+                  )}
                 </TableRow>
               );
             })}

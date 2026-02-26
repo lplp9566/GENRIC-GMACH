@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+﻿import { FC, useEffect, useMemo, useState } from "react";
 import { AppDispatch, RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
 import useTheme from "@mui/material/styles/useTheme";
@@ -27,11 +27,13 @@ import { toast } from "react-toastify";
 import { StatusGeneric } from "../../common/indexTypes";
 import {
   createDepositAction,
+  deleteDepositActionById,
   getAllDepositActions,
   getAllDeposits,
   getDepositActions,
   getDepositDetails,
   setPage,
+  updateDepositAction,
 } from "../../store/features/admin/adminDepositsSlice";
 import LoadingIndicator from "../components/StatusComponents/LoadingIndicator";
 import { setAddDepositModal } from "../../store/features/Main/AppMode";
@@ -45,6 +47,7 @@ import ConfirmModal from "../components/genricComponents/confirmModal";
 import {
   DepositActionsType,
   IDeposit,
+  IDepositAction,
   IDepositActionCreate,
 } from "../components/Deposits/depositsDto";
 
@@ -71,6 +74,10 @@ const DepositsPage: FC = () => {
   const [deleteDepositId, setDeleteDepositId] = useState<number | null>(null);
   const [editActionDate, setEditActionDate] = useState<string>("");
   const [editReturnDate, setEditReturnDate] = useState<string>("");
+  const [editDepositAction, setEditDepositAction] = useState<IDepositAction | null>(null);
+  const [editDepositActionAmount, setEditDepositActionAmount] = useState<string>("");
+  const [editDepositActionDate, setEditDepositActionDate] = useState<string>("");
+  const [deleteDepositAction, setDeleteDepositAction] = useState<IDepositAction | null>(null);
 
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const permission = authUser?.permission ?? authUser?.user?.permission;
@@ -181,7 +188,104 @@ const DepositsPage: FC = () => {
       await dispatch(getAllDeposits({ page, limit, status: filter }));
     }
   };
+  const getActionType = (action: IDepositAction) =>
+    ((action as any).action_type ?? (action as any).actionType) as DepositActionsType;
 
+  const canModifyAction = (action: IDepositAction) => {
+    const type = getActionType(action);
+    return (
+      type === DepositActionsType.AddToDeposit ||
+      type === DepositActionsType.RemoveFromDeposit
+    );
+  };
+
+  const handleCopyDepositAction = async (action: IDepositAction) => {
+    if (!canWrite || !canModifyAction(action)) return;
+    const depositId = Number(action.deposit?.id);
+    const type = getActionType(action);
+    const amount = Number(action.amount ?? 0);
+    if (!Number.isInteger(depositId) || depositId <= 0 || amount <= 0) return;
+
+    try {
+      await toast.promise(
+        dispatch(
+          createDepositAction({
+            deposit: depositId,
+            action_type: type,
+            amount,
+            date: toInputDate(action.date),
+          })
+        ).unwrap(),
+        {
+          pending: "מעתיק פעולה...",
+          success: "הפעולה הועתקה בהצלחה.",
+          error: "העתקת הפעולה נכשלה.",
+        }
+      );
+      await refreshAfterAction();
+    } catch {
+      // toast handles errors
+    }
+  };
+
+  const openEditDepositAction = (action: IDepositAction) => {
+    if (!canModifyAction(action)) return;
+    setEditDepositAction(action);
+    setEditDepositActionAmount(String(Number(action.amount ?? 0)));
+    setEditDepositActionDate(toInputDate(action.date));
+  };
+
+  const handleEditDepositActionSave = async () => {
+    if (!editDepositAction) return;
+    const amount = Number(editDepositActionAmount);
+    if (!Number.isFinite(amount) || amount <= 0 || !editDepositActionDate) {
+      toast.error("יש למלא סכום ותאריך תקינים.");
+      return;
+    }
+
+    try {
+      await toast.promise(
+        dispatch(
+          updateDepositAction({
+            id: editDepositAction.id,
+            payload: {
+              amount,
+              date: editDepositActionDate,
+            },
+          })
+        ).unwrap(),
+        {
+          pending: "מעדכן פעולה...",
+          success: "הפעולה עודכנה בהצלחה.",
+          error: "עדכון הפעולה נכשל.",
+        }
+      );
+      await refreshAfterAction();
+      setEditDepositAction(null);
+      setEditDepositActionAmount("");
+      setEditDepositActionDate("");
+    } catch {
+      // toast handles errors
+    }
+  };
+
+  const handleDeleteDepositAction = async () => {
+    if (!deleteDepositAction) return;
+    try {
+      await toast.promise(
+        dispatch(deleteDepositActionById(deleteDepositAction.id)).unwrap(),
+        {
+          pending: "מוחק פעולה...",
+          success: "הפעולה נמחקה בהצלחה.",
+          error: "מחיקת הפעולה נכשלה.",
+        }
+      );
+      await refreshAfterAction();
+      setDeleteDepositAction(null);
+    } catch {
+      // toast handles errors
+    }
+  };
   const handleActionSubmit = async (dto: IDepositActionCreate) => {
     await dispatch(createDepositAction(dto)).unwrap();
     await refreshAfterAction();
@@ -366,7 +470,13 @@ const DepositsPage: FC = () => {
                   </Box>
 
                   {tableActions.length > 0 ? (
-                    <DepositActionTable actions={tableActions} />
+                    <DepositActionTable
+                      actions={tableActions}
+                      canWrite={canWrite}
+                      onCopy={(action) => void handleCopyDepositAction(action)}
+                      onEdit={(action) => openEditDepositAction(action)}
+                      onDelete={(action) => setDeleteDepositAction(action)}
+                    />
                   ) : (
                     <Typography>אין נתונים להצגה</Typography>
                   )}
@@ -387,6 +497,7 @@ const DepositsPage: FC = () => {
                     <Stack spacing={1.5}>
                       {allDeposits.map((depositItem) => {
                         const isSelected = depositItem.id === selectedDepositId;
+
                         return (
                           <Box
                             key={depositItem.id}
@@ -550,8 +661,71 @@ const DepositsPage: FC = () => {
           text="למחוק את ההפקדה?"
         />
       )}
+
+      <Dialog
+        open={Boolean(editDepositAction)}
+        onClose={() => {
+          setEditDepositAction(null);
+          setEditDepositActionAmount("");
+          setEditDepositActionDate("");
+        }}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ textAlign: "right" }}>עריכת פעולת הפקדה</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <TextField
+              label="סכום"
+              type="number"
+              value={editDepositActionAmount}
+              onChange={(e) => setEditDepositActionAmount(e.target.value)}
+              fullWidth
+            />
+            <TextField
+              label="תאריך פעולה"
+              type="date"
+              value={editDepositActionDate}
+              onChange={(e) => setEditDepositActionDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setEditDepositAction(null);
+              setEditDepositActionAmount("");
+              setEditDepositActionDate("");
+            }}
+          >
+            ביטול
+          </Button>
+          <Button variant="contained" onClick={handleEditDepositActionSave}>
+            שמירה
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {Boolean(deleteDepositAction) && (
+        <ConfirmModal
+          open={Boolean(deleteDepositAction)}
+          onClose={() => setDeleteDepositAction(null)}
+          onSubmit={handleDeleteDepositAction}
+          text="למחוק את פעולת ההפקדה?"
+        />
+      )}
     </Box>
   );
 };
 
 export default DepositsPage;
+
+
+
+
+
+
+
+

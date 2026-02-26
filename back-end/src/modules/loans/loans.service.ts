@@ -331,9 +331,7 @@ qb.setParameter("todayDay", new Date().getDate());
       throw new Error(error.message);
     }
   }
- async editLoanSimple(loanId: number, dto: EditLoanDto) {
-  console.log(dto);
-  
+ async editLoanSimple(loanId: number, dto: EditLoanDto) {  
     const toDate = (v: string | Date | undefined): Date | undefined => {
   if (!v) return undefined;
   const d = v instanceof Date ? v : new Date(v);

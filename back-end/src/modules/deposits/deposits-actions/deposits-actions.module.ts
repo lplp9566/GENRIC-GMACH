@@ -6,12 +6,14 @@ import { DepositsActionsEntity } from './Entity/deposits-actions.entity';
 import { DepositsModule } from '../deposits.module';
 import { DepositsEntity } from '../Entity/deposits.entity';
 import { MailModule } from '../../mail/mail.module';
+import { FundsOverviewModule } from '../../funds-overview/funds-overview.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([DepositsActionsEntity,DepositsEntity]),
     DepositsModule,
-    MailModule
+    MailModule,
+    FundsOverviewModule,
   ],
   controllers: [ DepositsActionsController],
   providers: [DepositsActionsService],

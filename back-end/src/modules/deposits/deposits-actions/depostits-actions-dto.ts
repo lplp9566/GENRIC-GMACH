@@ -11,3 +11,9 @@ export interface IDepositAction{
     action_type : DepositActionsType
     update_date ?: Date
 }
+
+export interface IUpdateDepositAction {
+  amount?: number;
+  date?: Date;
+  update_date?: Date | null;
+}

@@ -23,10 +23,11 @@ export enum DepositActionsType{
 }
 export interface IDepositAction {
     id: number;
-    actionType: DepositActionsType;
-    amount: number;
+    actionType?: DepositActionsType;
+    action_type?: DepositActionsType;
+    amount?: number;
     date: Date;
-    update_date: Date | null;
+    update_date?: Date | null;
     deposit?: {
         id: number;
         user?: IUser;
@@ -39,4 +40,10 @@ export interface IDepositActionCreate {
     date: string;
     update_date?: string | null;
  
+}
+
+export interface IDepositActionUpdate {
+  amount?: number;
+  date?: string;
+  update_date?: string | null;
 }
