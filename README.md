@@ -1,93 +1,253 @@
 # Ahavat Chesed
 
+Comprehensive full-stack management system for a Gemach (loans, donations, deposits, investments, monthly payments, expenses, and operations).
 
+## Table of Contents
+1. [Project Purpose](#project-purpose)
+2. [Core Users and Permissions](#core-users-and-permissions)
+3. [Main Functional Areas](#main-functional-areas)
+4. [System Architecture](#system-architecture)
+5. [Repository Structure](#repository-structure)
+6. [Backend Modules](#backend-modules)
+7. [Frontend Routes and Screens](#frontend-routes-and-screens)
+8. [Announcements System](#announcements-system)
+9. [Environment Variables](#environment-variables)
+10. [Local Development](#local-development)
+11. [Database and Migrations](#database-and-migrations)
+12. [Common Commands](#common-commands)
+13. [Production Notes](#production-notes)
+14. [Troubleshooting](#troubleshooting)
+15. [License](#license)
 
-## Getting started
+## Project Purpose
+This system centralizes day-to-day Gemach operations:
+- User lifecycle and membership management
+- Loan origination and repayment tracking
+- Donations and recurring/one-time financial flows
+- Deposit and investment tracking
+- Expenses and financial oversight dashboards
+- Integrations (Nedarim Plus, mail notifications)
+- Internal communications (system announcements + read receipts)
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+The project supports both **admin workflows** and **end-user self-service** screens.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Core Users and Permissions
+The system is role-based:
+- `Admin`:
+  - Full management access (users, loans, donations, investments, expenses, reports)
+  - System operations and review actions
+  - Create/manage system announcements
+- `User`:
+  - Personal dashboard and personal financial records
+  - Access own loans/deposits/payments/donations
+  - View personal announcements
 
-## Add your files
+Auth is JWT-based, and route guards enforce role boundaries in both backend and frontend.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## Main Functional Areas
+- **Users**: profile, membership type, admin/user segmentation
+- **Loans**: loan lifecycle, payments, remaining balance, actions history
+- **Loan Requests**: request intake, admin approvals/status
+- **Monthly Payments**: recurring member payments and debt visibility
+- **Donations**: records, edits, receipts logic
+- **Deposits**: deposit records + deposit actions/details
+- **Investments**: investment records + transaction timelines
+- **Expenses**: categorized expense tracking
+- **Order Returns (Standing Orders)**: return status and related records
+- **Funds Overview**: aggregate financial health dashboards and yearly summaries
+- **Nedarim Plus**: external import/monitoring flows
+- **Announcements**: admin broadcasts with per-recipient read state
+- **Mail/Cron**: scheduled daily email operations
 
+## System Architecture
+### Backend
+- Framework: **NestJS 11**
+- ORM: **TypeORM**
+- DB: **PostgreSQL**
+- Auth: **JWT + Guards**
+- Scheduling: **@nestjs/schedule**
+
+### Frontend
+- Framework: **React + TypeScript**
+- Build tool: **Vite**
+- UI: **MUI**
+- State: **Redux Toolkit**
+- Routing: **react-router-dom**
+
+## Repository Structure
+```text
+.
+?? back-end/      # NestJS API + TypeORM entities/migrations/modules
+?? front-end/     # React admin/user application
+?? .gitlab-ci.yml
+?? README.md
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/lplp9566/ahavat-chesed.git
-git branch -M main
-git push -uf origin main
+
+## Backend Modules
+From `back-end/src/modules`, the main domains are:
+- `auth`
+- `users`
+- `loans`
+- `loan-requests`
+- `monthly_deposits`
+- `donations`
+- `deposits`
+- `investments`
+- `expenses`
+- `order-return`
+- `funds`, `funds-overview`, `funds-overview-by-year`
+- `bank-current`, `cash-holdings`
+- `regulation`
+- `membership_roles`, `role_monthly_rates`, `user_role_history`
+- `nedarim-plus`
+- `announcements`
+- `mail`
+- `requests`
+
+App wiring is done in `back-end/src/app.module.ts`.
+
+## Frontend Routes and Screens
+Primary routing lives in `front-end/src/App.tsx`.
+
+### Public
+- `/` login
+- `/forgot-password`
+
+### Admin area
+- `/home`
+- `/users`, `/users/new`
+- `/loans`, `/loans/new`, `/loans/:id`
+- `/loan-requests`
+- `/paymentsPage`
+- `/donations`
+- `/deposits`, `/deposit/:id`
+- `/investments`, `/investments/:id`
+- `/expenses`
+- `/standing-orders`
+- `/funds`, `/FundsOverviewByYear`
+- `/nedarim-plus`
+- `/announcements`
+
+### User area
+- `/u`
+- `/u/profile`
+- `/u/loans`
+- `/u/loan-requests`
+- `/u/deposits`
+- `/u/overview`
+- `/u/payments`
+- `/u/donations`
+- `/u/standing-orders`
+- `/u/statistics`
+- `/u/announcements`
+
+## Announcements System
+The project includes a full “system announcements” capability.
+
+### Admin can
+- Create a message with audience targeting:
+  - `all`
+  - `members`
+  - `friends`
+  - `custom` (specific users)
+- View sent messages
+- See read/unread recipient breakdown
+- Delete a message
+
+### User can
+- View personal inbox (`/u/announcements`)
+- See unread indication in navbar bell
+- Messages are marked as read when opening the page (current behavior)
+
+### Main API endpoints
+- `POST /announcements`
+- `GET /announcements`
+- `GET /announcements/:id/recipients`
+- `DELETE /announcements/:id`
+- `GET /announcements/my`
+- `POST /announcements/:id/read`
+
+## Environment Variables
+Create local files:
+- `back-end/.env`
+- `front-end/.env`
+
+### Backend example
+```env
+DATABASE_URL=postgres://USER:PASSWORD@HOST:5432/DB_NAME
+JWT_SECRET=change_me
+JWT_EXPIRES_IN=7d
+NODE_ENV=development
+PORT=3000
 ```
 
-## Integrate with your tools
+### Frontend example
+```env
+VITE_API_URL=http://localhost:3000
+```
 
-- [ ] [Set up project integrations](https://gitlab.com/lplp9566/ahavat-chesed/-/settings/integrations)
+## Local Development
+Run backend and frontend in separate terminals.
 
-## Collaborate with your team
+### Backend
+```bash
+cd back-end
+npm install
+npm run start:dev
+```
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+### Frontend
+```bash
+cd front-end
+npm install
+npm run dev
+```
 
-## Test and Deploy
+## Database and Migrations
+TypeORM migrations are in `back-end/src/migrations`.
 
-Use the built-in continuous integration in GitLab.
+Run migrations:
+```bash
+cd back-end
+npm run migration:run
+```
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Generate migration:
+```bash
+cd back-end
+npm run migration:generate -- src/migrations/<migration-name>
+```
 
-***
+Important:
+- `back-end/src/app.module.ts` currently has `synchronize: true`.
+- For production, prefer `synchronize: false` and run migrations explicitly.
 
-# Editing this README
+## Common Commands
+### Backend (`back-end/package.json`)
+- `npm run start:dev`
+- `npm run build`
+- `npm run lint`
+- `npm run test`
+- `npm run test:e2e`
+- `npm run migration:run`
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### Frontend (`front-end/package.json`)
+- `npm run dev`
+- `npm run build`
+- `npm run lint`
+- `npm run preview`
 
-## Suggestions for a good README
+## Production Notes
+- Disable TypeORM auto-sync in production.
+- Keep secrets only in environment variables.
+- Enforce strict CORS origins.
+- Validate PostgreSQL SSL requirements for hosting provider.
+- Keep cron and email credentials configured per environment.
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+## Troubleshooting
+- If UI text appears as garbled characters, verify file encoding is UTF-8.
+- If frontend shows import/export errors, restart Vite and hard refresh browser cache.
+- If migrations fail, verify `DATABASE_URL` points to the correct database/user.
 
 ## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Private internal project.
