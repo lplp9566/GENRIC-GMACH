@@ -32,13 +32,12 @@ const FundsByYearGraphs = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const authUser = useSelector((s: RootState) => s.authslice.user);
-  const isAdmin = Boolean(authUser?.is_admin);
+  const isAdmin = Boolean(authUser?.is_admin && authUser?.permission != "user");
 
   const items = useMemo(
-    () => (isAdmin && authUser?.permission != "user" && !selectedUser ? AdminYearlyFinancialItems : UserAdminFinancialItems),
+    () => (isAdmin  && !selectedUser ? AdminYearlyFinancialItems : UserAdminFinancialItems),
     [isAdmin, selectedUser]
   );
-
   const DEFAULT_FIELDS = useMemo(() => items.slice(0, 3).map((f) => f.key), [items]);
   const colorByKey = useMemo(
     () => Object.fromEntries(items.map((i) => [i.key, i.color])),
@@ -55,11 +54,11 @@ const FundsByYearGraphs = () => {
 
   // מביא נתונים לפי מצב
   useEffect(() => {
-    if (!isAdmin && authUser?.user?.id) {
+    if (!isAdmin &&  authUser?.user?.id) {
       dispatch(getUserFundsOverview(authUser.user.id));
-    } else if (isAdmin &&  authUser?.permission != "user" && !selectedUser  ) {
+    } else if (isAdmin &&  !selectedUser  ) {
       dispatch(getFundsOverviewByYear());
-    } else if (isAdmin && authUser?.permission != "user" && selectedUser) {
+    } else if (isAdmin  && selectedUser) {
       dispatch(getUserFundsOverview(selectedUser.id));
     }
   }, [dispatch, isAdmin, selectedUser, authUser?.user?.id]);
