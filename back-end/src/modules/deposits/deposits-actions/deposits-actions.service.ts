@@ -18,11 +18,18 @@ export class DepositsActionsService {
     private readonly mailService: MailService,
   ) {}
   async getDepositsActions() {
-    return await this.depositsActionsRepo.find();
+    return await this.depositsActionsRepo.find({
+      relations: ['deposit', 'deposit.user'],
+      order: { date: 'DESC', id: 'DESC' },
+    });
   }
 
   async getDepositsActionsByDepositId(id: number) {
-    return await this.depositsActionsRepo.find({ where: { deposit: { id } } });
+    return await this.depositsActionsRepo.find({
+      where: { deposit: { id } },
+      relations: ['deposit', 'deposit.user'],
+      order: { date: 'DESC', id: 'DESC' },
+    });
   }
   async createDepositAction(depositAction: IDepositAction) {
     try {

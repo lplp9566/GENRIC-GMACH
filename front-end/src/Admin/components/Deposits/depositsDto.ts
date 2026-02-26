@@ -27,6 +27,10 @@ export interface IDepositAction {
     amount: number;
     date: Date;
     update_date: Date | null;
+    deposit?: {
+        id: number;
+        user?: IUser;
+    };
 }
 export interface IDepositActionCreate {
     deposit: number;

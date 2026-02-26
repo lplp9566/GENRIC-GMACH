@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+﻿import { FC, useMemo, useState } from "react";
 import {
   Chip,
   Paper,
@@ -72,9 +72,20 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
   const renderSortIndicator = (field: SortField) =>
     currentSortField === field
       ? currentSortDirection === "asc"
-        ? " ▲"
-        : " ▼"
+        ? " ?"
+        : " ?"
       : "";
+
+  const getDepositOwnerLabel = (action: IDepositAction) => {
+    const depositId = action.deposit?.id;
+    const first = String(action.deposit?.user?.first_name ?? "").trim();
+    const last = String(action.deposit?.user?.last_name ?? "").trim();
+    const fullName = `${first} ${last}`.trim();
+
+    if (depositId && fullName) return `הפקדה #${depositId} - ${fullName}`;
+    if (depositId) return `הפקדה #${depositId}`;
+    return "-";
+  };
 
   return (
     <Paper elevation={3} sx={{ p: 3, borderRadius: 2, width: "100%" }}>
@@ -91,6 +102,7 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
         <Table size="small" sx={{ borderSpacing: "0 6px" }}>
           <TableHead>
             <TableRow sx={{ "& th": { fontWeight: 700, cursor: "pointer" } }}>
+              <TableCell align="right">הפקדה / מפקיד</TableCell>
               <TableCell align="right" onClick={() => handleHeaderClick("date")}>
                 תאריך{renderSortIndicator("date")}
               </TableCell>
@@ -116,6 +128,7 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
 
               return (
                 <TableRow key={action.id} hover sx={{ "& td": { border: "none" } }}>
+                  <TableCell align="right">{getDepositOwnerLabel(action)}</TableCell>
                   <TableCell align="right">
                     {new Date(action.date).toLocaleDateString("he-IL")}
                   </TableCell>
@@ -127,12 +140,12 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
                         type === DepositActionsType.InitialDeposit
                           ? "success"
                           : type === DepositActionsType.AddToDeposit
-                          ? "success"
-                          : type === DepositActionsType.RemoveFromDeposit
-                          ? "warning"
-                          : type === DepositActionsType.ChangeReturnDate
-                          ? "info"
-                          : "default"
+                            ? "success"
+                            : type === DepositActionsType.RemoveFromDeposit
+                              ? "warning"
+                              : type === DepositActionsType.ChangeReturnDate
+                                ? "info"
+                                : "default"
                       }
                     />
                   </TableCell>
@@ -154,3 +167,4 @@ const DepositActionTable: FC<DepositActionTableProps> = ({ actions }) => {
 };
 
 export default DepositActionTable;
+

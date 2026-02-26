@@ -32,7 +32,7 @@ const FundsByYearGraphs = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const authUser = useSelector((s: RootState) => s.authslice.user);
-  const isAdmin = Boolean(authUser?.is_admin && authUser?.permission != "user");
+  const isAdmin = Boolean(authUser?.is_admin || authUser?.permission != "user");
 
   const items = useMemo(
     () => (isAdmin  && !selectedUser ? AdminYearlyFinancialItems : UserAdminFinancialItems),
