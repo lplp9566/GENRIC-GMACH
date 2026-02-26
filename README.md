@@ -1,90 +1,86 @@
 # Ahavat Chesed
 
-Comprehensive full-stack management system for a Gemach (loans, donations, deposits, investments, monthly payments, expenses, and operations).
+> Full-stack Gemach management platform built with NestJS, PostgreSQL, React, and TypeScript.
 
-## Table of Contents
-1. [Project Purpose](#project-purpose)
-2. [Core Users and Permissions](#core-users-and-permissions)
-3. [Main Functional Areas](#main-functional-areas)
-4. [System Architecture](#system-architecture)
-5. [Repository Structure](#repository-structure)
-6. [Backend Modules](#backend-modules)
-7. [Frontend Routes and Screens](#frontend-routes-and-screens)
-8. [Announcements System](#announcements-system)
-9. [Environment Variables](#environment-variables)
-10. [Local Development](#local-development)
-11. [Database and Migrations](#database-and-migrations)
-12. [Common Commands](#common-commands)
-13. [Production Notes](#production-notes)
-14. [Troubleshooting](#troubleshooting)
-15. [License](#license)
+## Quick Navigation
+- [Project Summary](#project-summary)
+- [Core Roles](#core-roles)
+- [Functional Domains](#functional-domains)
+- [Architecture](#architecture)
+- [Repository Layout](#repository-layout)
+- [Backend Modules](#backend-modules)
+- [Frontend Routes](#frontend-routes)
+- [Announcements (System Messages)](#announcements-system-messages)
+- [Environment Setup](#environment-setup)
+- [Run Locally](#run-locally)
+- [Database & Migrations](#database--migrations)
+- [Scripts Reference](#scripts-reference)
+- [Production Checklist](#production-checklist)
+- [Troubleshooting](#troubleshooting)
 
-## Project Purpose
-This system centralizes day-to-day Gemach operations:
-- User lifecycle and membership management
-- Loan origination and repayment tracking
-- Donations and recurring/one-time financial flows
-- Deposit and investment tracking
-- Expenses and financial oversight dashboards
-- Integrations (Nedarim Plus, mail notifications)
-- Internal communications (system announcements + read receipts)
+## Project Summary
+Ahavat Chesed centralizes all core Gemach operations in one system:
+- User lifecycle and membership segmentation
+- Loan creation, repayment, and balance tracking
+- Donations, deposits, investments, and expenses
+- Monthly financial flows and standing order returns
+- Operational dashboards and yearly summaries
+- Nedarim Plus integrations
+- Internal announcements with read receipts
 
-The project supports both **admin workflows** and **end-user self-service** screens.
+The platform includes dedicated admin and user experiences with permission-based access.
 
-## Core Users and Permissions
-The system is role-based:
-- `Admin`:
-  - Full management access (users, loans, donations, investments, expenses, reports)
-  - System operations and review actions
-  - Create/manage system announcements
-- `User`:
-  - Personal dashboard and personal financial records
-  - Access own loans/deposits/payments/donations
-  - View personal announcements
+## Core Roles
+| Role | Access Scope |
+|---|---|
+| `Admin` | Full management across users, loans, finance domains, reports, and announcements |
+| `User` | Personal dashboard and personal financial/communication records |
 
-Auth is JWT-based, and route guards enforce role boundaries in both backend and frontend.
+Authentication is JWT-based and guarded by backend and frontend route protections.
 
-## Main Functional Areas
-- **Users**: profile, membership type, admin/user segmentation
-- **Loans**: loan lifecycle, payments, remaining balance, actions history
-- **Loan Requests**: request intake, admin approvals/status
-- **Monthly Payments**: recurring member payments and debt visibility
-- **Donations**: records, edits, receipts logic
-- **Deposits**: deposit records + deposit actions/details
-- **Investments**: investment records + transaction timelines
-- **Expenses**: categorized expense tracking
-- **Order Returns (Standing Orders)**: return status and related records
-- **Funds Overview**: aggregate financial health dashboards and yearly summaries
-- **Nedarim Plus**: external import/monitoring flows
-- **Announcements**: admin broadcasts with per-recipient read state
-- **Mail/Cron**: scheduled daily email operations
+## Functional Domains
+| Domain | Description |
+|---|---|
+| Users | Profiles, membership type, role separation |
+| Loans | Loan lifecycle, repayments, loan actions |
+| Loan Requests | Intake and admin approval process |
+| Monthly Payments | Recurring obligations and debt status |
+| Donations | Donation records and receipt-related flows |
+| Deposits | Deposit records + detailed actions |
+| Investments | Investment records + transaction history |
+| Expenses | Categorized expense management |
+| Standing Orders | Return/collection tracking |
+| Funds Overview | Financial summary and annual dashboards |
+| Nedarim Plus | External credit/collection integration flows |
+| Announcements | Broadcast messages + read/unread status |
+| Mail/Cron | Scheduled daily notifications and automation |
 
-## System Architecture
+## Architecture
 ### Backend
-- Framework: **NestJS 11**
-- ORM: **TypeORM**
-- DB: **PostgreSQL**
-- Auth: **JWT + Guards**
-- Scheduling: **@nestjs/schedule**
+- NestJS 11
+- TypeORM
+- PostgreSQL
+- JWT + Guards
+- `@nestjs/schedule`
 
 ### Frontend
-- Framework: **React + TypeScript**
-- Build tool: **Vite**
-- UI: **MUI**
-- State: **Redux Toolkit**
-- Routing: **react-router-dom**
+- React + TypeScript
+- Vite
+- MUI
+- Redux Toolkit
+- React Router
 
-## Repository Structure
+## Repository Layout
 ```text
 .
-?? back-end/      # NestJS API + TypeORM entities/migrations/modules
-?? front-end/     # React admin/user application
+?? back-end/      # NestJS API, modules, entities, migrations
+?? front-end/     # React app (admin + user)
 ?? .gitlab-ci.yml
 ?? README.md
 ```
 
 ## Backend Modules
-From `back-end/src/modules`, the main domains are:
+Located in `back-end/src/modules`:
 - `auth`
 - `users`
 - `loans`
@@ -95,25 +91,30 @@ From `back-end/src/modules`, the main domains are:
 - `investments`
 - `expenses`
 - `order-return`
-- `funds`, `funds-overview`, `funds-overview-by-year`
-- `bank-current`, `cash-holdings`
+- `funds`
+- `funds-overview`
+- `funds-overview-by-year`
+- `bank-current`
+- `cash-holdings`
 - `regulation`
-- `membership_roles`, `role_monthly_rates`, `user_role_history`
+- `membership_roles`
+- `role_monthly_rates`
+- `user_role_history`
 - `nedarim-plus`
 - `announcements`
 - `mail`
 - `requests`
 
-App wiring is done in `back-end/src/app.module.ts`.
+Main Nest application composition: `back-end/src/app.module.ts`.
 
-## Frontend Routes and Screens
-Primary routing lives in `front-end/src/App.tsx`.
+## Frontend Routes
+Main route config: `front-end/src/App.tsx`.
 
 ### Public
-- `/` login
+- `/` (login)
 - `/forgot-password`
 
-### Admin area
+### Admin
 - `/home`
 - `/users`, `/users/new`
 - `/loans`, `/loans/new`, `/loans/:id`
@@ -128,7 +129,7 @@ Primary routing lives in `front-end/src/App.tsx`.
 - `/nedarim-plus`
 - `/announcements`
 
-### User area
+### User
 - `/u`
 - `/u/profile`
 - `/u/loans`
@@ -141,25 +142,23 @@ Primary routing lives in `front-end/src/App.tsx`.
 - `/u/statistics`
 - `/u/announcements`
 
-## Announcements System
-The project includes a full “system announcements” capability.
-
-### Admin can
-- Create a message with audience targeting:
+## Announcements (System Messages)
+### Admin capabilities
+- Create message with audience targeting:
   - `all`
   - `members`
   - `friends`
   - `custom` (specific users)
-- View sent messages
-- See read/unread recipient breakdown
-- Delete a message
+- View sent announcements
+- Inspect read/unread per recipient
+- Delete announcement
 
-### User can
+### User capabilities
 - View personal inbox (`/u/announcements`)
-- See unread indication in navbar bell
-- Messages are marked as read when opening the page (current behavior)
+- See unread indicator in navbar bell
+- Messages are auto-marked as read on page entry (current behavior)
 
-### Main API endpoints
+### API endpoints
 - `POST /announcements`
 - `GET /announcements`
 - `GET /announcements/:id/recipients`
@@ -167,12 +166,12 @@ The project includes a full “system announcements” capability.
 - `GET /announcements/my`
 - `POST /announcements/:id/read`
 
-## Environment Variables
-Create local files:
+## Environment Setup
+Create local env files:
 - `back-end/.env`
 - `front-end/.env`
 
-### Backend example
+### Backend `.env` (example)
 ```env
 DATABASE_URL=postgres://USER:PASSWORD@HOST:5432/DB_NAME
 JWT_SECRET=change_me
@@ -181,30 +180,30 @@ NODE_ENV=development
 PORT=3000
 ```
 
-### Frontend example
+### Frontend `.env` (example)
 ```env
 VITE_API_URL=http://localhost:3000
 ```
 
-## Local Development
-Run backend and frontend in separate terminals.
+## Run Locally
+Use two terminals.
 
-### Backend
+### 1) Backend
 ```bash
 cd back-end
 npm install
 npm run start:dev
 ```
 
-### Frontend
+### 2) Frontend
 ```bash
 cd front-end
 npm install
 npm run dev
 ```
 
-## Database and Migrations
-TypeORM migrations are in `back-end/src/migrations`.
+## Database & Migrations
+Migrations folder: `back-end/src/migrations`.
 
 Run migrations:
 ```bash
@@ -218,36 +217,41 @@ cd back-end
 npm run migration:generate -- src/migrations/<migration-name>
 ```
 
-Important:
-- `back-end/src/app.module.ts` currently has `synchronize: true`.
-- For production, prefer `synchronize: false` and run migrations explicitly.
+Current note:
+- `back-end/src/app.module.ts` currently includes `synchronize: true`.
+- For production, use `synchronize: false` and run migrations explicitly.
 
-## Common Commands
+## Scripts Reference
 ### Backend (`back-end/package.json`)
-- `npm run start:dev`
-- `npm run build`
-- `npm run lint`
-- `npm run test`
-- `npm run test:e2e`
-- `npm run migration:run`
+| Command | Purpose |
+|---|---|
+| `npm run start:dev` | Run API in watch mode |
+| `npm run build` | Compile TypeScript |
+| `npm run lint` | Lint + fix |
+| `npm run test` | Unit tests |
+| `npm run test:e2e` | End-to-end tests |
+| `npm run migration:run` | Run DB migrations |
 
 ### Frontend (`front-end/package.json`)
-- `npm run dev`
-- `npm run build`
-- `npm run lint`
-- `npm run preview`
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start Vite dev server |
+| `npm run build` | Type-check and production build |
+| `npm run lint` | Lint project |
+| `npm run preview` | Preview production build |
 
-## Production Notes
-- Disable TypeORM auto-sync in production.
-- Keep secrets only in environment variables.
-- Enforce strict CORS origins.
-- Validate PostgreSQL SSL requirements for hosting provider.
-- Keep cron and email credentials configured per environment.
+## Production Checklist
+- Disable TypeORM auto-sync.
+- Keep secrets strictly in env vars.
+- Restrict CORS origins.
+- Verify PostgreSQL SSL requirements.
+- Configure scheduler/mail credentials per environment.
+- Run migrations as part of deployment pipeline.
 
 ## Troubleshooting
-- If UI text appears as garbled characters, verify file encoding is UTF-8.
-- If frontend shows import/export errors, restart Vite and hard refresh browser cache.
-- If migrations fail, verify `DATABASE_URL` points to the correct database/user.
+- Garbled Hebrew text: ensure UTF-8 file encoding.
+- Frontend import/export runtime error: restart Vite and hard refresh.
+- Migration failures: validate `DATABASE_URL`, DB permissions, and migration order.
 
 ## License
 Private internal project.
