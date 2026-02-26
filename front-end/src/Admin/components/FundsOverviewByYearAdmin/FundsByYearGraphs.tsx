@@ -57,9 +57,9 @@ const FundsByYearGraphs = () => {
   useEffect(() => {
     if (!isAdmin && authUser?.user?.id) {
       dispatch(getUserFundsOverview(authUser.user.id));
-    } else if (isAdmin && !selectedUser) {
+    } else if (isAdmin &&  authUser?.permission != "user" && !selectedUser  ) {
       dispatch(getFundsOverviewByYear());
-    } else if (isAdmin && selectedUser) {
+    } else if (isAdmin && authUser?.permission != "user" && selectedUser) {
       dispatch(getUserFundsOverview(selectedUser.id));
     }
   }, [dispatch, isAdmin, selectedUser, authUser?.user?.id]);
