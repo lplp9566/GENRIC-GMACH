@@ -44,6 +44,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ConfirmModal from "../genricComponents/confirmModal";
 import AiChatDialog from "./AiChatDialog";
 import { RtlThemeProvider } from "../../../Theme/rtl";
+import CashFlowSnapshotCard from "./CashFlowSnapshotCard";
 
 export const formatILS = (value?: number | string | null) => {
   const n = typeof value === "string" ? Number(value) : value ?? 0;
@@ -578,6 +579,7 @@ const name = import.meta.env.VITE_NAME
               monthlyNegtiveBalanceUsers={totalNegtivUsers}
               loansNegativeCount={totalNegativeLoans}
             />
+            <CashFlowSnapshotCard />
 
             {/* <Grid container spacing={3} justifyContent="center">
               {quickActions.map((action, i) => (
