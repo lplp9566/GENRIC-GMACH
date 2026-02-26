@@ -168,7 +168,14 @@ const DepositActionTable: FC<DepositActionTableProps> = ({
                     <TableCell align="center">
                       <Tooltip title="העתקה">
                         <span>
-                          <IconButton size="small" onClick={() => onCopy?.(action)} disabled={!mutable}>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              (e.currentTarget as HTMLButtonElement).blur();
+                              onCopy?.(action);
+                            }}
+                            disabled={!mutable}
+                          >
                             <ContentCopyIcon fontSize="small" />
                           </IconButton>
                         </span>

@@ -78,6 +78,7 @@ const DepositsPage: FC = () => {
   const [editDepositActionAmount, setEditDepositActionAmount] = useState<string>("");
   const [editDepositActionDate, setEditDepositActionDate] = useState<string>("");
   const [deleteDepositAction, setDeleteDepositAction] = useState<IDepositAction | null>(null);
+  const [copyDepositAction, setCopyDepositAction] = useState<IDepositAction | null>(null);
 
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const permission = authUser?.permission ?? authUser?.user?.permission;
@@ -202,30 +203,12 @@ const DepositsPage: FC = () => {
   const handleCopyDepositAction = async (action: IDepositAction) => {
     if (!canWrite || !canModifyAction(action)) return;
     const depositId = Number(action.deposit?.id);
-    const type = getActionType(action);
     const amount = Number(action.amount ?? 0);
     if (!Number.isInteger(depositId) || depositId <= 0 || amount <= 0) return;
-
-    try {
-      await toast.promise(
-        dispatch(
-          createDepositAction({
-            deposit: depositId,
-            action_type: type,
-            amount,
-            date: toInputDate(action.date),
-          })
-        ).unwrap(),
-        {
-          pending: "מעתיק פעולה...",
-          success: "הפעולה הועתקה בהצלחה.",
-          error: "העתקת הפעולה נכשלה.",
-        }
-      );
-      await refreshAfterAction();
-    } catch {
-      // toast handles errors
-    }
+    await dispatch(getDepositDetails(depositId));
+    setCopyDepositAction(action);
+    setActionDepositId(depositId);
+    setActionsOpen(true);
   };
 
   const openEditDepositAction = (action: IDepositAction) => {
@@ -291,6 +274,7 @@ const DepositsPage: FC = () => {
     await refreshAfterAction();
     setActionsOpen(false);
     setActionDepositId(null);
+    setCopyDepositAction(null);
   };
 
   const handleEditSave = async () => {
@@ -574,6 +558,7 @@ const DepositsPage: FC = () => {
         onClose={() => {
           setActionsOpen(false);
           setActionDepositId(null);
+          setCopyDepositAction(null);
         }}
         maxWidth="sm"
         fullWidth
@@ -585,11 +570,19 @@ const DepositsPage: FC = () => {
         }}
       >
         <DialogContent sx={{ p: 0, background: "transparent" }}>
-          {actionDepositId && actionDeposit && (
+          {actionDepositId && (
             <DepositsActions
               depositId={actionDepositId}
-              max={actionDeposit.current_balance ?? 0}
+              max={
+                actionDeposit?.current_balance ??
+                (deposit?.id === actionDepositId ? Number(deposit.current_balance ?? 0) : 0)
+              }
               handleSubmit={handleActionSubmit}
+              initialAction={copyDepositAction}
+              depositOptions={allDeposits}
+              selectedDepositId={actionDepositId}
+              onDepositChange={(nextId) => setActionDepositId(nextId)}
+              showDepositSelect={Boolean(copyDepositAction)}
             />
           )}
         </DialogContent>

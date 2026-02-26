@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+﻿import { FC, useEffect, useState } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import { toast } from "react-toastify";
 import { IDepositActionCreate, DepositActionsType } from "../depositsDto";
@@ -6,14 +6,29 @@ import { IDepositActionCreate, DepositActionsType } from "../depositsDto";
 interface IDepositAmountChangeProps {
   depositId: number;
   handleSubmit?: (dto: IDepositActionCreate) => Promise<void>;
+  initialDate?: string;
+  initialAmount?: number;
+  submitLabel?: string;
 }
 
 const DepositAmountChange: FC<IDepositAmountChangeProps> = ({
   depositId,
   handleSubmit,
+  initialDate,
+  initialAmount,
+  submitLabel,
 }) => {
-  const [amountStr, setAmountStr] = useState<string>("");
-  const [date, setDate] = useState<string>("");
+  const [amountStr, setAmountStr] = useState<string>(
+    initialAmount != null && Number.isFinite(initialAmount) ? String(initialAmount) : ""
+  );
+  const [date, setDate] = useState<string>(initialDate ?? "");
+
+  useEffect(() => {
+    setAmountStr(
+      initialAmount != null && Number.isFinite(initialAmount) ? String(initialAmount) : ""
+    );
+    setDate(initialDate ?? "");
+  }, [initialDate, initialAmount, depositId]);
 
   const amountNum = amountStr === "" ? NaN : Number(amountStr);
   const isValid = Number.isFinite(amountNum) && amountNum > 0 && !!date;
@@ -31,13 +46,13 @@ const DepositAmountChange: FC<IDepositAmountChangeProps> = ({
 
     try {
       if (!handleSubmit) throw new Error("לא הוגדרה פונקציית שליחה");
-      setAmountStr("");
-      setDate("");
       await toast.promise(handleSubmit(dto), {
         pending: "שולח...",
-        success: `הסכום ${amountNum} ש"ח נוסף בהצלחה להפקדה`,
+        success: `הסכום ${amountNum} ש\"ח נוסף בהצלחה להפקדה`,
         error: "אירעה שגיאה בשמירת הפעולה",
       });
+      setAmountStr("");
+      setDate("");
     } catch (err: any) {
       toast.error(err?.message ?? "אירעה שגיאה בשמירת הפעולה");
     }
@@ -70,8 +85,6 @@ const DepositAmountChange: FC<IDepositAmountChangeProps> = ({
         InputLabelProps={{ shrink: true }}
       />
 
-
-
       <TextField
         label="סכום"
         inputMode="numeric"
@@ -88,7 +101,7 @@ const DepositAmountChange: FC<IDepositAmountChangeProps> = ({
         disabled={!isValid}
         sx={{ bgcolor: isValid ? "green" : "grey.500" }}
       >
-        עדכן
+        {submitLabel ?? "עדכן"}
       </Button>
     </Box>
   );
