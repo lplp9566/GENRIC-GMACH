@@ -31,9 +31,9 @@ const UserRegulations = ({ surface, softBorder, accent, onOpenRegulations }: Pro
               כללי הגמ"ח מוצגים כאן וניתן לצפות בתקנון.
             </Typography>
           </Box>
-          <Button variant="contained" disabled sx={{ borderRadius: 3, fontWeight: 900, height: 44 }}>
+          {/* <Button variant="contained" disabled sx={{ borderRadius: 3, fontWeight: 900, height: 44 }}>
             בקרוב: מסמכים
-          </Button>
+          </Button> */}
         </Stack>
         <Divider />
         <Box textAlign={{ xs: "center", md: "left" }}>

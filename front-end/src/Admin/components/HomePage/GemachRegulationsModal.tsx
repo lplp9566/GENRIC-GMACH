@@ -46,6 +46,10 @@ const GemachRegulationsModal: React.FC<{
   const regulationArray = useSelector(
     (state: RootState) => state.AdminFundsOverviewReducer.regulation
   );
+  const authUser = useSelector((state: RootState) => state.authslice.user);
+  const canEdit = Boolean(
+    authUser?.is_admin || authUser?.permission === 'admin_write'
+  );
 
   const regulationUrl = regulationArray?.[0]?.regulation || '';
   const previewUrl = convertToPreviewLink(regulationUrl);
@@ -53,8 +57,11 @@ const GemachRegulationsModal: React.FC<{
   useEffect(() => {
     if (open) {
       dispatch(getRegulation());
+      if (!canEdit) {
+        setEditing(false);
+      }
     }
-  }, [open]);
+  }, [open, dispatch, canEdit]);
 
   useEffect(() => {
     if (editing && regulationUrl) {
@@ -63,6 +70,7 @@ const GemachRegulationsModal: React.FC<{
   }, [editing, regulationUrl]);
 
   const handleSave = () => {
+    if (!canEdit) return;
     dispatch(UpdateRegulation({ regulation: editedUrl }));
     setEditing(false);
     onClose();
@@ -76,24 +84,23 @@ const GemachRegulationsModal: React.FC<{
           justifyContent: 'space-between',
           alignItems: 'center',
           borderBottom: '1px solid #ddd',
-      
           px: 3,
           py: 2,
         }}
       >
         <Typography variant="h6" fontWeight={700}>
-          תקנון הגמח  
+          תקנון הגמח
         </Typography>
         <IconButton onClick={onClose}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{  px: 4, py: 3 }}>
+      <DialogContent sx={{ px: 4, py: 3 }}>
         <Box display="flex" flexDirection="column" gap={2} mb={2}>
-          {editing && (
+          {canEdit && editing && (
             <TextField
-            sx={{marginTop:5}}
+              sx={{ marginTop: 5 }}
               fullWidth
               value={editedUrl}
               onChange={(e) => setEditedUrl(e.target.value)}
@@ -103,21 +110,23 @@ const GemachRegulationsModal: React.FC<{
             />
           )}
 
-          <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap" >
-            {editing && (
+          <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap">
+            {canEdit && editing && (
               <Button variant="contained" color="success" onClick={handleSave}>
                 שמור
               </Button>
             )}
 
-            <Button
-              startIcon={editing ? <CloseIcon /> : <EditIcon />}
-              onClick={() => setEditing(!editing)}
-              color={editing ? 'secondary' : 'primary'}
-              variant="outlined"
-            >
-              {editing ? 'ביטול' : 'עריכה'}
-            </Button>
+            {canEdit && (
+              <Button
+                startIcon={editing ? <CloseIcon /> : <EditIcon />}
+                onClick={() => setEditing(!editing)}
+                color={editing ? 'secondary' : 'primary'}
+                variant="outlined"
+              >
+                {editing ? 'ביטול' : 'עריכה'}
+              </Button>
+            )}
           </Box>
         </Box>
 

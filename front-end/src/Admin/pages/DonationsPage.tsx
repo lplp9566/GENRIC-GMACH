@@ -96,8 +96,6 @@ const DonationsHomePage: FC = () => {
 
   useEffect(() => {
     if (donationsStatus !== "idle") return;
-
-    // לא אדמין -> מביאים רק את התרומות של המשתמש המחובר
     if (!isAdmin && sessionStorage.getItem("preferred_view_choice") === "user") {
       if (myUserId != null) dispatch(getDonationByUserId(Number(myUserId)));
       return;
