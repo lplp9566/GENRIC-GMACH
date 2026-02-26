@@ -253,5 +253,6 @@ Current note:
 - Frontend import/export runtime error: restart Vite and hard refresh.
 - Migration failures: validate `DATABASE_URL`, DB permissions, and migration order.
 
+
 ## License
 Private internal project.
