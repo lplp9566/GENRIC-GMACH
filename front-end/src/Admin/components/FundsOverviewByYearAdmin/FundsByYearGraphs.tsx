@@ -14,12 +14,10 @@ import LoadingIndicator from "../StatusComponents/LoadingIndicator";
 import { getUserFundsOverview } from "../../../store/features/user/userFundsOverviewSlice";
 
 const KEY_MAP: Record<string, string | null> = {
-  // Admin -> User
   total_special_fund_donations: "special_fund_donations",
   total_loans_taken: "total_loans_taken_count",
   total_fixed_deposits_deposited: "total_fixed_deposits_added",
-  total_cash_holdings: null, // לא קיים אצל משתמש
-  // אם יש עוד הבדלים בשמות – להוסיף כאן
+  total_cash_holdings: null, 
 };
 
 const FundsByYearGraphs = () => {
@@ -36,9 +34,8 @@ const FundsByYearGraphs = () => {
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const isAdmin = Boolean(authUser?.is_admin);
 
-  // סט השדות הנכון לפי מצב (כלל אחיד)
   const items = useMemo(
-    () => (isAdmin && !selectedUser ? AdminYearlyFinancialItems : UserAdminFinancialItems),
+    () => (isAdmin && authUser?.permission != "user" && !selectedUser ? AdminYearlyFinancialItems : UserAdminFinancialItems),
     [isAdmin, selectedUser]
   );
 
