@@ -2,6 +2,17 @@
 import { Box, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { UserDetailsStepProps } from "./AddUserStepsProps";
 
+const numberFieldSx = {
+  "& input[type=number]": {
+    MozAppearance: "textfield",
+  },
+  "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
+    {
+      WebkitAppearance: "none",
+      margin: 0,
+    },
+};
+
 const StepUserDetails: React.FC<UserDetailsStepProps> = ({ data, onUserChange }) => {
   return (
     <Box display="grid" gap={2} mb={2}>
@@ -22,9 +33,11 @@ const StepUserDetails: React.FC<UserDetailsStepProps> = ({ data, onUserChange })
       <TextField
         dir="rtl"
         label="תעודת זהות"
+        type="number"
         value={data.userData.id_number}
         onChange={onUserChange("id_number")}
         fullWidth
+        sx={numberFieldSx}
       />
       <TextField
         dir="rtl"

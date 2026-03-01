@@ -30,6 +30,7 @@ import {
 } from "../../store/features/loanRequests/loanRequestsSlice";
 import CheckLoanModal from "../components/Loans/CheckLoanModal";
 import { ICreateLoan } from "../components/Loans/LoanDto";
+import { RtlThemeProvider } from "../../Theme/rtl";
 
 const LoanRequestsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -202,21 +203,23 @@ const LoanRequestsPage: React.FC = () => {
             }}
           />
         )}
-        <Dialog
-          open={Boolean(selectedRequest)}
-          onClose={() => setSelected(null)}
-          maxWidth="sm"
-          fullWidth
-        >
-          <DialogTitle sx={{ textAlign: "center" }}>פרטי בקשה</DialogTitle>
-          <DialogContent>
-            {!selectedRequest && null}
-            {selectedRequest && (
-              <Stack spacing={1} sx={{ direction: "rtl" }}>
-                <Typography fontWeight={700} textAlign="center">
-                  מגיש: {selectedRequest.user?.first_name}{" "}
-                  {selectedRequest.user?.last_name}
-                </Typography>
+        <RtlThemeProvider>
+          <Dialog
+            open={Boolean(selectedRequest)}
+            onClose={() => setSelected(null)}
+            maxWidth="sm"
+            fullWidth
+            PaperProps={{ sx: { direction: "rtl" } }}
+          >
+            <DialogTitle sx={{ textAlign: "center" }}>פרטי בקשה</DialogTitle>
+            <DialogContent>
+              {!selectedRequest && null}
+              {selectedRequest && (
+                <Stack spacing={1} sx={{ direction: "rtl", textAlign: "right" }}>
+                  <Typography fontWeight={700} textAlign="center">
+                    מגיש: {selectedRequest.user?.first_name}{" "}
+                    {selectedRequest.user?.last_name}
+                  </Typography>
                 <TextField
                   label="סכום"
                   type="number"
@@ -225,7 +228,6 @@ const LoanRequestsPage: React.FC = () => {
                   fullWidth
                   disabled={!canEditRequest}
                   sx={{ direction: "rtl", "& .MuiInputBase-input": { textAlign: "right" } }}
-                  InputLabelProps={{ sx: { right: 14, left: "auto", transformOrigin: "top right" } }}
                 />
                 <TextField
                   label="החזר חודשי"
@@ -235,7 +237,6 @@ const LoanRequestsPage: React.FC = () => {
                   fullWidth
                   disabled={!canEditRequest}
                   sx={{ direction: "rtl", "& .MuiInputBase-input": { textAlign: "right" } }}
-                  InputLabelProps={{ sx: { right: 14, left: "auto", transformOrigin: "top right" } }}
                 />
                 <TextField
                   label="מטרה"
@@ -244,7 +245,6 @@ const LoanRequestsPage: React.FC = () => {
                   fullWidth
                   disabled={!canEditRequest}
                   sx={{ direction: "rtl", "& .MuiInputBase-input": { textAlign: "right" } }}
-                  InputLabelProps={{ sx: { right: 14, left: "auto", transformOrigin: "top right" } }}
                 />
                 <TextField
                   label="יום חיוב (1-28)"
@@ -254,9 +254,8 @@ const LoanRequestsPage: React.FC = () => {
                   fullWidth
                   disabled={!canEditRequest}
                   sx={{ direction: "rtl", "& .MuiInputBase-input": { textAlign: "right" } }}
-                  InputLabelProps={{ sx: { right: 14, left: "auto", transformOrigin: "top right" } }}
                 />
-                <FormControl fullWidth sx={{ direction: "rtl" }}>
+                <FormControl fullWidth sx={{ direction: "rtl", textAlign: "right" }}>
                   <InputLabel>אמצעי חיוב</InputLabel>
                   <Select
                     value={editPaymentMethod}
@@ -281,13 +280,13 @@ const LoanRequestsPage: React.FC = () => {
                     {selectedRequest.error_message}
                   </Typography>
                 )}
-                {canWrite && (
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    justifyContent="space-between"
-                    sx={{ width: "100%" }}
-                  >
+                  {canWrite && (
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      justifyContent="space-between"
+                      sx={{ width: "100%" }}
+                    >
                     <Button
                       variant="outlined"
                       disabled={!canEditRequest}
@@ -325,12 +324,13 @@ const LoanRequestsPage: React.FC = () => {
                     >
                       דחייה
                     </Button>
-                  </Stack>
-                )}
-              </Stack>
-            )}
-          </DialogContent>
-        </Dialog>
+                    </Stack>
+                  )}
+                </Stack>
+              )}
+            </DialogContent>
+          </Dialog>
+        </RtlThemeProvider>
       </Container>
     </Box>
   );

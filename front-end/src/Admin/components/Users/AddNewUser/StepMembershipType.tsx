@@ -11,8 +11,14 @@ const StepMembershipType: React.FC<Props> = ({ data, setData }) => {
   const value = data.userData.membership_type ?? MembershipType.MEMBER;
 
   return (
-    <Box sx={{ mt: 2 }}>
-      <FormControl>
+    <Box
+      sx={{
+        mt: 2,
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+      <FormControl sx={{ alignItems: "center" }}>
         <FormLabel sx={{ mb: 1 }}>סוג משתמש</FormLabel>
         <Select
           value={value}

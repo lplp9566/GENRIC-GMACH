@@ -29,6 +29,17 @@ interface EditUserProps {
   onClose: () => void;
 }
 
+const numberFieldSx = {
+  "& input[type=number]": {
+    MozAppearance: "textfield",
+  },
+  "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
+    {
+      WebkitAppearance: "none",
+      margin: 0,
+    },
+};
+
 const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -176,11 +187,12 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
                   />
                   <TextField
                     label="תעודת זהות"
+                    type="number"
                     dir="rtl"
                     value={formData.id_number ?? ""}
                     onChange={handleChange("id_number")}
                     fullWidth
-                    sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2 }}
+                    sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2, ...numberFieldSx }}
                   />
                   <Divider sx={{ my: 2 }} />
                   <TextField
@@ -201,11 +213,12 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
                   />
                   <TextField
                     label="תעודת זהות בן/בת זוג"
+                    type="number"
                     dir="rtl"
                     value={formData.spouse_id_number ?? ""}
                     onChange={handleChange("spouse_id_number")}
                     fullWidth
-                    sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2 }}
+                    sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2, ...numberFieldSx }}
                   />
                 </Box>
               </Stack>
@@ -218,24 +231,30 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
                 </Typography>
                 <TextField
                   label="מספר בנק"
+                  type="number"
                   dir="rtl"
                   value={formData.payment_details.bank_number ?? ""}
                   onChange={handlePaymentChange("bank_number")}
                   fullWidth
+                  sx={numberFieldSx}
                 />
                 <TextField
                   label="סניף"
+                  type="number"
                   dir="rtl"
                   value={formData.payment_details.bank_branch ?? ""}
                   onChange={handlePaymentChange("bank_branch")}
                   fullWidth
+                  sx={numberFieldSx}
                 />
                 <TextField
                   label="מספר חשבון"
+                  type="number"
                   dir="rtl"
                   value={formData.payment_details.bank_account_number ?? ""}
                   onChange={handlePaymentChange("bank_account_number")}
                   fullWidth
+                  sx={numberFieldSx}
                 />
                 <TextField
                   label="תאריך חיוב"
