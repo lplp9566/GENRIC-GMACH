@@ -15,6 +15,7 @@ import PaymentLoanActionForm from "./PaymentLoanActionForm";
 import DateOfPaymentChangeLoanForm from "./DateOfPaymentChangeLoanForm";
 import MonthlyPaymentChangeLoanForm from "./MonthlyPaymentChangeLoanForm";
 import AmountChangeLoanForm from "./AmountChangeLoanForm";
+import { RtlThemeProvider } from "../../../../Theme/rtl";
 
 interface ActionsProps {
   loanId: number;
@@ -75,23 +76,32 @@ export const Actions: React.FC<ActionsProps> = ({
   const submitWithLoan = (dto: ICreateLoanAction) =>
     handleSubmit({ ...dto, loanId: loanIdLocal });
   return (
-    <Box
-      dir="rtl"
-      sx={(theme) => ({
-        bgcolor:
-          theme.palette.mode === "dark"
-            ? "#0f172a"
-            : theme.palette.background.paper,
-        borderRadius: "42px",
-        border: `1px solid ${alpha(theme.palette.divider, 0.7)}`,
-        boxShadow:
-          theme.palette.mode === "dark"
-            ? "0 28px 70px rgba(2,6,23,0.7)"
-            : "0 20px 44px rgba(15,23,42,0.14)",
-        overflow: "hidden",
-        p: 3,
-      })}
-    >
+    <RtlThemeProvider>
+      <Box
+        dir="rtl"
+        sx={(theme) => ({
+          bgcolor:
+            theme.palette.mode === "dark"
+              ? "#0f172a"
+              : theme.palette.background.paper,
+          borderRadius: "42px",
+          border: `1px solid ${alpha(theme.palette.divider, 0.7)}`,
+          boxShadow:
+            theme.palette.mode === "dark"
+              ? "0 28px 70px rgba(2,6,23,0.7)"
+              : "0 20px 44px rgba(15,23,42,0.14)",
+          overflow: "hidden",
+          p: 3,
+          "& input[type=number]": {
+            MozAppearance: "textfield",
+          },
+          "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
+            {
+              WebkitAppearance: "none",
+              margin: 0,
+            },
+        })}
+      >
           <Box
             sx={(theme) => ({
               mx: -3,
@@ -228,7 +238,8 @@ export const Actions: React.FC<ActionsProps> = ({
             initialValue={initialValue}
           />
         )}
-    </Box>
+      </Box>
+    </RtlThemeProvider>
   );
 };
 
