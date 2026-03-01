@@ -258,7 +258,10 @@ const LoanMiniCard: React.FC<LoanMiniCardProps> = ({
       >
         <DialogContent>
           {loanDetails?.id === loan.id ? (
-            <GeneralLoanInfoCard loan={loanDetails} />
+            <GeneralLoanInfoCard
+              loan={loanDetails}
+              borrowerName={`${loan.user?.first_name ?? ""} ${loan.user?.last_name ?? ""}`.trim()}
+            />
           ) : (
             <LoadingIndicator />
           )}

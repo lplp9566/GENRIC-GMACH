@@ -335,7 +335,9 @@ const name = import.meta.env.VITE_NAME
                 >
                   <Box
                     display="flex"
+                    flexDirection="column"
                     alignItems="center"
+                    justifyContent="center"
                     gap={2}
                     sx={{ position: "relative" }}
                   >
@@ -360,20 +362,20 @@ const name = import.meta.env.VITE_NAME
                       {s.icon}
                     </Box>
 
-                    <Box >
-                      <Typography   sx={{textAlign:"center"}}variant="body2" color="text.secondary">
+                    <Box sx={{ textAlign: "center", width: "100%" }}>
+                      <Typography sx={{ textAlign: "center" }} variant="body2" color="text.secondary">
                         {s.label}
                       </Typography>
-                      <Typography sx={{textAlign:"center"}} variant="h5" fontWeight={900}>
+                      <Typography sx={{ textAlign: "center" }} variant="h5" fontWeight={900}>
                         {s.value}
                       </Typography>
                       {"subValue" in s && s.subValue && (
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
                           {s.subValue}
                         </Typography>
                       )}
                       {"isBankCard" in s && s.isBankCard && canWrite && (
-                        <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+                        <Box sx={{ display: "flex", justifyContent: "center", gap: 1, mt: 1 }}>
                           {!latestBankCurrent ? (
                             <Button
                               size="small"

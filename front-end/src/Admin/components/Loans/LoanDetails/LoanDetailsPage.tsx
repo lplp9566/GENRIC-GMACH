@@ -119,7 +119,10 @@ const LoanDetailsPage: React.FC = () => {
         sx={{ mt: 3 }}
       >
         <Grid item xs={12} md="auto" sx={{ flexBasis: { md: "40%" } }}>
-          <GeneralLoanInfoCard loan={loanDetails} />
+          <GeneralLoanInfoCard
+            loan={loanDetails}
+            borrowerName={`${loan.user?.first_name ?? ""} ${loan.user?.last_name ?? ""}`.trim()}
+          />
         </Grid>
 
         <Grid item xs={12} md={4}>

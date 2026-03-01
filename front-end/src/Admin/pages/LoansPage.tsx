@@ -201,45 +201,17 @@ export const LoansPage: React.FC = () => {
               </Box>
 
               <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: { xs: "column", sm: "row" },
-                  justifyContent: "space-between",
-                  alignItems: { xs: "stretch", sm: "center" },
-                  gap: 2,
-                }}
+                component={Stack}
+                direction={isSm ? "column" : "row"}
+                spacing={2}
+                justifyContent={isSm ? "center" : "space-between"}
+                alignItems="center"
               >
-                <Stack
-                  direction={{ xs: "column", sm: "row" }}
-                  spacing={1}
-                  sx={{ width: { xs: "100%", sm: "auto" } }}
-                >
-                  {canWrite && (
-                  <Button
-                    variant="contained"
-                    onClick={() => navigate("/loans/new")}
-                    fullWidth={isSm}
-                    sx={{
-                      bgcolor: "#2a8c82",
-                      "&:hover": { bgcolor: "#1f645f" },
-                    }}
-                  >
-                    הוספת הלוואה
-                  </Button>
-                  )}
-                  <Button
-                    variant="outlined"
-                    onClick={() => navigate("/loan-requests")}
-                    fullWidth={isSm}
-                  >
-                    בקשות הלוואה
-                  </Button>
-                </Stack>
                 <FormControl
                   size="small"
-                  fullWidth={isSm}
                   sx={{
-                    minWidth: { xs: "auto", sm: 160 },
+                    width: { xs: "100%", sm: "auto" },
+                    minWidth: { xs: "100%", sm: 160 },
                   }}
                 >
                   <InputLabel
@@ -262,6 +234,39 @@ export const LoansPage: React.FC = () => {
                     <MenuItem value={StatusGeneric.INACTIVE}>לא פעיל</MenuItem>
                   </Select>
                 </FormControl>
+
+                {canWrite && (
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate("/loans/new")}
+                    fullWidth={isSm}
+                    sx={{
+                      bgcolor: "#2a8c82",
+                      color: "#fff",
+                      width: { xs: "100%", sm: "auto" },
+                      "&:hover": { bgcolor: "#1f645f" },
+                    }}
+                  >
+                    הוספת הלוואה
+                  </Button>
+                )}
+
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate("/loan-requests")}
+                  fullWidth={isSm}
+                  sx={{
+                    borderColor: "#2a8c82",
+                    color: "#2a8c82",
+                    width: { xs: "100%", sm: "auto" },
+                    "&:hover": {
+                      borderColor: "#1f645f",
+                      color: "#1f645f",
+                    },
+                  }}
+                >
+                  בקשות הלוואה
+                </Button>
               </Box>
             </Stack>
           </Paper>

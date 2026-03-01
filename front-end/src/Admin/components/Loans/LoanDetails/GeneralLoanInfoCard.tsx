@@ -15,9 +15,10 @@ import { fmtDate } from "../../../../common/genricFunction";
 
 interface Props {
   loan: ILoanWithPayment;
+  borrowerName?: string;
 }
 
-export const GeneralLoanInfoCard: React.FC<Props> = ({ loan }) => {
+export const GeneralLoanInfoCard: React.FC<Props> = ({ loan, borrowerName }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const highlights = [
@@ -52,10 +53,6 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan }) => {
       label: "תאריך תחילת התשלום",
       value: fmtDate(loan.first_payment_date),
       condition: loan.first_payment_date !== null,
-    },
-    {
-      label: "מטרה",
-      value: loan.purpose,
     },
     {
       label: "תשלום חודשי התחלתי",
@@ -127,10 +124,10 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan }) => {
               variant="h5"
               sx={{ fontWeight: 800, color: theme.palette.text.primary }}
             >
-              פרטי הלוואה
+              לווה: {borrowerName?.trim() || "-"}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              סיכום מעודכן על הפעילות והתשלומים
+              מטרה: {loan.purpose?.trim() || "-"}
             </Typography>
           </Box>
           <Chip

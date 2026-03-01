@@ -51,6 +51,17 @@ const numOr = (v: any, fallback: number) => {
   return Number.isFinite(n) ? n : fallback;
 };
 
+const numberFieldSx = {
+  "& input[type=number]": {
+    MozAppearance: "textfield",
+  },
+  "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
+    {
+      WebkitAppearance: "none",
+      margin: 0,
+    },
+};
+
 const EditLoanModal: React.FC<EditLoanModalProps> = ({
   open,
   onClose,
@@ -292,6 +303,7 @@ const EditLoanModal: React.FC<EditLoanModalProps> = ({
                 type="number"
                 fullWidth
                 color="success"
+                sx={numberFieldSx}
                 value={form.loan_amount ?? ""}
                 error={!!errors.loan_amount}
                 helperText={errors.loan_amount}
@@ -311,6 +323,7 @@ const EditLoanModal: React.FC<EditLoanModalProps> = ({
                 type="number"
                 fullWidth
                 color="success"
+                sx={numberFieldSx}
                 value={form.monthly_payment ?? ""}
                 error={!!errors.monthly_payment}
                 helperText={errors.monthly_payment}
@@ -330,6 +343,7 @@ const EditLoanModal: React.FC<EditLoanModalProps> = ({
                 type="number"
                 fullWidth
                 color="success"
+                sx={numberFieldSx}
                 value={form.payment_date ?? ""}
                 error={!!errors.payment_date}
                 helperText={errors.payment_date}
