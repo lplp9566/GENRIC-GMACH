@@ -208,13 +208,13 @@ const LoanRequestsPage: React.FC = () => {
           maxWidth="sm"
           fullWidth
         >
-          <DialogTitle>פרטי בקשה</DialogTitle>
+          <DialogTitle sx={{ textAlign: "center" }}>פרטי בקשה</DialogTitle>
           <DialogContent>
             {!selectedRequest && null}
             {selectedRequest && (
-              <Stack spacing={1}>
-                <Typography fontWeight={700}>
-                  {selectedRequest.user?.first_name}{" "}
+              <Stack spacing={1} sx={{ direction: "rtl" }}>
+                <Typography fontWeight={700} textAlign="center">
+                  מגיש: {selectedRequest.user?.first_name}{" "}
                   {selectedRequest.user?.last_name}
                 </Typography>
                 <TextField
@@ -224,6 +224,8 @@ const LoanRequestsPage: React.FC = () => {
                   onChange={(e) => setEditAmount(Number(e.target.value))}
                   fullWidth
                   disabled={!canEditRequest}
+                  sx={{ direction: "rtl", "& .MuiInputBase-input": { textAlign: "right" } }}
+                  InputLabelProps={{ sx: { right: 14, left: "auto", transformOrigin: "top right" } }}
                 />
                 <TextField
                   label="החזר חודשי"
@@ -232,6 +234,8 @@ const LoanRequestsPage: React.FC = () => {
                   onChange={(e) => setEditMonthly(Number(e.target.value))}
                   fullWidth
                   disabled={!canEditRequest}
+                  sx={{ direction: "rtl", "& .MuiInputBase-input": { textAlign: "right" } }}
+                  InputLabelProps={{ sx: { right: 14, left: "auto", transformOrigin: "top right" } }}
                 />
                 <TextField
                   label="מטרה"
@@ -239,6 +243,8 @@ const LoanRequestsPage: React.FC = () => {
                   onChange={(e) => setEditPurpose(e.target.value)}
                   fullWidth
                   disabled={!canEditRequest}
+                  sx={{ direction: "rtl", "& .MuiInputBase-input": { textAlign: "right" } }}
+                  InputLabelProps={{ sx: { right: 14, left: "auto", transformOrigin: "top right" } }}
                 />
                 <TextField
                   label="יום חיוב (1-28)"
@@ -247,14 +253,17 @@ const LoanRequestsPage: React.FC = () => {
                   onChange={(e) => setEditPaymentDate(Number(e.target.value))}
                   fullWidth
                   disabled={!canEditRequest}
+                  sx={{ direction: "rtl", "& .MuiInputBase-input": { textAlign: "right" } }}
+                  InputLabelProps={{ sx: { right: 14, left: "auto", transformOrigin: "top right" } }}
                 />
-                <FormControl fullWidth>
+                <FormControl fullWidth sx={{ direction: "rtl" }}>
                   <InputLabel>אמצעי חיוב</InputLabel>
                   <Select
                     value={editPaymentMethod}
                     label="אמצעי חיוב"
                     onChange={(e) => setEditPaymentMethod(e.target.value)}
                     disabled={!canEditRequest}
+                    sx={{ "& .MuiSelect-select": { textAlign: "right" } }}
                   >
                     <MenuItem value="direct_debit">הוראת קבע</MenuItem>
                     <MenuItem value="credit_card">כרטיס אשראי</MenuItem>
@@ -263,7 +272,7 @@ const LoanRequestsPage: React.FC = () => {
                     <MenuItem value="other">אחר</MenuItem>
                   </Select>
                 </FormControl>
-                <Typography>סטטוס: {selectedRequest.status}</Typography>
+                <Typography>סטטוס: {statusMap[selectedRequest.status]?.label ?? selectedRequest.status}</Typography>
                 <Typography>
                   ערבים: {guarantorNames.length ? guarantorNames.join(", ") : "-"}
                 </Typography>
@@ -273,10 +282,16 @@ const LoanRequestsPage: React.FC = () => {
                   </Typography>
                 )}
                 {canWrite && (
-                  <Stack direction="row" spacing={1}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    justifyContent="space-between"
+                    sx={{ width: "100%" }}
+                  >
                     <Button
                       variant="outlined"
                       disabled={!canEditRequest}
+                      sx={{ flex: 1 }}
                       onClick={() =>
                         dispatch(
                           updateLoanRequestDetails({
@@ -295,6 +310,7 @@ const LoanRequestsPage: React.FC = () => {
                     <Button
                       variant="contained"
                       disabled={selectedRequest.status !== "ADMIN_PENDING"}
+                      sx={{ flex: 1 }}
                       onClick={() => openCheckModal(selectedRequest.id)}
                     >
                       אישור
@@ -302,6 +318,7 @@ const LoanRequestsPage: React.FC = () => {
                     <Button
                       variant="outlined"
                       disabled={selectedRequest.status !== "ADMIN_PENDING"}
+                      sx={{ flex: 1 }}
                       onClick={() =>
                         dispatch(adminRejectRequest({ id: selectedRequest.id }))
                       }

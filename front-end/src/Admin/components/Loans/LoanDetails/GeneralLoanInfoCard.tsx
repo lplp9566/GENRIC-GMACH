@@ -157,6 +157,7 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan, borrowerName }) => 
                   background: isDark
                     ? alpha(theme.palette.background.paper, 0.9)
                     : "#ffffff",
+                  textAlign: "center",
                 }}
               >
                 <Box
@@ -165,6 +166,7 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan, borrowerName }) => 
                     height: 4,
                     borderRadius: 999,
                     mb: 1.5,
+                    mx: "auto",
                   }}
                 />
                 <Typography variant="caption" color="text.secondary">
@@ -199,7 +201,8 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan, borrowerName }) => 
                     : "#f8fafc",
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: "flex-end",
+                  alignItems: "center",
+                  textAlign: "center",
                   minHeight: 86,
                 }}
               >
