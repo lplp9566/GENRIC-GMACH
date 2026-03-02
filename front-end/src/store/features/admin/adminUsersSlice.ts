@@ -49,10 +49,16 @@ export const editUser = createAsyncThunk(
         first_name: data.userData.first_name,
         last_name: data.userData.last_name,
         id_number: data.userData.id_number,
+        join_date: data.userData.join_date,
         phone_number: data.userData.phone_number,
         email_address: data.userData.email_address,
         permission: data.userData.permission,
         is_member:data.userData.is_member,
+        membership_type: data.userData.membership_type,
+        current_role:
+          typeof data.userData.current_role === "number"
+            ? data.userData.current_role
+            : data.userData.current_role?.id,
         notify_account: data.userData.notify_account,
         notify_receipts: data.userData.notify_receipts,
         notify_general: data.userData.notify_general,

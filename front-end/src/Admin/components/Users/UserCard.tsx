@@ -30,10 +30,13 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import EditUser from "./editUser";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import EditFriendUserModal from "./EditFriendUserModal";
+import ConvertFriendToMemberModal from "./ConvertFriendToMemberModal";
 
 const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
   const [expanded, setExpanded] = useState(false);
   const [editModal, seteditModal] = useState(false);
+  const [convertModal, setConvertModal] = useState(false);
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const permission = authUser?.permission ?? authUser?.user?.permission;
   const canWrite = Boolean(authUser?.is_admin || permission === "admin_write");
@@ -273,19 +276,52 @@ const UserCard: React.FC<{ user: IUser }> = ({ user }) => {
             </Typography>
             {canWrite && (
               <Box mt={2} textAlign="right">
-                <Button variant="contained" size="small" onClick={onEdit}>
-                  עריכת משתמש
-                </Button>
+                <Stack direction="row" spacing={1} justifyContent="flex-end">
+                  {user.membership_type === MembershipType.FRIEND && (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setConvertModal(true);
+                      }}
+                    >
+                      הפוך למשתמש
+                    </Button>
+                  )}
+                  <Button variant="contained" size="small" onClick={onEdit}>
+                    {user.membership_type === MembershipType.FRIEND
+                      ? "עריכת ידיד"
+                      : "עריכת משתמש"}
+                  </Button>
+                </Stack>
               </Box>
             )}
           </CardContent>
         </Collapse>
       </StyledCard>
       {editModal && canWrite && (
-        <EditUser
-          open={editModal}
+        <>
+          {user.membership_type === MembershipType.FRIEND ? (
+            <EditFriendUserModal
+              open={editModal}
+              user={user}
+              onClose={() => seteditModal(false)}
+            />
+          ) : (
+            <EditUser
+              open={editModal}
+              user={user}
+              onClose={() => seteditModal(false)}
+            />
+          )}
+        </>
+      )}
+      {convertModal && canWrite && user.membership_type === MembershipType.FRIEND && (
+        <ConvertFriendToMemberModal
+          open={convertModal}
           user={user}
-          onClose={() => seteditModal(false)}
+          onClose={() => setConvertModal(false)}
         />
       )}
     </>
