@@ -1,4 +1,3 @@
-// src/pages/LoanDetailsPage/LoanHeader.tsx
 import React from "react";
 import { Box, Paper, Typography, CircularProgress } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -38,10 +37,7 @@ const LoanHeader: React.FC<LoanHeaderProps> = ({
       }}
     >
       {lastName && firstName && (
-        <Paper
-          elevation={3}
-          sx={{ p: 2, flex: "1 1 23%", textAlign: "center" }}
-        >
+        <Paper elevation={3} sx={{ p: 2, flex: "1 1 23%", textAlign: "center" }}>
           <Typography variant="subtitle2" color="textSecondary">
             לווה
           </Typography>
@@ -51,7 +47,6 @@ const LoanHeader: React.FC<LoanHeaderProps> = ({
         </Paper>
       )}
 
-      {/* אחוזי החזר (דונאט) ובלאנס */}
       <Box
         sx={{
           flex: "1 1 20%",
@@ -98,23 +93,22 @@ const LoanHeader: React.FC<LoanHeaderProps> = ({
               fontWeight={700}
               color={balance >= 0 ? "green" : "red"}
             >
-              {`${balance.toLocaleString()} ₪`}
+              ₪{balance.toLocaleString("he-IL")}
             </Typography>
           </Box>
         </Box>
       </Box>
-      {
-        purpose && (
-      <Paper elevation={3} sx={{ p: 2, flex: "1 1 30%", textAlign: "center" }}>
-        <Typography variant="subtitle2" color="textSecondary">
-          מטרה
-        </Typography>
-        <Typography variant="h6" fontWeight={700}>
-          {purpose}
-        </Typography>
-      </Paper>
-        )
-      }
+
+      {purpose && (
+        <Paper elevation={3} sx={{ p: 2, flex: "1 1 30%", textAlign: "center" }}>
+          <Typography variant="subtitle2" color="textSecondary">
+            מטרה
+          </Typography>
+          <Typography variant="h6" fontWeight={700}>
+            {purpose}
+          </Typography>
+        </Paper>
+      )}
     </Box>
   );
 };
