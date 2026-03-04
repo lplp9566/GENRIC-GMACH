@@ -1,21 +1,9 @@
 ﻿import { useEffect, useMemo, useState } from "react";
-import {
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Grid,
-  Paper,
-  Stack,
-  Switch,
-  TextField,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Button, Grid, useTheme } from "@mui/material";
+import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
+import AccountBalanceRoundedIcon from "@mui/icons-material/AccountBalanceRounded";
+import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+import NotificationsActiveRoundedIcon from "@mui/icons-material/NotificationsActiveRounded";
 import { useDispatch, useSelector } from "react-redux";
 import { formatDate, parseDate } from "../../Admin/Hooks/genricFunction";
 import { AppDispatch, RootState } from "../../store/store";
@@ -23,6 +11,12 @@ import { editUser } from "../../store/features/admin/adminUsersSlice";
 import { setAuthUserData } from "../../store/features/auth/authSlice";
 import { toast } from "react-toastify";
 import { api } from "../../store/axiosInstance";
+import ProfileHeaderCard from "./components/UserProfilePage/ProfileHeaderCard";
+import ProfileInfoCard from "./components/UserProfilePage/ProfileInfoCard";
+import EditProfileDialog from "./components/UserProfilePage/EditProfileDialog";
+import EditNotificationsDialog from "./components/UserProfilePage/EditNotificationsDialog";
+import { buildFullDisplayName, mapMembershipType } from "./components/UserProfilePage/utils";
+import { NotificationFormData, ProfileFormData } from "./components/UserProfilePage/types";
 
 const UserProfilePage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -34,7 +28,8 @@ const UserProfilePage = () => {
 
   const [editOpen, setEditOpen] = useState(false);
   const [notifyOpen, setNotifyOpen] = useState(false);
-  const [formData, setFormData] = useState(() => ({
+
+  const [formData, setFormData] = useState<ProfileFormData>({
     first_name: user?.first_name ?? "",
     last_name: user?.last_name ?? "",
     email_address: user?.email_address ?? "",
@@ -46,20 +41,17 @@ const UserProfilePage = () => {
     bank_number: user?.payment_details?.bank_number ?? "",
     bank_branch: user?.payment_details?.bank_branch ?? "",
     bank_account_number: user?.payment_details?.bank_account_number ?? "",
-  }));
-  const [notifyData, setNotifyData] = useState(() => ({
+  });
+
+  const [notifyData, setNotifyData] = useState<NotificationFormData>({
     notify_account: user?.notify_account ?? true,
     notify_receipts: user?.notify_receipts ?? true,
     notify_general: user?.notify_general ?? true,
-  }));
-
-  useEffect(() => {
-    if (user?.id != null) {
-    }
-  }, [dispatch, user?.id]);
+  });
 
   useEffect(() => {
     if (!user) return;
+
     setFormData({
       first_name: user.first_name ?? "",
       last_name: user.last_name ?? "",
@@ -73,6 +65,7 @@ const UserProfilePage = () => {
       bank_branch: user.payment_details?.bank_branch ?? "",
       bank_account_number: user.payment_details?.bank_account_number ?? "",
     });
+
     setNotifyData({
       notify_account: user.notify_account ?? true,
       notify_receipts: user.notify_receipts ?? true,
@@ -81,6 +74,9 @@ const UserProfilePage = () => {
   }, [user]);
 
   const joinDate = formatDate(parseDate(user?.join_date));
+  const membershipTypeText = mapMembershipType(user?.membership_type);
+  const fullDisplayName = useMemo(() => buildFullDisplayName(user), [user]);
+
   const bankInfo = useMemo(
     () => ({
       bank_number: user?.payment_details?.bank_number ?? "לא הוזן",
@@ -89,6 +85,23 @@ const UserProfilePage = () => {
     }),
     [user?.payment_details]
   );
+
+  const surface = isDark ? "rgba(15,23,42,0.84)" : "rgba(255,255,255,0.88)";
+  const softBorder = isDark
+    ? "1px solid rgba(148,163,184,0.22)"
+    : "1px solid rgba(15,23,42,0.08)";
+
+  const cardSx = {
+    p: 3,
+    borderRadius: 4,
+    background: surface,
+    border: softBorder,
+    backdropFilter: "blur(8px)",
+    boxShadow: isDark
+      ? "0 12px 30px rgba(2,6,23,0.35)"
+      : "0 12px 30px rgba(15,23,42,0.08)",
+    height: "100%",
+  } as const;
 
   const handleSave = async () => {
     if (!user?.id) return;
@@ -123,6 +136,7 @@ const UserProfilePage = () => {
       dispatch(setAuthUserData(updated));
       setEditOpen(false);
     } catch {
+      // handled by toast
     }
   };
 
@@ -149,6 +163,7 @@ const UserProfilePage = () => {
       dispatch(setAuthUserData(updated));
       setNotifyOpen(false);
     } catch {
+      // handled by toast
     }
   };
 
@@ -160,6 +175,7 @@ const UserProfilePage = () => {
         error: "שליחת הסיכום נכשלה",
       });
     } catch {
+      // handled by toast
     }
   };
 
@@ -167,384 +183,105 @@ const UserProfilePage = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        py: { xs: 4, md: 6 },
+        py: { xs: 3, md: 5 },
         px: { xs: 2, sm: 4, md: 6 },
         direction: "rtl",
-        fontFamily: "Heebo, Arial, sans-serif",
+        fontFamily: '"Assistant", "Heebo", Arial, sans-serif',
         background: isDark
-          ? "radial-gradient(circle at 15% 15%, rgba(59,130,246,0.2), transparent 40%), linear-gradient(180deg, #0b1120 0%, #0f172a 70%)"
-          : "radial-gradient(circle at 15% 15%, rgba(59,130,246,0.12), transparent 40%), linear-gradient(180deg, #f8fafc 0%, #ffffff 70%)",
+          ? "radial-gradient(circle at 12% 8%, rgba(56,189,248,0.16), transparent 35%), radial-gradient(circle at 88% 5%, rgba(34,197,94,0.14), transparent 32%), linear-gradient(180deg, #0b1120 0%, #0f172a 72%)"
+          : "radial-gradient(circle at 12% 8%, rgba(56,189,248,0.13), transparent 35%), radial-gradient(circle at 88% 5%, rgba(34,197,94,0.1), transparent 32%), linear-gradient(180deg, #f8fafc 0%, #ffffff 72%)",
       }}
     >
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 3, md: 4 },
-          borderRadius: 4,
-          background: isDark
-            ? "linear-gradient(130deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9))"
-            : "linear-gradient(130deg, rgba(30,41,59,0.08), rgba(226,232,240,0.6))",
-          border: isDark ? "1px solid rgba(148,163,184,0.2)" : "none",
-        }}
-      >
-        <Stack spacing={1}>
-          <Chip
-            label="אזור אישי"
-            sx={{
-              alignSelf: "flex-start",
-              fontWeight: 700,
-              bgcolor: isDark ? "rgba(148,163,184,0.2)" : "rgba(15,23,42,0.08)",
-            }}
+      <ProfileHeaderCard
+        isDark={isDark}
+        softBorder={softBorder}
+        fullDisplayName={fullDisplayName}
+        onSendYearSummary={handleSendYearSummary}
+        onOpenEdit={() => setEditOpen(true)}
+      />
+
+      <Grid container spacing={2.5} sx={{ mt: 1.5 }}>
+        <Grid item xs={12} md={6}>
+          <ProfileInfoCard
+            cardSx={cardSx}
+            icon={<BadgeRoundedIcon sx={{ color: "#22c55e" }} />}
+            title="פרטי משתמש"
+            rows={[
+              { label: "מספר זהות", value: user?.id_number ?? "לא הוזן" },
+              { label: "טלפון", value: user?.phone_number ?? "לא הוזן" },
+              { label: "אימייל", value: user?.email_address ?? "לא הוזן" },
+              { label: "תאריך הצטרפות", value: joinDate || "לא הוזן" },
+              { label: "סוג חברות", value: membershipTypeText },
+            ]}
           />
-          <Typography variant="h4" fontWeight={800}>
-            {user?.first_name} {user?.last_name}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            סיכום פרטי אישי עם מידע עדכני.
-          </Typography>
-        </Stack>
-        <Box mt={2}>
-          <Button
-            variant="contained"
-            onClick={handleSendYearSummary}
-            sx={{ borderRadius: 3, fontWeight: 700 }}
-          >
-            שליחת סיכום שנה אחרונה
-          </Button>
-        </Box>
-      </Paper>
+        </Grid>
 
-      <Grid container spacing={3} sx={{ mt: 1 }}>
-        <Grid item xs={12} md={7}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 4, height: "100%" }}>
-            <Typography variant="h6" fontWeight={800} mb={2}>
-              פרטי משתמש
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Stack spacing={1.5}>
-              {[
-                { label: "מספר זהות", value: user?.id_number ?? "לא הוזן" },
-                { label: "טלפון", value: user?.phone_number ?? "לא הוזן" },
-                { label: "אימייל", value: user?.email_address ?? "לא הוזן" },
-                { label: "תאריך הצטרפות", value: joinDate || "לא הוזן" },
-                { label: "סוג חברות", value: user?.membership_type ?? "לא הוזן" },
-              ].map((row) => (
-                <Stack
-                  key={row.label}
-                  direction="row"
-                  justifyContent="space-between"
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {row.label}
-                  </Typography>
-                  <Typography variant="subtitle2" fontWeight={700}>
-                    {row.value}
-                  </Typography>
-                </Stack>
-              ))}
-            </Stack>
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="subtitle1" fontWeight={700} mb={1}>
-              פרטי בנק
-            </Typography>
-            <Stack spacing={1.2}>
-              {[
-                { label: "מספר בנק", value: bankInfo.bank_number },
-                { label: "מספר סניף", value: bankInfo.bank_branch },
-                { label: "מספר חשבון", value: bankInfo.bank_account_number },
-              ].map((row) => (
-                <Stack
-                  key={row.label}
-                  direction="row"
-                  justifyContent="space-between"
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {row.label}
-                  </Typography>
-                  <Typography variant="subtitle2" fontWeight={700}>
-                    {row.value}
-                  </Typography>
-                </Stack>
-              ))}
-            </Stack>
+        <Grid item xs={12} md={6}>
+          <ProfileInfoCard
+            cardSx={cardSx}
+            icon={<AccountBalanceRoundedIcon sx={{ color: "#22c55e" }} />}
+            title="פרטי בנק"
+            rows={[
+              { label: "מספר בנק", value: bankInfo.bank_number },
+              { label: "מספר סניף", value: bankInfo.bank_branch },
+              { label: "מספר חשבון", value: bankInfo.bank_account_number },
+            ]}
+          />
+        </Grid>
 
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="subtitle1" fontWeight={700} mb={1}>
-              פרטי בן/בת זוג
-            </Typography>
-            <Stack spacing={1.2}>
-              {[
-                {
-                  label: "שם פרטי",
-                  value: user?.spouse_first_name || "לא הוזן",
-                },
-                {
-                  label: "שם משפחה",
-                  value: user?.spouse_last_name || "לא הוזן",
-                },
-                {
-                  label: "תעודת זהות",
-                  value: user?.spouse_id_number || "לא הוזן",
-                },
-              ].map((row) => (
-                <Stack
-                  key={row.label}
-                  direction="row"
-                  justifyContent="space-between"
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {row.label}
-                  </Typography>
-                  <Typography variant="subtitle2" fontWeight={700}>
-                    {row.value}
-                  </Typography>
-                </Stack>
-              ))}
-            </Stack>
-            <Box mt={2}>
-              <Button
-                variant="outlined"
-                onClick={() => setEditOpen(true)}
-                sx={{ borderRadius: 3, fontWeight: 700 }}
-              >
-                עריכת פרטים
-              </Button>
-            </Box>
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="subtitle1" fontWeight={700} mb={1}>
-              פרטי התראות
-            </Typography>
-            <Stack spacing={1.2}>
-              {[
-                {
-                  label: "התראות חשבון",
-                  value: notifyData.notify_account,
-                },
-                {
-                  label: "קבלות/אישורים",
-                  value: notifyData.notify_receipts,
-                },
-                {
-                  label: "עדכונים כלליים",
-                  value: notifyData.notify_general,
-                },
-              ].map((row) => (
-                <Stack
-                  key={row.label}
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {row.label}
-                  </Typography>
-                  <Typography variant="subtitle2" fontWeight={700}>
-                    {row.value ? "פעיל" : "כבוי"}
-                  </Typography>
-                </Stack>
-              ))}
-            </Stack>
-            <Box mt={2}>
+        <Grid item xs={12} md={6}>
+          <ProfileInfoCard
+            cardSx={cardSx}
+            icon={<FavoriteRoundedIcon sx={{ color: "#22c55e" }} />}
+            title="פרטי בן/בת זוג"
+            rows={[
+              { label: "שם פרטי", value: user?.spouse_first_name || "לא הוזן" },
+              { label: "שם משפחה", value: user?.spouse_last_name || "לא הוזן" },
+              { label: "תעודת זהות", value: user?.spouse_id_number || "לא הוזן" },
+            ]}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <ProfileInfoCard
+            cardSx={cardSx}
+            icon={<NotificationsActiveRoundedIcon sx={{ color: "#22c55e" }} />}
+            title="פרטי התראות"
+            rows={[
+              { label: "התראות חשבון", value: notifyData.notify_account ? "פעיל" : "כבוי" },
+              { label: "קבלות/אישורים", value: notifyData.notify_receipts ? "פעיל" : "כבוי" },
+              { label: "עדכונים כלליים", value: notifyData.notify_general ? "פעיל" : "כבוי" },
+            ]}
+            action={
               <Button
                 variant="outlined"
                 onClick={() => setNotifyOpen(true)}
-                sx={{ borderRadius: 3, fontWeight: 700 }}
+                sx={{ borderRadius: 3, fontWeight: 800 }}
               >
                 עריכת התראות
               </Button>
-            </Box>
-          </Paper>
+            }
+          />
         </Grid>
       </Grid>
 
-      <Dialog open={editOpen} onClose={() => setEditOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle sx={{ textAlign: "right" }}>עריכת פרטים אישיים</DialogTitle>
-        <DialogContent sx={{ direction: "rtl" }}>
-          <Stack spacing={2} mt={1}>
-            <TextField
-              label="שם פרטי"
-              value={formData.first_name}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, first_name: e.target.value }))
-              }
-              fullWidth
-            />
-            <TextField
-              label="שם משפחה"
-              value={formData.last_name}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, last_name: e.target.value }))
-              }
-              fullWidth
-            />
-            <TextField
-              label="אימייל"
-              value={formData.email_address}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  email_address: e.target.value,
-                }))
-              }
-              fullWidth
-            />
-            <TextField
-              label="טלפון"
-              value={formData.phone_number}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  phone_number: e.target.value,
-                }))
-              }
-              fullWidth
-            />
-            <TextField
-              label="מספר זהות"
-              value={formData.id_number}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, id_number: e.target.value }))
-              }
-              fullWidth
-            />
-            <Divider />
-            <TextField
-              label="שם פרטי בן/בת זוג"
-              value={formData.spouse_first_name}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  spouse_first_name: e.target.value,
-                }))
-              }
-              fullWidth
-            />
-            <TextField
-              label="שם משפחה בן/בת זוג"
-              value={formData.spouse_last_name}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  spouse_last_name: e.target.value,
-                }))
-              }
-              fullWidth
-            />
-            <TextField
-              label="תעודת זהות בן/בת זוג"
-              value={formData.spouse_id_number}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  spouse_id_number: e.target.value,
-                }))
-              }
-              fullWidth
-            />
-            <Divider />
-            <TextField
-              label="מספר בנק"
-              value={formData.bank_number}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, bank_number: e.target.value }))
-              }
-              fullWidth
-            />
-            <TextField
-              label="מספר סניף"
-              value={formData.bank_branch}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, bank_branch: e.target.value }))
-              }
-              fullWidth
-            />
-            <TextField
-              label="מספר חשבון"
-              value={formData.bank_account_number}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  bank_account_number: e.target.value,
-                }))
-              }
-              fullWidth
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>
-          <Button onClick={() => setEditOpen(false)} variant="outlined">
-            ביטול
-          </Button>
-          <Button onClick={handleSave} variant="contained">
-            שמירה
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <EditProfileDialog
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        onSave={handleSave}
+        formData={formData}
+        setFormData={setFormData}
+      />
 
-      <Dialog open={notifyOpen} onClose={() => setNotifyOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle sx={{ textAlign: "right" }}>עריכת התראות</DialogTitle>
-        <DialogContent sx={{ direction: "rtl" }}>
-          <Stack spacing={2} mt={1}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography>התראות חשבון</Typography>
-              <Switch
-                checked={!!notifyData.notify_account}
-                onChange={(e) =>
-                  setNotifyData((prev) => ({
-                    ...prev,
-                    notify_account: e.target.checked,
-                  }))
-                }
-              />
-            </Stack>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography>קבלות/אישורים</Typography>
-              <Switch
-                checked={!!notifyData.notify_receipts}
-                onChange={(e) =>
-                  setNotifyData((prev) => ({
-                    ...prev,
-                    notify_receipts: e.target.checked,
-                  }))
-                }
-              />
-            </Stack>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography>עדכונים כלליים</Typography>
-              <Switch
-                checked={!!notifyData.notify_general}
-                onChange={(e) =>
-                  setNotifyData((prev) => ({
-                    ...prev,
-                    notify_general: e.target.checked,
-                  }))
-                }
-              />
-            </Stack>
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>
-          <Button onClick={() => setNotifyOpen(false)} variant="outlined">
-            ביטול
-          </Button>
-          <Button onClick={handleNotifySave} variant="contained">
-            שמירה
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <EditNotificationsDialog
+        open={notifyOpen}
+        onClose={() => setNotifyOpen(false)}
+        onSave={handleNotifySave}
+        notifyData={notifyData}
+        setNotifyData={setNotifyData}
+      />
     </Box>
   );
 };
 
 export default UserProfilePage;
-
-
-
-
-
-
-
-
-
-
-

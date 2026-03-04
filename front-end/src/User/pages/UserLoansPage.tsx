@@ -194,6 +194,9 @@ const UserLoansPage: React.FC = () => {
                     <GeneralLoanInfoCard
                       loan={loanDetails}
                       borrowerName={`${selectedLoan.user?.first_name ?? ""} ${selectedLoan.user?.last_name ?? ""}`.trim()}
+                      showBalance={false}
+                      hideEmptyGuarantors
+                      showFirstPaymentDay
                     />
                   </Box>
                 </>

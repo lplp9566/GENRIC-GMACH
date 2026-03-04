@@ -71,7 +71,7 @@ const UserFullStatsSection = ({ cards, surface, softBorder }: Props) => (
                   bgcolor: "action.hover",
                   display: "grid",
                   placeItems: "center",
-                  color: "primary.main",
+                  color: "#22c55e",
                 }}
               >
                 {getCardIcon(card.title)}

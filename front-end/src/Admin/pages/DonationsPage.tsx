@@ -92,7 +92,13 @@ const DonationsHomePage: FC = () => {
   const myUserId = authUser?.user?.id ?? null;
 
   const donations = Array.isArray(allDonations) ? allDonations : [];
-  const donationsBase = donations; // השרת כבר מחזיר מסונן לפי הצורך
+  // בצד תורם מציגים רק תרומות (ללא משיכות).
+  const donationsBase = useMemo(() => {
+    if (isAdmin) return donations;
+    return donations.filter(
+      (d: any) => String(d?.action ?? "").toLowerCase() === "donation"
+    );
+  }, [donations, isAdmin]);
 
   useEffect(() => {
     if (donationsStatus !== "idle") return;

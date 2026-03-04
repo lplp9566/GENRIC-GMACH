@@ -22,6 +22,7 @@ type SortDirection = "asc" | "desc";
 interface DepositActionTableProps {
   actions: IDepositAction[];
   canWrite?: boolean;
+  showDepositorName?: boolean;
   onCopy?: (action: IDepositAction) => void;
   onEdit?: (action: IDepositAction) => void;
   onDelete?: (action: IDepositAction) => void;
@@ -47,6 +48,7 @@ const isMutable = (type: DepositActionsType) =>
 const DepositActionTable: FC<DepositActionTableProps> = ({
   actions,
   canWrite = false,
+  showDepositorName = true,
   onCopy,
   onEdit,
   onDelete,
@@ -99,7 +101,9 @@ const DepositActionTable: FC<DepositActionTableProps> = ({
     const last = String(action.deposit?.user?.last_name ?? "").trim();
     const fullName = `${first} ${last}`.trim();
 
-    if (depositId && fullName) return `הפקדה #${depositId} - ${fullName}`;
+    if (depositId && fullName && showDepositorName) {
+      return `הפקדה #${depositId} - ${fullName}`;
+    }
     if (depositId) return `הפקדה #${depositId}`;
     return "-";
   };
@@ -116,7 +120,9 @@ const DepositActionTable: FC<DepositActionTableProps> = ({
         <Table size="small" sx={{ borderSpacing: "0 6px" }}>
           <TableHead>
             <TableRow sx={{ "& th": { fontWeight: 700, cursor: "pointer" } }}>
-              <TableCell align="right">הפקדה / מפקיד</TableCell>
+              <TableCell align="right">
+                {showDepositorName ? "הפקדה / מפקיד" : "הפקדה"}
+              </TableCell>
               <TableCell align="right" onClick={() => handleHeaderClick("date")}>
                 תאריך{renderSortIndicator("date")}
               </TableCell>

@@ -16,9 +16,18 @@ import { fmtDate } from "../../../../common/genricFunction";
 interface Props {
   loan: ILoanWithPayment;
   borrowerName?: string;
+  showBalance?: boolean;
+  hideEmptyGuarantors?: boolean;
+  showFirstPaymentDay?: boolean;
 }
 
-export const GeneralLoanInfoCard: React.FC<Props> = ({ loan, borrowerName }) => {
+export const GeneralLoanInfoCard: React.FC<Props> = ({
+  loan,
+  borrowerName,
+  showBalance = true,
+  hideEmptyGuarantors = false,
+  showFirstPaymentDay = false,
+}) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const highlights = [
@@ -55,6 +64,14 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan, borrowerName }) => 
       condition: loan.first_payment_date !== null,
     },
     {
+      label: "יום תשלום ראשון",
+      value:
+        loan.first_payment_date != null
+          ? new Date(loan.first_payment_date).getDate()
+          : "-",
+      condition: showFirstPaymentDay && loan.first_payment_date !== null,
+    },
+    {
       label: "תשלום חודשי התחלתי",
       value: `₪${loan.initial_monthly_payment.toLocaleString("he-IL")}`,
       condition: loan.initial_monthly_payment !== loan.monthly_payment,
@@ -74,14 +91,21 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({ loan, borrowerName }) => 
     {
       label: "בלאנס",
       value: `₪${loan.balance.toLocaleString("he-IL")}`,
+      condition: showBalance,
     },
     {
       label: "ערב 1",
       value: loan.guarantor1 ?? "אין",
+      condition: hideEmptyGuarantors
+        ? Boolean(String(loan.guarantor1 ?? "").trim())
+        : true,
     },
     {
       label: "ערב 2",
       value: loan.guarantor2 ?? "אין",
+      condition: hideEmptyGuarantors
+        ? Boolean(String(loan.guarantor2 ?? "").trim())
+        : true,
     },
   ];
 

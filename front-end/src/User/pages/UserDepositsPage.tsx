@@ -163,7 +163,7 @@ const UserDepositsPage: React.FC = () => {
           <Grid item xs={12} md={4}>
             <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
               {selectedDepositId ? (
-                <DepositActionTable actions={actions ?? []} />
+                <DepositActionTable actions={actions ?? []} showDepositorName={false} />
               ) : (
                 <Typography variant="body1">בחר הפקדה להצגת הפעולות.</Typography>
               )}

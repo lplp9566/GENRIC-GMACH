@@ -49,7 +49,6 @@ const UserHomePage = () => {
   const [unreadAnnouncements, setUnreadAnnouncements] = useState(0);
   const [unreadToastOpen, setUnreadToastOpen] = useState(false);
   const [hasShownUnreadToast, setHasShownUnreadToast] = useState(false);
-
   const user = authUser?.user;
   const primaryFirstName = (user?.first_name ?? "").trim();
   const primaryLastName = (user?.last_name ?? "").trim();
