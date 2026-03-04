@@ -335,11 +335,9 @@ const name = import.meta.env.VITE_NAME
                 >
                   <Box
                     display="flex"
-                    flexDirection="column"
                     alignItems="center"
                     justifyContent="center"
-                    gap={2}
-                    sx={{ position: "relative" }}
+                    sx={{ position: "relative", minHeight: 86 }}
                   >
                     <Box
                       sx={(theme) => {
@@ -356,6 +354,10 @@ const name = import.meta.env.VITE_NAME
                             theme.palette.mode === "dark" ? 0.18 : 0.12
                           ),
                           color: main,
+                          position: "absolute",
+                          left: 0,
+                          top: "50%",
+                          transform: "translateY(-50%)",
                         };
                       }}
                     >
