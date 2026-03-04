@@ -32,20 +32,25 @@ const StandingOrdersReturn = () => {
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const isAdmin = Boolean(authUser?.is_admin);
   useEffect(() => {
-    if(!isAdmin && authUser?.permission === "user") {
-      const id = authUser?.user?.id;
-      if (id != null) {
-        dispatch(getOrdersReturnByUserId(id));
-        return;
+    const authUserId = authUser?.user?.id;
+
+    // User-side view: always limit to the logged-in user's records,
+    // regardless of extra permissions (as long as not system admin).
+    if (!isAdmin) {
+      if (authUserId != null) {
+        dispatch(getOrdersReturnByUserId(authUserId));
       }
+      return;
     }
+
+    // Admin-side view: can filter by selected user, or see all.
     if (selectedUser) {
       dispatch(getOrdersReturnByUserId(selectedUser.id));
       return;
-    } else {
-      dispatch(getAllOrdersReturn());
     }
-  }, [dispatch, selectedUser]);
+
+    dispatch(getAllOrdersReturn());
+  }, [dispatch, selectedUser, isAdmin, authUser?.user?.id]);
   const today = new Date();
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth() + 1;
