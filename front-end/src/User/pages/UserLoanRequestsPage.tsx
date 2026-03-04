@@ -22,6 +22,8 @@ import {
   TableRow,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
@@ -39,6 +41,8 @@ import { getAllUsers } from "../../store/features/admin/adminUsersSlice";
 
 const UserLoanRequestsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme();
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const userId = authUser?.user?.id;
   const isMember = Boolean(authUser?.user?.is_member);
@@ -211,8 +215,8 @@ const UserLoanRequestsPage: React.FC = () => {
                   </Typography>
                 )}
                 {requests.length > 0 && (
-                  <TableContainer>
-                    <Table size="small">
+                  <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+                    <Table size="small" sx={{ minWidth: 640 }}>
                       <TableHead>
                         <TableRow>
                           <TableCell align="right">מספר</TableCell>
@@ -276,7 +280,7 @@ const UserLoanRequestsPage: React.FC = () => {
           <Typography variant="h6" fontWeight={700} mb={2}>
             הודעות ערבויות
           </Typography>
-          <FormControl size="small" sx={{ mb: 2, minWidth: 200 }}>
+          <FormControl size="small" fullWidth={isSm} sx={{ mb: 2, minWidth: { xs: "100%", sm: 200 } }}>
             <InputLabel id="guarantor-filter-label">סינון</InputLabel>
             <Select
               labelId="guarantor-filter-label"

@@ -320,10 +320,11 @@ const ConvertFriendToMemberModal: FC<ConvertFriendToMemberModalProps> = ({
             bgcolor: "background.paper",
             boxShadow: 24,
             borderRadius: 2,
-            p: 3,
-            minWidth: 360,
+            p: { xs: 2, md: 3 },
             maxWidth: 640,
-            width: "92%",
+            width: { xs: "94vw", sm: "92vw", md: "auto" },
+            maxHeight: "92vh",
+            overflowY: "auto",
             direction: "rtl",
           }}
         >

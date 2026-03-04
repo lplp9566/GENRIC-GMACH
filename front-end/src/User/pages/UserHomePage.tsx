@@ -6,7 +6,10 @@ import {
   Paper,
   Snackbar,
   Stack,
+  Tab,
+  Tabs,
   Typography,
+  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -32,6 +35,7 @@ const UserHomePage = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
   const accent = isDark ? "#fbbf24" : "#0f766e";
   const accentSoft = isDark ? "rgba(251,191,36,0.14)" : "rgba(15,118,110,0.12)";
@@ -49,6 +53,7 @@ const UserHomePage = () => {
   const [unreadAnnouncements, setUnreadAnnouncements] = useState(0);
   const [unreadToastOpen, setUnreadToastOpen] = useState(false);
   const [hasShownUnreadToast, setHasShownUnreadToast] = useState(false);
+  const [mobileTab, setMobileTab] = useState(0);
   const user = authUser?.user;
   const primaryFirstName = (user?.first_name ?? "").trim();
   const primaryLastName = (user?.last_name ?? "").trim();
@@ -238,145 +243,140 @@ const UserHomePage = () => {
           onOpenRegulations={() => setOpenRegulations(true)}
         />
 
-        <Paper
-          elevation={0}
-          sx={{
-            p: { xs: 2, md: 2.5 },
-            borderRadius: 5,
-            background: surface,
-            border: softBorder,
-            backdropFilter: "blur(8px)",
-          }}
-        >
-          <Grid container spacing={2} alignItems="stretch">
-            <Grid item xs={12} md={6}>
-              <UserRoleSection
-                title="הדרגה שלך"
-                currentRoleName={currentRole?.name ?? null}
-                currentRoleAmount={currentRoleRate?.amount ?? null}
-                surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
-                softBorder={softBorder}
-                formatILS={formatILS}
-              />
-            </Grid>
+        {isSm ? (
+          <Paper
+            elevation={0}
+            sx={{
+              p: 1.5,
+              borderRadius: 5,
+              background: surface,
+              border: softBorder,
+              backdropFilter: "blur(8px)",
+            }}
+          >
+            <Tabs
+              value={mobileTab}
+              onChange={(_, value) => setMobileTab(value)}
+              variant="scrollable"
+              allowScrollButtonsMobile
+              sx={{ mb: 2 }}
+            >
+              <Tab label="דרגה ותרומות" />
+              <Tab label="חובות" />
+              <Tab label="חיובים קרובים" />
+              <Tab label="הפקדות/הלוואות" />
+              <Tab label="נתונים מלאים" />
+            </Tabs>
 
-            <Grid item xs={12} md={6}>
-              <Stack spacing={1.3} sx={{ height: "100%" }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography variant="h6" fontWeight={900} textAlign="center" sx={{ width: "100%" }}>
-                    סך תרומות ודמי חבר
-                  </Typography>
-                </Stack>
+            {mobileTab === 0 && (
+              <Grid container spacing={2} alignItems="stretch">
+                <Grid item xs={12}>
+                  <UserRoleSection
+                    title="הדרגה שלך"
+                    currentRoleName={currentRole?.name ?? null}
+                    currentRoleAmount={currentRoleRate?.amount ?? null}
+                    surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+                    softBorder={softBorder}
+                    formatILS={formatILS}
+                  />
+                </Grid>
 
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 2.5,
-                    borderRadius: 4,
-                    background: isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)",
-                    border: softBorder,
-                    height: "100%",
-                  }}
-                >
-                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
-                    <Stack spacing={1} sx={{ flex: 1 }}>
-                      <Typography variant="h5" fontWeight={900}>
-                        {formatILS(totalContributions)}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        סה"כ תרומות: {formatILS(totalDonations)}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        סה"כ דמי חבר: {formatILS(totalMemberFees)}
+                <Grid item xs={12}>
+                  <Stack spacing={1.3} sx={{ height: "100%" }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="h6" fontWeight={900} textAlign="center" sx={{ width: "100%" }}>
+                        סך תרומות ודמי חבר
                       </Typography>
                     </Stack>
 
-                    <Box
+                    <Paper
+                      elevation={0}
                       sx={{
-                        position: "relative",
-                        width: 168,
-                        height: 168,
-                        borderRadius: "50%",
-                        background: `conic-gradient(#38bdf8 ${loanUsagePercent}%, ${
-                          isDark ? "rgba(71,85,105,0.7)" : "rgba(148,163,184,0.35)"
-                        } 0)`,
-                        boxShadow: isDark
-                          ? "0 0 0 10px rgba(51,65,85,0.45)"
-                          : "0 0 0 10px rgba(148,163,184,0.22)",
-                        flexShrink: 0,
+                        p: 2.5,
+                        borderRadius: 4,
+                        background: isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)",
+                        border: softBorder,
+                        height: "100%",
                       }}
                     >
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          inset: 16,
-                          borderRadius: "50%",
-                          background: isDark ? "#0b1735" : "#0f172a",
-                          display: "grid",
-                          placeItems: "center",
-                          textAlign: "center",
-                        }}
-                      >
-                        <Typography variant="h4" fontWeight={900} sx={{ color: "#e2e8f0", lineHeight: 1 }}>
-                          {loanUsagePercent}%
-                        </Typography>
-                        <Typography
-                          variant="caption"
+                      <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+                        <Stack spacing={1} sx={{ flex: 1 }}>
+                          <Typography variant="h5" fontWeight={900}>
+                            {formatILS(totalContributions)}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            סה"כ תרומות: {formatILS(totalDonations)}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            סה"כ דמי חבר: {formatILS(totalMemberFees)}
+                          </Typography>
+                        </Stack>
+
+                        <Box
                           sx={{
-                            color: "#cbd5e1",
-                            fontSize: 13,
-                            mt: 0.4,
+                            position: "relative",
+                            width: 168,
+                            height: 168,
+                            borderRadius: "50%",
+                            background: `conic-gradient(#38bdf8 ${loanUsagePercent}%, ${
+                              isDark ? "rgba(71,85,105,0.7)" : "rgba(148,163,184,0.35)"
+                            } 0)`,
+                            boxShadow: isDark
+                              ? "0 0 0 10px rgba(51,65,85,0.45)"
+                              : "0 0 0 10px rgba(148,163,184,0.22)",
+                            flexShrink: 0,
                           }}
                         >
-                          בהלוואות
-                        </Typography>
-                      </Box>
-                    </Box>
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              inset: 16,
+                              borderRadius: "50%",
+                              background: isDark ? "#0b1735" : "#0f172a",
+                              display: "grid",
+                              placeItems: "center",
+                              textAlign: "center",
+                            }}
+                          >
+                            <Typography variant="h4" fontWeight={900} sx={{ color: "#e2e8f0", lineHeight: 1 }}>
+                              {loanUsagePercent}%
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: "#cbd5e1",
+                                fontSize: 13,
+                                mt: 0.4,
+                              }}
+                            >
+                              בהלוואות
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Stack>
+                    </Paper>
                   </Stack>
-                </Paper>
-              </Stack>
-            </Grid>
-          </Grid>
-        </Paper>
+                </Grid>
+              </Grid>
+            )}
 
-        <Paper
-          elevation={0}
-          sx={{
-            p: { xs: 2, md: 2.5 },
-            borderRadius: 5,
-            background: surface,
-            border: softBorder,
-            backdropFilter: "blur(8px)",
-          }}
-        >
-          <UserDebtsSection
-            totalDebt={totalDebt}
-            monthlyDebt={monthlyDebt}
-            loansDebt={loansDebt}
-            standingOrdersDebt={standingOrdersDebt}
-            openLoansCount={openLoansBalances.length}
-            formatDebtILS={formatDebtILS}
-            accent={accent}
-            accentSoft={accentSoft}
-            surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
-            softBorder={softBorder}
-            isDark={isDark}
-          />
-        </Paper>
+            {mobileTab === 1 && (
+              <UserDebtsSection
+                totalDebt={totalDebt}
+                monthlyDebt={monthlyDebt}
+                loansDebt={loansDebt}
+                standingOrdersDebt={standingOrdersDebt}
+                openLoansCount={openLoansBalances.length}
+                formatDebtILS={formatDebtILS}
+                accent={accent}
+                accentSoft={accentSoft}
+                surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+                softBorder={softBorder}
+                isDark={isDark}
+              />
+            )}
 
-        <Grid container spacing={2.5}>
-          <Grid item xs={12} md={6}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: { xs: 2, md: 2.5 },
-                borderRadius: 5,
-                background: surface,
-                border: softBorder,
-                backdropFilter: "blur(8px)",
-                height: "100%",
-              }}
-            >
+            {mobileTab === 2 && (
               <UserNextChargesSection
                 nextChargeDate={nextChargeDate}
                 currentRoleAmount={currentRoleRate?.amount ?? null}
@@ -389,21 +389,9 @@ const UserHomePage = () => {
                 softBorder={softBorder}
                 isDark={isDark}
               />
-            </Paper>
-          </Grid>
+            )}
 
-          <Grid item xs={12} md={6}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: { xs: 2, md: 2.5 },
-                borderRadius: 5,
-                background: surface,
-                border: softBorder,
-                backdropFilter: "blur(8px)",
-                height: "100%",
-              }}
-            >
+            {mobileTab === 3 && (
               <UserDepositsLoansSection
                 depositsNowAmount={depositsNowAmount}
                 loansNowByTakenMinusRepaid={loansNowByTakenMinusRepaid}
@@ -413,38 +401,239 @@ const UserHomePage = () => {
                 softBorder={softBorder}
                 isDark={isDark}
               />
-            </Paper>
-          </Grid>
-        </Grid>
+            )}
 
-        <Paper
-          elevation={0}
-          sx={{
-            p: { xs: 2, md: 2.5 },
-            borderRadius: 5,
-            background: surface,
-            border: softBorder,
-            backdropFilter: "blur(8px)",
-          }}
-        >
-          <UserFullStatsSection
-            surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
-            softBorder={softBorder}
-            cards={[
-              { title: 'סה"כ תרומות', value: totalDonations, detail: "מצטבר לכל התקופה", kind: "money" },
-              { title: "תרומות רגילות", value: totalEquityDonations, detail: "תרומות רגילות מצטברות", kind: "money" },
-              { title: "תרומות לקרנות מיוחדות", value: totalSpecialFundDonations, detail: "קרנות ייעודיות", kind: "money" },
-              { title: "דמי חבר", value: totalMemberFees, detail: 'סה"כ דמי חבר', kind: "money" },
-              { title: "סכום הלוואות שנלקחו", value: totalLoansTaken, detail: "סכום הלוואות לאורך זמן", kind: "money" },
-              { title: "כמות הלוואות", value: totalLoansCount, detail: "מספר הלוואות מצטבר", kind: "count" },
-              { title: "סכום הלוואות שנפרעו", value: totalLoansRepaid, detail: "החזרים מצטברים", kind: "money" },
-              { title: "הפקדות קבועות", value: totalFixedDepositsDeposited, detail: 'סה"כ הפקדות', kind: "money" },
-              { title: "משיכות מהפקדות", value: totalFixedDepositsWithdrawn, detail: 'סה"כ משיכות', kind: "money" },
-              { title: "החזרים בהוראות קבע", value: totalStandingOrderReturn, detail: "חיובים שחזרו", kind: "money" },
-              { title: "אחזקה במזומן", value: totalCashHoldings, detail: "יתרה נוכחית", kind: "money" },
-            ]}
-          />
-        </Paper>
+            {mobileTab === 4 && (
+              <UserFullStatsSection
+                surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+                softBorder={softBorder}
+                cards={[
+                  { title: 'סה"כ תרומות', value: totalDonations, detail: "מצטבר לכל התקופה", kind: "money" },
+                  { title: "תרומות רגילות", value: totalEquityDonations, detail: "תרומות רגילות מצטברות", kind: "money" },
+                  { title: "תרומות לקרנות מיוחדות", value: totalSpecialFundDonations, detail: "קרנות ייעודיות", kind: "money" },
+                  { title: "דמי חבר", value: totalMemberFees, detail: 'סה"כ דמי חבר', kind: "money" },
+                  { title: "סכום הלוואות שנלקחו", value: totalLoansTaken, detail: "סכום הלוואות לאורך זמן", kind: "money" },
+                  { title: "כמות הלוואות", value: totalLoansCount, detail: "מספר הלוואות מצטבר", kind: "count" },
+                  { title: "סכום הלוואות שנפרעו", value: totalLoansRepaid, detail: "החזרים מצטברים", kind: "money" },
+                  { title: "הפקדות קבועות", value: totalFixedDepositsDeposited, detail: 'סה"כ הפקדות', kind: "money" },
+                  { title: "משיכות מהפקדות", value: totalFixedDepositsWithdrawn, detail: 'סה"כ משיכות', kind: "money" },
+                  { title: "החזרים בהוראות קבע", value: totalStandingOrderReturn, detail: "חיובים שחזרו", kind: "money" },
+                  { title: "אחזקה במזומן", value: totalCashHoldings, detail: "יתרה נוכחית", kind: "money" },
+                ]}
+              />
+            )}
+          </Paper>
+        ) : (
+          <>
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 2.5 },
+                borderRadius: 5,
+                background: surface,
+                border: softBorder,
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              <Grid container spacing={2} alignItems="stretch">
+                <Grid item xs={12} md={6}>
+                  <UserRoleSection
+                    title="הדרגה שלך"
+                    currentRoleName={currentRole?.name ?? null}
+                    currentRoleAmount={currentRoleRate?.amount ?? null}
+                    surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+                    softBorder={softBorder}
+                    formatILS={formatILS}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Stack spacing={1.3} sx={{ height: "100%" }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="h6" fontWeight={900} textAlign="center" sx={{ width: "100%" }}>
+                        סך תרומות ודמי חבר
+                      </Typography>
+                    </Stack>
+
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        p: 2.5,
+                        borderRadius: 4,
+                        background: isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)",
+                        border: softBorder,
+                        height: "100%",
+                      }}
+                    >
+                      <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+                        <Stack spacing={1} sx={{ flex: 1 }}>
+                          <Typography variant="h5" fontWeight={900}>
+                            {formatILS(totalContributions)}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            סה"כ תרומות: {formatILS(totalDonations)}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            סה"כ דמי חבר: {formatILS(totalMemberFees)}
+                          </Typography>
+                        </Stack>
+
+                        <Box
+                          sx={{
+                            position: "relative",
+                            width: 168,
+                            height: 168,
+                            borderRadius: "50%",
+                            background: `conic-gradient(#38bdf8 ${loanUsagePercent}%, ${
+                              isDark ? "rgba(71,85,105,0.7)" : "rgba(148,163,184,0.35)"
+                            } 0)`,
+                            boxShadow: isDark
+                              ? "0 0 0 10px rgba(51,65,85,0.45)"
+                              : "0 0 0 10px rgba(148,163,184,0.22)",
+                            flexShrink: 0,
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              inset: 16,
+                              borderRadius: "50%",
+                              background: isDark ? "#0b1735" : "#0f172a",
+                              display: "grid",
+                              placeItems: "center",
+                              textAlign: "center",
+                            }}
+                          >
+                            <Typography variant="h4" fontWeight={900} sx={{ color: "#e2e8f0", lineHeight: 1 }}>
+                              {loanUsagePercent}%
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: "#cbd5e1",
+                                fontSize: 13,
+                                mt: 0.4,
+                              }}
+                            >
+                              בהלוואות
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Stack>
+                    </Paper>
+                  </Stack>
+                </Grid>
+              </Grid>
+            </Paper>
+
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 2.5 },
+                borderRadius: 5,
+                background: surface,
+                border: softBorder,
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              <UserDebtsSection
+                totalDebt={totalDebt}
+                monthlyDebt={monthlyDebt}
+                loansDebt={loansDebt}
+                standingOrdersDebt={standingOrdersDebt}
+                openLoansCount={openLoansBalances.length}
+                formatDebtILS={formatDebtILS}
+                accent={accent}
+                accentSoft={accentSoft}
+                surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+                softBorder={softBorder}
+                isDark={isDark}
+              />
+            </Paper>
+
+            <Grid container spacing={2.5}>
+              <Grid item xs={12} md={6}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: { xs: 2, md: 2.5 },
+                    borderRadius: 5,
+                    background: surface,
+                    border: softBorder,
+                    backdropFilter: "blur(8px)",
+                    height: "100%",
+                  }}
+                >
+                  <UserNextChargesSection
+                    nextChargeDate={nextChargeDate}
+                    currentRoleAmount={currentRoleRate?.amount ?? null}
+                    loanChargeSchedule={loanChargeSchedule}
+                    formatDate={formatDate}
+                    formatDebtILS={formatDebtILS}
+                    accent={accent}
+                    accentSoft={accentSoft}
+                    surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+                    softBorder={softBorder}
+                    isDark={isDark}
+                  />
+                </Paper>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: { xs: 2, md: 2.5 },
+                    borderRadius: 5,
+                    background: surface,
+                    border: softBorder,
+                    backdropFilter: "blur(8px)",
+                    height: "100%",
+                  }}
+                >
+                  <UserDepositsLoansSection
+                    depositsNowAmount={depositsNowAmount}
+                    loansNowByTakenMinusRepaid={loansNowByTakenMinusRepaid}
+                    accent={accent}
+                    accentSoft={accentSoft}
+                    surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+                    softBorder={softBorder}
+                    isDark={isDark}
+                  />
+                </Paper>
+              </Grid>
+            </Grid>
+
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 2.5 },
+                borderRadius: 5,
+                background: surface,
+                border: softBorder,
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              <UserFullStatsSection
+                surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+                softBorder={softBorder}
+                cards={[
+                  { title: 'סה"כ תרומות', value: totalDonations, detail: "מצטבר לכל התקופה", kind: "money" },
+                  { title: "תרומות רגילות", value: totalEquityDonations, detail: "תרומות רגילות מצטברות", kind: "money" },
+                  { title: "תרומות לקרנות מיוחדות", value: totalSpecialFundDonations, detail: "קרנות ייעודיות", kind: "money" },
+                  { title: "דמי חבר", value: totalMemberFees, detail: 'סה"כ דמי חבר', kind: "money" },
+                  { title: "סכום הלוואות שנלקחו", value: totalLoansTaken, detail: "סכום הלוואות לאורך זמן", kind: "money" },
+                  { title: "כמות הלוואות", value: totalLoansCount, detail: "מספר הלוואות מצטבר", kind: "count" },
+                  { title: "סכום הלוואות שנפרעו", value: totalLoansRepaid, detail: "החזרים מצטברים", kind: "money" },
+                  { title: "הפקדות קבועות", value: totalFixedDepositsDeposited, detail: 'סה"כ הפקדות', kind: "money" },
+                  { title: "משיכות מהפקדות", value: totalFixedDepositsWithdrawn, detail: 'סה"כ משיכות', kind: "money" },
+                  { title: "החזרים בהוראות קבע", value: totalStandingOrderReturn, detail: "חיובים שחזרו", kind: "money" },
+                  { title: "אחזקה במזומן", value: totalCashHoldings, detail: "יתרה נוכחית", kind: "money" },
+                ]}
+              />
+            </Paper>
+          </>
+        )}
       </Stack>
 
       {openRegulations && (

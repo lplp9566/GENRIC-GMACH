@@ -1,5 +1,6 @@
 ﻿import { FC, useMemo, useState } from "react";
 import {
+  Box,
   Chip,
   IconButton,
   Paper,
@@ -109,7 +110,7 @@ const DepositActionTable: FC<DepositActionTableProps> = ({
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 3, borderRadius: 2, width: "100%" }}>
+    <Paper elevation={3} sx={{ p: { xs: 1.5, md: 3 }, borderRadius: 2, width: "100%" }}>
       <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}>
         פעולות בהפקדה
       </Typography>
@@ -117,105 +118,104 @@ const DepositActionTable: FC<DepositActionTableProps> = ({
       {actions.length === 0 ? (
         <Typography>אין פעולות להצגה</Typography>
       ) : (
-        <Table size="small" sx={{ borderSpacing: "0 6px" }}>
-          <TableHead>
-            <TableRow sx={{ "& th": { fontWeight: 700, cursor: "pointer" } }}>
-              <TableCell align="right">
-                {showDepositorName ? "הפקדה / מפקיד" : "הפקדה"}
-              </TableCell>
-              <TableCell align="right" onClick={() => handleHeaderClick("date")}>
-                תאריך{renderSortIndicator("date")}
-              </TableCell>
-              <TableCell align="center" onClick={() => handleHeaderClick("action_type")}>
-                סוג פעולה{renderSortIndicator("action_type")}
-              </TableCell>
-              <TableCell align="left" onClick={() => handleHeaderClick("result")}>
-                תוצאה{renderSortIndicator("result")}
-              </TableCell>
-              {canWrite && <TableCell align="center">פעולות</TableCell>}
-            </TableRow>
-          </TableHead>
+        <Box sx={{ width: "100%", overflowX: "auto" }}>
+          <Table size="small" sx={{ borderSpacing: "0 6px", minWidth: 620 }}>
+            <TableHead>
+              <TableRow sx={{ "& th": { fontWeight: 700, cursor: "pointer" } }}>
+                <TableCell align="right">{showDepositorName ? "הפקדה / מפקיד" : "הפקדה"}</TableCell>
+                <TableCell align="right" onClick={() => handleHeaderClick("date")}>
+                  תאריך{renderSortIndicator("date")}
+                </TableCell>
+                <TableCell align="center" onClick={() => handleHeaderClick("action_type")}>
+                  סוג פעולה{renderSortIndicator("action_type")}
+                </TableCell>
+                <TableCell align="left" onClick={() => handleHeaderClick("result")}>
+                  תוצאה{renderSortIndicator("result")}
+                </TableCell>
+                {canWrite && <TableCell align="center">פעולות</TableCell>}
+              </TableRow>
+            </TableHead>
 
-          <TableBody>
-            {sortedActions.map((action) => {
-              const type = ((action as any).action_type ?? (action as any).actionType) as DepositActionsType;
-              const label = ACTION_LABELS[type] ?? String(type);
-              const mutable = isMutable(type);
+            <TableBody>
+              {sortedActions.map((action) => {
+                const type = ((action as any).action_type ?? (action as any).actionType) as DepositActionsType;
+                const label = ACTION_LABELS[type] ?? String(type);
+                const mutable = isMutable(type);
 
-              return (
-                <TableRow key={action.id} hover sx={{ "& td": { border: "none" } }}>
-                  <TableCell align="right">{getDepositOwnerLabel(action)}</TableCell>
-                  <TableCell align="right">{new Date(action.date).toLocaleDateString("he-IL")}</TableCell>
-                  <TableCell align="center">
-                    <Chip
-                      label={label}
-                      size="small"
-                      color={
-                        type === DepositActionsType.InitialDeposit
-                          ? "success"
-                          : type === DepositActionsType.AddToDeposit
-                            ? "success"
-                            : type === DepositActionsType.RemoveFromDeposit
-                              ? "warning"
-                              : type === DepositActionsType.ChangeReturnDate
-                                ? "info"
-                                : "default"
-                      }
-                    />
-                  </TableCell>
-                  <TableCell align="left" sx={{ fontWeight: 600, color: "#007BFF" }}>
-                    {type === DepositActionsType.ChangeReturnDate && action.update_date
-                      ? new Date(action.update_date).toLocaleDateString("he-IL")
-                      : null}
-                    {type !== DepositActionsType.ChangeReturnDate && "₪"}
-                    {type !== DepositActionsType.ChangeReturnDate ? Number(action.amount ?? 0) : ""}
-                  </TableCell>
-                  {canWrite && (
+                return (
+                  <TableRow key={action.id} hover sx={{ "& td": { border: "none" } }}>
+                    <TableCell align="right">{getDepositOwnerLabel(action)}</TableCell>
+                    <TableCell align="right">{new Date(action.date).toLocaleDateString("he-IL")}</TableCell>
                     <TableCell align="center">
-                      <Tooltip title="העתקה">
-                        <span>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              (e.currentTarget as HTMLButtonElement).blur();
-                              onCopy?.(action);
-                            }}
-                            disabled={!mutable}
-                          >
-                            <ContentCopyIcon fontSize="small" />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                      <Tooltip title="עריכה">
-                        <span>
-                          <IconButton size="small" onClick={() => onEdit?.(action)} disabled={!mutable}>
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                      <Tooltip title="מחיקה">
-                        <span>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => onDelete?.(action)}
-                            disabled={!mutable}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
+                      <Chip
+                        label={label}
+                        size="small"
+                        color={
+                          type === DepositActionsType.InitialDeposit
+                            ? "success"
+                            : type === DepositActionsType.AddToDeposit
+                              ? "success"
+                              : type === DepositActionsType.RemoveFromDeposit
+                                ? "warning"
+                                : type === DepositActionsType.ChangeReturnDate
+                                  ? "info"
+                                  : "default"
+                        }
+                      />
                     </TableCell>
-                  )}
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                    <TableCell align="left" sx={{ fontWeight: 600, color: "#007BFF" }}>
+                      {type === DepositActionsType.ChangeReturnDate && action.update_date
+                        ? new Date(action.update_date).toLocaleDateString("he-IL")
+                        : null}
+                      {type !== DepositActionsType.ChangeReturnDate && "₪"}
+                      {type !== DepositActionsType.ChangeReturnDate ? Number(action.amount ?? 0) : ""}
+                    </TableCell>
+                    {canWrite && (
+                      <TableCell align="center">
+                        <Tooltip title="העתקה">
+                          <span>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                (e.currentTarget as HTMLButtonElement).blur();
+                                onCopy?.(action);
+                              }}
+                              disabled={!mutable}
+                            >
+                              <ContentCopyIcon fontSize="small" />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                        <Tooltip title="עריכה">
+                          <span>
+                            <IconButton size="small" onClick={() => onEdit?.(action)} disabled={!mutable}>
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                        <Tooltip title="מחיקה">
+                          <span>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => onDelete?.(action)}
+                              disabled={!mutable}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Box>
       )}
     </Paper>
   );
 };
 
 export default DepositActionTable;
-

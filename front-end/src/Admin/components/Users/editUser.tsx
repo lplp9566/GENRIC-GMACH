@@ -117,9 +117,11 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
             bgcolor: "background.paper",
             boxShadow: 24,
             borderRadius: 2,
-            p: 3,
-            minWidth: 400,
+            p: { xs: 2, md: 3 },
+            width: { xs: "94vw", sm: "90vw", md: "auto" },
             maxWidth: 600,
+            maxHeight: "92vh",
+            overflowY: "auto",
           }}
         >
           <StepperNavigation

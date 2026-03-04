@@ -1,5 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from "react";
-import { Box, Button, Grid, useTheme } from "@mui/material";
+import { Box, Button, Grid, Tab, Tabs, useMediaQuery, useTheme } from "@mui/material";
 import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
 import AccountBalanceRoundedIcon from "@mui/icons-material/AccountBalanceRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
@@ -22,12 +22,14 @@ const UserProfilePage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   const authUser = useSelector((s: RootState) => s.authslice.user);
 
   const user = authUser?.user;
 
   const [editOpen, setEditOpen] = useState(false);
   const [notifyOpen, setNotifyOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState(0);
 
   const [formData, setFormData] = useState<ProfileFormData>({
     first_name: user?.first_name ?? "",
@@ -200,70 +202,150 @@ const UserProfilePage = () => {
         onOpenEdit={() => setEditOpen(true)}
       />
 
-      <Grid container spacing={2.5} sx={{ mt: 1.5 }}>
-        <Grid item xs={12} md={6}>
-          <ProfileInfoCard
-            cardSx={cardSx}
-            icon={<BadgeRoundedIcon sx={{ color: "#22c55e" }} />}
-            title="פרטי משתמש"
-            rows={[
-              { label: "מספר זהות", value: user?.id_number ?? "לא הוזן" },
-              { label: "טלפון", value: user?.phone_number ?? "לא הוזן" },
-              { label: "אימייל", value: user?.email_address ?? "לא הוזן" },
-              { label: "תאריך הצטרפות", value: joinDate || "לא הוזן" },
-              { label: "סוג חברות", value: membershipTypeText },
-            ]}
-          />
-        </Grid>
+      {isSm ? (
+        <Box sx={{ mt: 1.5 }}>
+          <Tabs
+            value={mobileTab}
+            onChange={(_, value) => setMobileTab(value)}
+            variant="scrollable"
+            allowScrollButtonsMobile
+            sx={{ mb: 2 }}
+          >
+            <Tab label="משתמש" />
+            <Tab label="בנק" />
+            <Tab label="בן/בת זוג" />
+            <Tab label="התראות" />
+          </Tabs>
 
-        <Grid item xs={12} md={6}>
-          <ProfileInfoCard
-            cardSx={cardSx}
-            icon={<AccountBalanceRoundedIcon sx={{ color: "#22c55e" }} />}
-            title="פרטי בנק"
-            rows={[
-              { label: "מספר בנק", value: bankInfo.bank_number },
-              { label: "מספר סניף", value: bankInfo.bank_branch },
-              { label: "מספר חשבון", value: bankInfo.bank_account_number },
-            ]}
-          />
-        </Grid>
+          {mobileTab === 0 && (
+            <ProfileInfoCard
+              cardSx={cardSx}
+              icon={<BadgeRoundedIcon sx={{ color: "#22c55e" }} />}
+              title="פרטי משתמש"
+              rows={[
+                { label: "מספר זהות", value: user?.id_number ?? "לא הוזן" },
+                { label: "טלפון", value: user?.phone_number ?? "לא הוזן" },
+                { label: "אימייל", value: user?.email_address ?? "לא הוזן" },
+                { label: "תאריך הצטרפות", value: joinDate || "לא הוזן" },
+                { label: "סוג חברות", value: membershipTypeText },
+              ]}
+            />
+          )}
 
-        <Grid item xs={12} md={6}>
-          <ProfileInfoCard
-            cardSx={cardSx}
-            icon={<FavoriteRoundedIcon sx={{ color: "#22c55e" }} />}
-            title="פרטי בן/בת זוג"
-            rows={[
-              { label: "שם פרטי", value: user?.spouse_first_name || "לא הוזן" },
-              { label: "שם משפחה", value: user?.spouse_last_name || "לא הוזן" },
-              { label: "תעודת זהות", value: user?.spouse_id_number || "לא הוזן" },
-            ]}
-          />
-        </Grid>
+          {mobileTab === 1 && (
+            <ProfileInfoCard
+              cardSx={cardSx}
+              icon={<AccountBalanceRoundedIcon sx={{ color: "#22c55e" }} />}
+              title="פרטי בנק"
+              rows={[
+                { label: "מספר בנק", value: bankInfo.bank_number },
+                { label: "מספר סניף", value: bankInfo.bank_branch },
+                { label: "מספר חשבון", value: bankInfo.bank_account_number },
+              ]}
+            />
+          )}
 
-        <Grid item xs={12} md={6}>
-          <ProfileInfoCard
-            cardSx={cardSx}
-            icon={<NotificationsActiveRoundedIcon sx={{ color: "#22c55e" }} />}
-            title="פרטי התראות"
-            rows={[
-              { label: "התראות חשבון", value: notifyData.notify_account ? "פעיל" : "כבוי" },
-              { label: "קבלות/אישורים", value: notifyData.notify_receipts ? "פעיל" : "כבוי" },
-              { label: "עדכונים כלליים", value: notifyData.notify_general ? "פעיל" : "כבוי" },
-            ]}
-            action={
-              <Button
-                variant="outlined"
-                onClick={() => setNotifyOpen(true)}
-                sx={{ borderRadius: 3, fontWeight: 800 }}
-              >
-                עריכת התראות
-              </Button>
-            }
-          />
+          {mobileTab === 2 && (
+            <ProfileInfoCard
+              cardSx={cardSx}
+              icon={<FavoriteRoundedIcon sx={{ color: "#22c55e" }} />}
+              title="פרטי בן/בת זוג"
+              rows={[
+                { label: "שם פרטי", value: user?.spouse_first_name || "לא הוזן" },
+                { label: "שם משפחה", value: user?.spouse_last_name || "לא הוזן" },
+                { label: "תעודת זהות", value: user?.spouse_id_number || "לא הוזן" },
+              ]}
+            />
+          )}
+
+          {mobileTab === 3 && (
+            <ProfileInfoCard
+              cardSx={cardSx}
+              icon={<NotificationsActiveRoundedIcon sx={{ color: "#22c55e" }} />}
+              title="פרטי התראות"
+              rows={[
+                { label: "התראות חשבון", value: notifyData.notify_account ? "פעיל" : "כבוי" },
+                { label: "קבלות/אישורים", value: notifyData.notify_receipts ? "פעיל" : "כבוי" },
+                { label: "עדכונים כלליים", value: notifyData.notify_general ? "פעיל" : "כבוי" },
+              ]}
+              action={
+                <Button
+                  variant="outlined"
+                  onClick={() => setNotifyOpen(true)}
+                  sx={{ borderRadius: 3, fontWeight: 800 }}
+                >
+                  עריכת התראות
+                </Button>
+              }
+            />
+          )}
+        </Box>
+      ) : (
+        <Grid container spacing={2.5} sx={{ mt: 1.5 }}>
+          <Grid item xs={12} md={6}>
+            <ProfileInfoCard
+              cardSx={cardSx}
+              icon={<BadgeRoundedIcon sx={{ color: "#22c55e" }} />}
+              title="פרטי משתמש"
+              rows={[
+                { label: "מספר זהות", value: user?.id_number ?? "לא הוזן" },
+                { label: "טלפון", value: user?.phone_number ?? "לא הוזן" },
+                { label: "אימייל", value: user?.email_address ?? "לא הוזן" },
+                { label: "תאריך הצטרפות", value: joinDate || "לא הוזן" },
+                { label: "סוג חברות", value: membershipTypeText },
+              ]}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <ProfileInfoCard
+              cardSx={cardSx}
+              icon={<AccountBalanceRoundedIcon sx={{ color: "#22c55e" }} />}
+              title="פרטי בנק"
+              rows={[
+                { label: "מספר בנק", value: bankInfo.bank_number },
+                { label: "מספר סניף", value: bankInfo.bank_branch },
+                { label: "מספר חשבון", value: bankInfo.bank_account_number },
+              ]}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <ProfileInfoCard
+              cardSx={cardSx}
+              icon={<FavoriteRoundedIcon sx={{ color: "#22c55e" }} />}
+              title="פרטי בן/בת זוג"
+              rows={[
+                { label: "שם פרטי", value: user?.spouse_first_name || "לא הוזן" },
+                { label: "שם משפחה", value: user?.spouse_last_name || "לא הוזן" },
+                { label: "תעודת זהות", value: user?.spouse_id_number || "לא הוזן" },
+              ]}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <ProfileInfoCard
+              cardSx={cardSx}
+              icon={<NotificationsActiveRoundedIcon sx={{ color: "#22c55e" }} />}
+              title="פרטי התראות"
+              rows={[
+                { label: "התראות חשבון", value: notifyData.notify_account ? "פעיל" : "כבוי" },
+                { label: "קבלות/אישורים", value: notifyData.notify_receipts ? "פעיל" : "כבוי" },
+                { label: "עדכונים כלליים", value: notifyData.notify_general ? "פעיל" : "כבוי" },
+              ]}
+              action={
+                <Button
+                  variant="outlined"
+                  onClick={() => setNotifyOpen(true)}
+                  sx={{ borderRadius: 3, fontWeight: 800 }}
+                >
+                  עריכת התראות
+                </Button>
+              }
+            />
+          </Grid>
         </Grid>
-      </Grid>
+      )}
 
       <EditProfileDialog
         open={editOpen}

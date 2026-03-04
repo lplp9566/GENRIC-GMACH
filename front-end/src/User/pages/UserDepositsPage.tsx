@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -9,6 +9,10 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Tab,
+  Tabs,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
@@ -25,6 +29,8 @@ import LoadingIndicator from "../../Admin/components/StatusComponents/LoadingInd
 
 const UserDepositsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme();
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const userId = authUser?.user?.id;
   const { allDeposits, allDepositsStatus } = useSelector(
@@ -42,6 +48,7 @@ const UserDepositsPage: React.FC = () => {
   );
   const [filter, setFilter] = useState<StatusGeneric>(StatusGeneric.ACTIVE);
   const [autoFallback, setAutoFallback] = useState(false);
+  const [mobileTab, setMobileTab] = useState(0);
 
   useEffect(() => {
     if (userId) {
@@ -93,31 +100,40 @@ const UserDepositsPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", py: 4, direction: "rtl" }}>
-            <Container maxWidth="xl">
-        <Grid container spacing={3} direction="row" sx={{ direction: "ltr" }}>
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-              <Typography variant="h6" fontWeight={600} mb={2}>
-                הפקדות
-              </Typography>
-              <FormControl size="small" fullWidth sx={{ mb: 2 }}>
-                <InputLabel id="user-deposits-filter-label">סינון</InputLabel>
-                <Select
-                  labelId="user-deposits-filter-label"
-                  label="סינון"
-                  value={filter}
-                  onChange={(e) => {
-                    setAutoFallback(false);
-                    setFilter(e.target.value as StatusGeneric);
-                  }}
-                >
-                  <MenuItem value={StatusGeneric.ALL}>הכל</MenuItem>
-                  <MenuItem value={StatusGeneric.ACTIVE}>פעילות</MenuItem>
-                  <MenuItem value={StatusGeneric.INACTIVE}>לא פעילות</MenuItem>
-                </Select>
-              </FormControl>
-              <Box>
+    <Box sx={{ minHeight: "100vh", py: { xs: 2.5, md: 4 }, direction: "rtl" }}>
+      <Container maxWidth="xl">
+        {isSm ? (
+          <Paper sx={{ p: 1.5, borderRadius: 2, direction: "rtl" }}>
+            <Tabs
+              value={mobileTab}
+              onChange={(_, value) => setMobileTab(value)}
+              variant="fullWidth"
+              sx={{ mb: 2 }}
+            >
+              <Tab label="רשימת הפקדות" />
+              <Tab label="פרטי הפקדה" />
+              <Tab label="פעולות" />
+            </Tabs>
+
+            {mobileTab === 0 && (
+              <>
+                <FormControl size="small" fullWidth sx={{ mb: 2 }}>
+                  <InputLabel id="user-deposits-filter-label">סינון</InputLabel>
+                  <Select
+                    labelId="user-deposits-filter-label"
+                    label="סינון"
+                    value={filter}
+                    onChange={(e) => {
+                      setAutoFallback(false);
+                      setFilter(e.target.value as StatusGeneric);
+                    }}
+                  >
+                    <MenuItem value={StatusGeneric.ALL}>הכל</MenuItem>
+                    <MenuItem value={StatusGeneric.ACTIVE}>פעילות</MenuItem>
+                    <MenuItem value={StatusGeneric.INACTIVE}>לא פעילות</MenuItem>
+                  </Select>
+                </FormControl>
+
                 {allDeposits.length === 0 ? (
                   <Typography variant="body2" color="text.secondary">
                     אין הפקדות על שמך
@@ -140,36 +156,109 @@ const UserDepositsPage: React.FC = () => {
                         <DepositCard
                           deposit={depositItem}
                           readOnly
-                          onClick={() => setSelectedDepositId(depositItem.id)}
+                          onClick={() => {
+                            setSelectedDepositId(depositItem.id);
+                            setMobileTab(1);
+                          }}
                         />
                       </Box>
                     );
                   })
                 )}
-              </Box>
-            </Paper>
-          </Grid>
+              </>
+            )}
 
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-              {deposit ? (
+            {mobileTab === 1 &&
+              (deposit ? (
                 <DepositDetailsInfoCard deposit={deposit} />
               ) : (
                 <Typography variant="body1">בחר הפקדה להצגת פרטים.</Typography>
-              )}
-            </Paper>
-          </Grid>
+              ))}
 
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-              {selectedDepositId ? (
+            {mobileTab === 2 &&
+              (selectedDepositId ? (
                 <DepositActionTable actions={actions ?? []} showDepositorName={false} />
               ) : (
-                <Typography variant="body1">בחר הפקדה להצגת הפעולות.</Typography>
-              )}
-            </Paper>
+                <Typography variant="body1">בחר הפקדה להצגת פעולות.</Typography>
+              ))}
+          </Paper>
+        ) : (
+          <Grid container spacing={{ xs: 2, md: 3 }} direction="row" sx={{ direction: "ltr" }}>
+            <Grid item xs={12} md={4}>
+              <Paper sx={{ p: { xs: 1.5, md: 2 }, borderRadius: 2, direction: "rtl" }}>
+                <Typography variant="h6" fontWeight={600} mb={2}>
+                  הפקדות
+                </Typography>
+                <FormControl size="small" fullWidth sx={{ mb: 2 }}>
+                  <InputLabel id="user-deposits-filter-label">סינון</InputLabel>
+                  <Select
+                    labelId="user-deposits-filter-label"
+                    label="סינון"
+                    value={filter}
+                    onChange={(e) => {
+                      setAutoFallback(false);
+                      setFilter(e.target.value as StatusGeneric);
+                    }}
+                  >
+                    <MenuItem value={StatusGeneric.ALL}>הכל</MenuItem>
+                    <MenuItem value={StatusGeneric.ACTIVE}>פעילות</MenuItem>
+                    <MenuItem value={StatusGeneric.INACTIVE}>לא פעילות</MenuItem>
+                  </Select>
+                </FormControl>
+                <Box>
+                  {allDeposits.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary">
+                      אין הפקדות על שמך
+                    </Typography>
+                  ) : (
+                    allDeposits.map((depositItem) => {
+                      const isSelected = depositItem.id === selectedDepositId;
+                      return (
+                        <Box
+                          key={depositItem.id}
+                          sx={{
+                            mb: 2,
+                            border: isSelected
+                              ? "2px solid #2a8c82"
+                              : "1px solid rgba(0,0,0,0.08)",
+                            borderRadius: 2,
+                            overflow: "hidden",
+                          }}
+                        >
+                          <DepositCard
+                            deposit={depositItem}
+                            readOnly
+                            onClick={() => setSelectedDepositId(depositItem.id)}
+                          />
+                        </Box>
+                      );
+                    })
+                  )}
+                </Box>
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Paper sx={{ p: { xs: 1.5, md: 2 }, borderRadius: 2, direction: "rtl" }}>
+                {deposit ? (
+                  <DepositDetailsInfoCard deposit={deposit} />
+                ) : (
+                  <Typography variant="body1">בחר הפקדה להצגת פרטים.</Typography>
+                )}
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Paper sx={{ p: { xs: 1.5, md: 2 }, borderRadius: 2, direction: "rtl" }}>
+                {selectedDepositId ? (
+                  <DepositActionTable actions={actions ?? []} showDepositorName={false} />
+                ) : (
+                  <Typography variant="body1">בחר הפקדה להצגת פעולות.</Typography>
+                )}
+              </Paper>
+            </Grid>
           </Grid>
-        </Grid>
+        )}
       </Container>
     </Box>
   );

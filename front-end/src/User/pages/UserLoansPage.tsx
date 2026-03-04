@@ -11,6 +11,8 @@ import {
   MenuItem,
   Button,
   Stack,
+  Tab,
+  Tabs,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -39,6 +41,7 @@ const UserLoansPage: React.FC = () => {
   const [selectedLoanId, setSelectedLoanId] = useState<number | null>(null);
   const [filter, setFilter] = useState<StatusGeneric>(StatusGeneric.ACTIVE);
   const [autoFallback, setAutoFallback] = useState(false);
+  const [mobileTab, setMobileTab] = useState(0);
 
   useEffect(() => {
     if (userId) {
@@ -85,13 +88,13 @@ const UserLoansPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", py: 4, direction: "rtl" }}>
+    <Box sx={{ minHeight: "100vh", py: { xs: 2.5, md: 4 }, direction: "rtl" }}>
       <Container maxWidth="xl">
         <Paper
           elevation={3}
           sx={{
-            p: 3,
-            mb: 4,
+            p: { xs: 2, md: 3 },
+            mb: { xs: 2.5, md: 4 },
             borderRadius: 2,
             width: { xs: "100%", sm: "90%", md: "60%", lg: "40%" },
             mx: "auto",
@@ -142,12 +145,20 @@ const UserLoansPage: React.FC = () => {
             </Box>
           </Stack>
         </Paper>
-        <Grid container spacing={3} direction="row" sx={{ direction: "ltr" }}>
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-              <Typography variant="h6" fontWeight={600} mb={2}>
-                הלוואות
-              </Typography>
+        {isSm ? (
+          <Paper sx={{ p: 1.5, borderRadius: 2, direction: "rtl" }}>
+            <Tabs
+              value={mobileTab}
+              onChange={(_, value) => setMobileTab(value)}
+              variant="fullWidth"
+              sx={{ mb: 2 }}
+            >
+              <Tab label="רשימת הלוואות" />
+              <Tab label="פרטי הלוואה" />
+              <Tab label="פעולות" />
+            </Tabs>
+
+            {mobileTab === 0 && (
               <Box>
                 {allLoans.length === 0 ? (
                   <Typography variant="body2" color="text.secondary">
@@ -171,55 +182,137 @@ const UserLoansPage: React.FC = () => {
                         <LoanCard
                           loan={loan}
                           readOnly
-                          onClick={() => setSelectedLoanId(loan.id)}
+                          onClick={() => {
+                            setSelectedLoanId(loan.id);
+                            setMobileTab(1);
+                          }}
                         />
                       </Box>
                     );
                   })
                 )}
               </Box>
-            </Paper>
-          </Grid>
+            )}
 
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-              {selectedLoan && loanDetails ? (
-                <>
-                  <LoanHeader
-                    principal={selectedLoan.loan_amount}
-                    remaining={loanDetails.remaining_balance}
-                    balance={loanDetails.balance}
-                  />
-                  <Box sx={{ mt: 2 }}>
-                    <GeneralLoanInfoCard
-                      loan={loanDetails}
-                      borrowerName={`${selectedLoan.user?.first_name ?? ""} ${selectedLoan.user?.last_name ?? ""}`.trim()}
-                      showBalance={false}
-                      hideEmptyGuarantors
-                      showFirstPaymentDay
+            {mobileTab === 1 && (
+              <>
+                {selectedLoan && loanDetails ? (
+                  <>
+                    <LoanHeader
+                      principal={selectedLoan.loan_amount}
+                      remaining={loanDetails.remaining_balance}
+                      balance={loanDetails.balance}
                     />
-                  </Box>
-                </>
-              ) : (
-                <Typography variant="body1">בחר הלוואה להצגת פרטים.</Typography>
-              )}
-            </Paper>
-          </Grid>
+                    <Box sx={{ mt: 2 }}>
+                      <GeneralLoanInfoCard
+                        loan={loanDetails}
+                        borrowerName={`${selectedLoan.user?.first_name ?? ""} ${selectedLoan.user?.last_name ?? ""}`.trim()}
+                        showBalance={false}
+                        hideEmptyGuarantors
+                        showFirstPaymentDay
+                      />
+                    </Box>
+                  </>
+                ) : (
+                  <Typography variant="body1">בחר הלוואה להצגת פרטים.</Typography>
+                )}
+              </>
+            )}
 
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
-              {selectedLoanId && loanDetails ? (
-                <ActionsTable
-                  actions={loanDetails.actions ?? []}
-                  loanId={selectedLoanId}
-                  readOnly
-                />
-              ) : (
-                <Typography variant="body1">בחר הלוואה להצגת פעולות.</Typography>
-              )}
-            </Paper>
+            {mobileTab === 2 && (
+              <>
+                {selectedLoanId && loanDetails ? (
+                  <ActionsTable
+                    actions={loanDetails.actions ?? []}
+                    loanId={selectedLoanId}
+                    readOnly
+                  />
+                ) : (
+                  <Typography variant="body1">בחר הלוואה להצגת פעולות.</Typography>
+                )}
+              </>
+            )}
+          </Paper>
+        ) : (
+          <Grid container spacing={{ xs: 2, md: 3 }} direction="row" sx={{ direction: "ltr" }}>
+            <Grid item xs={12} md={4}>
+              <Paper sx={{ p: { xs: 1.5, md: 2 }, borderRadius: 2, direction: "rtl" }}>
+                <Typography variant="h6" fontWeight={600} mb={2}>
+                  הלוואות
+                </Typography>
+                <Box>
+                  {allLoans.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary">
+                      אין הלוואות על שמך
+                    </Typography>
+                  ) : (
+                    allLoans.map((loan) => {
+                      const isSelected = loan.id === selectedLoanId;
+                      return (
+                        <Box
+                          key={loan.id}
+                          sx={{
+                            mb: 2,
+                            border: isSelected
+                              ? "2px solid #2a8c82"
+                              : "1px solid rgba(0,0,0,0.08)",
+                            borderRadius: 2,
+                            overflow: "hidden",
+                          }}
+                        >
+                          <LoanCard
+                            loan={loan}
+                            readOnly
+                            onClick={() => setSelectedLoanId(loan.id)}
+                          />
+                        </Box>
+                      );
+                    })
+                  )}
+                </Box>
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Paper sx={{ p: { xs: 1.5, md: 2 }, borderRadius: 2, direction: "rtl" }}>
+                {selectedLoan && loanDetails ? (
+                  <>
+                    <LoanHeader
+                      principal={selectedLoan.loan_amount}
+                      remaining={loanDetails.remaining_balance}
+                      balance={loanDetails.balance}
+                    />
+                    <Box sx={{ mt: 2 }}>
+                      <GeneralLoanInfoCard
+                        loan={loanDetails}
+                        borrowerName={`${selectedLoan.user?.first_name ?? ""} ${selectedLoan.user?.last_name ?? ""}`.trim()}
+                        showBalance={false}
+                        hideEmptyGuarantors
+                        showFirstPaymentDay
+                      />
+                    </Box>
+                  </>
+                ) : (
+                  <Typography variant="body1">בחר הלוואה להצגת פרטים.</Typography>
+                )}
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Paper sx={{ p: { xs: 1.5, md: 2 }, borderRadius: 2, direction: "rtl" }}>
+                {selectedLoanId && loanDetails ? (
+                  <ActionsTable
+                    actions={loanDetails.actions ?? []}
+                    loanId={selectedLoanId}
+                    readOnly
+                  />
+                ) : (
+                  <Typography variant="body1">בחר הלוואה להצגת פעולות.</Typography>
+                )}
+              </Paper>
+            </Grid>
           </Grid>
-        </Grid>
+        )}
       </Container>
     </Box>
   );

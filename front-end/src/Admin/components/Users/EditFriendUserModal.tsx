@@ -67,10 +67,11 @@ const EditFriendUserModal: FC<EditFriendUserModalProps> = ({
             bgcolor: "background.paper",
             boxShadow: 24,
             borderRadius: 2,
-            p: 3,
-            minWidth: 360,
+            p: { xs: 2, md: 3 },
             maxWidth: 560,
-            width: "90%",
+            width: { xs: "94vw", sm: "90vw", md: "auto" },
+            maxHeight: "92vh",
+            overflowY: "auto",
             direction: "rtl",
           }}
         >

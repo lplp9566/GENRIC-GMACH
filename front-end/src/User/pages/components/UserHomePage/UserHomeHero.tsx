@@ -96,7 +96,8 @@ const UserHomeHero = ({
           sx={{
             borderRadius: 999,
             px: 3,
-            minWidth: 148,
+            width: { xs: "100%", sm: "auto" },
+            minWidth: { sm: 148 },
             height: 46,
             fontWeight: 900,
             bgcolor: accent,
@@ -117,7 +118,8 @@ const UserHomeHero = ({
           sx={{
             borderRadius: 999,
             px: 3,
-            minWidth: 148,
+            width: { xs: "100%", sm: "auto" },
+            minWidth: { sm: 148 },
             height: 46,
             fontWeight: 900,
             bgcolor: "#0ea5e9",
@@ -135,7 +137,8 @@ const UserHomeHero = ({
           sx={{
             borderRadius: 999,
             px: 3,
-            minWidth: 148,
+            width: { xs: "100%", sm: "auto" },
+            minWidth: { sm: 148 },
             height: 46,
             fontWeight: 900,
             bgcolor: "#22c55e",
@@ -154,7 +157,8 @@ const UserHomeHero = ({
           sx={{
             borderRadius: 999,
             px: 2.2,
-            minWidth: 148,
+            width: { xs: "100%", sm: "auto" },
+            minWidth: { sm: 148 },
             height: 46,
             fontWeight: 900,
             bgcolor: "#6366f1",
