@@ -5,25 +5,17 @@ import { formatILS } from "../../../../Admin/components/HomePage/HomePage";
 
 interface UserDepositsLoansSectionProps {
   depositsNowAmount: number;
-  totalFixedDepositsDeposited: number;
-  totalFixedDepositsWithdrawn: number;
   loansNowByTakenMinusRepaid: number;
-  totalLoansTaken: number;
-  totalLoansRepaid: number;
   accent: string;
   accentSoft: string;
   surface: string;
   softBorder: string;
   isDark: boolean;
-};
+}
 
 const UserDepositsLoansSection = ({
   depositsNowAmount,
-  totalFixedDepositsDeposited,
-  totalFixedDepositsWithdrawn,
   loansNowByTakenMinusRepaid,
-  totalLoansTaken,
-  totalLoansRepaid,
   accent,
   accentSoft,
   surface,
@@ -31,18 +23,16 @@ const UserDepositsLoansSection = ({
   isDark,
 }: UserDepositsLoansSectionProps) => (
   <>
-    <SectionTitle>הפקדות והלוואות כרגע</SectionTitle>
+    <SectionTitle align="center">הפקדות והלוואות פעילות</SectionTitle>
 
     <Grid container spacing={2}>
       <Grid item xs={12} md={6}>
         <UserStatCard
-          title="הפקדות נטו (כרגע)"
+          title="הפקדות  פעילות "
           value={formatILS(depositsNowAmount)}
-          subtitle={`סה"כ הופקד: ${formatILS(totalFixedDepositsDeposited)} • סה"כ נמשך: ${formatILS(
-            totalFixedDepositsWithdrawn
-          )}`}
           tone="accent"
           icon="💰"
+          centered
           accent={accent}
           accentSoft={accentSoft}
           surface={surface}
@@ -53,11 +43,11 @@ const UserDepositsLoansSection = ({
 
       <Grid item xs={12} md={6}>
         <UserStatCard
-          title="כסף בהלוואה כרגע"
+          title="הלוואות  פעילות "
           value={formatILS(loansNowByTakenMinusRepaid)}
-          subtitle={`נלקח: ${formatILS(totalLoansTaken)} • הוחזר: ${formatILS(totalLoansRepaid)}`}
           tone="accent"
           icon="📌"
+          centered
           accent={accent}
           accentSoft={accentSoft}
           surface={surface}

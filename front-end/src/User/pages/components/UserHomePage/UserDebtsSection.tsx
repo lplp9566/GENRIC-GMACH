@@ -1,5 +1,6 @@
-import { Box, Divider, Grid, Paper, Stack, Typography } from "@mui/material";
+﻿import { Box, Divider, Grid, Paper, Stack, Typography } from "@mui/material";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import SectionTitle from "./SectionTitle";
 import UserStatCard from "./UserStatCard";
 
@@ -41,16 +42,16 @@ const UserDebtsSection = ({
   isDark,
 }: UserDebtsSectionProps) => (
   <>
-    <SectionTitle>החובות שלך</SectionTitle>
+    <SectionTitle align="center">החובות שלך</SectionTitle>
 
     <Paper
       elevation={0}
       sx={{
         p: 3,
-        borderRadius: 4,
+        borderRadius: 5,
         background: surface,
         border: softBorder,
-        backdropFilter: "blur(6px)",
+        backdropFilter: "blur(8px)",
       }}
     >
       <Stack spacing={2}>
@@ -65,11 +66,9 @@ const UserDebtsSection = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontWeight: 900,
-              fontSize: 18,
             }}
           >
-            ₪
+            <WarningAmberRoundedIcon fontSize="small" />
           </Box>
 
           <Box textAlign="center">
@@ -87,7 +86,7 @@ const UserDebtsSection = ({
           </Box>
         </Stack>
 
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="text.secondary" textAlign="center">
           פירוט לפי סוג: דמי חבר, הלוואות והחזרי הוראות קבע.
         </Typography>
 
@@ -96,7 +95,7 @@ const UserDebtsSection = ({
         <Grid container spacing={2}>
           <Grid item xs={12} md={4}>
             <UserStatCard
-              title="חוב דמי חבר"
+              title="חוב בדמי חבר"
               value={formatDebtILS(monthlyDebt)}
               subtitle='יתרת חיוב חודשית לגמ"ח'
               icon="₪"
@@ -111,7 +110,7 @@ const UserDebtsSection = ({
 
           <Grid item xs={12} md={4}>
             <UserStatCard
-              title="חוב הלוואות"
+              title="חוב בהלוואות"
               value={formatDebtILS(loansDebt)}
               subtitle={`${openLoansCount} הלוואות פתוחות`}
               icon="₪"
@@ -126,7 +125,7 @@ const UserDebtsSection = ({
 
           <Grid item xs={12} md={4}>
             <UserStatCard
-              title="חוב החזרי הוראות קבע"
+              title="חוב בהחזרי הוראות קבע"
               value={formatDebtILS(standingOrdersDebt)}
               subtitle="חיובים שחזרו"
               icon={<CurrencyExchangeIcon fontSize="small" />}
@@ -134,11 +133,7 @@ const UserDebtsSection = ({
               accent={standingOrdersDebt > 0 ? "#ef4444" : accent}
               accentSoft={standingOrdersDebt > 0 ? "rgba(239,68,68,0.2)" : accentSoft}
               surface={debtCardSurface(isDark, standingOrdersDebt > 0, surface)}
-              softBorder={debtCardBorder(
-                isDark,
-                standingOrdersDebt > 0,
-                softBorder
-              )}
+              softBorder={debtCardBorder(isDark, standingOrdersDebt > 0, softBorder)}
               isDark={isDark}
             />
           </Grid>

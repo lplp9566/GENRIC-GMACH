@@ -19,7 +19,7 @@ const UserRoleSection = ({
   formatILS,
 }: Props) => (
   <>
-    <SectionTitle>{title}</SectionTitle>
+    <SectionTitle align="center">{title}</SectionTitle>
     <Paper
       elevation={0}
       sx={{

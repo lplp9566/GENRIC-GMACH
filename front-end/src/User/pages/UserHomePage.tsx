@@ -1,5 +1,14 @@
 ﻿import { useEffect, useMemo, useState } from "react";
-import { Box, Grid, Paper, Stack, Typography, useTheme } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Grid,
+  Paper,
+  Snackbar,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import GemachRegulationsModal from "../../Admin/components/HomePage/GemachRegulationsModal";
@@ -10,6 +19,7 @@ import { getUserFinancialsByUserGuard } from "../../store/features/user/userFina
 import { getAllLoans } from "../../store/features/admin/adminLoanSlice";
 import { StatusGeneric } from "../../common/indexTypes";
 import { getAllMonthlyRanks } from "../../store/features/admin/adminRankSlice";
+import { api } from "../../store/axiosInstance";
 import UserHomeHero from "./components/UserHomePage/UserHomeHero";
 import UserNextChargesSection from "./components/UserHomePage/UserNextChargesSection";
 import UserDepositsLoansSection from "./components/UserHomePage/UserDepositsLoansSection";
@@ -24,19 +34,11 @@ const UserHomePage = () => {
   const isDark = theme.palette.mode === "dark";
 
   const accent = isDark ? "#fbbf24" : "#0f766e";
-  const accentSoft = isDark ? "rgba(251,191,36,0.12)" : "rgba(15,118,110,0.12)";
-  const surface = isDark ? "rgba(15,23,42,0.9)" : "rgba(255,255,255,0.9)";
+  const accentSoft = isDark ? "rgba(251,191,36,0.14)" : "rgba(15,118,110,0.12)";
+  const surface = isDark ? "rgba(15,23,42,0.88)" : "rgba(255,255,255,0.86)";
   const softBorder = isDark
-    ? "1px solid rgba(148,163,184,0.2)"
-    : "1px solid rgba(15,23,42,0.08)";
-
-  const sectionSx = {
-    animation: "fadeUp 0.6s ease both",
-    "@keyframes fadeUp": {
-      from: { opacity: 0, transform: "translateY(12px)" },
-      to: { opacity: 1, transform: "translateY(0)" },
-    },
-  };
+    ? "1px solid rgba(148,163,184,0.22)"
+    : "1px solid rgba(15,23,42,0.09)";
 
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const { allLoans } = useSelector((s: RootState) => s.AdminLoansSlice);
@@ -44,6 +46,9 @@ const UserHomePage = () => {
   const userFinancials = useSelector((s: RootState) => s.UserFinancialSlice.data);
 
   const [openRegulations, setOpenRegulations] = useState(false);
+  const [unreadAnnouncements, setUnreadAnnouncements] = useState(0);
+  const [unreadToastOpen, setUnreadToastOpen] = useState(false);
+  const [hasShownUnreadToast, setHasShownUnreadToast] = useState(false);
 
   const user = authUser?.user;
   const primaryFirstName = (user?.first_name ?? "").trim();
@@ -52,9 +57,7 @@ const UserHomePage = () => {
   const spouseLastName = (user?.spouse_last_name ?? "").trim();
 
   const userName = useMemo(() => {
-    if (!spouseFirstName) {
-      return `${primaryFirstName} ${primaryLastName}`.trim();
-    }
+    if (!spouseFirstName) return `${primaryFirstName} ${primaryLastName}`.trim();
 
     if (spouseLastName && spouseLastName !== primaryLastName) {
       return `${primaryFirstName} ו${spouseFirstName} ${primaryLastName}/${spouseLastName}`.trim();
@@ -76,6 +79,41 @@ const UserHomePage = () => {
     }
   }, [dispatch, user?.id]);
 
+  useEffect(() => {
+    let mounted = true;
+    const loadMyAnnouncements = async () => {
+      try {
+        const { data } = await api.get<{ unreadCount: number }>(
+          "/announcements/my"
+        );
+        if (!mounted) return;
+        setUnreadAnnouncements(Number(data?.unreadCount ?? 0));
+      } catch {
+        if (!mounted) return;
+        setUnreadAnnouncements(0);
+      }
+    };
+
+    if (user?.id) {
+      void loadMyAnnouncements();
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (hasShownUnreadToast || unreadAnnouncements <= 0) return;
+
+    const timer = setTimeout(() => {
+      setUnreadToastOpen(true);
+      setHasShownUnreadToast(true);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [unreadAnnouncements, hasShownUnreadToast]);
+
   const formatDebtILS = (value: number) => (value > 0 ? `-${formatILS(value)}` : formatILS(0));
 
   const monthlyBalance = user?.payment_details?.monthly_balance ?? 0;
@@ -87,12 +125,12 @@ const UserHomePage = () => {
 
   const totalStandingOrderReturn = userFinancials?.total_standing_order_return_unpaid ?? 0;
   const standingOrdersDebt = totalStandingOrderReturn;
-
   const totalDebt = loansDebt + monthlyDebt + standingOrdersDebt;
 
   const nextChargeDate = useMemo(() => {
     const chargeDay = Number(user?.payment_details?.charge_date ?? 0);
     if (!chargeDay || chargeDay < 1 || chargeDay > 31) return null;
+
     const now = new Date();
     const candidate = new Date(now.getFullYear(), now.getMonth(), chargeDay);
     if (candidate < now) candidate.setMonth(candidate.getMonth() + 1);
@@ -101,14 +139,17 @@ const UserHomePage = () => {
 
   const loanChargeSchedule = useMemo(() => {
     if (!allLoans || allLoans.length === 0) return [];
+
     const now = new Date();
     return allLoans
       .filter((loan) => loan?.isActive)
       .map((loan) => {
         const day = Number(loan?.payment_date ?? 0);
         if (day < 1 || day > 31) return null;
+
         const candidate = new Date(now.getFullYear(), now.getMonth(), day);
         if (candidate < now) candidate.setMonth(candidate.getMonth() + 1);
+
         return {
           id: loan.id,
           date: candidate,
@@ -129,10 +170,12 @@ const UserHomePage = () => {
 
   const currentRoleRate = useMemo(() => {
     if (!currentRole?.monthlyRates?.length) return null;
+
     const now = new Date();
     const sorted = [...currentRole.monthlyRates].sort(
       (a, b) => new Date(b.effective_from).getTime() - new Date(a.effective_from).getTime()
     );
+
     const active = sorted.find((r) => new Date(r.effective_from) <= now);
     return active ?? sorted[0];
   }, [currentRole]);
@@ -155,6 +198,7 @@ const UserHomePage = () => {
   const activeLoansRemaining = (allLoans ?? [])
     .filter((loan) => loan.isActive)
     .reduce((sum, loan) => sum + (loan.remaining_balance ?? 0), 0);
+
   const loanUsagePercent =
     totalContributions > 0
       ? Math.min(100, Math.round((activeLoansRemaining / totalContributions) * 100))
@@ -162,185 +206,271 @@ const UserHomePage = () => {
 
   const depositsNowAmount = Math.max(0, totalFixedDepositsDeposited - totalFixedDepositsWithdrawn);
   const loansNowByTakenMinusRepaid = Math.max(0, totalLoansTaken - totalLoansRepaid);
-  const donationExternalUrl = import.meta.env.VITE_DONATIONS_EXTERNAL_URL as
-    | string
-    | undefined;
+
+  const donationExternalUrl = import.meta.env.VITE_DONATIONS_EXTERNAL_URL as string | undefined;
 
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        py: { xs: 4, md: 6 },
-        px: { xs: 2, sm: 4, md: 6 },
+        py: { xs: 3, md: 5 },
+        px: { xs: 1.5, sm: 3, md: 5 },
         direction: "rtl",
         fontFamily: '"Assistant", "Heebo", Arial, sans-serif',
         background: isDark
-          ? "radial-gradient(circle at 12% 8%, rgba(251,191,36,0.18), transparent 45%), radial-gradient(circle at 88% 10%, rgba(20,184,166,0.18), transparent 35%), linear-gradient(180deg, #0b1120 0%, #0f172a 70%)"
-          : "radial-gradient(circle at 12% 8%, rgba(251,191,36,0.22), transparent 45%), radial-gradient(circle at 88% 10%, rgba(20,184,166,0.18), transparent 35%), linear-gradient(180deg, #f8fafc 0%, #ffffff 70%)",
+          ? "radial-gradient(circle at 10% 0%, rgba(34,197,94,0.08), transparent 30%), radial-gradient(circle at 85% 0%, rgba(59,130,246,0.1), transparent 30%), linear-gradient(180deg, #0b1120 0%, #0f172a 70%)"
+          : "radial-gradient(circle at 10% 0%, rgba(34,197,94,0.11), transparent 28%), radial-gradient(circle at 85% 0%, rgba(59,130,246,0.12), transparent 28%), linear-gradient(180deg, #f8fafc 0%, #ffffff 70%)",
       }}
     >
-      <UserHomeHero
-        userName={userName}
-        isDark={isDark}
-        accent={accent}
-        softBorder={softBorder}
-        onLoanRequest={() => navigate("/u/loan-requests")}
-        onDonate={() => {
-          if (donationExternalUrl) {
-            window.open(donationExternalUrl, "_blank", "noopener,noreferrer");
-            return;
-          }
-          navigate("/u/donations");
-        }}
-        onOpenRegulations={() => setOpenRegulations(true)}
-      />
+      <Stack spacing={3.5}>
+        <UserHomeHero
+          userName={userName}
+          isDark={isDark}
+          accent={accent}
+          softBorder={softBorder}
+          onLoanRequest={() => navigate("/u/loan-requests")}
+          onDonate={() => {
+            if (donationExternalUrl) {
+              window.open(donationExternalUrl, "_blank", "noopener,noreferrer");
+              return;
+            }
+            navigate("/u/donations");
+          }}
+          onOpenRegulations={() => setOpenRegulations(true)}
+        />
 
-      <Box sx={{ mt: 4, ...sectionSx }}>
-        <Grid container spacing={2.5}>
-          <Grid item xs={12} md={6}>
-            <UserRoleSection
-              title="הדרגה שלך"
-              currentRoleName={currentRole?.name ?? null}
-              currentRoleAmount={currentRoleRate?.amount ?? null}
-              surface={surface}
-              softBorder={softBorder}
-              formatILS={formatILS}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" fontWeight={800} mb={1.2}>
-              סך תרומות ודמי חבר
-            </Typography>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 3,
-                borderRadius: 4,
-                background: surface,
-                border: softBorder,
-                backdropFilter: "blur(6px)",
-              }}
-            >
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
-                <Stack spacing={1} sx={{ flex: 1 }}>
-                  <Typography variant="h5" fontWeight={900}>
-                    {formatILS(totalContributions)}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    סה"כ תרומות: {formatILS(totalDonations)}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    סה"כ דמי חבר: {formatILS(totalMemberFees)}
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 2, md: 2.5 },
+            borderRadius: 5,
+            background: surface,
+            border: softBorder,
+            backdropFilter: "blur(8px)",
+          }}
+        >
+          <Grid container spacing={2} alignItems="stretch">
+            <Grid item xs={12} md={6}>
+              <UserRoleSection
+                title="הדרגה שלך"
+                currentRoleName={currentRole?.name ?? null}
+                currentRoleAmount={currentRoleRate?.amount ?? null}
+                surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+                softBorder={softBorder}
+                formatILS={formatILS}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Stack spacing={1.3} sx={{ height: "100%" }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  <Typography variant="h6" fontWeight={900} textAlign="center" sx={{ width: "100%" }}>
+                    סך תרומות ודמי חבר
                   </Typography>
                 </Stack>
 
-                <Box
+                <Paper
+                  elevation={0}
                   sx={{
-                    position: "relative",
-                    width: 122,
-                    height: 122,
-                    borderRadius: "50%",
-                    background: `conic-gradient(#22c55e ${loanUsagePercent}%, ${
-                      isDark ? "rgba(148,163,184,0.28)" : "rgba(148,163,184,0.2)"
-                    } 0)`,
-                    flexShrink: 0,
+                    p: 2.5,
+                    borderRadius: 4,
+                    background: isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)",
+                    border: softBorder,
+                    height: "100%",
                   }}
                 >
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      inset: 9,
-                      borderRadius: "50%",
-                      background: isDark ? "#0f172a" : "#ffffff",
-                      display: "grid",
-                      placeItems: "center",
-                      textAlign: "center",
-                    }}
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+                    <Stack spacing={1} sx={{ flex: 1 }}>
+                      <Typography variant="h5" fontWeight={900}>
+                        {formatILS(totalContributions)}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        סה"כ תרומות: {formatILS(totalDonations)}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        סה"כ דמי חבר: {formatILS(totalMemberFees)}
+                      </Typography>
+                    </Stack>
+
+                    <Box
+                      sx={{
+                        position: "relative",
+                        width: 168,
+                        height: 168,
+                        borderRadius: "50%",
+                        background: `conic-gradient(#38bdf8 ${loanUsagePercent}%, ${
+                          isDark ? "rgba(71,85,105,0.7)" : "rgba(148,163,184,0.35)"
+                        } 0)`,
+                        boxShadow: isDark
+                          ? "0 0 0 10px rgba(51,65,85,0.45)"
+                          : "0 0 0 10px rgba(148,163,184,0.22)",
+                        flexShrink: 0,
+                      }}
                     >
-                    <Typography variant="h6" fontWeight={900}>
-                      {loanUsagePercent}%
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      בהלוואות
-                    </Typography>
-                  </Box>
-                </Box>
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          inset: 16,
+                          borderRadius: "50%",
+                          background: isDark ? "#0b1735" : "#0f172a",
+                          display: "grid",
+                          placeItems: "center",
+                          textAlign: "center",
+                        }}
+                      >
+                        <Typography variant="h4" fontWeight={900} sx={{ color: "#e2e8f0", lineHeight: 1 }}>
+                          {loanUsagePercent}%
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: "#cbd5e1",
+                            fontSize: 13,
+                            mt: 0.4,
+                          }}
+                        >
+                          בהלוואות
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Stack>
+                </Paper>
               </Stack>
+            </Grid>
+          </Grid>
+        </Paper>
+
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 2, md: 2.5 },
+            borderRadius: 5,
+            background: surface,
+            border: softBorder,
+            backdropFilter: "blur(8px)",
+          }}
+        >
+          <UserDebtsSection
+            totalDebt={totalDebt}
+            monthlyDebt={monthlyDebt}
+            loansDebt={loansDebt}
+            standingOrdersDebt={standingOrdersDebt}
+            openLoansCount={openLoansBalances.length}
+            formatDebtILS={formatDebtILS}
+            accent={accent}
+            accentSoft={accentSoft}
+            surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+            softBorder={softBorder}
+            isDark={isDark}
+          />
+        </Paper>
+
+        <Grid container spacing={2.5}>
+          <Grid item xs={12} md={6}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 2.5 },
+                borderRadius: 5,
+                background: surface,
+                border: softBorder,
+                backdropFilter: "blur(8px)",
+                height: "100%",
+              }}
+            >
+              <UserNextChargesSection
+                nextChargeDate={nextChargeDate}
+                currentRoleAmount={currentRoleRate?.amount ?? null}
+                loanChargeSchedule={loanChargeSchedule}
+                formatDate={formatDate}
+                formatDebtILS={formatDebtILS}
+                accent={accent}
+                accentSoft={accentSoft}
+                surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+                softBorder={softBorder}
+                isDark={isDark}
+              />
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 2.5 },
+                borderRadius: 5,
+                background: surface,
+                border: softBorder,
+                backdropFilter: "blur(8px)",
+                height: "100%",
+              }}
+            >
+              <UserDepositsLoansSection
+                depositsNowAmount={depositsNowAmount}
+                loansNowByTakenMinusRepaid={loansNowByTakenMinusRepaid}
+                accent={accent}
+                accentSoft={accentSoft}
+                surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+                softBorder={softBorder}
+                isDark={isDark}
+              />
             </Paper>
           </Grid>
         </Grid>
-      </Box>
 
-      <Box sx={{ mt: 4, ...sectionSx }}>
-        <UserNextChargesSection
-          nextChargeDate={nextChargeDate}
-          currentRoleAmount={currentRoleRate?.amount ?? null}
-          loanChargeSchedule={loanChargeSchedule}
-          formatDate={formatDate}
-          formatDebtILS={formatDebtILS}
-          accent={accent}
-          accentSoft={accentSoft}
-          surface={surface}
-          softBorder={softBorder}
-          isDark={isDark}
-        />
-      </Box>
-
-      <Box sx={{ mt: 4, ...sectionSx }}>
-        <UserDepositsLoansSection
-          depositsNowAmount={depositsNowAmount}
-          totalFixedDepositsDeposited={totalFixedDepositsDeposited}
-          totalFixedDepositsWithdrawn={totalFixedDepositsWithdrawn}
-          loansNowByTakenMinusRepaid={loansNowByTakenMinusRepaid}
-          totalLoansTaken={totalLoansTaken}
-          totalLoansRepaid={totalLoansRepaid}
-          accent={accent}
-          accentSoft={accentSoft}
-          surface={surface}
-          softBorder={softBorder}
-          isDark={isDark}
-        />
-      </Box>
-
-      <Box sx={{ mt: 4, ...sectionSx }}>
-        <UserDebtsSection
-          totalDebt={totalDebt}
-          monthlyDebt={monthlyDebt}
-          loansDebt={loansDebt}
-          standingOrdersDebt={standingOrdersDebt}
-          openLoansCount={openLoansBalances.length}
-          formatDebtILS={formatDebtILS}
-          accent={accent}
-          accentSoft={accentSoft}
-          surface={surface}
-          softBorder={softBorder}
-          isDark={isDark}
-        />
-      </Box>
-
-      <Box sx={{ mt: 4, ...sectionSx }}>
-        <UserFullStatsSection
-          surface={surface}
-          softBorder={softBorder}
-          cards={[
-            { title: 'סה"כ תרומות', value: totalDonations, detail: "מצטבר לכל התקופה", kind: "money" },
-            { title: "תרומות רגילות", value: totalEquityDonations, detail: "תרומות רגילות מצטברות", kind: "money" },
-            { title: "תרומות לקרנות מיוחדות", value: totalSpecialFundDonations, detail: "קרנות ייעודיות", kind: "money" },
-            { title: "דמי חבר", value: totalMemberFees, detail: 'סה"כ דמי חבר', kind: "money" },
-            { title: "סכום הלוואות שנלקחו", value: totalLoansTaken, detail: "סכום הלוואות לאורך זמן", kind: "money" },
-            { title: "כמות הלוואות", value: totalLoansCount, detail: "מספר הלוואות מצטבר", kind: "count" },
-            { title: "סכום הלוואות שנפרעו", value: totalLoansRepaid, detail: "החזרים מצטברים", kind: "money" },
-            { title: "הפקדות קבועות", value: totalFixedDepositsDeposited, detail: 'סה"כ הפקדות', kind: "money" },
-            { title: "משיכות מהפקדות", value: totalFixedDepositsWithdrawn, detail: 'סה"כ משיכות', kind: "money" },
-            { title: "החזרים בהוראות קבע", value: totalStandingOrderReturn, detail: "חיובים שחזרו", kind: "money" },
-            { title: "אחזקה במזומן", value: totalCashHoldings, detail: "יתרה נוכחית", kind: "money" },
-          ]}
-        />
-      </Box>
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 2, md: 2.5 },
+            borderRadius: 5,
+            background: surface,
+            border: softBorder,
+            backdropFilter: "blur(8px)",
+          }}
+        >
+          <UserFullStatsSection
+            surface={isDark ? "rgba(15,23,42,0.65)" : "rgba(248,250,252,0.82)"}
+            softBorder={softBorder}
+            cards={[
+              { title: 'סה"כ תרומות', value: totalDonations, detail: "מצטבר לכל התקופה", kind: "money" },
+              { title: "תרומות רגילות", value: totalEquityDonations, detail: "תרומות רגילות מצטברות", kind: "money" },
+              { title: "תרומות לקרנות מיוחדות", value: totalSpecialFundDonations, detail: "קרנות ייעודיות", kind: "money" },
+              { title: "דמי חבר", value: totalMemberFees, detail: 'סה"כ דמי חבר', kind: "money" },
+              { title: "סכום הלוואות שנלקחו", value: totalLoansTaken, detail: "סכום הלוואות לאורך זמן", kind: "money" },
+              { title: "כמות הלוואות", value: totalLoansCount, detail: "מספר הלוואות מצטבר", kind: "count" },
+              { title: "סכום הלוואות שנפרעו", value: totalLoansRepaid, detail: "החזרים מצטברים", kind: "money" },
+              { title: "הפקדות קבועות", value: totalFixedDepositsDeposited, detail: 'סה"כ הפקדות', kind: "money" },
+              { title: "משיכות מהפקדות", value: totalFixedDepositsWithdrawn, detail: 'סה"כ משיכות', kind: "money" },
+              { title: "החזרים בהוראות קבע", value: totalStandingOrderReturn, detail: "חיובים שחזרו", kind: "money" },
+              { title: "אחזקה במזומן", value: totalCashHoldings, detail: "יתרה נוכחית", kind: "money" },
+            ]}
+          />
+        </Paper>
+      </Stack>
 
       {openRegulations && (
         <GemachRegulationsModal open={openRegulations} onClose={() => setOpenRegulations(false)} />
       )}
+
+      <Snackbar
+        open={unreadToastOpen}
+        autoHideDuration={5000}
+        onClose={() => setUnreadToastOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          severity="info"
+          variant="filled"
+          onClose={() => setUnreadToastOpen(false)}
+          sx={{ cursor: "pointer" }}
+          onClick={() => {
+            setUnreadToastOpen(false);
+            navigate("/u/announcements");
+          }}
+        >
+          יש לך {unreadAnnouncements} הודעות שלא נקראו
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

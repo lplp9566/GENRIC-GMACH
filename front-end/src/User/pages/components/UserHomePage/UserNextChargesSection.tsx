@@ -34,7 +34,7 @@ const UserNextChargesSection = ({
   isDark,
 }: Props) => (
   <>
-    <SectionTitle>החיובים הקרובים</SectionTitle>
+    <SectionTitle align="center">החיובים הקרובים</SectionTitle>
 
     <Grid container spacing={2}>
       <Grid item xs={12} md={6}>
@@ -68,7 +68,7 @@ const UserNextChargesSection = ({
           }}
         >
           <Stack spacing={1.5}>
-            <Stack direction="row" spacing={1.25} alignItems="center">
+            <Stack direction="row" spacing={1.25} alignItems="center" justifyContent="center">
               <Box
                 sx={{
                   width: 36,

@@ -29,6 +29,7 @@ import { api } from "../../../../store/axiosInstance";
 const NAV_BG = "#0D2233";
 const NAV_TXT = "#FFFFFF";
 const BP_MOBILE = 960;
+const ANNOUNCEMENTS_UNREAD_EVENT = "announcements:unread-changed";
 
 const links = [
   { label: "דף הבית", path: "/u" },
@@ -61,18 +62,29 @@ const UserNavbar = () => {
 
   useEffect(() => {
     if (!userId) return;
+
     const loadUnread = async () => {
       try {
-        const { data } = await api.get<{ unreadCount: number }>(
-          "/announcements/my"
-        );
+        const { data } = await api.get<{ unreadCount: number }>("/announcements/my");
         setUnreadAnnouncements(Number(data?.unreadCount ?? 0));
       } catch {
         setUnreadAnnouncements(0);
       }
     };
-    loadUnread();
-  }, [userId]);
+
+    const onUnreadChanged = (event: Event) => {
+      const customEvent = event as CustomEvent<{ unreadCount?: number }>;
+      const nextValue = Number(customEvent?.detail?.unreadCount ?? 0);
+      setUnreadAnnouncements(nextValue);
+    };
+
+    void loadUnread();
+    window.addEventListener(ANNOUNCEMENTS_UNREAD_EVENT, onUnreadChanged as EventListener);
+
+    return () => {
+      window.removeEventListener(ANNOUNCEMENTS_UNREAD_EVENT, onUnreadChanged as EventListener);
+    };
+  }, [userId, pathname]);
 
   return (
     <>

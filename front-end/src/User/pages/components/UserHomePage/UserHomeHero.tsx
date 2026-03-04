@@ -1,4 +1,4 @@
-﻿import { Box, Button, Chip, Paper, Stack, Typography } from "@mui/material";
+﻿import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 
 type Props = {
@@ -23,95 +23,147 @@ const UserHomeHero = ({
   <Paper
     elevation={0}
     sx={{
-      p: { xs: 3, md: 4 },
-      borderRadius: 5,
+      p: { xs: 2.5, md: 4 },
+      borderRadius: 6,
       background: isDark
-        ? "linear-gradient(135deg, rgba(15,23,42,0.96), rgba(30,41,59,0.96))"
-        : "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(241,245,249,0.96))",
+        ? "linear-gradient(135deg, #0f172a 0%, #111827 45%, #0b3a3e 100%)"
+        : "linear-gradient(135deg, #ffffff 0%, #eff6ff 45%, #ecfeff 100%)",
       color: isDark ? "#f8fafc" : "#0f172a",
       position: "relative",
       overflow: "hidden",
       border: softBorder,
+      boxShadow: isDark
+        ? "0 24px 50px rgba(2,6,23,0.45)"
+        : "0 24px 50px rgba(15,23,42,0.12)",
     }}
   >
     <Box
       sx={{
         position: "absolute",
-        width: 360,
-        height: 360,
+        width: 420,
+        height: 420,
         borderRadius: "50%",
-        bgcolor: "rgba(255,255,255,0.08)",
-        top: -140,
-        left: -100,
+        background: isDark
+          ? "radial-gradient(circle, rgba(45,212,191,0.18), transparent 70%)"
+          : "radial-gradient(circle, rgba(14,165,233,0.18), transparent 70%)",
+        top: -220,
+        left: -140,
       }}
     />
     <Box
       sx={{
         position: "absolute",
-        width: 240,
-        height: 240,
-        borderRadius: 80,
-        bgcolor: "rgba(255,255,255,0.12)",
-        bottom: -80,
-        right: -40,
-        transform: "rotate(12deg)",
+        width: 300,
+        height: 300,
+        borderRadius: "50%",
+        background: isDark
+          ? "radial-gradient(circle, rgba(250,204,21,0.16), transparent 70%)"
+          : "radial-gradient(circle, rgba(16,185,129,0.16), transparent 70%)",
+        bottom: -170,
+        right: -80,
       }}
     />
 
-    <Stack spacing={1.5} position="relative" zIndex={1}>
+    <Stack spacing={2.4} position="relative" zIndex={1} alignItems="center">
+      <Stack spacing={1} sx={{ width: "100%", maxWidth: 860 }} alignItems="center">
+        <Typography
+          variant="h3"
+          fontWeight={900}
+          sx={{ letterSpacing: "-0.5px", textAlign: "center", width: "100%" }}
+        >
+          ברוך הבא {userName}
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{ opacity: 0.88, maxWidth: 760, textAlign: "center", width: "100%" }}
+        >
+          מצב חשבון עדכני, חיובים קרובים וכל הנתונים החשובים במקום אחד.
+        </Typography>
+      </Stack>
 
-      <Typography variant="h3" fontWeight={900} sx={{ letterSpacing: "-0.5px" }}>
-        ברוך הבא{` ${userName}`}
-      </Typography>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={{ xs: 1, sm: 1.25 }}
+        flexWrap="wrap"
+        useFlexGap
+        justifyContent="center"
+        alignItems="center"
+        sx={{ width: "100%", maxWidth: 860, mx: "auto" }}
+      >
+        <Button
+          variant="contained"
+          onClick={onLoanRequest}
+          sx={{
+            borderRadius: 999,
+            px: 3,
+            minWidth: 148,
+            height: 46,
+            fontWeight: 900,
+            bgcolor: accent,
+            color: "#fff",
+            boxShadow: isDark ? "0 8px 20px rgba(0,0,0,0.35)" : "0 8px 20px rgba(15,23,42,0.18)",
+            "&:hover": {
+              bgcolor: accent,
+              transform: "translateY(-1px)",
+            },
+          }}
+        >
+          בקשת הלוואה
+        </Button>
 
-      <Typography variant="subtitle1" sx={{ opacity: 0.9, maxWidth: 720 }}>
-        הדרגה שלך, החיובים הקרובים, הפקדות, חובות ונתונים מלאים — הכל במקום אחד.
-      </Typography>
+        <Button
+          variant="contained"
+          onClick={onOpenRegulations}
+          sx={{
+            borderRadius: 999,
+            px: 3,
+            minWidth: 148,
+            height: 46,
+            fontWeight: 900,
+            bgcolor: "#0ea5e9",
+            color: "#fff",
+            boxShadow: isDark ? "0 8px 20px rgba(0,0,0,0.35)" : "0 8px 20px rgba(15,23,42,0.18)",
+            "&:hover": { bgcolor: "#0284c7", transform: "translateY(-1px)" },
+          }}
+        >
+          תקנון הגמ"ח
+        </Button>
 
-      <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+        <Button
+          variant="contained"
+          onClick={onDonate}
+          sx={{
+            borderRadius: 999,
+            px: 3,
+            minWidth: 148,
+            height: 46,
+            fontWeight: 900,
+            bgcolor: "#22c55e",
+            color: "#fff",
+            boxShadow: isDark ? "0 8px 20px rgba(0,0,0,0.35)" : "0 8px 20px rgba(15,23,42,0.18)",
+            "&:hover": { bgcolor: "#16a34a", transform: "translateY(-1px)" },
+          }}
+        >
+          תרומה
+        </Button>
+
         <Button
           component={RouterLink}
           to="/u/profile"
           variant="contained"
           sx={{
-            borderRadius: 3,
+            borderRadius: 999,
+            px: 2.2,
+            minWidth: 148,
+            height: 46,
             fontWeight: 900,
-            bgcolor: accent,
+            bgcolor: "#6366f1",
             color: "#fff",
-            "&:hover": { bgcolor: accent },
+            boxShadow: isDark ? "0 8px 20px rgba(0,0,0,0.35)" : "0 8px 20px rgba(15,23,42,0.18)",
+            "&:hover": { bgcolor: "#4f46e5", transform: "translateY(-1px)" },
           }}
         >
-          פרופיל אישי
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={onDonate}
-          sx={{
-            borderRadius: 3,
-            fontWeight: 900,
-          }}
-        >
-          תרומה
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={onLoanRequest}
-          sx={{
-            borderRadius: 3,
-            fontWeight: 900,
-          }}
-        >
-          בקשת הלוואה
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={onOpenRegulations}
-          sx={{
-            borderRadius: 3,
-            fontWeight: 900,
-          }}
-        >
-          תקנון הגמ"ח
+          לפרופיל האישי
         </Button>
       </Stack>
     </Stack>

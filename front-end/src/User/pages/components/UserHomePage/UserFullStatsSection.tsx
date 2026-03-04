@@ -1,4 +1,4 @@
-import { Box, Grid, Paper, Stack, Typography } from "@mui/material";
+﻿import { Box, Grid, Paper, Stack, Typography } from "@mui/material";
 import SectionTitle from "./SectionTitle";
 import { formatILS } from "../../../../Admin/components/HomePage/HomePage";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
@@ -43,7 +43,7 @@ const getCardIcon = (title: string) => {
 
 const UserFullStatsSection = ({ cards, surface, softBorder }: Props) => (
   <>
-    <SectionTitle>הנתונים המלאים</SectionTitle>
+    <SectionTitle align="center">הנתונים המלאים</SectionTitle>
 
     <Grid container spacing={{ xs: 2, md: 3 }}>
       {cards.map((card) => (
@@ -52,10 +52,10 @@ const UserFullStatsSection = ({ cards, surface, softBorder }: Props) => (
             elevation={0}
             sx={{
               p: 3,
-              borderRadius: 4,
+              borderRadius: 5,
               background: surface,
               border: softBorder,
-              backdropFilter: "blur(6px)",
+              backdropFilter: "blur(8px)",
             }}
           >
             <Box sx={{ position: "relative", minHeight: 98 }}>
@@ -86,8 +86,8 @@ const UserFullStatsSection = ({ cards, surface, softBorder }: Props) => (
                   {card.value == null
                     ? "לא הוגדר"
                     : card.kind === "count"
-                    ? Number(card.value ?? 0).toLocaleString("he-IL")
-                    : formatILS(card.value)}
+                      ? Number(card.value ?? 0).toLocaleString("he-IL")
+                      : formatILS(card.value)}
                 </Typography>
 
                 <Typography variant="body2" color="text.secondary">

@@ -2,10 +2,11 @@
 
 type Props = {
   children: string;
+  align?: "inherit" | "left" | "center" | "right";
 };
 
-const SectionTitle = ({ children }: Props) => (
-  <Typography variant="h5" fontWeight={900} mb={2}>
+const SectionTitle = ({ children, align = "inherit" }: Props) => (
+  <Typography variant="h5" fontWeight={900} mb={2} textAlign={align}>
     {children}
   </Typography>
 );

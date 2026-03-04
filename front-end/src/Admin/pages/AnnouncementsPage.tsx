@@ -79,6 +79,7 @@ type RecipientStatusResponse = {
 const fmt = (v?: string | null) => (v ? new Date(v).toLocaleString("he-IL") : "-");
 const fmtTimeOnly = (v?: string | null) =>
   v ? new Date(v).toLocaleString("he-IL", { hour: "2-digit", minute: "2-digit" }) : "-";
+const ANNOUNCEMENTS_UNREAD_EVENT = "announcements:unread-changed";
 
 const audienceLabel = (audience?: Audience | null) => {
   switch (audience) {
@@ -129,6 +130,11 @@ export default function AnnouncementsPage() {
     try {
       const { data } = await api.get<MyAnnouncementsResponse>("/announcements/my");
       setMyData(data);
+      window.dispatchEvent(
+        new CustomEvent<{ unreadCount: number }>(ANNOUNCEMENTS_UNREAD_EVENT, {
+          detail: { unreadCount: Number(data?.unreadCount ?? 0) },
+        }),
+      );
       const unseenIds = (data.items ?? []).filter((m) => !m.seen).map((m) => m.id);
       if (unseenIds.length > 0) {
         const nowIso = new Date().toISOString();
@@ -138,6 +144,11 @@ export default function AnnouncementsPage() {
             unseenIds.includes(m.id) && !m.readAt ? { ...m, seen: true, readAt: nowIso } : m,
           ),
         }));
+        window.dispatchEvent(
+          new CustomEvent<{ unreadCount: number }>(ANNOUNCEMENTS_UNREAD_EVENT, {
+            detail: { unreadCount: 0 },
+          }),
+        );
         await Promise.allSettled(
           unseenIds.map((id) => api.post(`/announcements/${id}/read`)),
         );

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+﻿import { ReactNode } from "react";
 import { Box, Paper, Stack, Typography } from "@mui/material";
 
 type Props = {
@@ -32,10 +32,20 @@ const UserStatCard = ({
     elevation={0}
     sx={{
       p: 3,
-      borderRadius: 4,
+      borderRadius: 5,
       background: surface,
       border: softBorder,
-      backdropFilter: "blur(6px)",
+      backdropFilter: "blur(8px)",
+      boxShadow: isDark
+        ? "0 14px 36px rgba(2,6,23,0.35)"
+        : "0 14px 36px rgba(15,23,42,0.08)",
+      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+      "&:hover": {
+        transform: "translateY(-2px)",
+        boxShadow: isDark
+          ? "0 18px 44px rgba(2,6,23,0.45)"
+          : "0 18px 44px rgba(15,23,42,0.12)",
+      },
     }}
   >
     <Stack spacing={0.75} alignItems={centered ? "center" : "stretch"}>
@@ -55,8 +65,8 @@ const UserStatCard = ({
               tone === "accent"
                 ? accentSoft
                 : isDark
-                ? "rgba(255,255,255,0.10)"
-                : "rgba(15,23,42,0.06)",
+                  ? "rgba(255,255,255,0.10)"
+                  : "rgba(15,23,42,0.06)",
             color: tone === "accent" ? accent : isDark ? "#fff" : "#0f172a",
             display: "flex",
             alignItems: "center",
@@ -66,11 +76,8 @@ const UserStatCard = ({
         >
           {icon}
         </Box>
-        <Typography
-          variant="subtitle2"
-          fontWeight={900}
-          textAlign={centered ? "center" : "inherit"}
-        >
+
+        <Typography variant="subtitle2" fontWeight={900} textAlign={centered ? "center" : "inherit"}>
           {title}
         </Typography>
       </Stack>
@@ -80,11 +87,7 @@ const UserStatCard = ({
       </Typography>
 
       {!!subtitle && (
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          textAlign={centered ? "center" : "inherit"}
-        >
+        <Typography variant="body2" color="text.secondary" textAlign={centered ? "center" : "inherit"}>
           {subtitle}
         </Typography>
       )}
