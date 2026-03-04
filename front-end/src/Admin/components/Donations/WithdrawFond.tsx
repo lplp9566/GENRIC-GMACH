@@ -28,6 +28,16 @@ import { toast } from "react-toastify";
 import { RtlThemeProvider } from "../../../Theme/rtl";
 
 const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+const numberFieldSx = {
+  "& input[type=number]": {
+    MozAppearance: "textfield",
+  },
+  "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
+    {
+      WebkitAppearance: "none",
+      margin: 0,
+    },
+};
 
 const WithdrawFundModal: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -179,6 +189,7 @@ const WithdrawFundModal: React.FC = () => {
               size="medium"
               color="success"
               fullWidth
+              sx={numberFieldSx}
               value={amount}
               onChange={(e) => setAmount(+e.target.value)}
               inputProps={{ min: 0, step: "0.5" }}

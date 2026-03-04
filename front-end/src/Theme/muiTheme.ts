@@ -181,10 +181,10 @@ export const getMuiTheme = (mode: AppMode) => {
               borderColor: alpha(t.border, isDark ? 0.7 : 1),
             },
             "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: alpha(t.primary, 0.65),
+              borderColor: alpha(t.border, isDark ? 0.95 : 1),
             },
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: t.primary,
+              borderColor: t.success,
               borderWidth: 3,
             },
           },
@@ -199,7 +199,7 @@ export const getMuiTheme = (mode: AppMode) => {
           root: {
             direction: "rtl",
             color: t.text2,
-            "&.Mui-focused": { color: t.primary },
+            "&.Mui-focused": { color: t.success },
           },
         },
       },
