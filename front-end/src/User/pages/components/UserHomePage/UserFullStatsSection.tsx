@@ -1,6 +1,17 @@
-﻿import { Grid, Paper, Stack, Typography } from "@mui/material";
+import { Box, Grid, Paper, Stack, Typography } from "@mui/material";
 import SectionTitle from "./SectionTitle";
 import { formatILS } from "../../../../Admin/components/HomePage/HomePage";
+import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
+import AutoGraphIcon from "@mui/icons-material/AutoGraph";
+import HandshakeIcon from "@mui/icons-material/Handshake";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
+import PriceCheckIcon from "@mui/icons-material/PriceCheck";
+import SavingsIcon from "@mui/icons-material/Savings";
+import MoneyOffIcon from "@mui/icons-material/MoneyOff";
+import PaidIcon from "@mui/icons-material/Paid";
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 
 type StatCard = {
   title: string;
@@ -13,6 +24,21 @@ type Props = {
   cards: StatCard[];
   surface: string;
   softBorder: string;
+};
+
+const getCardIcon = (title: string) => {
+  if (title.includes('סה"כ תרומות')) return <VolunteerActivismIcon />;
+  if (title.includes("תרומות רגילות")) return <AutoGraphIcon />;
+  if (title.includes("תרומות לקרנות מיוחדות")) return <HandshakeIcon />;
+  if (title.includes("דמי חבר")) return <AccountBalanceWalletIcon />;
+  if (title.includes("סכום הלוואות שנלקחו")) return <AccountBalanceIcon />;
+  if (title.includes("כמות הלוואות")) return <FormatListNumberedIcon />;
+  if (title.includes("סכום הלוואות שנפרעו")) return <PriceCheckIcon />;
+  if (title.includes("הפקדות קבועות")) return <SavingsIcon />;
+  if (title.includes("משיכות מהפקדות")) return <MoneyOffIcon />;
+  if (title.includes("החזרים בהוראות קבע")) return <CurrencyExchangeIcon />;
+  if (title.includes("אחזקה במזומן")) return <PaidIcon />;
+  return <PaidIcon />;
 };
 
 const UserFullStatsSection = ({ cards, surface, softBorder }: Props) => (
@@ -32,23 +58,43 @@ const UserFullStatsSection = ({ cards, surface, softBorder }: Props) => (
               backdropFilter: "blur(6px)",
             }}
           >
-            <Stack spacing={1}>
-              <Typography variant="subtitle2" fontWeight={900}>
-                {card.title}
-              </Typography>
+            <Box sx={{ position: "relative", minHeight: 98 }}>
+              <Box
+                sx={{
+                  position: "absolute",
+                  left: 0,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: 42,
+                  height: 42,
+                  borderRadius: 2.5,
+                  bgcolor: "action.hover",
+                  display: "grid",
+                  placeItems: "center",
+                  color: "primary.main",
+                }}
+              >
+                {getCardIcon(card.title)}
+              </Box>
 
-              <Typography variant="h6" fontWeight={900}>
-                {card.value == null
-                  ? "לא הוגדר"
-                  : card.kind === "count"
-                  ? Number(card.value ?? 0).toLocaleString("he-IL")
-                  : formatILS(card.value)}
-              </Typography>
+              <Stack spacing={1} alignItems="center" textAlign="center">
+                <Typography variant="subtitle2" fontWeight={900}>
+                  {card.title}
+                </Typography>
 
-              <Typography variant="body2" color="text.secondary">
-                {card.detail}
-              </Typography>
-            </Stack>
+                <Typography variant="h6" fontWeight={900}>
+                  {card.value == null
+                    ? "לא הוגדר"
+                    : card.kind === "count"
+                    ? Number(card.value ?? 0).toLocaleString("he-IL")
+                    : formatILS(card.value)}
+                </Typography>
+
+                <Typography variant="body2" color="text.secondary">
+                  {card.detail}
+                </Typography>
+              </Stack>
+            </Box>
           </Paper>
         </Grid>
       ))}

@@ -1,11 +1,13 @@
-﻿import { Box, Paper, Stack, Typography } from "@mui/material";
+import { ReactNode } from "react";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 
 type Props = {
   title: string;
   value: string;
   subtitle?: string;
   tone?: "neutral" | "accent";
-  icon?: string;
+  icon?: ReactNode;
+  centered?: boolean;
   accent: string;
   accentSoft: string;
   surface: string;
@@ -19,6 +21,7 @@ const UserStatCard = ({
   subtitle,
   tone = "neutral",
   icon = "₪",
+  centered = false,
   accent,
   accentSoft,
   surface,
@@ -35,8 +38,14 @@ const UserStatCard = ({
       backdropFilter: "blur(6px)",
     }}
   >
-    <Stack spacing={0.75}>
-      <Stack direction="row" spacing={1.25} alignItems="center">
+    <Stack spacing={0.75} alignItems={centered ? "center" : "stretch"}>
+      <Stack
+        direction="row"
+        spacing={1.25}
+        alignItems="center"
+        justifyContent={centered ? "center" : "flex-start"}
+        sx={{ width: "100%" }}
+      >
         <Box
           sx={{
             width: 36,
@@ -57,17 +66,25 @@ const UserStatCard = ({
         >
           {icon}
         </Box>
-        <Typography variant="subtitle2" fontWeight={900}>
+        <Typography
+          variant="subtitle2"
+          fontWeight={900}
+          textAlign={centered ? "center" : "inherit"}
+        >
           {title}
         </Typography>
       </Stack>
 
-      <Typography variant="h6" fontWeight={900}>
+      <Typography variant="h6" fontWeight={900} textAlign={centered ? "center" : "inherit"}>
         {value}
       </Typography>
 
       {!!subtitle && (
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          textAlign={centered ? "center" : "inherit"}
+        >
           {subtitle}
         </Typography>
       )}

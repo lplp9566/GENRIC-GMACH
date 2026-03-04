@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from "react";
-import { Box, useTheme } from "@mui/material";
+import { Box, Grid, Paper, Stack, Typography, useTheme } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import GemachRegulationsModal from "../../Admin/components/HomePage/GemachRegulationsModal";
 import { formatILS } from "../../Admin/components/HomePage/HomePage";
@@ -11,15 +12,14 @@ import { StatusGeneric } from "../../common/indexTypes";
 import { getAllMonthlyRanks } from "../../store/features/admin/adminRankSlice";
 import UserHomeHero from "./components/UserHomePage/UserHomeHero";
 import UserNextChargesSection from "./components/UserHomePage/UserNextChargesSection";
-import UserContributionsSection from "./components/UserHomePage/UserContributionsSection";
 import UserDepositsLoansSection from "./components/UserHomePage/UserDepositsLoansSection";
 import UserFullStatsSection from "./components/UserHomePage/UserFullStatsSection";
-import UserRegulations from "./components/UserHomePage/UserRegulations";
 import UserRoleSection from "./components/UserHomePage/UserRoleSection";
 import UserDebtsSection from "./components/UserHomePage/UserDebtsSection";
 
 const UserHomePage = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
@@ -46,7 +46,22 @@ const UserHomePage = () => {
   const [openRegulations, setOpenRegulations] = useState(false);
 
   const user = authUser?.user;
-  const userName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
+  const primaryFirstName = (user?.first_name ?? "").trim();
+  const primaryLastName = (user?.last_name ?? "").trim();
+  const spouseFirstName = (user?.spouse_first_name ?? "").trim();
+  const spouseLastName = (user?.spouse_last_name ?? "").trim();
+
+  const userName = useMemo(() => {
+    if (!spouseFirstName) {
+      return `${primaryFirstName} ${primaryLastName}`.trim();
+    }
+
+    if (spouseLastName && spouseLastName !== primaryLastName) {
+      return `${primaryFirstName} ו${spouseFirstName} ${primaryLastName}/${spouseLastName}`.trim();
+    }
+
+    return `${primaryFirstName} ו${spouseFirstName} ${primaryLastName}`.trim();
+  }, [primaryFirstName, primaryLastName, spouseFirstName, spouseLastName]);
 
   useEffect(() => {
     if (user?.id != null) {
@@ -137,19 +152,19 @@ const UserHomePage = () => {
   const totalCashHoldings = userFinancials?.total_cash_holdings ?? 0;
 
   const totalContributions = totalDonations + totalMemberFees;
-
-  const activeLoans = (allLoans ?? []).filter((loan) => loan.isActive);
-  const activeLoansRemaining = activeLoans.reduce(
-    (sum, loan) => sum + (loan.remaining_balance ?? 0),
-    0
-  );
-
-  const loanUsageRatio =
-    totalContributions > 0 ? Math.min(1, activeLoansRemaining / totalContributions) : 0;
-  const loanUsagePercent = Math.round(loanUsageRatio * 100);
+  const activeLoansRemaining = (allLoans ?? [])
+    .filter((loan) => loan.isActive)
+    .reduce((sum, loan) => sum + (loan.remaining_balance ?? 0), 0);
+  const loanUsagePercent =
+    totalContributions > 0
+      ? Math.min(100, Math.round((activeLoansRemaining / totalContributions) * 100))
+      : 0;
 
   const depositsNowAmount = Math.max(0, totalFixedDepositsDeposited - totalFixedDepositsWithdrawn);
   const loansNowByTakenMinusRepaid = Math.max(0, totalLoansTaken - totalLoansRepaid);
+  const donationExternalUrl = import.meta.env.VITE_DONATIONS_EXTERNAL_URL as
+    | string
+    | undefined;
 
   return (
     <Box
@@ -164,17 +179,96 @@ const UserHomePage = () => {
           : "radial-gradient(circle at 12% 8%, rgba(251,191,36,0.22), transparent 45%), radial-gradient(circle at 88% 10%, rgba(20,184,166,0.18), transparent 35%), linear-gradient(180deg, #f8fafc 0%, #ffffff 70%)",
       }}
     >
-      <UserHomeHero userName={userName} isDark={isDark} accent={accent} softBorder={softBorder} />
+      <UserHomeHero
+        userName={userName}
+        isDark={isDark}
+        accent={accent}
+        softBorder={softBorder}
+        onLoanRequest={() => navigate("/u/loan-requests")}
+        onDonate={() => {
+          if (donationExternalUrl) {
+            window.open(donationExternalUrl, "_blank", "noopener,noreferrer");
+            return;
+          }
+          navigate("/u/donations");
+        }}
+        onOpenRegulations={() => setOpenRegulations(true)}
+      />
 
       <Box sx={{ mt: 4, ...sectionSx }}>
-        <UserRoleSection
-          title="הדרגה שלך"
-          currentRoleName={currentRole?.name ?? null}
-          currentRoleAmount={currentRoleRate?.amount ?? null}
-          surface={surface}
-          softBorder={softBorder}
-          formatILS={formatILS}
-        />
+        <Grid container spacing={2.5}>
+          <Grid item xs={12} md={6}>
+            <UserRoleSection
+              title="הדרגה שלך"
+              currentRoleName={currentRole?.name ?? null}
+              currentRoleAmount={currentRoleRate?.amount ?? null}
+              surface={surface}
+              softBorder={softBorder}
+              formatILS={formatILS}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Typography variant="h6" fontWeight={800} mb={1.2}>
+              סך תרומות ודמי חבר
+            </Typography>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                borderRadius: 4,
+                background: surface,
+                border: softBorder,
+                backdropFilter: "blur(6px)",
+              }}
+            >
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+                <Stack spacing={1} sx={{ flex: 1 }}>
+                  <Typography variant="h5" fontWeight={900}>
+                    {formatILS(totalContributions)}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    סה"כ תרומות: {formatILS(totalDonations)}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    סה"כ דמי חבר: {formatILS(totalMemberFees)}
+                  </Typography>
+                </Stack>
+
+                <Box
+                  sx={{
+                    position: "relative",
+                    width: 122,
+                    height: 122,
+                    borderRadius: "50%",
+                    background: `conic-gradient(#22c55e ${loanUsagePercent}%, ${
+                      isDark ? "rgba(148,163,184,0.28)" : "rgba(148,163,184,0.2)"
+                    } 0)`,
+                    flexShrink: 0,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: 9,
+                      borderRadius: "50%",
+                      background: isDark ? "#0f172a" : "#ffffff",
+                      display: "grid",
+                      placeItems: "center",
+                      textAlign: "center",
+                    }}
+                    >
+                    <Typography variant="h6" fontWeight={900}>
+                      {loanUsagePercent}%
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      בהלוואות
+                    </Typography>
+                  </Box>
+                </Box>
+              </Stack>
+            </Paper>
+          </Grid>
+        </Grid>
       </Box>
 
       <Box sx={{ mt: 4, ...sectionSx }}>
@@ -188,15 +282,6 @@ const UserHomePage = () => {
           accentSoft={accentSoft}
           surface={surface}
           softBorder={softBorder}
-          isDark={isDark}
-        />
-      </Box>
-
-      <Box sx={{ mt: 4, ...sectionSx }}>
-        <UserContributionsSection
-          totalContributions={totalContributions}
-          activeLoansRemaining={activeLoansRemaining}
-          loanUsagePercent={loanUsagePercent}
           isDark={isDark}
         />
       </Box>
@@ -250,15 +335,6 @@ const UserHomePage = () => {
             { title: "החזרים בהוראות קבע", value: totalStandingOrderReturn, detail: "חיובים שחזרו", kind: "money" },
             { title: "אחזקה במזומן", value: totalCashHoldings, detail: "יתרה נוכחית", kind: "money" },
           ]}
-        />
-      </Box>
-
-      <Box sx={{ mt: 4, ...sectionSx }}>
-        <UserRegulations
-          surface={surface}
-          softBorder={softBorder}
-          accent={accent}
-          onOpenRegulations={() => setOpenRegulations(true)}
         />
       </Box>
 

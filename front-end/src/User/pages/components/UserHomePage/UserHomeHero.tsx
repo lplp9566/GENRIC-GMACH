@@ -6,9 +6,20 @@ type Props = {
   isDark: boolean;
   accent: string;
   softBorder: string;
+  onLoanRequest: () => void;
+  onDonate: () => void;
+  onOpenRegulations: () => void;
 };
 
-const UserHomeHero = ({ userName, isDark, accent, softBorder }: Props) => (
+const UserHomeHero = ({
+  userName,
+  isDark,
+  accent,
+  softBorder,
+  onLoanRequest,
+  onDonate,
+  onOpenRegulations,
+}: Props) => (
   <Paper
     elevation={0}
     sx={{
@@ -48,18 +59,9 @@ const UserHomeHero = ({ userName, isDark, accent, softBorder }: Props) => (
     />
 
     <Stack spacing={1.5} position="relative" zIndex={1}>
-      <Chip
-        label='גמ"ח דיגיטלי'
-        sx={{
-          alignSelf: "flex-start",
-          bgcolor: isDark ? "rgba(255,255,255,0.16)" : "rgba(15,23,42,0.06)",
-          color: isDark ? "#fff" : "#0f172a",
-          fontWeight: 900,
-        }}
-      />
 
       <Typography variant="h3" fontWeight={900} sx={{ letterSpacing: "-0.5px" }}>
-        ברוך הבא{userName ? `, ${userName}` : ""}
+        ברוך הבא{` ${userName}`}
       </Typography>
 
       <Typography variant="subtitle1" sx={{ opacity: 0.9, maxWidth: 720 }}>
@@ -80,6 +82,36 @@ const UserHomeHero = ({ userName, isDark, accent, softBorder }: Props) => (
           }}
         >
           פרופיל אישי
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={onDonate}
+          sx={{
+            borderRadius: 3,
+            fontWeight: 900,
+          }}
+        >
+          תרומה
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={onLoanRequest}
+          sx={{
+            borderRadius: 3,
+            fontWeight: 900,
+          }}
+        >
+          בקשת הלוואה
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={onOpenRegulations}
+          sx={{
+            borderRadius: 3,
+            fontWeight: 900,
+          }}
+        >
+          תקנון הגמ"ח
         </Button>
       </Stack>
     </Stack>

@@ -100,7 +100,7 @@ const UserLoansPage: React.FC = () => {
         >
           <Stack spacing={2}>
             <Typography variant="h5" fontWeight={600} textAlign="center">
-              ׳”׳׳•׳•׳׳•׳×
+              הלוואות
             </Typography>
             <Box
               sx={{
@@ -121,22 +121,22 @@ const UserLoansPage: React.FC = () => {
                   minWidth: { xs: "100%", sm: 240 },
                 }}
               >
-                ׳‘׳§׳©׳× ׳”׳׳•׳•׳׳”
+                בקשת הלוואה
               </Button>
               <FormControl size="small" fullWidth={isSm} sx={{ minWidth: { xs: "100%", sm: 220 } }}>
-                <InputLabel id="user-loans-filter-label">׳¡׳˜׳˜׳•׳¡</InputLabel>
+                <InputLabel id="user-loans-filter-label">סטטוס</InputLabel>
                 <Select
                   labelId="user-loans-filter-label"
-                  label="׳¡׳˜׳˜׳•׳¡"
+                  label="סטטוס"
                   value={filter}
                   onChange={(e) => {
                     setAutoFallback(false);
                     setFilter(e.target.value as StatusGeneric);
                   }}
                 >
-                  <MenuItem value={StatusGeneric.ALL}>׳”׳›׳</MenuItem>
-                  <MenuItem value={StatusGeneric.ACTIVE}>׳₪׳¢׳™׳׳•׳×</MenuItem>
-                  <MenuItem value={StatusGeneric.INACTIVE}>׳׳ ׳₪׳¢׳™׳׳•׳×</MenuItem>
+                  <MenuItem value={StatusGeneric.ALL}>הכל</MenuItem>
+                  <MenuItem value={StatusGeneric.ACTIVE}>פעיל</MenuItem>
+                  <MenuItem value={StatusGeneric.INACTIVE}>לא פעיל</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -146,12 +146,12 @@ const UserLoansPage: React.FC = () => {
           <Grid item xs={12} md={4}>
             <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
               <Typography variant="h6" fontWeight={600} mb={2}>
-                ׳”׳׳•׳•׳׳•׳×
+                הלוואות
               </Typography>
               <Box>
                 {allLoans.length === 0 ? (
                   <Typography variant="body2" color="text.secondary">
-                    ׳׳™׳ ׳”׳׳•׳•׳׳•׳× ׳¢׳ ׳©׳׳
+                    אין הלוואות על שמך
                   </Typography>
                 ) : (
                   allLoans.map((loan) => {
@@ -198,7 +198,7 @@ const UserLoansPage: React.FC = () => {
                   </Box>
                 </>
               ) : (
-                <Typography variant="body1">׳‘׳—׳¨ ׳”׳׳•׳•׳׳” ׳׳”׳¦׳’׳× ׳₪׳¨׳˜׳™׳.</Typography>
+                <Typography variant="body1">בחר הלוואה להצגת פרטים.</Typography>
               )}
             </Paper>
           </Grid>
@@ -212,7 +212,7 @@ const UserLoansPage: React.FC = () => {
                   readOnly
                 />
               ) : (
-                <Typography variant="body1">׳‘׳—׳¨ ׳”׳׳•׳•׳׳” ׳׳”׳¦׳’׳× ׳”׳₪׳¢׳•׳׳•׳×.</Typography>
+                <Typography variant="body1">בחר הלוואה להצגת פעולות.</Typography>
               )}
             </Paper>
           </Grid>

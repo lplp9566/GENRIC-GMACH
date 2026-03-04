@@ -1,4 +1,5 @@
-﻿import { Box, Divider, Grid, Paper, Stack, Typography } from "@mui/material";
+import { Box, Divider, Grid, Paper, Stack, Typography } from "@mui/material";
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import SectionTitle from "./SectionTitle";
 import UserStatCard from "./UserStatCard";
 
@@ -14,6 +15,16 @@ interface UserDebtsSectionProps {
   surface: string;
   softBorder: string;
   isDark: boolean;
+}
+
+const debtCardSurface = (isDark: boolean, hasDebt: boolean, surface: string) => {
+  if (!hasDebt) return surface;
+  return isDark ? "rgba(153,27,27,0.55)" : "#fee2e2";
+};
+
+const debtCardBorder = (isDark: boolean, hasDebt: boolean, softBorder: string) => {
+  if (!hasDebt) return softBorder;
+  return isDark ? "1px solid rgba(248,113,113,0.75)" : "1px solid rgba(220,38,38,0.65)";
 };
 
 const UserDebtsSection = ({
@@ -43,7 +54,7 @@ const UserDebtsSection = ({
       }}
     >
       <Stack spacing={2}>
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
           <Box
             sx={{
               width: 46,
@@ -61,12 +72,16 @@ const UserDebtsSection = ({
             ₪
           </Box>
 
-          <Box>
-            <Typography variant="subtitle2" fontWeight={900}>
+          <Box textAlign="center">
+            <Typography variant="subtitle2" fontWeight={900} textAlign="center">
               סה"כ חוב פתוח
             </Typography>
 
-            <Typography variant="h4" fontWeight={900}>
+            <Typography
+              variant="h4"
+              fontWeight={900}
+              color={totalDebt > 0 ? "#ef4444" : "text.primary"}
+            >
               {formatDebtILS(totalDebt)}
             </Typography>
           </Box>
@@ -84,10 +99,12 @@ const UserDebtsSection = ({
               title="חוב דמי חבר"
               value={formatDebtILS(monthlyDebt)}
               subtitle='יתרת חיוב חודשית לגמ"ח'
-              accent={accent}
-              accentSoft={accentSoft}
-              surface={surface}
-              softBorder={softBorder}
+              icon="₪"
+              centered
+              accent={monthlyDebt > 0 ? "#ef4444" : accent}
+              accentSoft={monthlyDebt > 0 ? "rgba(239,68,68,0.2)" : accentSoft}
+              surface={debtCardSurface(isDark, monthlyDebt > 0, surface)}
+              softBorder={debtCardBorder(isDark, monthlyDebt > 0, softBorder)}
               isDark={isDark}
             />
           </Grid>
@@ -97,10 +114,12 @@ const UserDebtsSection = ({
               title="חוב הלוואות"
               value={formatDebtILS(loansDebt)}
               subtitle={`${openLoansCount} הלוואות פתוחות`}
-              accent={accent}
-              accentSoft={accentSoft}
-              surface={surface}
-              softBorder={softBorder}
+              icon="₪"
+              centered
+              accent={loansDebt > 0 ? "#ef4444" : accent}
+              accentSoft={loansDebt > 0 ? "rgba(239,68,68,0.2)" : accentSoft}
+              surface={debtCardSurface(isDark, loansDebt > 0, surface)}
+              softBorder={debtCardBorder(isDark, loansDebt > 0, softBorder)}
               isDark={isDark}
             />
           </Grid>
@@ -110,10 +129,16 @@ const UserDebtsSection = ({
               title="חוב החזרי הוראות קבע"
               value={formatDebtILS(standingOrdersDebt)}
               subtitle="חיובים שחזרו"
-              accent={accent}
-              accentSoft={accentSoft}
-              surface={surface}
-              softBorder={softBorder}
+              icon={<CurrencyExchangeIcon fontSize="small" />}
+              centered
+              accent={standingOrdersDebt > 0 ? "#ef4444" : accent}
+              accentSoft={standingOrdersDebt > 0 ? "rgba(239,68,68,0.2)" : accentSoft}
+              surface={debtCardSurface(isDark, standingOrdersDebt > 0, surface)}
+              softBorder={debtCardBorder(
+                isDark,
+                standingOrdersDebt > 0,
+                softBorder
+              )}
               isDark={isDark}
             />
           </Grid>
