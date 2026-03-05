@@ -35,6 +35,19 @@ const InvestmentsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const columnsMaxHeight = isDesktop ? "calc(100vh - 180px)" : "none";
+  const hiddenScrollbarSx = isDesktop
+    ? {
+        overflowY: "auto",
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+        "&::-webkit-scrollbar": {
+          width: 0,
+          height: 0,
+        },
+      }
+    : {};
 
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const permission = authUser?.permission ?? authUser?.user?.permission;
@@ -240,7 +253,22 @@ const InvestmentsPage: React.FC = () => {
 
             <Grid container spacing={3} sx={{ direction: "rtl" }}>
               <Grid item xs={12} md={8}>
-                <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    direction: "rtl",
+                    ...(isDesktop
+                      ? {
+                          position: "sticky",
+                          top: 16,
+                          maxHeight: columnsMaxHeight,
+                          display: "flex",
+                          flexDirection: "column",
+                        }
+                      : {}),
+                  }}
+                >
                   <Box
                     sx={{
                       display: "flex",
@@ -281,7 +309,14 @@ const InvestmentsPage: React.FC = () => {
                   {visibleActions.length === 0 ? (
                     <Typography>אין פעולות להצגה</Typography>
                   ) : (
-                    <InvestmentActionTable
+                    <Box
+                      sx={{
+                        flex: isDesktop ? 1 : "unset",
+                        minHeight: 0,
+                        ...hiddenScrollbarSx,
+                      }}
+                    >
+                      <InvestmentActionTable
                       actions={visibleActions}
                       showInvestmentColumn={!selectedInvestmentId}
                       title={
@@ -289,13 +324,29 @@ const InvestmentsPage: React.FC = () => {
                           ? "פעולות על השקעה"
                           : "פעולות על כל ההשקעות"
                       }
-                    />
+                      />
+                    </Box>
                   )}
                 </Paper>
               </Grid>
 
               <Grid item xs={12} md={4}>
-                <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    direction: "rtl",
+                    ...(isDesktop
+                      ? {
+                          position: "sticky",
+                          top: 16,
+                          maxHeight: columnsMaxHeight,
+                          display: "flex",
+                          flexDirection: "column",
+                        }
+                      : {}),
+                  }}
+                >
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="h6" fontWeight={600}>
                       השקעות
@@ -310,7 +361,14 @@ const InvestmentsPage: React.FC = () => {
                   {filteredInvestments.length === 0 ? (
                     <Typography>אין השקעות להצגה</Typography>
                   ) : (
-                    <Stack spacing={1.5}>
+                    <Box
+                      sx={{
+                        flex: isDesktop ? 1 : "unset",
+                        minHeight: 0,
+                        ...hiddenScrollbarSx,
+                      }}
+                    >
+                      <Stack spacing={1.5}>
                       {filteredInvestments.map((inv) => (
                         <InvestmentMiniCard
                           key={inv.id}
@@ -324,7 +382,8 @@ const InvestmentsPage: React.FC = () => {
                           onActionSuccess={handleRefresh}
                         />
                       ))}
-                    </Stack>
+                      </Stack>
+                    </Box>
                   )}
                 </Paper>
               </Grid>

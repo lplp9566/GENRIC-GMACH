@@ -39,6 +39,7 @@ interface ActionsTableProps {
   onCopyAction?: (action: ILoanAction) => void;
   showLoanColumn?: boolean;
   title?: string;
+  hideTitle?: boolean;
 }
 
 export const ActionsTable: React.FC<ActionsTableProps> = ({
@@ -48,6 +49,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
   onCopyAction,
   showLoanColumn,
   title,
+  hideTitle = false,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -149,15 +151,17 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
     <Paper elevation={3} sx={{ borderRadius: 2, width: "100%", p: { xs: 1.5, md: 2 } }}>
       <Stack
         direction={{ xs: "column", sm: "row" }}
-        justifyContent="space-between"
+        justifyContent={hideTitle ? "center" : "space-between"}
         alignItems={{ xs: "stretch", sm: "center" }}
         spacing={1}
         sx={{ mb: 1 }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 600, textAlign: "center", flex: 1 }}>
-          {title ?? "פעולות על ההלוואה"}
-        </Typography>
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+        {!hideTitle && (
+          <Typography variant="h6" sx={{ fontWeight: 600, textAlign: "center", flex: 1 }}>
+            {title ?? "פעולות על ההלוואה"}
+          </Typography>
+        )}
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ mx: hideTitle ? "auto" : 0 }}>
           <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 170 } }}>
             <InputLabel id="loan-actions-type-filter-label">סוג פעולה</InputLabel>
             <Select

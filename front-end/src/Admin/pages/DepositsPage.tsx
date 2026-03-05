@@ -62,6 +62,19 @@ const DepositsPage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const columnsMaxHeight = isDesktop ? "calc(100vh - 180px)" : "none";
+  const hiddenScrollbarSx = isDesktop
+    ? {
+        overflowY: "auto",
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+        "&::-webkit-scrollbar": {
+          width: 0,
+          height: 0,
+        },
+      }
+    : {};
 
   const [filter, setFilter] = useState<StatusGeneric>(StatusGeneric.ACTIVE);
   const [selectedDepositId, setSelectedDepositId] = useState<number | null>(null);
@@ -430,7 +443,22 @@ const DepositsPage: FC = () => {
 
             <Grid container spacing={3} sx={{ direction: "rtl" }}>
               <Grid item xs={12} md={8}>
-                <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    direction: "rtl",
+                    ...(isDesktop
+                      ? {
+                          position: "sticky",
+                          top: 16,
+                          maxHeight: columnsMaxHeight,
+                          display: "flex",
+                          flexDirection: "column",
+                        }
+                      : {}),
+                  }}
+                >
                   <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <Box>
                       <Typography variant="h6" fontWeight={600}>
@@ -454,13 +482,21 @@ const DepositsPage: FC = () => {
                   </Box>
 
                   {tableActions.length > 0 ? (
-                    <DepositActionTable
-                      actions={tableActions}
-                      canWrite={canWrite}
-                      onCopy={(action) => void handleCopyDepositAction(action)}
-                      onEdit={(action) => openEditDepositAction(action)}
-                      onDelete={(action) => setDeleteDepositAction(action)}
-                    />
+                    <Box
+                      sx={{
+                        flex: isDesktop ? 1 : "unset",
+                        minHeight: 0,
+                        ...hiddenScrollbarSx,
+                      }}
+                    >
+                      <DepositActionTable
+                        actions={tableActions}
+                        canWrite={canWrite}
+                        onCopy={(action) => void handleCopyDepositAction(action)}
+                        onEdit={(action) => openEditDepositAction(action)}
+                        onDelete={(action) => setDeleteDepositAction(action)}
+                      />
+                    </Box>
                   ) : (
                     <Typography>אין נתונים להצגה</Typography>
                   )}
@@ -468,7 +504,22 @@ const DepositsPage: FC = () => {
               </Grid>
 
               <Grid item xs={12} md={4}>
-                <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    direction: "rtl",
+                    ...(isDesktop
+                      ? {
+                          position: "sticky",
+                          top: 16,
+                          maxHeight: columnsMaxHeight,
+                          display: "flex",
+                          flexDirection: "column",
+                        }
+                      : {}),
+                  }}
+                >
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="h6" fontWeight={600}>
                       הפקדות
@@ -478,46 +529,54 @@ const DepositsPage: FC = () => {
                   {allDeposits.length === 0 ? (
                     <Typography>אין נתונים להצגה</Typography>
                   ) : (
-                    <Stack spacing={1.5}>
-                      {allDeposits.map((depositItem) => {
-                        const isSelected = depositItem.id === selectedDepositId;
+                    <Box
+                      sx={{
+                        flex: isDesktop ? 1 : "unset",
+                        minHeight: 0,
+                        ...hiddenScrollbarSx,
+                      }}
+                    >
+                      <Stack spacing={1.5}>
+                        {allDeposits.map((depositItem) => {
+                          const isSelected = depositItem.id === selectedDepositId;
 
-                        return (
-                          <Box
-                            key={depositItem.id}
-                            sx={{
-                              border: isSelected ? "2px solid #2a8c82" : "1px solid rgba(0,0,0,0.08)",
-                              borderRadius: 2,
-                              overflow: "hidden",
-                            }}
-                          >
-                            <DepositCard
-                              deposit={depositItem}
-                              readOnly={!canWrite}
-                              compactActions
-                              onClick={() => setSelectedDepositId(depositItem.id)}
-                              onAddAction={() => {
-                                setActionDepositId(depositItem.id);
-                                setActionsOpen(true);
+                          return (
+                            <Box
+                              key={depositItem.id}
+                              sx={{
+                                border: isSelected ? "2px solid #2a8c82" : "1px solid rgba(0,0,0,0.08)",
+                                borderRadius: 2,
+                                overflow: "hidden",
                               }}
-                              onView={() => {
-                                dispatch(getDepositDetails(depositItem.id));
-                                setDetailsDepositId(depositItem.id);
-                              }}
-                              onEdit={() => {
-                                dispatch(getDepositDetails(depositItem.id));
-                                setEditDepositId(depositItem.id);
-                                setEditActionDate(toInputDate(new Date()));
-                                setEditReturnDate(toInputDate(depositItem.end_date));
-                              }}
-                              onDelete={() => {
-                                setDeleteDepositId(depositItem.id);
-                              }}
-                            />
-                          </Box>
-                        );
-                      })}
-                    </Stack>
+                            >
+                              <DepositCard
+                                deposit={depositItem}
+                                readOnly={!canWrite}
+                                compactActions
+                                onClick={() => setSelectedDepositId(depositItem.id)}
+                                onAddAction={() => {
+                                  setActionDepositId(depositItem.id);
+                                  setActionsOpen(true);
+                                }}
+                                onView={() => {
+                                  dispatch(getDepositDetails(depositItem.id));
+                                  setDetailsDepositId(depositItem.id);
+                                }}
+                                onEdit={() => {
+                                  dispatch(getDepositDetails(depositItem.id));
+                                  setEditDepositId(depositItem.id);
+                                  setEditActionDate(toInputDate(new Date()));
+                                  setEditReturnDate(toInputDate(depositItem.end_date));
+                                }}
+                                onDelete={() => {
+                                  setDeleteDepositId(depositItem.id);
+                                }}
+                              />
+                            </Box>
+                          );
+                        })}
+                      </Stack>
+                    </Box>
                   )}
                 </Paper>
               </Grid>

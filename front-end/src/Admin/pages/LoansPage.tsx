@@ -13,6 +13,8 @@ import {
   Dialog,
   DialogContent,
   Stack,
+  Tab,
+  Tabs,
   useTheme,
   useMediaQuery,
   Grid,
@@ -63,6 +65,7 @@ export const LoansPage: React.FC = () => {
   const [initialAction, setInitialAction] =
     useState<ICreateLoanAction | null>(null);
   const [actionLoanId, setActionLoanId] = useState<number | null>(null);
+  const [mobileTab, setMobileTab] = useState(0);
   const { allLoans, loanActions, page, status, total } = useSelector(
     (s: RootState) => s.AdminLoansSlice
   );
@@ -314,114 +317,33 @@ export const LoansPage: React.FC = () => {
                 </Grid>
               </Grid>
 
-              <Grid container spacing={3} sx={{ direction: "rtl" }}>
-                <Grid item xs={12} md={8}>
-                  <Paper
-                    sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      direction: "rtl",
-                      ...(isDesktop
-                        ? {
-                            position: "sticky",
-                            top: 16,
-                            maxHeight: columnsMaxHeight,
-                            display: "flex",
-                            flexDirection: "column",
-                          }
-                        : {}),
-                    }}
+              {isSm ? (
+                <Paper sx={{ p: 1.5, borderRadius: 2, direction: "rtl" }}>
+                  <Tabs
+                    value={mobileTab}
+                    onChange={(_, value) => setMobileTab(value)}
+                    variant="fullWidth"
+                    sx={{ mb: 2 }}
                   >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        mb: 2,
-                      }}
-                    >
-                      <Box>
-                        <Typography variant="h6" fontWeight={600}>
-                          {"פעולות הלוואות"}
-                        </Typography>
-                        {selectedLoan && (
-                          <Typography variant="body2" color="text.secondary">
-                            {"הלוואה"} #{selectedLoan.id} - {selectedLoan.user.first_name} {selectedLoan.user.last_name}
-                          </Typography>
-                        )}
-                      </Box>
-                      {selectedLoanId && (
-                        <Button
-                          variant="outlined"
-                          onClick={() => setSelectedLoanId(null)}
-                        >
-                          {"הצג את כל הפעולות"}
-                        </Button>
-                      )}
-                    </Box>
-                    <Box sx={{ flex: isDesktop ? 1 : "unset", minHeight: 0, ...hiddenScrollbarSx }}>
-                      {visibleActions.length === 0 ? (
-                        <Typography>
-                          {"אין פעולות להצגה"}
-                        </Typography>
-                      ) : (
-                        <ActionsTable
-                          actions={visibleActions}
-                          loanId={selectedLoanId ?? undefined}
-                          readOnly={!canWrite}
-                          onCopyAction={handleCopyAction}
-                          showLoanColumn={!selectedLoanId}
-                          title={
-                            selectedLoanId
-                              ? "פעולות על הלוואה"
-                              : "פעולות על כל ההלוואות"
-                          }
-                        />
-                      )}
-                    </Box>
-                  </Paper>
-                </Grid>
+                    <Tab label="רשימת הלוואות" />
+                    <Tab label="פעולות" />
+                  </Tabs>
 
-                <Grid item xs={12} md={4}>
-                  <Paper
-                    sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      direction: "rtl",
-                      ...(isDesktop
-                        ? {
-                            position: "sticky",
-                            top: 16,
-                            maxHeight: columnsMaxHeight,
-                            display: "flex",
-                            flexDirection: "column",
-                          }
-                        : {}),
-                    }}
-                  >
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="h6" fontWeight={600}>
-                        {"הלוואות"}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {selectedLoanId
-                          ? "בחרת הלוואה להצגת פעולות."
-                          : "בחר הלוואה להצגת פעולות."}
-                      </Typography>
-                    </Box>
-                    {allLoans.length === 0 ? (
-                      <Typography>
-                        {"אין הלוואות להצגה"}
-                      </Typography>
-                    ) : (
-                      <Box sx={{ flex: isDesktop ? 1 : "unset", minHeight: 0, ...hiddenScrollbarSx }}>
+                  {mobileTab === 0 && (
+                    <Box>
+                      {allLoans.length === 0 ? (
+                        <Typography>אין הלוואות להצגה</Typography>
+                      ) : (
                         <Stack spacing={1.5}>
                           {allLoans.map((loan) => (
                             <LoanMiniCard
                               key={loan.id}
                               loan={loan}
                               selected={loan.id === selectedLoanId}
-                              onSelect={() => setSelectedLoanId(loan.id)}
+                              onSelect={() => {
+                                setSelectedLoanId(loan.id);
+                                setMobileTab(1);
+                              }}
                               onActionSuccess={() => {
                                 refreshLoans();
                                 refreshActions();
@@ -429,11 +351,169 @@ export const LoansPage: React.FC = () => {
                             />
                           ))}
                         </Stack>
+                      )}
+                    </Box>
+                  )}
+
+                  {mobileTab === 1 && (
+                    <Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          mb: 2,
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="h6" fontWeight={600}>
+                            {"פעולות הלוואות"}
+                          </Typography>
+                          {selectedLoan && (
+                            <Typography variant="body2" color="text.secondary">
+                              {"הלוואה"} #{selectedLoan.id} - {selectedLoan.user.first_name} {selectedLoan.user.last_name}
+                            </Typography>
+                          )}
+                        </Box>
+                        {selectedLoanId && (
+                          <Button variant="outlined" onClick={() => setSelectedLoanId(null)}>
+                            {"הצג את כל הפעולות"}
+                          </Button>
+                        )}
                       </Box>
-                    )}
-                  </Paper>
+                      {visibleActions.length === 0 ? (
+                        <Typography>אין פעולות להצגה</Typography>
+                      ) : (
+                        <ActionsTable
+                          actions={visibleActions}
+                          loanId={selectedLoanId ?? undefined}
+                          readOnly={!canWrite}
+                          onCopyAction={handleCopyAction}
+                          showLoanColumn={!selectedLoanId}
+                          hideTitle
+                        />
+                      )}
+                    </Box>
+                  )}
+                </Paper>
+              ) : (
+                <Grid container spacing={3} sx={{ direction: "rtl" }}>
+                  <Grid item xs={12} md={8}>
+                    <Paper
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        direction: "rtl",
+                        ...(isDesktop
+                          ? {
+                              position: "sticky",
+                              top: 16,
+                              maxHeight: columnsMaxHeight,
+                              display: "flex",
+                              flexDirection: "column",
+                            }
+                          : {}),
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          mb: 2,
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="h6" fontWeight={600}>
+                            {"פעולות הלוואות"}
+                          </Typography>
+                          {selectedLoan && (
+                            <Typography variant="body2" color="text.secondary">
+                              {"הלוואה"} #{selectedLoan.id} - {selectedLoan.user.first_name} {selectedLoan.user.last_name}
+                            </Typography>
+                          )}
+                        </Box>
+                        {selectedLoanId && (
+                          <Button
+                            variant="outlined"
+                            onClick={() => setSelectedLoanId(null)}
+                          >
+                            {"הצג את כל הפעולות"}
+                          </Button>
+                        )}
+                      </Box>
+                      <Box sx={{ flex: isDesktop ? 1 : "unset", minHeight: 0, ...hiddenScrollbarSx }}>
+                        {visibleActions.length === 0 ? (
+                          <Typography>
+                            {"אין פעולות להצגה"}
+                          </Typography>
+                        ) : (
+                          <ActionsTable
+                            actions={visibleActions}
+                            loanId={selectedLoanId ?? undefined}
+                            readOnly={!canWrite}
+                            onCopyAction={handleCopyAction}
+                            showLoanColumn={!selectedLoanId}
+                            hideTitle
+                          />
+                        )}
+                      </Box>
+                    </Paper>
+                  </Grid>
+
+                  <Grid item xs={12} md={4}>
+                    <Paper
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        direction: "rtl",
+                        ...(isDesktop
+                          ? {
+                              position: "sticky",
+                              top: 16,
+                              maxHeight: columnsMaxHeight,
+                              display: "flex",
+                              flexDirection: "column",
+                            }
+                          : {}),
+                      }}
+                    >
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="h6" fontWeight={600}>
+                          {"הלוואות"}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {selectedLoanId
+                            ? "בחרת הלוואה להצגת פעולות."
+                            : "בחר הלוואה להצגת פעולות."}
+                        </Typography>
+                      </Box>
+                      {allLoans.length === 0 ? (
+                        <Typography>
+                          {"אין הלוואות להצגה"}
+                        </Typography>
+                      ) : (
+                        <Box sx={{ flex: isDesktop ? 1 : "unset", minHeight: 0, ...hiddenScrollbarSx }}>
+                          <Stack spacing={1.5}>
+                            {allLoans.map((loan) => (
+                              <LoanMiniCard
+                                key={loan.id}
+                                loan={loan}
+                                selected={loan.id === selectedLoanId}
+                                onSelect={() => setSelectedLoanId(loan.id)}
+                                onActionSuccess={() => {
+                                  refreshLoans();
+                                  refreshActions();
+                                }}
+                              />
+                            ))}
+                          </Stack>
+                        </Box>
+                      )}
+                    </Paper>
+                  </Grid>
                 </Grid>
-              </Grid>
+              )}
             </Box>
           )}
 
