@@ -41,10 +41,10 @@ export class LoanEntity {
   remaining_balance: number;
 
   @Column({ type: 'float' })
-  total_installments: number;
+  remaining_installments: number;
 
   @Column({ type: 'float' })
-  total_remaining_payments: number;
+  paid_installments: number;
 
   @Column({ type: 'int' })
   initial_monthly_payment: number;
@@ -69,3 +69,4 @@ export class LoanEntity {
   })
   actions: LoanActionEntity[];
 }
+

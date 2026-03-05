@@ -58,7 +58,7 @@ export class ReceiptsDailyCronService {
         case LoanPaymentActionType.LOAN_CREATED: {
           const lines = [
             `הלוואה מספר ${loan.id} נוצרה בהצלחה.`,
-            `מספר תשלומים: ${Math.ceil(loan.total_installments)}.`,
+            `מספר תשלומים: ${Math.ceil(loan.remaining_installments)}.`,
             `סכום ההלוואה: ${this.mailService.formatCurrency(loan.loan_amount)}.`,
             `סכום ההחזר החודשי: ${this.mailService.formatCurrency(loan.monthly_payment)}.`,
             `יום התשלום: ${loan.payment_date ?? '-'} בחודש.`,
@@ -77,7 +77,7 @@ export class ReceiptsDailyCronService {
           break;
         }
         case LoanPaymentActionType.PAYMENT: {
-          const remainingPayments = loan.total_remaining_payments;
+          const remainingPayments = loan.paid_installments;
           const lines = [
             `התקבל תשלום בסך ${this.mailService.formatCurrency(action.value)} עבור הלוואה מספר ${loan.id}.`,
             `יתרה להחזר: ${this.mailService.formatCurrency(loan.remaining_balance)}.`,
@@ -378,3 +378,4 @@ export class ReceiptsDailyCronService {
     return base.toISOString().slice(0, 10);
   }
 }
+

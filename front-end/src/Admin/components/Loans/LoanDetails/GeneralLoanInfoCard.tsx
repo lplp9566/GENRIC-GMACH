@@ -82,11 +82,11 @@ export const GeneralLoanInfoCard: React.FC<Props> = ({
     },
     {
       label: "סה\"כ תשלומים שנותרו",
-      value: Math.ceil(loan.total_installments),
+      value: Math.ceil(loan.remaining_installments),
     },
     {
       label: "מספר תשלומים ששולמו",
-      value: loan.total_remaining_payments,
+      value: loan.paid_installments,
     },
     {
       label: "בלאנס",

@@ -1,4 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
+﻿import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { BadRequestException } from '@nestjs/common';
 import { Repository } from 'typeorm';
@@ -91,8 +91,8 @@ describe('LoanActionsService', () => {
         user: { id: 10 },
         remaining_balance: 100,
         monthly_payment: 50,
-        total_remaining_payments: 0,
-        total_installments: 2,
+        paid_installments: 0,
+        remaining_installments: 2,
         isActive: true,
       } as any;
       loansRepo.findOne.mockResolvedValue(loan);
@@ -117,3 +117,4 @@ describe('LoanActionsService', () => {
     });
   });
 });
+

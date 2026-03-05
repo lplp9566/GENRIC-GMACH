@@ -13,9 +13,9 @@ export interface ILoanWithUser {
   isActive: boolean;
   remaining_balance: number;
   initial_monthly_payment: number;
-  total_installments: number;
+  remaining_installments: number;
   first_payment_date: string  | null;
-  total_remaining_payments: number;
+  paid_installments: number;
   balance: number;
   guarantor1: string | null;
   guarantor2: string | null;

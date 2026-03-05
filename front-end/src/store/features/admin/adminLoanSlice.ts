@@ -252,8 +252,8 @@ export const AdminLoansSlice = createSlice({
               payment_date: updated.payment_date,
               isActive: updated.isActive,
               remaining_balance: updated.remaining_balance,
-              total_installments: updated.total_installments,
-              total_remaining_payments: updated.total_remaining_payments,
+              remaining_installments: updated.remaining_installments,
+              paid_installments: updated.paid_installments,
               first_payment_date: updated.first_payment_date,
               balance: updated.balance,
             };

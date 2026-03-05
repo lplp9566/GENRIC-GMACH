@@ -1,4 +1,4 @@
-import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
+﻿import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoanActionEntity } from './loan-actions/Entity/loan_actions.entity';
@@ -116,7 +116,7 @@ qb.setParameter("todayDay", new Date().getDate());
       const fund_details = await this.fundsOverviewService.getFundDetails();
       if (fund_details.available_funds < loanData?.loan_amount!) {
         throw new BadRequestException(
-          'אתה לא יכול להוציא הלוואה על  ' +
+          'אתה לא יכול להוציא הלוואה על ' +
             loanData.loan_amount +
             ' ש"ח, במערכת יש כרגע ' +
             fund_details.available_funds +
@@ -125,7 +125,7 @@ qb.setParameter("todayDay", new Date().getDate());
       }
       const loanRecord = this.loansRepository.create(loanData);
       loanRecord.remaining_balance = loanRecord.loan_amount;
-      loanRecord.total_installments =
+      loanRecord.remaining_installments =
         loanRecord.loan_amount / loanRecord.monthly_payment;
       const year = getYearFromDate(loanRecord.loan_date);
       const user = await this.usersService.getUserById(Number(loanRecord.user));
@@ -134,7 +134,7 @@ qb.setParameter("todayDay", new Date().getDate());
       }
       loanRecord.initial_monthly_payment = loanData.monthly_payment!;
       loanRecord.initial_loan_amount = loanData.loan_amount!;
-      loanRecord.total_remaining_payments = 0;
+      loanRecord.paid_installments = 0;
       loanRecord.updated_at = new Date();
       if (loanData.guarantor1) {
         loanRecord.guarantor1 = loanData.guarantor1;
@@ -157,8 +157,8 @@ qb.setParameter("todayDay", new Date().getDate());
         'אישור הקמת הלוואה',
         [
           `הלוואה מספר ${result.id} נוצרה בהצלחה.`,
-          `מספר תשלומים: ${Math.ceil(loanRecord.total_installments)}.`,
-          `סכום הלוואה: ${this.mailService.formatCurrency(
+          `מספר תשלומים: ${Math.ceil(loanRecord.remaining_installments)}.`,
+          `סכום ההלוואה: ${this.mailService.formatCurrency(
             loanRecord.loan_amount,
           )}.`,
           `סכום ההחזר החודשי: ${this.mailService.formatCurrency(
@@ -214,7 +214,7 @@ qb.setParameter("todayDay", new Date().getDate());
       loan.loan_amount += dto.value;
       loan.remaining_balance += dto.value;
       loan.updated_at = new Date();
-      (loan.total_installments = loan.remaining_balance / loan.monthly_payment),
+      (loan.remaining_installments = loan.remaining_balance / loan.monthly_payment),
         await this.loansRepository.save(loan);
       const result = await this.paymentsRepository.save({
         loan,
@@ -222,12 +222,12 @@ qb.setParameter("todayDay", new Date().getDate());
         value: diff,
         action_type: LoanPaymentActionType.AMOUNT_CHANGE,
         updated_at: new Date(),
-        note: dto.note || `שינוי סכום הלוואה ל-${dto.value}`,
+        note: dto.note || `שינוי סכום ההלוואה ל-${dto.value}`,
       })
       await this.LoanActionBalanceService.computeLoanNetBalance(dto.loanId);
       await this.maybeSendReceiptEmail(
         loan.user,
-        'עדכון סכום הלוואה',
+        'עדכון סכום ההלוואה',
         [
           `סכום ההלוואה עודכן ב-${this.mailService.formatCurrency(dto.value)}.`,
           `יתרה חדשה להחזר: ${this.mailService.formatCurrency(
@@ -238,7 +238,7 @@ qb.setParameter("todayDay", new Date().getDate());
       return result;
       }
     catch (error) {
-      console.error('❌ Error in editLoin:', error.message);
+      console.error('Error in editLoan:', error.message);
       throw new Error(error.message);
     }
   }
@@ -256,7 +256,7 @@ qb.setParameter("todayDay", new Date().getDate());
     try {
       loan.monthly_payment = dto.value;
       loan.updated_at = new Date();
-      (loan.total_installments = loan.remaining_balance / loan.monthly_payment),
+      (loan.remaining_installments = loan.remaining_balance / loan.monthly_payment),
         await this.loansRepository.save(loan);
       const result  =  await this.paymentsRepository.save({
         loan,
@@ -314,7 +314,7 @@ qb.setParameter("todayDay", new Date().getDate());
       );
       return result;
     } catch (error) {
-      console.error('❌ Error in editDateOfPyment:', error.message);
+      console.error('Error in editDateOfPayment:', error.message);
       throw new Error(error.message);
     }
   }
@@ -346,16 +346,16 @@ qb.setParameter("todayDay", new Date().getDate());
   if (!loan.isActive) throw new BadRequestException('Loan not active');
   const changes: string[] = [];
   const pendingActions: { action_type: LoanPaymentActionType; value: number }[] = [];
-  // שינוי סכום הלוואה
+  // שינוי סכום ההלוואה
   if (dto.loan_amount !== undefined && dto.loan_amount !== loan.loan_amount) {
     const oldAmount = Number(loan.loan_amount);
     const newAmount = Number(dto.loan_amount);
     const diff = newAmount - oldAmount; 
-    // אם מגדילים – חייבים כסף פנוי
+    // אם מגדילים - חייבים כסף פנוי
     if (diff > 0) {
       const fund = await this.fundsOverviewService.getFundDetails();
       if (Number(fund.available_funds) < diff) {
-        throw new BadRequestException(`אין מספיק כסף להגדלת ההלוואה ב־${diff} ₪`);
+        throw new BadRequestException(`אין מספיק כסף להגדלת ההלוואה ב-₪${diff}`);
       }
     }
     loan.loan_amount = newAmount;
@@ -403,10 +403,10 @@ qb.setParameter("todayDay", new Date().getDate());
   loan.guarantor1 = dto.guarantor1 !== undefined ? dto.guarantor1 : loan.guarantor1;
   loan.guarantor2 = dto.guarantor2 !== undefined ? dto.guarantor2 : loan.guarantor2;
   loan.updated_at = new Date();
-  loan.total_installments =
+  loan.remaining_installments =
     Number(loan.monthly_payment) > 0
       ? Number(loan.remaining_balance) / Number(loan.monthly_payment)
-      : loan.total_installments;
+      : loan.remaining_installments;
   // אם balance אצלך אמור להיות היתרה הנוכחית
   const result = await this.loansRepository.save(loan);
    if (result) await this.LoanActionBalanceService.computeLoanNetBalance(loan.id);
@@ -452,3 +452,4 @@ qb.setParameter("todayDay", new Date().getDate());
     });
   }
 }
+

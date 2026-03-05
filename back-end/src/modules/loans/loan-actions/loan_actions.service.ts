@@ -1,4 +1,4 @@
-import {
+﻿import {
   BadRequestException,
   forwardRef,
   Inject,
@@ -101,10 +101,10 @@ export class LoanActionsService {
       await this.paymentsRepo.save(newPayment);
 
       loan.remaining_balance -= dto.value;
-      loan.total_remaining_payments += 1;
+      loan.paid_installments += 1;
       if (loan.remaining_balance < 0) loan.remaining_balance = 0;
 
-      loan.total_installments = loan.remaining_balance / loan.monthly_payment;
+      loan.remaining_installments = loan.remaining_balance / loan.monthly_payment;
       loan.updated_at = new Date();
       if (loan.remaining_balance === 0) {
         loan.isActive = false;
@@ -124,7 +124,7 @@ export class LoanActionsService {
       }
       const remainingPayments = Math.max(
         0,
-        Math.ceil(loan.total_installments) - Number(loan.total_remaining_payments || 0),
+        Math.ceil(loan.remaining_installments) - Number(loan.paid_installments || 0),
       );
 
       const year = getYearFromDate(dto.date);
@@ -155,7 +155,7 @@ export class LoanActionsService {
 
       return newPayment;
     } catch (error) {
-      console.error('❌ Error in addPayment:', error.message);
+      console.error('Error in addPayment:', error.message);
       throw new BadRequestException(error.message);
     }
   }
@@ -174,7 +174,7 @@ export class LoanActionsService {
       });
       return payments;
     } catch (error) {
-      console.error('❌ Error in getLoanPayments:', error.message);
+      console.error('Error in getLoanPayments:', error.message);
       throw new Error(error.message);
     }
   }
@@ -186,7 +186,7 @@ export class LoanActionsService {
       });
       return actions;
     } catch (error) {
-      console.error('❌ Error in getAllActions:', error.message);
+      console.error('Error in getAllActions:', error.message);
       throw new Error(error.message);
     }
   }
@@ -213,7 +213,7 @@ async editPayment(
 
     if (newValue <= 0) throw new BadRequestException('Payment must be > 0');
 
-    // delta: כמה "שינינו" את התשלום
+    // delta: כמה שינינו את התשלום
     const delta = newValue - oldValue;
 
     // יתרה חדשה = יתרה נוכחית - delta
@@ -242,7 +242,7 @@ async editPayment(
       loan.isActive = true;
     }
 
-    loan.total_installments =
+    loan.remaining_installments =
       loan.monthly_payment > 0
         ? loan.remaining_balance / loan.monthly_payment
         : 0;
@@ -258,7 +258,7 @@ async editPayment(
       }
     const remainingPayments = Math.max(
       0,
-      Math.ceil(loan.total_installments) - Number(loan.total_remaining_payments || 0),
+      Math.ceil(loan.remaining_installments) - Number(loan.paid_installments || 0),
     );
     await this.maybeSendReceiptEmail(
       userWithPayments ?? loan.user,
@@ -281,7 +281,7 @@ async editPayment(
     }
     return action;
   } catch (error) {
-    console.error('❌ Error in editPayment:', error.message);
+    console.error('Error in editPayment:', error.message);
     throw new BadRequestException(error.message);
   }
 }
@@ -301,7 +301,7 @@ async deleteAction(actionId: number): Promise<{ deleted: true }> {
       if (loan.remaining_balance > 0) {
         loan.isActive = true;
       }
-      loan.total_installments =
+      loan.remaining_installments =
         loan.monthly_payment > 0
           ? loan.remaining_balance / loan.monthly_payment
           : 0;
@@ -322,7 +322,7 @@ async deleteAction(actionId: number): Promise<{ deleted: true }> {
           loan.user.id,
         );
       }
-      loan.total_installments =
+      loan.remaining_installments =
         loan.monthly_payment > 0
           ? loan.remaining_balance / loan.monthly_payment
           : 0;
@@ -353,7 +353,7 @@ async deleteAllPaymentsForLoan(loanId: number): Promise<{ deleted: true }> {
     await this.paymentDetailsService.deleteLoanBalance(loan.id, loan.user.id);
     return { deleted: true };
   } catch (error) {
-    console.error('❌ Error in deleteAllPaymentsForLoan:', error.message);
+    console.error('Error in deleteAllPaymentsForLoan:', error.message);
     throw new BadRequestException(error.message);
   }
 }
@@ -386,3 +386,4 @@ private async maybeSendReceiptEmail(
   });
 }
 }
+
