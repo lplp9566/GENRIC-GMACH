@@ -5,6 +5,10 @@ import {
   Chip,
   Stack,
   Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   Table,
   TableHead,
   TableRow,
@@ -13,6 +17,7 @@ import {
   Tooltip,
   IconButton,
 } from "@mui/material";
+import type { SelectChangeEvent } from "@mui/material/Select";
 import { ActionTypes, ILoanAction, LoanPaymentActionType } from "../LoanDto";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditIcon from "@mui/icons-material/Edit";
@@ -52,6 +57,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const [currentSortDirection, setCurrentSortDirection] =
     useState<SortDirection>("asc");
+  const [rowsLimit, setRowsLimit] = useState<"10" | "30" | "all">("10");
 
   const handleHeaderClick = (field: SortField) => {
     if (field === currentSortField) {
@@ -77,8 +83,8 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
     toast.promise(
       dispatch(deleteLoanAction({ id: selected.id, loanId: targetLoanId })),
       {
-        pending: "Deleting action...",
-        success: "Action deleted.",
+        pending: "מוחק פעולה...",
+        success: "הפעולה נמחקה.",
         error: "Failed to delete action.",
       }
     );
@@ -120,11 +126,41 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
     onCopyAction?.(action);
   };
 
+  const handleRowsLimitChange = (event: SelectChangeEvent) => {
+    setRowsLimit(event.target.value as "10" | "30" | "all");
+  };
+
+  const displayedActions = useMemo(() => {
+    if (rowsLimit === "all") return sortedActions;
+    return sortedActions.slice(0, Number(rowsLimit));
+  }, [rowsLimit, sortedActions]);
+
   return (
     <Paper elevation={3} sx={{ borderRadius: 2, width: "100%", p: { xs: 1.5, md: 2 } }}>
-      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}>
-        {title ?? "פעולות על ההלוואה"}
-      </Typography>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "stretch", sm: "center" }}
+        spacing={1}
+        sx={{ mb: 1 }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: 600, textAlign: "center", flex: 1 }}>
+          {title ?? "פעולות על ההלוואה"}
+        </Typography>
+        <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 120 } }}>
+          <InputLabel id="loan-actions-limit-label">תצוגה</InputLabel>
+          <Select
+            labelId="loan-actions-limit-label"
+            label="פעולות"
+            value={rowsLimit}
+            onChange={handleRowsLimitChange}
+          >
+            <MenuItem value="10">10</MenuItem>
+            <MenuItem value="30">30</MenuItem>
+            <MenuItem value="all">הכל</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
 
       {actions.length === 0 && <Typography>לא נמצאו פעולות</Typography>}
 
@@ -172,7 +208,7 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
             </TableHead>
 
             <TableBody>
-              {sortedActions.map((action) => {
+              {displayedActions.map((action) => {
                 const actionLabel =
                   ActionTypes.find((item) => item.value === action.action_type)?.label ||
                   action.action_type;
