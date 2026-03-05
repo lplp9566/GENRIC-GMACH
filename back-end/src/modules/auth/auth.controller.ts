@@ -18,11 +18,12 @@ export class AuthController {
 
   @Post('login')
   async login(
+    @Body('identifier') identifier: string,
     @Body('email') email: string,
     @Body('password') password: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const token = await this.authService.login(email, password);
+    const token = await this.authService.login(identifier ?? email, password);
     res.cookie('Authentication', token, {
       httpOnly: true,
       secure: true,

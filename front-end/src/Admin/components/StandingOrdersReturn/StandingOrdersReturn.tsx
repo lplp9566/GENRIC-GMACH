@@ -1,10 +1,11 @@
-import {
+﻿import {
   Box,
   Container,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
+  Stack,
 } from "@mui/material";
 import StandingOrdersReturnHeader from "./StandingOrdersReturnHeader";
 import SummaryCard from "../Loans/LoansDashboard/SummaryCard";
@@ -67,6 +68,7 @@ const StandingOrdersReturn = () => {
   const [statusFilter, setStatusFilter] = useState<"all" | "paid" | "unpaid">(
     "all"
   );
+  const [rowsLimit, setRowsLimit] = useState<"10" | "30" | "all">("10");
   const paymentsThisYear = useMemo(
     () =>
       orderReturn.filter(
@@ -118,6 +120,10 @@ const StandingOrdersReturn = () => {
     }
     return paymentsThisMonth;
   }, [paymentsThisMonth, statusFilter]);
+  const displayedPayments = useMemo(() => {
+    if (rowsLimit === "all") return filteredPayments;
+    return filteredPayments.slice(0, Number(rowsLimit));
+  }, [filteredPayments, rowsLimit]);
   const sumMonthPaid = filteredPayments
     .filter((p) => p.paid)
     .reduce((sum, p) => sum + p.amount, 0);
@@ -165,11 +171,11 @@ const StandingOrdersReturn = () => {
           >
             <SummaryCard label="סה״כ החזרי הוראות קבע" value={countMonth} />
             <SummaryCard
-              label="מספר הוראות קבע ששולמו "
+              label="סכום הוראות קבע ששולמו"
               value={`₪ ${sumMonthPaid.toLocaleString()}`}
             />
             <SummaryCard
-              label="מספר החזרי הוראות קבע שלא שולמו "
+              label="סכום החזרי הוראות קבע שלא שולמו"
               value={`₪ ${sumMonthNotPaid.toLocaleString()}`}
             />
           </Box>
@@ -182,24 +188,41 @@ const StandingOrdersReturn = () => {
         years={years}
         months={months}
         extraFilters={
-          <FormControl fullWidth size="small">
-            <InputLabel id="return-status-label">סטטוס</InputLabel>
-            <Select
-              labelId="return-status-label"
-              value={statusFilter}
-              label="סטטוס"
-              onChange={(e) =>
-                setStatusFilter(e.target.value as "all" | "paid" | "unpaid")
-              }
-            >
-              <MenuItem value="all">הכל</MenuItem>
-              <MenuItem value="paid">שולם</MenuItem>
-              <MenuItem value="unpaid">לא שולם</MenuItem>
-            </Select>
-          </FormControl>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="return-status-label">סטטוס</InputLabel>
+              <Select
+                labelId="return-status-label"
+                value={statusFilter}
+                label="סטטוס"
+                onChange={(e) =>
+                  setStatusFilter(e.target.value as "all" | "paid" | "unpaid")
+                }
+              >
+                <MenuItem value="all">הכל</MenuItem>
+                <MenuItem value="paid">שולם</MenuItem>
+                <MenuItem value="unpaid">לא שולם</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth size="small">
+              <InputLabel id="return-limit-label">תצוגה</InputLabel>
+              <Select
+                labelId="return-limit-label"
+                value={rowsLimit}
+                label="תצוגה"
+                onChange={(e) =>
+                  setRowsLimit(e.target.value as "10" | "30" | "all")
+                }
+              >
+                <MenuItem value="10">10</MenuItem>
+                <MenuItem value="30">30</MenuItem>
+                <MenuItem value="all">הכל</MenuItem>
+              </Select>
+            </FormControl>
+          </Stack>
         }
       />
-          <StandingOrderReturnTable payments={filteredPayments} />
+          <StandingOrderReturnTable payments={displayedPayments} />
         </Box>
       </Box>
     </Container>
@@ -207,3 +230,4 @@ const StandingOrdersReturn = () => {
 };
 
 export default StandingOrdersReturn;
+

@@ -14,16 +14,16 @@ const LoginPage = () => {
   const error = auth?.error ?? null;
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await toast.promise(dispatch(login({ email, password })).unwrap(), {
+      await toast.promise(dispatch(login({ identifier, password })).unwrap(), {
         pending: "מתחבר...",
         success: "התחברת בהצלחה",
-        error: "אימייל או סיסמה שגויים",
+        error: "אימייל/ת\"ז או סיסמה שגויים",
       });
       await dispatch(validate()).unwrap();
       navigate("/Home", { replace: true });
@@ -45,10 +45,10 @@ const LoginPage = () => {
           </Typography>
           <Box component="form" onSubmit={onSubmit} sx={{ display: "grid", gap: 2 }}>
             <TextField
-              label="אימייל"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              label='אימייל או ת"ז'
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
             />
             <TextField
               label="סיסמה"
@@ -64,7 +64,7 @@ const LoginPage = () => {
             <Button
               type="submit"
               variant="contained"
-              disabled={!email || !password || status === "pending"}
+              disabled={!identifier || !password || status === "pending"}
             >
               {status === "pending" ? "מתחבר..." : "התחבר"}
             </Button>
