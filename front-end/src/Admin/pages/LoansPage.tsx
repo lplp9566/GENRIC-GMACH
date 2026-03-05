@@ -43,6 +43,19 @@ export const LoansPage: React.FC = () => {
   const permission = authUser?.permission ?? authUser?.user?.permission;
   const canWrite = Boolean(authUser?.is_admin || permission === "admin_write");
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const columnsMaxHeight = isDesktop ? "calc(100vh - 180px)" : "none";
+  const hiddenScrollbarSx = isDesktop
+    ? {
+        overflowY: "auto",
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+        "&::-webkit-scrollbar": {
+          width: 0,
+          height: 0,
+        },
+      }
+    : {};
 
   const [filter, setFilter] = useState<StatusGeneric>(StatusGeneric.ACTIVE);
   const [selectedLoanId, setSelectedLoanId] = useState<number | null>(null);
@@ -303,7 +316,22 @@ export const LoansPage: React.FC = () => {
 
               <Grid container spacing={3} sx={{ direction: "rtl" }}>
                 <Grid item xs={12} md={8}>
-                  <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                  <Paper
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      direction: "rtl",
+                      ...(isDesktop
+                        ? {
+                            position: "sticky",
+                            top: 16,
+                            maxHeight: columnsMaxHeight,
+                            display: "flex",
+                            flexDirection: "column",
+                          }
+                        : {}),
+                    }}
+                  >
                     <Box
                       sx={{
                         display: "flex",
@@ -331,29 +359,46 @@ export const LoansPage: React.FC = () => {
                         </Button>
                       )}
                     </Box>
-                    {visibleActions.length === 0 ? (
-                      <Typography>
-                        {"אין פעולות להצגה"}
-                      </Typography>
-                    ) : (
-                      <ActionsTable
-                        actions={visibleActions}
-                        loanId={selectedLoanId ?? undefined}
-                        readOnly={!canWrite}
-                        onCopyAction={handleCopyAction}
-                        showLoanColumn={!selectedLoanId}
-                        title={
-                          selectedLoanId
-                            ? "פעולות על הלוואה"
-                            : "פעולות על כל ההלוואות"
-                        }
-                      />
-                    )}
+                    <Box sx={{ flex: isDesktop ? 1 : "unset", minHeight: 0, ...hiddenScrollbarSx }}>
+                      {visibleActions.length === 0 ? (
+                        <Typography>
+                          {"אין פעולות להצגה"}
+                        </Typography>
+                      ) : (
+                        <ActionsTable
+                          actions={visibleActions}
+                          loanId={selectedLoanId ?? undefined}
+                          readOnly={!canWrite}
+                          onCopyAction={handleCopyAction}
+                          showLoanColumn={!selectedLoanId}
+                          title={
+                            selectedLoanId
+                              ? "פעולות על הלוואה"
+                              : "פעולות על כל ההלוואות"
+                          }
+                        />
+                      )}
+                    </Box>
                   </Paper>
                 </Grid>
 
                 <Grid item xs={12} md={4}>
-                  <Paper sx={{ p: 2, borderRadius: 2, direction: "rtl" }}>
+                  <Paper
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      direction: "rtl",
+                      ...(isDesktop
+                        ? {
+                            position: "sticky",
+                            top: 16,
+                            maxHeight: columnsMaxHeight,
+                            display: "flex",
+                            flexDirection: "column",
+                          }
+                        : {}),
+                    }}
+                  >
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="h6" fontWeight={600}>
                         {"הלוואות"}
@@ -369,20 +414,22 @@ export const LoansPage: React.FC = () => {
                         {"אין הלוואות להצגה"}
                       </Typography>
                     ) : (
-                      <Stack spacing={1.5}>
-                        {allLoans.map((loan) => (
-                          <LoanMiniCard
-                            key={loan.id}
-                            loan={loan}
-                            selected={loan.id === selectedLoanId}
-                            onSelect={() => setSelectedLoanId(loan.id)}
-                            onActionSuccess={() => {
-                              refreshLoans();
-                              refreshActions();
-                            }}
-                          />
-                        ))}
-                      </Stack>
+                      <Box sx={{ flex: isDesktop ? 1 : "unset", minHeight: 0, ...hiddenScrollbarSx }}>
+                        <Stack spacing={1.5}>
+                          {allLoans.map((loan) => (
+                            <LoanMiniCard
+                              key={loan.id}
+                              loan={loan}
+                              selected={loan.id === selectedLoanId}
+                              onSelect={() => setSelectedLoanId(loan.id)}
+                              onActionSuccess={() => {
+                                refreshLoans();
+                                refreshActions();
+                              }}
+                            />
+                          ))}
+                        </Stack>
+                      </Box>
                     )}
                   </Paper>
                 </Grid>
