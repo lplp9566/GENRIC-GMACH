@@ -2,14 +2,14 @@
 import {
   Box,
   Paper,
+  Chip,
+  Stack,
   Typography,
   Table,
   TableHead,
   TableRow,
   TableCell,
   TableBody,
-  Chip,
-  Stack,
   Tooltip,
   IconButton,
 } from "@mui/material";
@@ -130,7 +130,20 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
 
       {actions.length > 0 && (
         <Box sx={{ width: "100%", overflowX: "auto" }}>
-          <Table size="small" sx={{ borderSpacing: "0 6px", minWidth: 620 }}>
+          <Table
+            size="small"
+            sx={{
+              borderSpacing: "0 6px",
+              width: "100%",
+              tableLayout: "fixed",
+              minWidth: readOnly ? 0 : 620,
+              "& .MuiTableCell-root": {
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              },
+            }}
+          >
             <TableHead>
               <TableRow
                 sx={{
@@ -159,98 +172,103 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
             </TableHead>
 
             <TableBody>
-              {sortedActions.map((action) => (
-                <TableRow key={action.id} hover sx={{ "& td": { border: "none" } }}>
-                  {showLoanColumn && (
+              {sortedActions.map((action) => {
+                const actionLabel =
+                  ActionTypes.find((item) => item.value === action.action_type)?.label ||
+                  action.action_type;
+
+                return (
+                  <TableRow key={action.id} hover sx={{ "& td": { border: "none" } }}>
+                    {showLoanColumn && (
+                      <TableCell align="right">
+                        {action.loan
+                          ? `#${action.loan.id} - ${action.loan.user?.first_name ?? ""} ${
+                              action.loan.user?.last_name ?? ""
+                            }`
+                          : "-"}
+                      </TableCell>
+                    )}
+
                     <TableCell align="right">
-                      {action.loan
-                        ? `#${action.loan.id} - ${action.loan.user?.first_name ?? ""} ${
-                            action.loan.user?.last_name ?? ""
-                          }`
-                        : "-"}
+                      {new Date(action.date).toLocaleDateString("he-IL")}
                     </TableCell>
-                  )}
 
-                  <TableCell align="right">
-                    {new Date(action.date).toLocaleDateString("he-IL")}
-                  </TableCell>
-
-                  <TableCell align="center">
-                    <Chip
-                      label={
-                        ActionTypes.find((item) => item.value === action.action_type)?.label ||
-                        action.action_type
-                      }
-                      size="small"
-                      color={
-                        action.action_type === "LOAN_CREATED"
-                          ? "secondary"
-                          : action.action_type === "PAYMENT"
-                            ? "success"
-                            : action.action_type === "AMOUNT_CHANGE"
-                              ? "warning"
-                              : action.action_type === "MONTHLY_PAYMENT_CHANGE"
-                                ? "info"
-                                : action.action_type === "DATE_OF_PAYMENT_CHANGE"
-                                  ? "primary"
-                                  : "default"
-                      }
-                    />
-                  </TableCell>
-
-                  <TableCell align="left" sx={{ fontWeight: 600, color: "#007BFF" }}>
-                    {action.action_type === LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE
-                      ? `יום ${action.value} בחודש`
-                      : action.value.toLocaleString("he-IL", {
-                          style: "currency",
-                          currency: "ILS",
-                        })}
-                  </TableCell>
-
-                  {!readOnly && (
                     <TableCell align="center">
-                      <Stack direction="row" spacing={0.5} justifyContent="center" alignItems="center">
-                        <Tooltip title="העתקה">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleCopy(action)}
-                            disabled={action.action_type === LoanPaymentActionType.LOAN_CREATED}
-                          >
-                            <ContentCopyIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-
-                        <Tooltip title="עריכה">
-                          <span>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleEdit(action)}
-                              disabled={action.action_type === LoanPaymentActionType.LOAN_CREATED}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-
-                        <Tooltip title="מחיקה">
-                          <span>
-                            <IconButton
-                              size="small"
-                              onClick={() => {
-                                setDeleteModal(true);
-                                setSelected(action);
-                              }}
-                              disabled={action.action_type === LoanPaymentActionType.LOAN_CREATED}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                      </Stack>
+                      <Tooltip title={actionLabel}>
+                        <Chip
+                          label={actionLabel}
+                          size="small"
+                          color={
+                            action.action_type === "LOAN_CREATED"
+                              ? "secondary"
+                              : action.action_type === "PAYMENT"
+                                ? "success"
+                                : action.action_type === "AMOUNT_CHANGE"
+                                  ? "warning"
+                                  : action.action_type === "MONTHLY_PAYMENT_CHANGE"
+                                    ? "info"
+                                    : action.action_type === "DATE_OF_PAYMENT_CHANGE"
+                                      ? "primary"
+                                      : "default"
+                          }
+                        />
+                      </Tooltip>
                     </TableCell>
-                  )}
-                </TableRow>
-              ))}
+
+                    <TableCell align="left" sx={{ fontWeight: 600, color: "#007BFF" }}>
+                      {action.action_type === LoanPaymentActionType.DATE_OF_PAYMENT_CHANGE
+                        ? `יום ${action.value} בחודש`
+                        : action.value.toLocaleString("he-IL", {
+                            style: "currency",
+                            currency: "ILS",
+                          })}
+                    </TableCell>
+
+                    {!readOnly && (
+                      <TableCell align="center">
+                        <Stack direction="row" spacing={0.5} justifyContent="center" alignItems="center">
+                          <Tooltip title="העתקה">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleCopy(action)}
+                              disabled={action.action_type === LoanPaymentActionType.LOAN_CREATED}
+                            >
+                              <ContentCopyIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+
+                          <Tooltip title="עריכה">
+                            <span>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleEdit(action)}
+                                disabled={action.action_type === LoanPaymentActionType.LOAN_CREATED}
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+
+                          <Tooltip title="מחיקה">
+                            <span>
+                              <IconButton
+                                size="small"
+                                onClick={() => {
+                                  setDeleteModal(true);
+                                  setSelected(action);
+                                }}
+                                disabled={action.action_type === LoanPaymentActionType.LOAN_CREATED}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        </Stack>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </Box>
