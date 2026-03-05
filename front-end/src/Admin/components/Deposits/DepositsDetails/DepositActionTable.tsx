@@ -3,6 +3,10 @@ import {
   Box,
   Chip,
   IconButton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   Paper,
   Table,
   TableBody,
@@ -12,6 +16,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import type { SelectChangeEvent } from "@mui/material/Select";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -55,7 +60,8 @@ const DepositActionTable: FC<DepositActionTableProps> = ({
   onDelete,
 }) => {
   const [currentSortField, setCurrentSortField] = useState<SortField>("date");
-  const [currentSortDirection, setCurrentSortDirection] = useState<SortDirection>("asc");
+  const [currentSortDirection, setCurrentSortDirection] = useState<SortDirection>("desc");
+  const [rowsLimit, setRowsLimit] = useState<"10" | "30" | "all">("10");
 
   const handleHeaderClick = (field: SortField) => {
     if (field === currentSortField) {
@@ -96,6 +102,15 @@ const DepositActionTable: FC<DepositActionTableProps> = ({
         : " ↓"
       : "";
 
+  const handleRowsLimitChange = (event: SelectChangeEvent) => {
+    setRowsLimit(event.target.value as "10" | "30" | "all");
+  };
+
+  const displayedActions = useMemo(() => {
+    if (rowsLimit === "all") return sortedActions;
+    return sortedActions.slice(0, Number(rowsLimit));
+  }, [rowsLimit, sortedActions]);
+
   const getDepositOwnerLabel = (action: IDepositAction) => {
     const depositId = action.deposit?.id;
     const first = String(action.deposit?.user?.first_name ?? "").trim();
@@ -111,9 +126,33 @@ const DepositActionTable: FC<DepositActionTableProps> = ({
 
   return (
     <Paper elevation={3} sx={{ p: { xs: 1.5, md: 3 }, borderRadius: 2, width: "100%" }}>
-      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}>
-        פעולות בהפקדה
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "stretch", sm: "center" },
+          justifyContent: "space-between",
+          gap: 1,
+          mb: 1,
+        }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: 600, textAlign: "center", flex: 1 }}>
+          פעולות בהפקדה
+        </Typography>
+        <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 120 } }}>
+          <InputLabel id="deposit-actions-limit-label">תצוגה</InputLabel>
+          <Select
+            labelId="deposit-actions-limit-label"
+            label="תצוגה"
+            value={rowsLimit}
+            onChange={handleRowsLimitChange}
+          >
+            <MenuItem value="10">10</MenuItem>
+            <MenuItem value="30">30</MenuItem>
+            <MenuItem value="all">הכל</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
       {actions.length === 0 ? (
         <Typography>אין פעולות להצגה</Typography>
@@ -137,7 +176,7 @@ const DepositActionTable: FC<DepositActionTableProps> = ({
             </TableHead>
 
             <TableBody>
-              {sortedActions.map((action) => {
+              {displayedActions.map((action) => {
                 const type = ((action as any).action_type ?? (action as any).actionType) as DepositActionsType;
                 const label = ACTION_LABELS[type] ?? String(type);
                 const mutable = isMutable(type);

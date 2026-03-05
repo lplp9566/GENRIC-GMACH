@@ -1,7 +1,12 @@
 ﻿import {
   Box,
   CircularProgress,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -11,6 +16,7 @@
   Tooltip,
 } from "@mui/material";
 import { FC, useState } from "react";
+import type { SelectChangeEvent } from "@mui/material/Select";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditExpenseModal from "./EditExpenseModal";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -55,23 +61,18 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        height={300}
-      >
+      <Box display="flex" alignItems="center" justifyContent="center" height={300}>
         <CircularProgress />
       </Box>
     );
   }
+
   const dispatch = useDispatch<AppDispatch>();
 
   const [editMode, setEditMode] = useState(false);
   const [delateMode, setDelateMode] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState<ExpenseRow | null>(
-    null
-  );
+  const [rowsLimit, setRowsLimit] = useState<"10" | "30" | "all">("10");
+  const [selectedExpense, setSelectedExpense] = useState<ExpenseRow | null>(null);
 
   const openEdit = (row: ExpenseRow) => {
     setSelectedExpense({
@@ -80,23 +81,19 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
     });
     setEditMode(true);
   };
-  const handelDelete=()=>{
+
+  const handelDelete = () => {
     try {
-      toast.promise(
-           dispatch(
-             deleteExpenseById(Number(selectedExpense?.id!))
-           ).unwrap(),
-           {
-             pending: "מוחק הוצאה...",
-             success: "ההוצאה נמחקה בהצלחה! 👌",
-             error: "שגיאה במחיקת  ההוצאה 💥",
-           }
-         );
-         setDelateMode(false)
-    } catch (error) {
-        
+      toast.promise(dispatch(deleteExpenseById(Number(selectedExpense?.id!))).unwrap(), {
+        pending: "מוחק הוצאה...",
+        success: "ההוצאה נמחקה בהצלחה! 👌",
+        error: "שגיאה במחיקת ההוצאה 💥",
+      });
+      setDelateMode(false);
+    } catch {
+      // handled by toast
     }
-  }
+  };
 
   const onClickEdit = (row: ExpenseRow) => {
     setSelectedExpense({
@@ -106,17 +103,43 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
     setEditMode(true);
   };
 
+  const handleRowsLimitChange = (event: SelectChangeEvent) => {
+    setRowsLimit(event.target.value as "10" | "30" | "all");
+  };
+
+  const displayedRows = rowsLimit === "all" ? rows : rows.slice(0, Number(rowsLimit));
+
   return (
     <Box sx={{ overflow: "auto" }}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "stretch", sm: "center" }}
+        spacing={1}
+        sx={{ mb: 1 }}
+      >
+        <Box />
+        <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 120 } }}>
+          <InputLabel id="expenses-limit-label">תצוגה</InputLabel>
+          <Select
+            labelId="expenses-limit-label"
+            label="תצוגה"
+            value={rowsLimit}
+            onChange={handleRowsLimitChange}
+          >
+            <MenuItem value="10">10</MenuItem>
+            <MenuItem value="30">30</MenuItem>
+            <MenuItem value="all">הכל</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
+
       <Table size="small" stickyHeader>
         <TableHead>
           <TableRow>
             <TableCell align="right">קטגוריה</TableCell>
 
-            <TableCell
-              align="right"
-              sortDirection={sortBy === "amount" ? sortDir : (false as any)}
-            >
+            <TableCell align="right" sortDirection={sortBy === "amount" ? sortDir : (false as any)}>
               <TableSortLabel
                 active={sortBy === "amount"}
                 direction={sortBy === "amount" ? sortDir : "asc"}
@@ -126,10 +149,7 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
               </TableSortLabel>
             </TableCell>
 
-            <TableCell
-              align="right"
-              sortDirection={sortBy === "date" ? sortDir : (false as any)}
-            >
+            <TableCell align="right" sortDirection={sortBy === "date" ? sortDir : (false as any)}>
               <TableSortLabel
                 active={sortBy === "date"}
                 direction={sortBy === "date" ? sortDir : "asc"}
@@ -140,20 +160,19 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
             </TableCell>
 
             <TableCell align="right">הערה</TableCell>
-  {!readOnly && <TableCell align="right">פעולות</TableCell>}
-
+            {!readOnly && <TableCell align="right">פעולות</TableCell>}
           </TableRow>
         </TableHead>
 
         <TableBody>
-          {rows.length === 0 ? (
+          {displayedRows.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} align="center">
                 אין נתונים להצגה
               </TableCell>
             </TableRow>
           ) : (
-            rows.map((row) => (
+            displayedRows.map((row) => (
               <TableRow
                 key={row.id}
                 hover
@@ -176,41 +195,41 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
                 <TableCell align="right">{row.note || "—"}</TableCell>
 
                 {!readOnly && (
-                <TableCell align="right" onClick={(e) => e.stopPropagation()}>
-                  <Tooltip title="שכפל הוצאה">
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDuplicate(row);
-                      }}
-                    >
-                      <ContentCopyIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="עריכה הוצאה">
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openEdit(row);
-                      }}
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="עריכה הוצאה">
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        setSelectedExpense(row)
-                    setDelateMode(true)
-                      }}
-                    >
-                      <DeleteOutlineIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
+                  <TableCell align="right" onClick={(e) => e.stopPropagation()}>
+                    <Tooltip title="שכפל הוצאה">
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDuplicate(row);
+                        }}
+                      >
+                        <ContentCopyIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="עריכה הוצאה">
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEdit(row);
+                        }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="מחיקת הוצאה">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setSelectedExpense(row);
+                          setDelateMode(true);
+                        }}
+                      >
+                        <DeleteOutlineIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
                 )}
               </TableRow>
             ))
@@ -223,14 +242,15 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
               expense={selectedExpense!}
             />
           )}
-          {delateMode && !readOnly && 
-          <ConfirmModal
-          open={delateMode}
-          onClose={()=>setDelateMode(false)}
-            onSubmit={handelDelete}
-            text="האם אתה בטוח שברצונך לממחוק את ההוצאה"
 
-          />}
+          {delateMode && !readOnly && (
+            <ConfirmModal
+              open={delateMode}
+              onClose={() => setDelateMode(false)}
+              onSubmit={handelDelete}
+              text="האם אתה בטוח שברצונך למחוק את ההוצאה"
+            />
+          )}
         </TableBody>
       </Table>
     </Box>

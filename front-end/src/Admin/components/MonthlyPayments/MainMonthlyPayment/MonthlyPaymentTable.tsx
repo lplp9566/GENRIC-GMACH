@@ -1,6 +1,12 @@
 import {
+  Box,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -10,7 +16,7 @@ import {
 } from "@mui/material";
 import { IMonthlyPayment, paymentMethod } from "../MonthlyPaymentsDto";
 import { fmtDate } from "../../../../common/genricFunction";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MonthlyPaymentEditModal from "./MonthlyPaymentEditModal";
 import ConfirmModal from "../../genricComponents/confirmModal";
 import { toast } from "react-toastify";
@@ -22,6 +28,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { AddPaymentModal } from "../AddMonthlyPayment/AddMonthlyPayment";
 import { setMonthlyPaymentModalMode } from "../../../../store/features/Main/AppMode";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import type { SelectChangeEvent } from "@mui/material/Select";
 
 interface MonthlyPaymentProps {
   paymentsThisMonth: IMonthlyPayment[];
@@ -38,6 +45,7 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
   const [editMode, setEditMode] = useState<boolean>(false);
   const [deleteMode, setDeleteMode] = useState<boolean>(false);
   const [copyMode, setcopyMode] = useState(false);
+  const [rowsLimit, setRowsLimit] = useState<"10" | "30" | "all">("10");
   const modalOpen = useSelector(
     (s: RootState) => s.mapModeSlice.MonthlyPaymentModalMode
   );
@@ -59,12 +67,51 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
     });
     setDeleteMode(false);
   };
+
+  const handleRowsLimitChange = (event: SelectChangeEvent) => {
+    setRowsLimit(event.target.value as "10" | "30" | "all");
+  };
+
+  const sortedPayments = useMemo(() => {
+    const copy = [...paymentsThisMonth];
+    copy.sort((a, b) => {
+      const ta = new Date(a.deposit_date).getTime();
+      const tb = new Date(b.deposit_date).getTime();
+      return tb - ta;
+    });
+    return copy;
+  }, [paymentsThisMonth]);
+
+  const displayedPayments = useMemo(() => {
+    if (rowsLimit === "all") return sortedPayments;
+    return sortedPayments.slice(0, Number(rowsLimit));
+  }, [rowsLimit, sortedPayments]);
+
   return (
-    <div>
-      {" "}
-      <Paper
-        sx={{ borderRadius: 2, overflow: "auto", padding: 2, boxShadow: 1 }}
-      >
+    <Box>
+      <Paper sx={{ borderRadius: 2, overflow: "auto", padding: 2, boxShadow: 1 }}>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "stretch", sm: "center" }}
+          spacing={1}
+          sx={{ mb: 1 }}
+        >
+          <Box />
+          <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 120 } }}>
+            <InputLabel id="monthly-payments-limit-label">תצוגה</InputLabel>
+            <Select
+              labelId="monthly-payments-limit-label"
+              label="תצוגה"
+              value={rowsLimit}
+              onChange={handleRowsLimitChange}
+            >
+              <MenuItem value="10">10</MenuItem>
+              <MenuItem value="30">30</MenuItem>
+              <MenuItem value="all">הכל</MenuItem>
+            </Select>
+          </FormControl>
+        </Stack>
         <Table size="small" sx={{ minWidth: 650 }}>
           <TableHead sx={{ bgcolor: "grey.100" }}>
             <TableRow>
@@ -77,8 +124,8 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {paymentsThisMonth.length > 0 ? (
-              paymentsThisMonth.map((p) => (
+            {displayedPayments.length > 0 ? (
+              displayedPayments.map((p) => (
                 <TableRow key={p.id} hover>
                   <TableCell align="right">
                     {p.user.first_name} {p.user.last_name}
@@ -192,7 +239,7 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
           </TableBody>
         </Table>
       </Paper>
-    </div>
+    </Box>
   );
 };
 

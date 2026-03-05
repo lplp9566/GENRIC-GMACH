@@ -56,8 +56,9 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
   const [selected, setSelected] = useState<ILoanAction | null>(null);
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const [currentSortDirection, setCurrentSortDirection] =
-    useState<SortDirection>("asc");
+    useState<SortDirection>("desc");
   const [rowsLimit, setRowsLimit] = useState<"10" | "30" | "all">("10");
+  const [actionTypeFilter, setActionTypeFilter] = useState<"all" | LoanPaymentActionType>("all");
 
   const handleHeaderClick = (field: SortField) => {
     if (field === currentSortField) {
@@ -130,10 +131,19 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
     setRowsLimit(event.target.value as "10" | "30" | "all");
   };
 
+  const handleActionTypeFilterChange = (event: SelectChangeEvent) => {
+    setActionTypeFilter(event.target.value as "all" | LoanPaymentActionType);
+  };
+
+  const filteredActions = useMemo(() => {
+    if (actionTypeFilter === "all") return sortedActions;
+    return sortedActions.filter((action) => action.action_type === actionTypeFilter);
+  }, [sortedActions, actionTypeFilter]);
+
   const displayedActions = useMemo(() => {
-    if (rowsLimit === "all") return sortedActions;
-    return sortedActions.slice(0, Number(rowsLimit));
-  }, [rowsLimit, sortedActions]);
+    if (rowsLimit === "all") return filteredActions;
+    return filteredActions.slice(0, Number(rowsLimit));
+  }, [rowsLimit, filteredActions]);
 
   return (
     <Paper elevation={3} sx={{ borderRadius: 2, width: "100%", p: { xs: 1.5, md: 2 } }}>
@@ -147,19 +157,38 @@ export const ActionsTable: React.FC<ActionsTableProps> = ({
         <Typography variant="h6" sx={{ fontWeight: 600, textAlign: "center", flex: 1 }}>
           {title ?? "פעולות על ההלוואה"}
         </Typography>
-        <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 120 } }}>
-          <InputLabel id="loan-actions-limit-label">תצוגה</InputLabel>
-          <Select
-            labelId="loan-actions-limit-label"
-            label="פעולות"
-            value={rowsLimit}
-            onChange={handleRowsLimitChange}
-          >
-            <MenuItem value="10">10</MenuItem>
-            <MenuItem value="30">30</MenuItem>
-            <MenuItem value="all">הכל</MenuItem>
-          </Select>
-        </FormControl>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+          <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 170 } }}>
+            <InputLabel id="loan-actions-type-filter-label">סוג פעולה</InputLabel>
+            <Select
+              labelId="loan-actions-type-filter-label"
+              label="סוג פעולה"
+              value={actionTypeFilter}
+              onChange={handleActionTypeFilterChange}
+            >
+              <MenuItem value="all">כל הסוגים</MenuItem>
+              {ActionTypes.map((actionType) => (
+                <MenuItem key={actionType.value} value={actionType.value}>
+                  {actionType.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 120 } }}>
+            <InputLabel id="loan-actions-limit-label">תצוגה</InputLabel>
+            <Select
+              labelId="loan-actions-limit-label"
+              label="תצוגה"
+              value={rowsLimit}
+              onChange={handleRowsLimitChange}
+            >
+              <MenuItem value="10">10</MenuItem>
+              <MenuItem value="30">30</MenuItem>
+              <MenuItem value="all">הכל</MenuItem>
+            </Select>
+          </FormControl>
+        </Stack>
       </Stack>
 
       {actions.length === 0 && <Typography>לא נמצאו פעולות</Typography>}
