@@ -1,6 +1,5 @@
 ﻿import React, { useEffect, useMemo, useState } from "react";
-import { Box, Button, Card, CardContent, Grid, Stack, Typography, alpha } from "@mui/material";
-import { Pie, PieChart, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { Box, Button, Card, CardContent, Stack, Typography, alpha } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../store/store";
 import { getAllDonations } from "../../../store/features/admin/adminDonationsSlice";
@@ -24,7 +23,7 @@ const formatILS = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value || 0);
 
-const CashFlowSnapshotCard: React.FC = () => {
+export const CashFlowSnapshotCard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [mode, setMode] = useState<RangeMode>("month");
 
@@ -183,34 +182,28 @@ const CashFlowSnapshotCard: React.FC = () => {
     return donationsOut + expensesOut + loansOut + depositsOut + standingUnpaid + investmentsOut;
   }, [donations, expenses, loanActions, depositActions, standingOrders, investmentTransactions, cutoffDate]);
 
-  const pieData = [
-    { name: "נכנס", value: incomeTotal, color: "#18a957" },
-    { name: "יצא", value: expenseTotal, color: "#e02424" },
-  ];
-
   const net = incomeTotal - expenseTotal;
 
   return (
     <Card
       sx={(theme) => ({
-        mt: 4,
-        borderRadius: 6,
+        borderRadius: 4,
         border: `1px solid ${alpha(theme.palette.divider, 0.8)}`,
         boxShadow:
           theme.palette.mode === "dark"
-            ? "0 18px 48px rgba(0,0,0,0.38)"
-            : "0 18px 48px rgba(15,23,42,0.12)",
+            ? "0 14px 36px rgba(0,0,0,0.3)"
+            : "0 14px 36px rgba(15,23,42,0.1)",
         background:
           theme.palette.mode === "dark"
             ? `linear-gradient(180deg, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(
                 theme.palette.background.paper,
-                0.78
+                0.8
               )})`
             : "linear-gradient(180deg, #ffffff, #f9fbff)",
       })}
     >
-      <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-        <Stack alignItems="center" spacing={1.2} sx={{ mb: 2.5 }}>
+      <CardContent sx={{ p: { xs: 1.6, md: 2.2 } }}>
+        <Stack alignItems="center" spacing={1} sx={{ mb: 1.6 }}>
           <Typography variant="h6" fontWeight={900} textAlign="center">
             תזרים נכנס/יצא
           </Typography>
@@ -221,7 +214,7 @@ const CashFlowSnapshotCard: React.FC = () => {
             direction="row"
             spacing={1}
             sx={(theme) => ({
-              p: 0.6,
+              p: 0.5,
               borderRadius: 999,
               border: `1px solid ${alpha(theme.palette.divider, 0.8)}`,
               bgcolor: alpha(theme.palette.background.default, 0.5),
@@ -231,7 +224,7 @@ const CashFlowSnapshotCard: React.FC = () => {
               size="small"
               variant={mode === "month" ? "contained" : "text"}
               onClick={() => setMode("month")}
-              sx={{ borderRadius: 999, px: 2.5, fontWeight: 800 }}
+              sx={{ borderRadius: 999, px: 2, fontWeight: 800 }}
             >
               חודש אחרון
             </Button>
@@ -239,96 +232,64 @@ const CashFlowSnapshotCard: React.FC = () => {
               size="small"
               variant={mode === "year" ? "contained" : "text"}
               onClick={() => setMode("year")}
-              sx={{ borderRadius: 999, px: 2.5, fontWeight: 800 }}
+              sx={{ borderRadius: 999, px: 2, fontWeight: 800 }}
             >
               שנה אחרונה
             </Button>
           </Stack>
         </Stack>
 
-        <Grid container spacing={2.5} alignItems="center" sx={{ direction: "ltr" }}>
-          <Grid item xs={12} md={6}>
-            <Grid container spacing={1.5} sx={{ direction: "rtl" }}>
-              <Grid item xs={12}>
-                <Box
-                  sx={(theme) => ({
-                    p: 2,
-                    borderRadius: 3,
-                    background: alpha("#18a957", theme.palette.mode === "dark" ? 0.16 : 0.1),
-                  })}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    נכנס
-                  </Typography>
-                  <Typography variant="h6" fontWeight={900} sx={{ color: "#18a957" }}>
-                    {formatILS(incomeTotal)}
-                  </Typography>
-                </Box>
-              </Grid>
+        <Stack spacing={1.2} sx={{ direction: "rtl" }}>
+          <Box
+            sx={(theme) => ({
+              p: 1.5,
+              borderRadius: 3,
+              background: alpha("#18a957", theme.palette.mode === "dark" ? 0.16 : 0.1),
+            })}
+          >
+            <Typography variant="body2" color="text.secondary">
+              נכנס
+            </Typography>
+            <Typography variant="h6" fontWeight={900} sx={{ color: "#18a957" }}>
+              {formatILS(incomeTotal)}
+            </Typography>
+          </Box>
 
-              <Grid item xs={12}>
-                <Box
-                  sx={(theme) => ({
-                    p: 2,
-                    borderRadius: 3,
-                    background: alpha("#e02424", theme.palette.mode === "dark" ? 0.18 : 0.09),
-                  })}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    יצא
-                  </Typography>
-                  <Typography variant="h6" fontWeight={900} sx={{ color: "#e02424" }}>
-                    {formatILS(expenseTotal)}
-                  </Typography>
-                </Box>
-              </Grid>
+          <Box
+            sx={(theme) => ({
+              p: 1.5,
+              borderRadius: 3,
+              background: alpha("#e02424", theme.palette.mode === "dark" ? 0.18 : 0.09),
+            })}
+          >
+            <Typography variant="body2" color="text.secondary">
+              יצא
+            </Typography>
+            <Typography variant="h6" fontWeight={900} sx={{ color: "#e02424" }}>
+              {formatILS(expenseTotal)}
+            </Typography>
+          </Box>
 
-              <Grid item xs={12}>
-                <Box
-                  sx={(theme) => ({
-                    p: 2,
-                    borderRadius: 3,
-                    border: `1px dashed ${alpha(theme.palette.divider, 0.9)}`,
-                    bgcolor: alpha(theme.palette.background.default, 0.45),
-                  })}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    נטו תזרימי
-                  </Typography>
-                  <Typography
-                    variant="h5"
-                    fontWeight={900}
-                    sx={{ color: net >= 0 ? "#18a957" : "#e02424" }}
-                  >
-                    {formatILS(net)}
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          </Grid>
-
-          <Grid item xs={12} md={6} sx={{ height: 250 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={90}
-                  innerRadius={52}
-                  paddingAngle={4}
-                >
-                  {pieData.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => formatILS(Number(value))} />
-              </PieChart>
-            </ResponsiveContainer>
-          </Grid>
-        </Grid>
+          <Box
+            sx={(theme) => ({
+              p: 1.5,
+              borderRadius: 3,
+              border: `1px dashed ${alpha(theme.palette.divider, 0.9)}`,
+              bgcolor: alpha(theme.palette.background.default, 0.45),
+            })}
+          >
+            <Typography variant="body2" color="text.secondary">
+              נטו תזרימי
+            </Typography>
+            <Typography
+              variant="h5"
+              fontWeight={900}
+              sx={{ color: net >= 0 ? "#18a957" : "#e02424" }}
+            >
+              {formatILS(net)}
+            </Typography>
+          </Box>
+        </Stack>
       </CardContent>
     </Card>
   );

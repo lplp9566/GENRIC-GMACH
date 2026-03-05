@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import { Box, Grid, Paper, Typography } from "@mui/material";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 import { formatILS } from "./HomePage";
 
 type Props = {
@@ -34,86 +34,102 @@ const DebtCards: React.FC<Props> = ({
       count: loansNegativeCount,
       countLabel: "הלוואות בחוב",
     },
+    {
+      key: "deposits" as const,
+      title: "הפקדות",
+      value: null,
+      debtBg: "linear-gradient(135deg, #334155, #1f2937)",
+      okBg: "linear-gradient(135deg, #334155, #1f2937)",
+      count: 0,
+      countLabel: "נתונים יופיעו בקרוב",
+      comingSoon: true,
+    },
   ];
 
   return (
-    <Grid
-      container
-      spacing={{ xs: 2, sm: 3 }}
-      justifyContent="center"
-      sx={{ mt: { xs: 2, sm: 3 } }}
-    >
+    <Stack spacing={1.2} sx={{ mt: { xs: 2, sm: 3 } }}>
       {cards.map((c) => {
-        const hasDebt = c.value > 0;
+        const hasDebt = Number(c.value ?? 0) > 0;
 
         return (
-          <Grid item xs={12} sm={6} md={4} key={c.key}>
-            <Paper
-              elevation={0}
+          <Paper
+            key={c.key}
+            elevation={0}
+            sx={{
+              p: { xs: 1.4, sm: 1.6 },
+              borderRadius: 3,
+              background: c.comingSoon ? c.okBg : hasDebt ? c.debtBg : c.okBg,
+              color: "#fff",
+              boxShadow: "0 10px 22px rgba(0,0,0,0.2)",
+              position: "relative",
+              overflow: "hidden",
+              textAlign: "center",
+              minHeight: { xs: 92, sm: 96 },
+            }}
+          >
+            <Box
               sx={{
-                p: { xs: 2, sm: 2.5 },
-                borderRadius: 4,
-                background: hasDebt ? c.debtBg : c.okBg,
-                color: "#fff",
-                boxShadow: "0 14px 32px rgba(0,0,0,0.25)",
+                position: "absolute",
+                inset: 0,
+                display: "grid",
+                placeItems: "center",
+                opacity: 0.1,
+                transform: "scale(2.1)",
+                pointerEvents: "none",
+              }}
+            />
+
+            <Box
+              sx={{
                 position: "relative",
-                overflow: "hidden",
-                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 0.35,
               }}
             >
-              <Box
-                sx={{
-                  position: "absolute",
-                  inset: 0,
-                  display: "grid",
-                  placeItems: "center",
-                  opacity: 0.12,
-                  transform: "scale(2.2)",
-                  pointerEvents: "none",
-                }}
-              ></Box>
+              <Typography variant="subtitle2" fontWeight={900}>
+                {c.title}
+              </Typography>
 
-              <Box
-                sx={{
-                  position: "relative",
-                  minHeight: { xs: 96, sm: 120 },
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 0.6,
-                }}
-              >
-                <Typography variant="subtitle1" fontWeight={900}>
-                  {c.title}
-                </Typography>
-
+              {c.comingSoon ? (
                 <Typography
-                  variant="h4"
-                  fontWeight={1000}
-                  sx={{ lineHeight: 1, fontSize: { xs: 22, sm: 28 } }}
+                  variant="body1"
+                  fontWeight={800}
+                  sx={{ fontSize: { xs: 15, sm: 16 } }}
                 >
-                  {hasDebt ? formatILS(c.value) : "אין חוב"}
+                  נתונים יופיעו בקרוב
                 </Typography>
-                {c.count > 0 && (
+              ) : (
+                <>
                   <Typography
                     variant="h6"
                     fontWeight={1000}
-                    sx={{
-                      lineHeight: 1,
-                      direction: "ltr",
-                      fontSize: { xs: 22, sm: 28 },
-                    }}
+                    sx={{ lineHeight: 1.1, fontSize: { xs: 20, sm: 22 } }}
                   >
-                    {` ${c.countLabel} ${c.count}`}
+                    {hasDebt ? formatILS(c.value) : "אין חוב"}
                   </Typography>
-                )}
-              </Box>
-            </Paper>
-          </Grid>
+                  {c.count > 0 && (
+                    <Typography
+                      variant="body1"
+                      fontWeight={900}
+                      sx={{
+                        lineHeight: 1.1,
+                        direction: "ltr",
+                        fontSize: { xs: 17, sm: 18 },
+                      }}
+                    >
+                      {` ${c.countLabel} ${c.count}`}
+                    </Typography>
+                  )}
+                </>
+              )}
+            </Box>
+          </Paper>
         );
       })}
-    </Grid>
+    </Stack>
   );
 };
 

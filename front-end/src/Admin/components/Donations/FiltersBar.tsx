@@ -1,17 +1,29 @@
-import { Box, Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import React from 'react'
+﻿import { Box, Grid, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import React, { ReactNode } from "react";
+
 interface FiltersBarProps {
-      yearFilter: number | "all";
-  monthFilter: number | "all";  // 0..11 או "all"
+  yearFilter: number | "all";
+  monthFilter: number | "all";
   yearOptions: number[];
   monthOptions: number[];
   monthsLabels: string[];
   onChangeYear: (v: number | "all") => void;
   onChangeMonth: (v: number | "all") => void;
+  extraFilters?: ReactNode;
 }
-const FiltersBar: React.FC<FiltersBarProps> = ({yearFilter, monthFilter, yearOptions, monthOptions, monthsLabels, onChangeYear, onChangeMonth}) => {
+
+const FiltersBar: React.FC<FiltersBarProps> = ({
+  yearFilter,
+  monthFilter,
+  yearOptions,
+  monthOptions,
+  monthsLabels,
+  onChangeYear,
+  onChangeMonth,
+  extraFilters,
+}) => {
   return (
-<Box sx={{ mb: 3 }}>
+    <Box sx={{ mb: 3 }}>
       <Grid container spacing={2} justifyContent="center">
         <Grid item>
           <FormControl size="small" sx={{ minWidth: 160 }}>
@@ -56,8 +68,11 @@ const FiltersBar: React.FC<FiltersBarProps> = ({yearFilter, monthFilter, yearOpt
             </Select>
           </FormControl>
         </Grid>
-      </Grid>
-    </Box>  )
-}
 
-export default FiltersBar
+        {extraFilters && <Grid item>{extraFilters}</Grid>}
+      </Grid>
+    </Box>
+  );
+};
+
+export default FiltersBar;

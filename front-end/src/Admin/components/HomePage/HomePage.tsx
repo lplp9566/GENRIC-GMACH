@@ -44,7 +44,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ConfirmModal from "../genricComponents/confirmModal";
 import AiChatDialog from "./AiChatDialog";
 import { RtlThemeProvider } from "../../../Theme/rtl";
-import CashFlowSnapshotCard from "./CashFlowSnapshotCard";
+import { CashFlowSnapshotCard } from "./CashFlowSnapshotCard";
 
 export const formatILS = (value?: number | string | null) => {
   const n = typeof value === "string" ? Number(value) : value ?? 0;
@@ -205,19 +205,19 @@ const name = import.meta.env.VITE_NAME
     {
       label: "סכום זמין",
       value: formatILS(fundsOverview?.available_funds),
-      icon: <AccountBalanceWalletIcon sx={{ fontSize: 40 }} />,
+      icon: <AccountBalanceWalletIcon sx={{ fontSize: { xs: 28, sm: 32 } }} />,
       colorKey: "secondary" as const,
     },
     {
       label: "קרן הגמ״ח",
       value: formatILS(fundsOverview?.fund_principal),
-      icon: <AccountBalanceIcon sx={{ fontSize: 40 }} />,
+      icon: <AccountBalanceIcon sx={{ fontSize: { xs: 28, sm: 32 } }} />,
       colorKey: "success" as const,
     },
     {
       label: "הון עצמי",
       value: formatILS(fundsOverview?.own_equity),
-      icon: <TrendingUpIcon sx={{ fontSize: 40 }} />,
+      icon: <TrendingUpIcon sx={{ fontSize: { xs: 28, sm: 32 } }} />,
       colorKey: "primary" as const,
     },
     {
@@ -228,7 +228,7 @@ const name = import.meta.env.VITE_NAME
       subValue: latestBankCurrent
         ? new Date(latestBankCurrent.date).toLocaleDateString("he-IL")
         : undefined,
-      icon: <AccountBalanceWalletIcon sx={{ fontSize: 40 }} />,
+      icon: <AccountBalanceWalletIcon sx={{ fontSize: { xs: 28, sm: 32 } }} />,
       colorKey: "info" as const,
       isBankCard: true,
     },
@@ -297,19 +297,19 @@ const name = import.meta.env.VITE_NAME
           {/* STATS */}
           <Grid
             container
-            spacing={{ xs: 2, sm: 4 }}
+            spacing={{ xs: 1.5, sm: 2 }}
             mt={{ xs: 2, sm: -6 }}
             justifyContent="center"
           >
             {stats.map((s, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
+              <Grid item xs={12} sm={6} md={3} key={index}>
                 <Paper
                   elevation={0}
                   sx={(theme) => {
                     const main = theme.palette[s.colorKey].main;
                     return {
-                      p: 3,
-                      borderRadius: 4,
+                      p: { xs: 1.5, sm: 2 },
+                      borderRadius: 3,
                       border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
                       backgroundColor: theme.palette.background.paper,
                       overflow: "hidden",
@@ -337,15 +337,15 @@ const name = import.meta.env.VITE_NAME
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    sx={{ position: "relative", minHeight: 86 }}
+                    sx={{ position: "relative", minHeight: { xs: 66, sm: 74 } }}
                   >
                     <Box
                       sx={(theme) => {
                         const main = theme.palette[s.colorKey].main;
                         return {
-                          width: 56,
-                          height: 56,
-                          borderRadius: 3,
+                          width: { xs: 40, sm: 46 },
+                          height: { xs: 40, sm: 46 },
+                          borderRadius: 2,
                           display: "grid",
                           placeItems: "center",
                           alignItems:"center",
@@ -365,10 +365,10 @@ const name = import.meta.env.VITE_NAME
                     </Box>
 
                     <Box sx={{ textAlign: "center", width: "100%" }}>
-                      <Typography sx={{ textAlign: "center" }} variant="body2" color="text.secondary">
+                      <Typography sx={{ textAlign: "center", fontSize: { xs: 12, sm: 13 } }} variant="body2" color="text.secondary">
                         {s.label}
                       </Typography>
-                      <Typography sx={{ textAlign: "center" }} variant="h5" fontWeight={900}>
+                      <Typography sx={{ textAlign: "center", fontSize: { xs: 24, sm: 26 } }} variant="h5" fontWeight={900}>
                         {s.value}
                       </Typography>
                       {"subValue" in s && s.subValue && (
@@ -577,13 +577,19 @@ const name = import.meta.env.VITE_NAME
 
           {/* QUICK ACTIONS */}
           <Box mt={{ xs: 6, sm: 10 }}>
-            <DebtCards
-              monthlyDebt={totalNegativeBalance}
-              loansDebt={totalLoansDebt}
-              monthlyNegtiveBalanceUsers={totalNegtivUsers}
-              loansNegativeCount={totalNegativeLoans}
-            />
-            <CashFlowSnapshotCard />
+            <Grid container spacing={2} sx={{ direction: "rtl" }} alignItems="stretch">
+              <Grid item xs={12} md={4}>
+                <DebtCards
+                  monthlyDebt={totalNegativeBalance}
+                  loansDebt={totalLoansDebt}
+                  monthlyNegtiveBalanceUsers={totalNegtivUsers}
+                  loansNegativeCount={totalNegativeLoans}
+                />
+              </Grid>
+              <Grid item xs={12} md={8}>
+                <CashFlowSnapshotCard />
+              </Grid>
+            </Grid>
 
             {/* <Grid container spacing={3} justifyContent="center">
               {quickActions.map((action, i) => (

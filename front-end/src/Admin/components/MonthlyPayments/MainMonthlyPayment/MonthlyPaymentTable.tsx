@@ -1,17 +1,13 @@
-import {
+﻿import {
   Box,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
-  Stack,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  TableSortLabel,
   Tooltip,
 } from "@mui/material";
 import { IMonthlyPayment, paymentMethod } from "../MonthlyPaymentsDto";
@@ -28,13 +24,18 @@ import EditIcon from "@mui/icons-material/Edit";
 import { AddPaymentModal } from "../AddMonthlyPayment/AddMonthlyPayment";
 import { setMonthlyPaymentModalMode } from "../../../../store/features/Main/AppMode";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import type { SelectChangeEvent } from "@mui/material/Select";
 
 interface MonthlyPaymentProps {
   paymentsThisMonth: IMonthlyPayment[];
+  rowsLimit: "10" | "30" | "all";
 }
+
+type SortField = "user" | "amount" | "date" | "payment_method";
+type SortDirection = "asc" | "desc";
+
 const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
   paymentsThisMonth,
+  rowsLimit,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const authUser = useSelector((s: RootState) => s.authslice.user);
@@ -45,7 +46,10 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
   const [editMode, setEditMode] = useState<boolean>(false);
   const [deleteMode, setDeleteMode] = useState<boolean>(false);
   const [copyMode, setcopyMode] = useState(false);
-  const [rowsLimit, setRowsLimit] = useState<"10" | "30" | "all">("10");
+  const [currentSortField, setCurrentSortField] = useState<SortField>("date");
+  const [currentSortDirection, setCurrentSortDirection] =
+    useState<SortDirection>("desc");
+
   const modalOpen = useSelector(
     (s: RootState) => s.mapModeSlice.MonthlyPaymentModalMode
   );
@@ -55,6 +59,7 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
       setcopyMode(false);
     }
   }, [modalOpen]);
+
   const onDelete = async () => {
     const promise = dispatch(
       deleteMonthlyPayment(Number(selectedPayment!.id))
@@ -62,25 +67,53 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
 
     toast.promise(promise, {
       pending: "ממתין...",
-      success: "התשלום נמחק בהצלחה! 👌",
-      error: "שגיאה במחיקת התשלום 💥",
+      success: "התשלום נמחק בהצלחה",
+      error: "שגיאה במחיקת התשלום",
     });
     setDeleteMode(false);
   };
 
-  const handleRowsLimitChange = (event: SelectChangeEvent) => {
-    setRowsLimit(event.target.value as "10" | "30" | "all");
+  const handleHeaderClick = (field: SortField) => {
+    if (field === currentSortField) {
+      setCurrentSortDirection((dir) => (dir === "asc" ? "desc" : "asc"));
+    } else {
+      setCurrentSortField(field);
+      setCurrentSortDirection("asc");
+    }
   };
+
+  const directionFor = (field: SortField): "asc" | "desc" =>
+    currentSortField === field ? currentSortDirection : "asc";
 
   const sortedPayments = useMemo(() => {
     const copy = [...paymentsThisMonth];
+
     copy.sort((a, b) => {
-      const ta = new Date(a.deposit_date).getTime();
-      const tb = new Date(b.deposit_date).getTime();
-      return tb - ta;
+      let cmp = 0;
+
+      if (currentSortField === "date") {
+        const ta = new Date(a.deposit_date).getTime();
+        const tb = new Date(b.deposit_date).getTime();
+        cmp = ta - tb;
+      } else if (currentSortField === "amount") {
+        cmp = Number(a.amount) - Number(b.amount);
+      } else if (currentSortField === "payment_method") {
+        const ma =
+          paymentMethod.find((pm) => pm.value === a.payment_method)?.label ?? "";
+        const mb =
+          paymentMethod.find((pm) => pm.value === b.payment_method)?.label ?? "";
+        cmp = ma.localeCompare(mb, "he");
+      } else {
+        const ua = `${a.user?.first_name ?? ""} ${a.user?.last_name ?? ""}`.trim();
+        const ub = `${b.user?.first_name ?? ""} ${b.user?.last_name ?? ""}`.trim();
+        cmp = ua.localeCompare(ub, "he");
+      }
+
+      return currentSortDirection === "asc" ? cmp : -cmp;
     });
+
     return copy;
-  }, [paymentsThisMonth]);
+  }, [paymentsThisMonth, currentSortField, currentSortDirection]);
 
   const displayedPayments = useMemo(() => {
     if (rowsLimit === "all") return sortedPayments;
@@ -90,39 +123,66 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
   return (
     <Box>
       <Paper sx={{ borderRadius: 2, overflow: "auto", padding: 2, boxShadow: 1 }}>
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          justifyContent="space-between"
-          alignItems={{ xs: "stretch", sm: "center" }}
-          spacing={1}
-          sx={{ mb: 1 }}
-        >
-          <Box />
-          <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 120 } }}>
-            <InputLabel id="monthly-payments-limit-label">תצוגה</InputLabel>
-            <Select
-              labelId="monthly-payments-limit-label"
-              label="תצוגה"
-              value={rowsLimit}
-              onChange={handleRowsLimitChange}
-            >
-              <MenuItem value="10">10</MenuItem>
-              <MenuItem value="30">30</MenuItem>
-              <MenuItem value="all">הכל</MenuItem>
-            </Select>
-          </FormControl>
-        </Stack>
         <Table size="small" sx={{ minWidth: 650 }}>
           <TableHead sx={{ bgcolor: "grey.100" }}>
             <TableRow>
-              <TableCell align="right">משתמש</TableCell>
-              <TableCell align="right">סכום</TableCell>
-              <TableCell align="right">תאריך</TableCell>
-              <TableCell align="right">אמצעי תשלום</TableCell>
+              <TableCell
+                align="right"
+                sortDirection={currentSortField === "user" ? currentSortDirection : false}
+              >
+                <TableSortLabel
+                  active={currentSortField === "user"}
+                  direction={directionFor("user")}
+                  onClick={() => handleHeaderClick("user")}
+                >
+                  משתמש
+                </TableSortLabel>
+              </TableCell>
+
+              <TableCell
+                align="right"
+                sortDirection={currentSortField === "amount" ? currentSortDirection : false}
+              >
+                <TableSortLabel
+                  active={currentSortField === "amount"}
+                  direction={directionFor("amount")}
+                  onClick={() => handleHeaderClick("amount")}
+                >
+                  סכום
+                </TableSortLabel>
+              </TableCell>
+
+              <TableCell
+                align="right"
+                sortDirection={currentSortField === "date" ? currentSortDirection : false}
+              >
+                <TableSortLabel
+                  active={currentSortField === "date"}
+                  direction={directionFor("date")}
+                  onClick={() => handleHeaderClick("date")}
+                >
+                  תאריך
+                </TableSortLabel>
+              </TableCell>
+
+              <TableCell
+                align="right"
+                sortDirection={currentSortField === "payment_method" ? currentSortDirection : false}
+              >
+                <TableSortLabel
+                  active={currentSortField === "payment_method"}
+                  direction={directionFor("payment_method")}
+                  onClick={() => handleHeaderClick("payment_method")}
+                >
+                  אמצעי תשלום
+                </TableSortLabel>
+              </TableCell>
+
               <TableCell align="right">הערות</TableCell>
               {isAdmin && <TableCell align="right">פעולות</TableCell>}
             </TableRow>
           </TableHead>
+
           <TableBody>
             {displayedPayments.length > 0 ? (
               displayedPayments.map((p) => (
@@ -138,17 +198,11 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
                   </TableCell>
                   <TableCell align="right">{fmtDate(p.deposit_date)}</TableCell>
                   <TableCell align="right">
-                    {
-                      paymentMethod.find((pm) => pm.value == p.payment_method)
-                        ?.label
-                    }
+                    {paymentMethod.find((pm) => pm.value == p.payment_method)?.label}
                   </TableCell>
                   <TableCell align="right">{p.description}</TableCell>
                   {isAdmin && (
-                    <TableCell
-                      align="right"
-                      onClick={(e) => e.stopPropagation()}
-                    >
+                    <TableCell align="right" onClick={(e) => e.stopPropagation()}>
                       <Tooltip title="עריכת תשלום">
                         <IconButton
                           color="primary"
@@ -158,13 +212,7 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
                             setEditMode(true);
                           }}
                         >
-                          <EditIcon
-                            sx={{ color: "primary.main" }}
-                            onClick={() => {
-                              setSelectedPayment(p);
-                              setEditMode(true);
-                            }}
-                          />
+                          <EditIcon sx={{ color: "primary.main" }} />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="העתקת פעולה">
@@ -180,8 +228,6 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
                           <ContentCopyIcon sx={{ fontSize: 20 }} />
                         </IconButton>
                       </Tooltip>
-
-                      {/* מחיקה */}
                       <Tooltip title="מחיקת תשלום">
                         <IconButton
                           color="error"
@@ -201,7 +247,7 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={isAdmin ? 6 : 5}
                   align="center"
                   sx={{ py: 4, color: "text.secondary" }}
                 >
@@ -209,6 +255,7 @@ const MonthlyPaymentTable: React.FC<MonthlyPaymentProps> = ({
                 </TableCell>
               </TableRow>
             )}
+
             {editMode && selectedPayment && (
               <MonthlyPaymentEditModal
                 editMode={editMode}

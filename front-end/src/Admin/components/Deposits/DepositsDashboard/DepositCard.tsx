@@ -12,9 +12,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EventIcon from "@mui/icons-material/Event";
 import AddIcon from "@mui/icons-material/Add";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -102,23 +100,10 @@ const DepositCard: React.FC<DepositCardProps> = ({
         <Grid container spacing={1} mb={2}>
           <Grid item xs={6}>
             <Box display="flex" alignItems="center" gap={1} sx={{ flexDirection: "row-reverse" }}>
-              <AccountBalanceIcon fontSize="small" sx={{ color: "#006CF0" }} />
-              <Box textAlign="right">
-                <Typography variant="body2" color="text.secondary">
-                  סכום הפקדה
-                </Typography>
-                <Typography variant="subtitle1" fontWeight={700} color="#006CF0">
-                  ₪{deposit.initialDeposit.toLocaleString("he-IL")}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={6}>
-            <Box display="flex" alignItems="center" gap={1} sx={{ flexDirection: "row-reverse" }}>
               <AccountBalanceWalletIcon fontSize="small" sx={{ color: "#28A960" }} />
               <Box textAlign="right">
                 <Typography variant="body2" color="text.secondary">
-                  יתרה נוכחית
+                  סכום הפקדה נוכחי
                 </Typography>
                 <Typography variant="subtitle1" fontWeight={700} color="#28A960">
                   ₪{deposit.current_balance.toLocaleString("he-IL")}
@@ -128,32 +113,10 @@ const DepositCard: React.FC<DepositCardProps> = ({
           </Grid>
           <Grid item xs={6}>
             <Box display="flex" alignItems="center" gap={1} sx={{ flexDirection: "row-reverse" }}>
-              <CalendarTodayIcon
-                fontSize="small"
-                sx={{ color: isDark ? "#7CCBFF" : "#2A8CCF" }}
-              />
-              <Box textAlign="right">
-                <Typography variant="body2" color="text.secondary">
-                  תאריך התחלה
-                </Typography>
-                <Typography
-                  variant="subtitle1"
-                  fontWeight={700}
-                  color={isDark ? "#BFE6FF" : "#1C3C3C"}
-                >
-                  {deposit.start_date
-                    ? new Date(deposit.start_date).toLocaleDateString("he-IL")
-                    : "-"}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={6}>
-            <Box display="flex" alignItems="center" gap={1} sx={{ flexDirection: "row-reverse" }}>
               <EventIcon fontSize="small" sx={{ color: "#D35400" }} />
               <Box textAlign="right">
                 <Typography variant="body2" color="text.secondary">
-                  תאריך סיום
+                  תאריך ההחזרה
                 </Typography>
                 <Typography variant="subtitle1" fontWeight={700} color="#D35400">
                   {deposit.end_date

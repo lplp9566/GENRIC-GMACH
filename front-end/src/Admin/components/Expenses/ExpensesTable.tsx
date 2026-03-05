@@ -1,12 +1,7 @@
 ﻿import {
   Box,
   CircularProgress,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -15,8 +10,7 @@
   TableSortLabel,
   Tooltip,
 } from "@mui/material";
-import { FC, useState } from "react";
-import type { SelectChangeEvent } from "@mui/material/Select";
+import { FC, useMemo, useState } from "react";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditExpenseModal from "./EditExpenseModal";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -47,16 +41,18 @@ interface ExpensesTableProps {
   sortDir: SortDir;
   onSortClick: (key: SortBy) => void;
   onDuplicate: (row: ExpenseRow) => void;
+  rowsLimit: "10" | "30" | "all";
   readOnly?: boolean;
 }
 
-const ExpensesTable: FC<ExpensesTableProps> = ({
+export const ExpensesTable: FC<ExpensesTableProps> = ({
   isLoading,
   rows,
   sortBy,
   sortDir,
   onSortClick,
   onDuplicate,
+  rowsLimit,
   readOnly,
 }) => {
   if (isLoading) {
@@ -71,7 +67,6 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
 
   const [editMode, setEditMode] = useState(false);
   const [delateMode, setDelateMode] = useState(false);
-  const [rowsLimit, setRowsLimit] = useState<"10" | "30" | "all">("10");
   const [selectedExpense, setSelectedExpense] = useState<ExpenseRow | null>(null);
 
   const openEdit = (row: ExpenseRow) => {
@@ -86,8 +81,8 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
     try {
       toast.promise(dispatch(deleteExpenseById(Number(selectedExpense?.id!))).unwrap(), {
         pending: "מוחק הוצאה...",
-        success: "ההוצאה נמחקה בהצלחה! 👌",
-        error: "שגיאה במחיקת ההוצאה 💥",
+        success: "ההוצאה נמחקה בהצלחה!",
+        error: "שגיאה במחיקת ההוצאה",
       });
       setDelateMode(false);
     } catch {
@@ -103,37 +98,13 @@ const ExpensesTable: FC<ExpensesTableProps> = ({
     setEditMode(true);
   };
 
-  const handleRowsLimitChange = (event: SelectChangeEvent) => {
-    setRowsLimit(event.target.value as "10" | "30" | "all");
-  };
-
-  const displayedRows = rowsLimit === "all" ? rows : rows.slice(0, Number(rowsLimit));
+  const displayedRows = useMemo(() => {
+    if (rowsLimit === "all") return rows;
+    return rows.slice(0, Number(rowsLimit));
+  }, [rows, rowsLimit]);
 
   return (
     <Box sx={{ overflow: "auto" }}>
-      <Stack
-        direction={{ xs: "column", sm: "row" }}
-        justifyContent="space-between"
-        alignItems={{ xs: "stretch", sm: "center" }}
-        spacing={1}
-        sx={{ mb: 1 }}
-      >
-        <Box />
-        <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 120 } }}>
-          <InputLabel id="expenses-limit-label">תצוגה</InputLabel>
-          <Select
-            labelId="expenses-limit-label"
-            label="תצוגה"
-            value={rowsLimit}
-            onChange={handleRowsLimitChange}
-          >
-            <MenuItem value="10">10</MenuItem>
-            <MenuItem value="30">30</MenuItem>
-            <MenuItem value="all">הכל</MenuItem>
-          </Select>
-        </FormControl>
-      </Stack>
-
       <Table size="small" stickyHeader>
         <TableHead>
           <TableRow>

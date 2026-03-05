@@ -1,11 +1,12 @@
 ﻿import { FC, useEffect, useMemo, useState } from "react";
-import { Box, Container, Grid, Alert } from "@mui/material";
+import { Box, Container, Grid, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import type { SelectChangeEvent } from "@mui/material/Select";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
 
 import Frame from "../components/Donations/Frame";
 import FiltersBar from "../components/Donations/FiltersBar";
-import ExpensesTable, {
+import { ExpensesTable,
   ExpenseRow,
   SortBy,
   SortDir,
@@ -105,6 +106,7 @@ const ExpensesHomePage: FC = () => {
   const [view, setView] = useState<ViewMode>("split");
   const [monthFilter, setMonthFilter] = useState<number | "all">("all");
   const [yearFilter, setYearFilter] = useState<number | "all">("all");
+  const [rowsLimit, setRowsLimit] = useState<"10" | "30" | "all">("10");
   const [sortBy, setSortBy] = useState<SortBy>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [activeKey, setActiveKey] = useState<string | null>(null);
@@ -276,6 +278,23 @@ const ExpensesHomePage: FC = () => {
                 monthsLabels={MONTHS}
                 onChangeYear={setYearFilter}
                 onChangeMonth={setMonthFilter}
+                extraFilters={
+                  <FormControl size="small" sx={{ minWidth: 120 }}>
+                    <InputLabel id="expenses-limit-label">תצוגה</InputLabel>
+                    <Select
+                      labelId="expenses-limit-label"
+                      label="תצוגה"
+                      value={rowsLimit}
+                      onChange={(e: SelectChangeEvent) =>
+                        setRowsLimit(e.target.value as "10" | "30" | "all")
+                      }
+                    >
+                      <MenuItem value="10">10</MenuItem>
+                      <MenuItem value="30">30</MenuItem>
+                      <MenuItem value="all">הכל</MenuItem>
+                    </Select>
+                  </FormControl>
+                }
               />
 
               <ExpensesTable
@@ -283,6 +302,7 @@ const ExpensesHomePage: FC = () => {
                 rows={rows}
                 sortBy={sortBy}
                 sortDir={sortDir}
+                rowsLimit={rowsLimit}
                 readOnly={!canWrite}
                 onSortClick={handleSortClick}
                 onDuplicate={(row) => {

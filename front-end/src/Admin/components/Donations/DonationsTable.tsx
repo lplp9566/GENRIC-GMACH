@@ -1,7 +1,12 @@
-import {
+﻿import {
   Box,
   CircularProgress,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -10,7 +15,8 @@ import {
   TableSortLabel,
   Tooltip,
 } from "@mui/material";
-import { FC, useState } from "react";
+import type { SelectChangeEvent } from "@mui/material/Select";
+import { FC, useMemo, useState } from "react";
 import EditDonationModal from "./EditDonationModal";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
@@ -22,6 +28,7 @@ import {
   setAddDonationModal,
 } from "../../../store/features/Main/AppMode";
 import { ddmmyyyyToInputDate } from "../../Hooks/genricFunction";
+
 export type DonationRow = {
   id: string | number;
   userName: string;
@@ -32,8 +39,10 @@ export type DonationRow = {
   note?: string;
   userId: number;
 };
+
 export type SortBy = "date" | "amount";
 export type SortDir = "asc" | "desc";
+
 interface DonationsTableProps {
   isLoading: boolean;
   rows: DonationRow[];
@@ -49,24 +58,24 @@ const DonationsTable: FC<DonationsTableProps> = ({
   sortDir,
   onSortClick,
 }) => {
-  if (isLoading) {
-    return (
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        height={300}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
   const [editMode, setEditMode] = useState<boolean>(false);
   const [selectedDonation, setSelectedDonation] = useState<DonationRow | null>(
     null
   );
+  const [rowsLimit, setRowsLimit] = useState<"10" | "30" | "all">("10");
+
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const isAdmin = Boolean(authUser?.is_admin);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const displayedRows = useMemo(() => {
+    if (rowsLimit === "all") return rows;
+    return rows.slice(0, Number(rowsLimit));
+  }, [rows, rowsLimit]);
+
+  const handleRowsLimitChange = (event: SelectChangeEvent) => {
+    setRowsLimit(event.target.value as "10" | "30" | "all");
+  };
 
   const onClickEdit = (donation: DonationRow) => {
     setSelectedDonation({
@@ -75,7 +84,6 @@ const DonationsTable: FC<DonationsTableProps> = ({
     });
     setEditMode(true);
   };
-  const dispatch = useDispatch<AppDispatch>();
 
   const onClickDuplicate = (row: DonationRow) => {
     const reason = String(row.donation_reason ?? "").trim();
@@ -87,7 +95,7 @@ const DonationsTable: FC<DonationsTableProps> = ({
         kind,
         fundName: kind === "fund" ? reason : "",
         amount: row.amount,
-        date: ddmmyyyyToInputDate(row.date), // או לשים היום אם רוצים
+        date: ddmmyyyyToInputDate(row.date),
       })
     );
 
@@ -96,128 +104,157 @@ const DonationsTable: FC<DonationsTableProps> = ({
 
   return (
     <Box sx={{ overflow: "auto" }}>
-      <Table size="small" stickyHeader>
-        <TableHead>
-          <TableRow>
-            <TableCell align="right">תורם</TableCell>
-            <TableCell
-              align="right"
-              sortDirection={sortBy === "amount" ? sortDir : (false as any)}
-            >
-              <TableSortLabel
-                active={sortBy === "amount"}
-                direction={sortBy === "amount" ? sortDir : "asc"}
-                onClick={() => onSortClick("amount")}
-              >
-                סכום
-              </TableSortLabel>
-            </TableCell>
-            <TableCell
-              align="right"
-              sortDirection={sortBy === "date" ? sortDir : (false as any)}
-            >
-              <TableSortLabel
-                active={sortBy === "date"}
-                direction={sortBy === "date" ? sortDir : "asc"}
-                onClick={() => onSortClick("date")}
-              >
-                תאריך
-              </TableSortLabel>
-            </TableCell>
-            <TableCell align="right">פעולה</TableCell>
-            <TableCell align="right">קרן/תרומה רגילה</TableCell>
-            <TableCell align="right">הערות</TableCell>
-          {isAdmin && <TableCell align="right">פעולות</TableCell> }  
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={isAdmin ? 7 : 6} align="center">
-                אין תרומות להצגה
-              </TableCell>
-            </TableRow>
-          ) : (
-            rows.map((donationRow) => (
-              <TableRow
-                key={donationRow.id}
-                hover
-                sx={{ cursor: "pointer" }}
-              >
-                <TableCell align="right">{donationRow.userName}</TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    color:
-                      donationRow.action == "withdraw"
-                        ? "error.main"
-                        : "success.main",
-                    fontWeight: 700,
-                  }}
-                >
-                  {donationRow.amount.toLocaleString("he-IL", {
-                    style: "currency",
-                    currency: "ILS",
-                  })}
-                </TableCell>
-                <TableCell align="right">{donationRow.date}</TableCell>
-                <TableCell align="right">
-                  {donationRow.action == "donation" ? "תרומה" : "משיכה"}
-                </TableCell>
-                <TableCell align="right">
-                  {donationRow.donation_reason == "Equity"
-                    ? "תרומה רגילה"
-                    : ` קרן ${donationRow.donation_reason}`}
-                </TableCell>
-                <TableCell align="right">{donationRow.note || "-"}</TableCell>
-                { isAdmin && (
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="flex-end"
+        alignItems={{ xs: "stretch", sm: "center" }}
+        spacing={1}
+        sx={{ mb: 1 }}
+      >
+        <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 120 } }}>
+          <InputLabel id="donations-limit-label">תצוגה</InputLabel>
+          <Select
+            labelId="donations-limit-label"
+            label="תצוגה"
+            value={rowsLimit}
+            onChange={handleRowsLimitChange}
+          >
+            <MenuItem value="10">10</MenuItem>
+            <MenuItem value="30">30</MenuItem>
+            <MenuItem value="all">הכל</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
 
-                <TableCell align="right">
-                  <Tooltip title="שכפול תרומה">
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onClickDuplicate(donationRow);
-                      }}
-                    >
-                      <ContentCopyIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="עריכה">
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onClickEdit(donationRow);
-                      }}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="מחיקה (בקרוב)">
-                    <span>
-                      <IconButton disabled>
-                        <DeleteOutlineIcon />
-                      </IconButton>
-                    </span>
-                  </Tooltip>
+      {isLoading ? (
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          height={300}
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Table size="small" stickyHeader>
+          <TableHead>
+            <TableRow>
+              <TableCell align="right">תורם</TableCell>
+              <TableCell
+                align="right"
+                sortDirection={sortBy === "amount" ? sortDir : (false as any)}
+              >
+                <TableSortLabel
+                  active={sortBy === "amount"}
+                  direction={sortBy === "amount" ? sortDir : "asc"}
+                  onClick={() => onSortClick("amount")}
+                >
+                  סכום
+                </TableSortLabel>
+              </TableCell>
+              <TableCell
+                align="right"
+                sortDirection={sortBy === "date" ? sortDir : (false as any)}
+              >
+                <TableSortLabel
+                  active={sortBy === "date"}
+                  direction={sortBy === "date" ? sortDir : "asc"}
+                  onClick={() => onSortClick("date")}
+                >
+                  תאריך
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="right">פעולה</TableCell>
+              <TableCell align="right">קרן/תרומה רגילה</TableCell>
+              <TableCell align="right">הערות</TableCell>
+              {isAdmin && <TableCell align="right">פעולות</TableCell>}
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {rows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={isAdmin ? 7 : 6} align="center">
+                  אין תרומות להצגה
                 </TableCell>
-                )}
               </TableRow>
-            ))
-          )}
-          {editMode && (
-            <EditDonationModal
-              open={editMode}
-              onClose={() => setEditMode(false)}
-              donation={selectedDonation!}
-            />
-          )}
-        </TableBody>
-      </Table>
+            ) : (
+              displayedRows.map((donationRow) => (
+                <TableRow key={donationRow.id} hover sx={{ cursor: "pointer" }}>
+                  <TableCell align="right">{donationRow.userName}</TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      color:
+                        donationRow.action === "withdraw"
+                          ? "error.main"
+                          : "success.main",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {donationRow.amount.toLocaleString("he-IL", {
+                      style: "currency",
+                      currency: "ILS",
+                    })}
+                  </TableCell>
+                  <TableCell align="right">{donationRow.date}</TableCell>
+                  <TableCell align="right">
+                    {donationRow.action === "donation" ? "תרומה" : "משיכה"}
+                  </TableCell>
+                  <TableCell align="right">
+                    {donationRow.donation_reason === "Equity"
+                      ? "תרומה רגילה"
+                      : `קרן ${donationRow.donation_reason}`}
+                  </TableCell>
+                  <TableCell align="right">{donationRow.note || "-"}</TableCell>
+
+                  {isAdmin && (
+                    <TableCell align="right">
+                      <Tooltip title="שכפול תרומה">
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onClickDuplicate(donationRow);
+                          }}
+                        >
+                          <ContentCopyIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="עריכה">
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onClickEdit(donationRow);
+                          }}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="מחיקה (בקרוב)">
+                        <span>
+                          <IconButton disabled>
+                            <DeleteOutlineIcon />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))
+            )}
+
+            {editMode && selectedDonation && (
+              <EditDonationModal
+                open={editMode}
+                onClose={() => setEditMode(false)}
+                donation={selectedDonation}
+              />
+            )}
+          </TableBody>
+        </Table>
+      )}
     </Box>
   );
 };
 
 export default DonationsTable;
-
-

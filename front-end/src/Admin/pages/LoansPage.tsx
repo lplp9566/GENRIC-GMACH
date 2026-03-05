@@ -300,16 +300,16 @@ export const LoansPage: React.FC = () => {
               }}
             >
               <Grid container spacing={2} justifyContent="center" mb={4}>
-                <Grid item xs={12} sm={isSm ? 6 : 3}>
+                <Grid item xs={4} sm={isSm ? 6 : 3}>
                   <SummaryCard label="מספר הלוואות" value={total} />
                 </Grid>
-                <Grid item xs={12} sm={isSm ? 6 : 3}>
+                <Grid item xs={4} sm={isSm ? 6 : 3}>
                   <SummaryCard
                     label="סכום הלוואות"
                     value={`\u20AA${totalAmount.toLocaleString("he-IL")}`}
                   />
                 </Grid>
-                <Grid item xs={12} sm={isSm ? 6 : 3}>
+                <Grid item xs={4} sm={isSm ? 6 : 3}>
                   <SummaryCard
                     label="יתרה לתשלום"
                     value={`\u20AA${totalRepaid.toLocaleString("he-IL")}`}

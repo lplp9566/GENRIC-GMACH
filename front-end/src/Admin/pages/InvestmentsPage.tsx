@@ -13,6 +13,8 @@ import {
   Select,
   SelectChangeEvent,
   Stack,
+  Tab,
+  Tabs,
   Typography,
   useMediaQuery,
   useTheme,
@@ -57,6 +59,7 @@ const InvestmentsPage: React.FC = () => {
   const [selectedInvestmentId, setSelectedInvestmentId] = useState<number | null>(
     null
   );
+  const [mobileTab, setMobileTab] = useState(0);
   const [newInvestmentOpen, setNewInvestmentOpen] = useState(false);
   const [actionsOpen, setActionsOpen] = useState(false);
 
@@ -251,143 +254,241 @@ const InvestmentsPage: React.FC = () => {
               </Grid>
             </Grid>
 
-            <Grid container spacing={3} sx={{ direction: "rtl" }}>
-              <Grid item xs={12} md={8}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    direction: "rtl",
-                    ...(isDesktop
-                      ? {
-                          position: "sticky",
-                          top: 16,
-                          maxHeight: columnsMaxHeight,
-                          display: "flex",
-                          flexDirection: "column",
-                        }
-                      : {}),
-                  }}
+            {isSm ? (
+              <Paper sx={{ p: 1.5, borderRadius: 2, direction: "rtl" }}>
+                <Tabs
+                  value={mobileTab}
+                  onChange={(_, value) => setMobileTab(value)}
+                  variant="fullWidth"
+                  sx={{ mb: 2 }}
                 >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      mb: 2,
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="h6" fontWeight={600}>
-                        פעולות השקעות
-                      </Typography>
-                      {selectedInvestment && (
-                        <Typography variant="body2" color="text.secondary">
-                          השקעה #{selectedInvestment.id} - {selectedInvestment.investment_name}
-                        </Typography>
-                      )}
-                    </Box>
-                    <Stack direction="row" spacing={1}>
-                      {selectedInvestmentId && (
-                        <Button variant="outlined" onClick={() => setSelectedInvestmentId(null)}>
-                          הצג את כל הפעולות
-                        </Button>
-                      )}
-                      {canWrite && (
-                        <Button
-                          variant="contained"
-                          onClick={() => setActionsOpen(true)}
-                          disabled={!selectedInvestment || !selectedInvestment.is_active}
-                          sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
-                        >
-                          פעולות להשקעה
-                        </Button>
-                      )}
-                    </Stack>
-                  </Box>
+                  <Tab label="רשימת השקעות" />
+                  <Tab label="פעולות" />
+                </Tabs>
 
-                  {visibleActions.length === 0 ? (
-                    <Typography>אין פעולות להצגה</Typography>
-                  ) : (
-                    <Box
-                      sx={{
-                        flex: isDesktop ? 1 : "unset",
-                        minHeight: 0,
-                        ...hiddenScrollbarSx,
-                      }}
-                    >
-                      <InvestmentActionTable
-                      actions={visibleActions}
-                      showInvestmentColumn={!selectedInvestmentId}
-                      title={
-                        selectedInvestmentId
-                          ? "פעולות על השקעה"
-                          : "פעולות על כל ההשקעות"
-                      }
-                      />
-                    </Box>
-                  )}
-                </Paper>
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    direction: "rtl",
-                    ...(isDesktop
-                      ? {
-                          position: "sticky",
-                          top: 16,
-                          maxHeight: columnsMaxHeight,
-                          display: "flex",
-                          flexDirection: "column",
-                        }
-                      : {}),
-                  }}
-                >
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="h6" fontWeight={600}>
-                      השקעות
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {selectedInvestmentId
-                        ? "בחרת השקעה להצגת פעולות."
-                        : "בחר השקעה להצגת פעולות."}
-                    </Typography>
-                  </Box>
-
-                  {filteredInvestments.length === 0 ? (
-                    <Typography>אין השקעות להצגה</Typography>
-                  ) : (
-                    <Box
-                      sx={{
-                        flex: isDesktop ? 1 : "unset",
-                        minHeight: 0,
-                        ...hiddenScrollbarSx,
-                      }}
-                    >
+                {mobileTab === 0 && (
+                  <Box>
+                    {filteredInvestments.length === 0 ? (
+                      <Typography>אין השקעות להצגה</Typography>
+                    ) : (
                       <Stack spacing={1.5}>
-                      {filteredInvestments.map((inv) => (
-                        <InvestmentMiniCard
-                          key={inv.id}
-                          investment={inv}
-                          selected={inv.id === selectedInvestmentId}
-                          onSelect={() => setSelectedInvestmentId(inv.id)}
-                          onOpenAction={() => {
-                            setSelectedInvestmentId(inv.id);
-                            setActionsOpen(true);
-                          }}
-                          onActionSuccess={handleRefresh}
-                        />
-                      ))}
+                        {filteredInvestments.map((inv) => (
+                          <InvestmentMiniCard
+                            key={inv.id}
+                            investment={inv}
+                            selected={inv.id === selectedInvestmentId}
+                            onSelect={() => {
+                              setSelectedInvestmentId(inv.id);
+                              setMobileTab(1);
+                            }}
+                            onOpenAction={() => {
+                              setSelectedInvestmentId(inv.id);
+                              setActionsOpen(true);
+                            }}
+                            onActionSuccess={handleRefresh}
+                          />
+                        ))}
+                      </Stack>
+                    )}
+                  </Box>
+                )}
+
+                {mobileTab === 1 && (
+                  <Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        mb: 2,
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="h6" fontWeight={600}>
+                          פעולות השקעות
+                        </Typography>
+                        {selectedInvestment && (
+                          <Typography variant="body2" color="text.secondary">
+                            השקעה #{selectedInvestment.id} - {selectedInvestment.investment_name}
+                          </Typography>
+                        )}
+                      </Box>
+                      <Stack direction="row" spacing={1}>
+                        {selectedInvestmentId && (
+                          <Button variant="outlined" onClick={() => setSelectedInvestmentId(null)}>
+                            הצג את כל הפעולות
+                          </Button>
+                        )}
+                        {canWrite && (
+                          <Button
+                            variant="contained"
+                            onClick={() => setActionsOpen(true)}
+                            disabled={!selectedInvestment || !selectedInvestment.is_active}
+                            sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
+                          >
+                            פעולות להשקעה
+                          </Button>
+                        )}
                       </Stack>
                     </Box>
-                  )}
-                </Paper>
+
+                    {visibleActions.length === 0 ? (
+                      <Typography>אין פעולות להצגה</Typography>
+                    ) : (
+                      <InvestmentActionTable
+                        actions={visibleActions}
+                        showInvestmentColumn={!selectedInvestmentId}
+                        hideTitle
+                        title={
+                          selectedInvestmentId
+                            ? "פעולות על השקעה"
+                            : "פעולות על כל ההשקעות"
+                        }
+                      />
+                    )}
+                  </Box>
+                )}
+              </Paper>
+            ) : (
+              <Grid container spacing={3} sx={{ direction: "rtl" }}>
+                <Grid item xs={12} md={8}>
+                  <Paper
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      direction: "rtl",
+                      ...(isDesktop
+                        ? {
+                            position: "sticky",
+                            top: 16,
+                            maxHeight: columnsMaxHeight,
+                            display: "flex",
+                            flexDirection: "column",
+                          }
+                        : {}),
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        mb: 2,
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="h6" fontWeight={600}>
+                          פעולות השקעות
+                        </Typography>
+                        {selectedInvestment && (
+                          <Typography variant="body2" color="text.secondary">
+                            השקעה #{selectedInvestment.id} - {selectedInvestment.investment_name}
+                          </Typography>
+                        )}
+                      </Box>
+                      <Stack direction="row" spacing={1}>
+                        {selectedInvestmentId && (
+                          <Button variant="outlined" onClick={() => setSelectedInvestmentId(null)}>
+                            הצג את כל הפעולות
+                          </Button>
+                        )}
+                        {canWrite && (
+                          <Button
+                            variant="contained"
+                            onClick={() => setActionsOpen(true)}
+                            disabled={!selectedInvestment || !selectedInvestment.is_active}
+                            sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
+                          >
+                            פעולות להשקעה
+                          </Button>
+                        )}
+                      </Stack>
+                    </Box>
+
+                    {visibleActions.length === 0 ? (
+                      <Typography>אין פעולות להצגה</Typography>
+                    ) : (
+                      <Box
+                        sx={{
+                          flex: isDesktop ? 1 : "unset",
+                          minHeight: 0,
+                          ...hiddenScrollbarSx,
+                        }}
+                      >
+                        <InvestmentActionTable
+                          actions={visibleActions}
+                          showInvestmentColumn={!selectedInvestmentId}
+                          hideTitle
+                          title={
+                            selectedInvestmentId
+                              ? "פעולות על השקעה"
+                              : "פעולות על כל ההשקעות"
+                          }
+                        />
+                      </Box>
+                    )}
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <Paper
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      direction: "rtl",
+                      ...(isDesktop
+                        ? {
+                            position: "sticky",
+                            top: 16,
+                            maxHeight: columnsMaxHeight,
+                            display: "flex",
+                            flexDirection: "column",
+                          }
+                        : {}),
+                    }}
+                  >
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="h6" fontWeight={600}>
+                        השקעות
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {selectedInvestmentId
+                          ? "בחרת השקעה להצגת פעולות."
+                          : "בחר השקעה להצגת פעולות."}
+                      </Typography>
+                    </Box>
+
+                    {filteredInvestments.length === 0 ? (
+                      <Typography>אין השקעות להצגה</Typography>
+                    ) : (
+                      <Box
+                        sx={{
+                          flex: isDesktop ? 1 : "unset",
+                          minHeight: 0,
+                          ...hiddenScrollbarSx,
+                        }}
+                      >
+                        <Stack spacing={1.5}>
+                          {filteredInvestments.map((inv) => (
+                            <InvestmentMiniCard
+                              key={inv.id}
+                              investment={inv}
+                              selected={inv.id === selectedInvestmentId}
+                              onSelect={() => setSelectedInvestmentId(inv.id)}
+                              onOpenAction={() => {
+                                setSelectedInvestmentId(inv.id);
+                                setActionsOpen(true);
+                              }}
+                              onActionSuccess={handleRefresh}
+                            />
+                          ))}
+                        </Stack>
+                      </Box>
+                    )}
+                  </Paper>
+                </Grid>
               </Grid>
-            </Grid>
+            )}
           </Box>
         )}
 

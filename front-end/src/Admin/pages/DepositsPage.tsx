@@ -19,6 +19,8 @@ import {
   Select,
   SelectChangeEvent,
   Stack,
+  Tab,
+  Tabs,
   TextField,
   Typography,
   useMediaQuery,
@@ -92,6 +94,7 @@ const DepositsPage: FC = () => {
   const [editDepositActionDate, setEditDepositActionDate] = useState<string>("");
   const [deleteDepositAction, setDeleteDepositAction] = useState<IDepositAction | null>(null);
   const [copyDepositAction, setCopyDepositAction] = useState<IDepositAction | null>(null);
+  const [mobileTab, setMobileTab] = useState(0);
 
   const authUser = useSelector((s: RootState) => s.authslice.user);
   const permission = authUser?.permission ?? authUser?.user?.permission;
@@ -441,101 +444,23 @@ const DepositsPage: FC = () => {
               </Grid>
             </Grid>
 
-            <Grid container spacing={3} sx={{ direction: "rtl" }}>
-              <Grid item xs={12} md={8}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    direction: "rtl",
-                    ...(isDesktop
-                      ? {
-                          position: "sticky",
-                          top: 16,
-                          maxHeight: columnsMaxHeight,
-                          display: "flex",
-                          flexDirection: "column",
-                        }
-                      : {}),
-                  }}
+            {isSm ? (
+              <Paper sx={{ p: 1.5, borderRadius: 2, direction: "rtl" }}>
+                <Tabs
+                  value={mobileTab}
+                  onChange={(_, value) => setMobileTab(value)}
+                  variant="fullWidth"
+                  sx={{ mb: 2 }}
                 >
-                  <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <Box>
-                      <Typography variant="h6" fontWeight={600}>
-                        פעולות הפקדות
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {selectedDeposit
-                          ? `הפקדה #${selectedDeposit.id} - ${(selectedDeposit.user?.first_name ?? "").trim()} ${(selectedDeposit.user?.last_name ?? "").trim()}`
-                          : "מוצגות כל הפעולות כברירת מחדל"}
-                      </Typography>
-                    </Box>
-                    {selectedDepositId && (
-                      <Button
-                        variant="contained"
-                        onClick={() => setSelectedDepositId(null)}
-                        sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
-                      >
-                        הצג את כל הפעולות
-                      </Button>
-                    )}
-                  </Box>
+                  <Tab label="רשימת הפקדות" />
+                  <Tab label="פעולות" />
+                </Tabs>
 
-                  {tableActions.length > 0 ? (
-                    <Box
-                      sx={{
-                        flex: isDesktop ? 1 : "unset",
-                        minHeight: 0,
-                        ...hiddenScrollbarSx,
-                      }}
-                    >
-                      <DepositActionTable
-                        actions={tableActions}
-                        canWrite={canWrite}
-                        onCopy={(action) => void handleCopyDepositAction(action)}
-                        onEdit={(action) => openEditDepositAction(action)}
-                        onDelete={(action) => setDeleteDepositAction(action)}
-                      />
-                    </Box>
-                  ) : (
-                    <Typography>אין נתונים להצגה</Typography>
-                  )}
-                </Paper>
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    direction: "rtl",
-                    ...(isDesktop
-                      ? {
-                          position: "sticky",
-                          top: 16,
-                          maxHeight: columnsMaxHeight,
-                          display: "flex",
-                          flexDirection: "column",
-                        }
-                      : {}),
-                  }}
-                >
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="h6" fontWeight={600}>
-                      הפקדות
-                    </Typography>
-                  </Box>
-
-                  {allDeposits.length === 0 ? (
-                    <Typography>אין נתונים להצגה</Typography>
-                  ) : (
-                    <Box
-                      sx={{
-                        flex: isDesktop ? 1 : "unset",
-                        minHeight: 0,
-                        ...hiddenScrollbarSx,
-                      }}
-                    >
+                {mobileTab === 0 && (
+                  <Box>
+                    {allDeposits.length === 0 ? (
+                      <Typography>אין נתונים להצגה</Typography>
+                    ) : (
                       <Stack spacing={1.5}>
                         {allDeposits.map((depositItem) => {
                           const isSelected = depositItem.id === selectedDepositId;
@@ -553,7 +478,10 @@ const DepositsPage: FC = () => {
                                 deposit={depositItem}
                                 readOnly={!canWrite}
                                 compactActions
-                                onClick={() => setSelectedDepositId(depositItem.id)}
+                                onClick={() => {
+                                  setSelectedDepositId(depositItem.id);
+                                  setMobileTab(1);
+                                }}
                                 onAddAction={() => {
                                   setActionDepositId(depositItem.id);
                                   setActionsOpen(true);
@@ -576,11 +504,192 @@ const DepositsPage: FC = () => {
                           );
                         })}
                       </Stack>
+                    )}
+                  </Box>
+                )}
+
+                {mobileTab === 1 && (
+                  <Box>
+                    <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <Box>
+                        <Typography variant="h6" fontWeight={600}>
+                          פעולות הפקדות
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {selectedDeposit
+                            ? `הפקדה #${selectedDeposit.id} - ${(selectedDeposit.user?.first_name ?? "").trim()} ${(selectedDeposit.user?.last_name ?? "").trim()}`
+                            : "מוצגות כל הפעולות כברירת מחדל"}
+                        </Typography>
+                      </Box>
+                      {selectedDepositId && (
+                        <Button
+                          variant="contained"
+                          onClick={() => setSelectedDepositId(null)}
+                          sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
+                        >
+                          הצג את כל הפעולות
+                        </Button>
+                      )}
                     </Box>
-                  )}
-                </Paper>
+
+                    {tableActions.length > 0 ? (
+                      <DepositActionTable
+                        actions={tableActions}
+                        canWrite={canWrite}
+                        hideTitle
+                        onCopy={(action) => void handleCopyDepositAction(action)}
+                        onEdit={(action) => openEditDepositAction(action)}
+                        onDelete={(action) => setDeleteDepositAction(action)}
+                      />
+                    ) : (
+                      <Typography>אין נתונים להצגה</Typography>
+                    )}
+                  </Box>
+                )}
+              </Paper>
+            ) : (
+              <Grid container spacing={3} sx={{ direction: "rtl" }}>
+                <Grid item xs={12} md={8}>
+                  <Paper
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      direction: "rtl",
+                      ...(isDesktop
+                        ? {
+                            position: "sticky",
+                            top: 16,
+                            maxHeight: columnsMaxHeight,
+                            display: "flex",
+                            flexDirection: "column",
+                          }
+                        : {}),
+                    }}
+                  >
+                    <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <Box>
+                        <Typography variant="h6" fontWeight={600}>
+                          פעולות הפקדות
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {selectedDeposit
+                            ? `הפקדה #${selectedDeposit.id} - ${(selectedDeposit.user?.first_name ?? "").trim()} ${(selectedDeposit.user?.last_name ?? "").trim()}`
+                            : "מוצגות כל הפעולות כברירת מחדל"}
+                        </Typography>
+                      </Box>
+                      {selectedDepositId && (
+                        <Button
+                          variant="contained"
+                          onClick={() => setSelectedDepositId(null)}
+                          sx={{ bgcolor: "#2a8c82", "&:hover": { bgcolor: "#1f645f" } }}
+                        >
+                          הצג את כל הפעולות
+                        </Button>
+                      )}
+                    </Box>
+
+                    {tableActions.length > 0 ? (
+                      <Box
+                        sx={{
+                          flex: isDesktop ? 1 : "unset",
+                          minHeight: 0,
+                          ...hiddenScrollbarSx,
+                        }}
+                      >
+                        <DepositActionTable
+                          actions={tableActions}
+                          canWrite={canWrite}
+                          hideTitle
+                          onCopy={(action) => void handleCopyDepositAction(action)}
+                          onEdit={(action) => openEditDepositAction(action)}
+                          onDelete={(action) => setDeleteDepositAction(action)}
+                        />
+                      </Box>
+                    ) : (
+                      <Typography>אין נתונים להצגה</Typography>
+                    )}
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <Paper
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      direction: "rtl",
+                      ...(isDesktop
+                        ? {
+                            position: "sticky",
+                            top: 16,
+                            maxHeight: columnsMaxHeight,
+                            display: "flex",
+                            flexDirection: "column",
+                          }
+                        : {}),
+                    }}
+                  >
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="h6" fontWeight={600}>
+                        הפקדות
+                      </Typography>
+                    </Box>
+
+                    {allDeposits.length === 0 ? (
+                      <Typography>אין נתונים להצגה</Typography>
+                    ) : (
+                      <Box
+                        sx={{
+                          flex: isDesktop ? 1 : "unset",
+                          minHeight: 0,
+                          ...hiddenScrollbarSx,
+                        }}
+                      >
+                        <Stack spacing={1.5}>
+                          {allDeposits.map((depositItem) => {
+                            const isSelected = depositItem.id === selectedDepositId;
+
+                            return (
+                              <Box
+                                key={depositItem.id}
+                                sx={{
+                                  border: isSelected ? "2px solid #2a8c82" : "1px solid rgba(0,0,0,0.08)",
+                                  borderRadius: 2,
+                                  overflow: "hidden",
+                                }}
+                              >
+                                <DepositCard
+                                  deposit={depositItem}
+                                  readOnly={!canWrite}
+                                  compactActions
+                                  onClick={() => setSelectedDepositId(depositItem.id)}
+                                  onAddAction={() => {
+                                    setActionDepositId(depositItem.id);
+                                    setActionsOpen(true);
+                                  }}
+                                  onView={() => {
+                                    dispatch(getDepositDetails(depositItem.id));
+                                    setDetailsDepositId(depositItem.id);
+                                  }}
+                                  onEdit={() => {
+                                    dispatch(getDepositDetails(depositItem.id));
+                                    setEditDepositId(depositItem.id);
+                                    setEditActionDate(toInputDate(new Date()));
+                                    setEditReturnDate(toInputDate(depositItem.end_date));
+                                  }}
+                                  onDelete={() => {
+                                    setDeleteDepositId(depositItem.id);
+                                  }}
+                                />
+                              </Box>
+                            );
+                          })}
+                        </Stack>
+                      </Box>
+                    )}
+                  </Paper>
+                </Grid>
               </Grid>
-            </Grid>
+            )}
           </Box>
         )}
 

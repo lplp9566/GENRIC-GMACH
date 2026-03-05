@@ -18,6 +18,7 @@ interface InvestmentActionTableProps {
   actions: TransactionDto[];
   title?: string;
   showInvestmentColumn?: boolean;
+  hideTitle?: boolean;
 }
 
 const INVESTMENT_ACTION_TYPES: {
@@ -35,6 +36,7 @@ const InvestmentActionTable: React.FC<InvestmentActionTableProps> = ({
   actions,
   title,
   showInvestmentColumn,
+  hideTitle = false,
 }) => {
   const [currentSortField, setCurrentSortField] = useState<SortField>("date");
   const [currentSortDirection, setCurrentSortDirection] =
@@ -90,9 +92,11 @@ const InvestmentActionTable: React.FC<InvestmentActionTableProps> = ({
 
   return (
     <Paper elevation={3} sx={{ p: 3, borderRadius: 2, width: "100%" }}>
-      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}>
+      {!hideTitle && (
+        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}>
         {title ?? "פעולות על השקעות"}
-      </Typography>
+        </Typography>
+      )}
 
       {actions.length === 0 && <Typography>לא נמצאו פעולות</Typography>}
 

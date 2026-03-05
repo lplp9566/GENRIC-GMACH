@@ -1,6 +1,7 @@
 // PaymentsPage.tsx
 import { useState, useMemo, useEffect } from "react";
-import { Box, Container } from "@mui/material";
+import { Box, Container, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import type { SelectChangeEvent } from "@mui/material/Select";
 
 import { useDispatch, useSelector } from "react-redux";
 import MonthlyPaymentHeader from "../components/MonthlyPayments/MainMonthlyPayment/MonthlyPaymentHeader";
@@ -76,6 +77,7 @@ export default function PaymentsPage() {
   const [selectedMonth, setSelectedMonth] = useState<number>(
     months.includes(currentMonth) ? currentMonth : 0
   );
+  const [rowsLimit, setRowsLimit] = useState<"10" | "30" | "all">("10");
 
   useEffect(() => {
     if (selectedMonth !== 0 && !months.includes(selectedMonth)) {
@@ -143,8 +145,28 @@ export default function PaymentsPage() {
               setSelectedMonth={setSelectedMonth}
               years={years}
               months={months}
+              extraFilters={
+                <FormControl fullWidth size="small">
+                  <InputLabel id="monthly-payments-limit-label">תצוגה</InputLabel>
+                  <Select
+                    labelId="monthly-payments-limit-label"
+                    label="תצוגה"
+                    value={rowsLimit}
+                    onChange={(e: SelectChangeEvent) =>
+                      setRowsLimit(e.target.value as "10" | "30" | "all")
+                    }
+                  >
+                    <MenuItem value="10">10</MenuItem>
+                    <MenuItem value="30">30</MenuItem>
+                    <MenuItem value="all">הכל</MenuItem>
+                  </Select>
+                </FormControl>
+              }
             />
-            <MonthlyPaymentTable paymentsThisMonth={paymentsThisMonth} />
+            <MonthlyPaymentTable
+              paymentsThisMonth={paymentsThisMonth}
+              rowsLimit={rowsLimit}
+            />
           </Box>
         </Box>
       </Box>

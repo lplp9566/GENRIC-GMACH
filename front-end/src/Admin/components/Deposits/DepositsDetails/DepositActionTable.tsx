@@ -32,6 +32,7 @@ interface DepositActionTableProps {
   onCopy?: (action: IDepositAction) => void;
   onEdit?: (action: IDepositAction) => void;
   onDelete?: (action: IDepositAction) => void;
+  hideTitle?: boolean;
 }
 
 const ACTION_LABELS: Record<DepositActionsType, string> = {
@@ -58,6 +59,7 @@ const DepositActionTable: FC<DepositActionTableProps> = ({
   onCopy,
   onEdit,
   onDelete,
+  hideTitle = false,
 }) => {
   const [currentSortField, setCurrentSortField] = useState<SortField>("date");
   const [currentSortDirection, setCurrentSortDirection] = useState<SortDirection>("desc");
@@ -131,14 +133,16 @@ const DepositActionTable: FC<DepositActionTableProps> = ({
           display: "flex",
           flexDirection: { xs: "column", sm: "row" },
           alignItems: { xs: "stretch", sm: "center" },
-          justifyContent: "space-between",
+          justifyContent: hideTitle ? "flex-end" : "space-between",
           gap: 1,
           mb: 1,
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 600, textAlign: "center", flex: 1 }}>
-          פעולות בהפקדה
-        </Typography>
+        {!hideTitle && (
+          <Typography variant="h6" sx={{ fontWeight: 600, textAlign: "center", flex: 1 }}>
+            פעולות בהפקדה
+          </Typography>
+        )}
         <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 120 } }}>
           <InputLabel id="deposit-actions-limit-label">תצוגה</InputLabel>
           <Select
