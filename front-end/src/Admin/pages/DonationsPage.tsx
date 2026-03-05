@@ -1,5 +1,15 @@
 import { FC, useEffect, useMemo, useRef, useState } from "react";
-import { Box, Container, Grid, Alert } from "@mui/material";
+import {
+  Box,
+  Container,
+  Grid,
+  Alert,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
+import type { SelectChangeEvent } from "@mui/material/Select";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
 import {
@@ -144,6 +154,7 @@ const DonationsHomePage: FC = () => {
   const [sortBy, setSortBy] = useState<SortBy>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  const [rowsLimit, setRowsLimit] = useState<"10" | "30" | "all">("10");
 
   const isFundsView = !!activeKey && activeKey !== "__regular__";
 
@@ -346,6 +357,23 @@ useEffect(() => {
                 monthsLabels={MONTHS}
                 onChangeYear={setYearFilter}
                 onChangeMonth={setMonthFilter}
+                extraFilters={
+                  <FormControl size="small" sx={{ minWidth: 120 }}>
+                    <InputLabel id="donations-limit-label">תצוגה</InputLabel>
+                    <Select
+                      labelId="donations-limit-label"
+                      label="תצוגה"
+                      value={rowsLimit}
+                      onChange={(e: SelectChangeEvent) =>
+                        setRowsLimit(e.target.value as "10" | "30" | "all")
+                      }
+                    >
+                      <MenuItem value="10">10</MenuItem>
+                      <MenuItem value="30">30</MenuItem>
+                      <MenuItem value="all">הכל</MenuItem>
+                    </Select>
+                  </FormControl>
+                }
               />
 
               <DonationsTable
@@ -354,6 +382,7 @@ useEffect(() => {
                 sortBy={sortBy}
                 sortDir={sortDir}
                 onSortClick={handleSortClick}
+                rowsLimit={rowsLimit}
               />
             </Frame>
           </Grid>
