@@ -1,4 +1,4 @@
-import {
+﻿import {
   Button,
   Dialog,
   DialogActions,
@@ -10,12 +10,19 @@ import {
 } from "@mui/material";
 import { RtlThemeProvider } from "../../../../Theme/rtl";
 import { ProfileFormData } from "./types";
+
 type Props = {
   open: boolean;
   formData: ProfileFormData;
   onClose: () => void;
   onSave: () => void;
   setFormData: React.Dispatch<React.SetStateAction<ProfileFormData>>;
+};
+
+const toInputDate = (value?: string | Date | null) => {
+  if (!value) return "";
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  return String(value).slice(0, 10);
 };
 
 const EditProfileDialog = ({
@@ -29,11 +36,7 @@ const EditProfileDialog = ({
     <DialogTitle sx={{ textAlign: "center" }}>עריכת פרטים אישיים</DialogTitle>
     <DialogContent sx={{ direction: "rtl" }}>
       <RtlThemeProvider>
-        <Stack
-          spacing={2}
-          mt={1}
-        
-        >
+        <Stack spacing={2} mt={1}>
           <TextField
             label="שם פרטי"
             value={formData.first_name}
@@ -77,6 +80,16 @@ const EditProfileDialog = ({
             }
             fullWidth
           />
+          <TextField
+            label="תאריך לידה"
+            type="date"
+            value={toInputDate(formData.birth_date)}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, birth_date: e.target.value }))
+            }
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+          />
 
           <Divider />
 
@@ -111,6 +124,19 @@ const EditProfileDialog = ({
                 spouse_id_number: e.target.value,
               }))
             }
+            fullWidth
+          />
+          <TextField
+            label="תאריך לידה בן/בת זוג"
+            type="date"
+            value={toInputDate(formData.spouse_birth_date)}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                spouse_birth_date: e.target.value,
+              }))
+            }
+            InputLabelProps={{ shrink: true }}
             fullWidth
           />
 

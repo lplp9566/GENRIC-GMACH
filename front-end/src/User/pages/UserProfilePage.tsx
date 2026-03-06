@@ -36,10 +36,12 @@ const UserProfilePage = () => {
     last_name: user?.last_name ?? "",
     email_address: user?.email_address ?? "",
     id_number: user?.id_number ?? "",
+    birth_date: user?.birth_date ,
     phone_number: user?.phone_number ?? "",
     spouse_first_name: user?.spouse_first_name ?? "",
     spouse_last_name: user?.spouse_last_name ?? "",
     spouse_id_number: user?.spouse_id_number ?? "",
+    spouse_birth_date: user?.spouse_birth_date ?? null,
     bank_number: user?.payment_details?.bank_number ?? "",
     bank_branch: user?.payment_details?.bank_branch ?? "",
     bank_account_number: user?.payment_details?.bank_account_number ?? "",
@@ -59,10 +61,12 @@ const UserProfilePage = () => {
       last_name: user.last_name ?? "",
       email_address: user.email_address ?? "",
       id_number: user.id_number ?? "",
+      birth_date: user.birth_date ?? null,
       phone_number: user.phone_number ?? "",
       spouse_first_name: user.spouse_first_name ?? "",
       spouse_last_name: user.spouse_last_name ?? "",
       spouse_id_number: user.spouse_id_number ?? "",
+      spouse_birth_date: user.spouse_birth_date ?? null,
       bank_number: user.payment_details?.bank_number ?? "",
       bank_branch: user.payment_details?.bank_branch ?? "",
       bank_account_number: user.payment_details?.bank_account_number ?? "",
@@ -76,6 +80,8 @@ const UserProfilePage = () => {
   }, [user]);
 
   const joinDate = formatDate(parseDate(user?.join_date));
+  const birthDate = formatDate(parseDate(user?.birth_date));
+  const spouseBirthDate = formatDate(parseDate(user?.spouse_birth_date));
   const membershipTypeText = mapMembershipType(user?.membership_type);
   const fullDisplayName = useMemo(() => buildFullDisplayName(user), [user]);
 
@@ -105,6 +111,12 @@ const UserProfilePage = () => {
     height: "100%",
   } as const;
 
+  const toNullableDate = (value: string | Date | null | undefined): Date | null => {
+    if (!value) return null;
+    const parsed = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
   const handleSave = async () => {
     if (!user?.id) return;
     try {
@@ -117,10 +129,12 @@ const UserProfilePage = () => {
               last_name: formData.last_name,
               email_address: formData.email_address,
               id_number: formData.id_number,
+              birth_date: toNullableDate(formData.birth_date),
               phone_number: formData.phone_number,
               spouse_first_name: formData.spouse_first_name,
               spouse_last_name: formData.spouse_last_name,
               spouse_id_number: formData.spouse_id_number,
+              spouse_birth_date: toNullableDate(formData.spouse_birth_date),
               payment_details: {
                 bank_number: Number(formData.bank_number) || 0,
                 bank_branch: Number(formData.bank_branch) || 0,
@@ -224,6 +238,7 @@ const UserProfilePage = () => {
               title="פרטי משתמש"
               rows={[
                 { label: "מספר זהות", value: user?.id_number ?? "לא הוזן" },
+                { label: "תאריך לידה", value: birthDate || "לא הוזן" },
                 { label: "טלפון", value: user?.phone_number ?? "לא הוזן" },
                 { label: "אימייל", value: user?.email_address ?? "לא הוזן" },
                 { label: "תאריך הצטרפות", value: joinDate || "לא הוזן" },
@@ -254,6 +269,7 @@ const UserProfilePage = () => {
                 { label: "שם פרטי", value: user?.spouse_first_name || "לא הוזן" },
                 { label: "שם משפחה", value: user?.spouse_last_name || "לא הוזן" },
                 { label: "תעודת זהות", value: user?.spouse_id_number || "לא הוזן" },
+                { label: "תאריך לידה", value: spouseBirthDate || "לא הוזן" },
               ]}
             />
           )}
@@ -289,6 +305,7 @@ const UserProfilePage = () => {
               title="פרטי משתמש"
               rows={[
                 { label: "מספר זהות", value: user?.id_number ?? "לא הוזן" },
+                { label: "תאריך לידה", value: birthDate || "לא הוזן" },
                 { label: "טלפון", value: user?.phone_number ?? "לא הוזן" },
                 { label: "אימייל", value: user?.email_address ?? "לא הוזן" },
                 { label: "תאריך הצטרפות", value: joinDate || "לא הוזן" },
@@ -319,6 +336,7 @@ const UserProfilePage = () => {
                 { label: "שם פרטי", value: user?.spouse_first_name || "לא הוזן" },
                 { label: "שם משפחה", value: user?.spouse_last_name || "לא הוזן" },
                 { label: "תעודת זהות", value: user?.spouse_id_number || "לא הוזן" },
+                { label: "תאריך לידה", value: spouseBirthDate || "לא הוזן" },
               ]}
             />
           </Grid>

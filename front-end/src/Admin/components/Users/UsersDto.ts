@@ -4,7 +4,7 @@
   last_name: string;
   id_number: string;
   join_date: Date | null;
-  birth_date?: Date | null;
+  birth_date: Date | null;
   password: string;
   phone_number: string;
   email_address: string;
