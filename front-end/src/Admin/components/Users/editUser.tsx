@@ -196,6 +196,22 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
                     fullWidth
                     sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2, ...numberFieldSx }}
                   />
+                  <TextField
+                    label="תאריך לידה"
+                    type="date"
+                    dir="rtl"
+                    value={
+                      formData.birth_date
+                        ? formData.birth_date instanceof Date
+                          ? formData.birth_date.toISOString().slice(0, 10)
+                          : String(formData.birth_date).slice(0, 10)
+                        : ""
+                    }
+                    onChange={handleChange("birth_date")}
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2 }}
+                  />
                   <Divider sx={{ my: 2 }} />
                   <TextField
                     label="שם פרטי בן/בת זוג"
@@ -221,6 +237,22 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
                     onChange={handleChange("spouse_id_number")}
                     fullWidth
                     sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2, ...numberFieldSx }}
+                  />
+                  <TextField
+                    label="תאריך לידה בן/בת זוג"
+                    type="date"
+                    dir="rtl"
+                    value={
+                      formData.spouse_birth_date
+                        ? formData.spouse_birth_date instanceof Date
+                          ? formData.spouse_birth_date.toISOString().slice(0, 10)
+                          : String(formData.spouse_birth_date).slice(0, 10)
+                        : ""
+                    }
+                    onChange={handleChange("spouse_birth_date")}
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ width: "49.5%", marginLeft: "2px", marginTop: 2 }}
                   />
                 </Box>
               </Stack>
@@ -275,12 +307,24 @@ const EditUser: FC<EditUserProps> = ({ user, open, onClose }) => {
                 <Typography>שם משפחה: {formData.last_name}</Typography>
                 <Typography>אימייל: {formData.email_address}</Typography>
                 <Typography>טלפון: {formData.phone_number}</Typography>
+                <Typography>
+                  תאריך לידה:{" "}
+                  {formData.birth_date
+                    ? new Date(formData.birth_date).toLocaleDateString("he-IL")
+                    : "לא הוזן"}
+                </Typography>
                 {formData.spouse_first_name && (
                   <Typography>בן/בת זוג: {formData.spouse_first_name} {formData.spouse_last_name}</Typography>
                 )}
                 {formData.spouse_id_number && (
                   <Typography>ת"ז בן/בת זוג: {formData.spouse_id_number}</Typography>
                 )}
+                <Typography>
+                  תאריך לידה בן/בת זוג:{" "}
+                  {formData.spouse_birth_date
+                    ? new Date(formData.spouse_birth_date).toLocaleDateString("he-IL")
+                    : "לא הוזן"}
+                </Typography>
               </Stack>
             )}
           </Box>

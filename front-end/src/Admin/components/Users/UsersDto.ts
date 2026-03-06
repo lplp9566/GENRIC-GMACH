@@ -4,6 +4,7 @@
   last_name: string;
   id_number: string;
   join_date: Date | null;
+  birth_date?: Date | null;
   password: string;
   phone_number: string;
   email_address: string;
@@ -16,6 +17,7 @@
   spouse_first_name?: string | null;
   spouse_last_name?: string | null;
   spouse_id_number?: string | null;
+  spouse_birth_date?: Date | string | null;
   payment_details: IPaymentDetails;
   current_role: ICurrentRole;
   membership_type: MembershipType;
@@ -51,6 +53,7 @@ export interface ICreateUser {
   last_name: string;
   id_number: string;
   join_date: string | null;
+  birth_date?: string | null;
   password: string;
   email_address: string;
   phone_number: string;
@@ -61,6 +64,7 @@ export interface ICreateUser {
   spouse_first_name?: string | null;
   spouse_last_name?: string | null;
   spouse_id_number?: string | null;
+  spouse_birth_date?: string | null;
 }
 export interface ICreatePaymentDetails {
   bank_number: number | null;

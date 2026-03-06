@@ -27,7 +27,8 @@ const StepSummary: React.FC<Props> = ({ data }) => {
   const hasSpouse =
     data.userData.spouse_first_name ||
     data.userData.spouse_last_name ||
-    data.userData.spouse_id_number;
+    data.userData.spouse_id_number ||
+    data.userData.spouse_birth_date;
 
   return (
     <Box mb={2}>
@@ -99,6 +100,10 @@ const StepSummary: React.FC<Props> = ({ data }) => {
                   </Typography>
                   <Typography align={"center"}>
                     <strong>ת"ז בן/בת זוג:</strong> {data.userData.spouse_id_number}
+                  </Typography>
+                  <Typography align={"center"}>
+                    <strong>תאריך לידה בן/בת זוג:</strong>{" "}
+                    {data.userData.spouse_birth_date || "לא הוזן"}
                   </Typography>
                 </>
               )}

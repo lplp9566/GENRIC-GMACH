@@ -50,6 +50,7 @@ export const editUser = createAsyncThunk(
         last_name: data.userData.last_name,
         id_number: data.userData.id_number,
         join_date: data.userData.join_date,
+        birth_date: data.userData.birth_date,
         phone_number: data.userData.phone_number,
         email_address: data.userData.email_address,
         permission: data.userData.permission,
@@ -65,6 +66,7 @@ export const editUser = createAsyncThunk(
         spouse_first_name: data.userData.spouse_first_name,
         spouse_last_name: data.userData.spouse_last_name,
         spouse_id_number: data.userData.spouse_id_number,
+        spouse_birth_date: data.userData.spouse_birth_date,
       },
       paymentData: {
         bank_number: data.userData.payment_details?.bank_number,

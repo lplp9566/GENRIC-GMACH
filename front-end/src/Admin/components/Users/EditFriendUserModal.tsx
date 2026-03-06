@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+﻿import React, { FC, useState } from "react";
 import { Box, Button, Modal, Stack, TextField, Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
@@ -141,6 +141,21 @@ const EditFriendUserModal: FC<EditFriendUserModalProps> = ({
               fullWidth
               sx={numberFieldSx}
             />
+            <TextField
+              label="תאריך לידה בן/בת זוג"
+              type="date"
+              dir="rtl"
+              value={
+                formData.spouse_birth_date
+                  ? formData.spouse_birth_date instanceof Date
+                    ? formData.spouse_birth_date.toISOString().slice(0, 10)
+                    : String(formData.spouse_birth_date).slice(0, 10)
+                  : ""
+              }
+              onChange={handleChange("spouse_birth_date")}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
           </Stack>
 
           <Stack direction="row" justifyContent="space-between" sx={{ mt: 3 }}>
@@ -158,3 +173,4 @@ const EditFriendUserModal: FC<EditFriendUserModalProps> = ({
 };
 
 export default EditFriendUserModal;
+

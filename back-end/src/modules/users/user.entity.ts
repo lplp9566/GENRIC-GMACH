@@ -44,6 +44,17 @@ export class UserEntity {
     },
   })
   join_date: Date | null;
+
+  @Column({
+    type: 'date',
+    nullable: true,
+    default: null,
+    transformer: {
+      from: (value: string | null) => (value ? new Date(value) : null),
+      to: (value: Date | string | null) => value ?? null,
+    },
+  })
+  birth_date: Date | null;
   @Column({ type: 'text' })
   password: string;
 
@@ -64,6 +75,17 @@ export class UserEntity {
 
   @Column({ type: 'text', nullable: true })
   spouse_id_number: string | null;
+
+  @Column({
+    type: 'date',
+    nullable: true,
+    default: null,
+    transformer: {
+      from: (value: string | null) => (value ? new Date(value) : null),
+      to: (value: Date | string | null) => value ?? null,
+    },
+  })
+  spouse_birth_date: Date | null;
 
   @Column({ type: 'boolean', default: true, nullable: true })
   notify_account: boolean;

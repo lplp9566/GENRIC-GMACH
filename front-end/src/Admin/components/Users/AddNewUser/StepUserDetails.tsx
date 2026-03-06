@@ -41,6 +41,15 @@ const StepUserDetails: React.FC<UserDetailsStepProps> = ({ data, onUserChange })
       />
       <TextField
         dir="rtl"
+        label="תאריך לידה"
+        type="date"
+        value={data.userData.birth_date ?? ""}
+        onChange={onUserChange("birth_date")}
+        fullWidth
+        InputLabelProps={{ shrink: true }}
+      />
+      <TextField
+        dir="rtl"
         label="אימייל"
         type="email"
         value={data.userData.email_address}

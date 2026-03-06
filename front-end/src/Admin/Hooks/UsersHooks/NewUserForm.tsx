@@ -23,6 +23,7 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
         last_name: "",
         id_number: "",
         join_date: null,
+        birth_date: null,
         password: "",
         email_address: "",
         phone_number: "",
@@ -33,6 +34,7 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
         spouse_first_name: "",
         spouse_last_name: "",
         spouse_id_number: "",
+        spouse_birth_date: null,
     },
     paymentData: {
       bank_number: null,
@@ -171,6 +173,7 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
             last_name: "",
             id_number: "",
             join_date: "",
+            birth_date: "",
             password: "",
             email_address: "",
             phone_number: "",
@@ -181,6 +184,7 @@ export const useNewUserForm = (navigateParam?: ReturnType<typeof useNavigate>) =
             spouse_first_name: "",
             spouse_last_name: "",
             spouse_id_number: "",
+            spouse_birth_date: null,
           },
           paymentData: {
             bank_number: 0,

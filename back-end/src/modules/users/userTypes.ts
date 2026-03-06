@@ -24,6 +24,8 @@ export interface IUserCreate {
   last_name: string
   id_number: string
   join_date: Date
+  birth_date?: Date | null
+  spouse_birth_date?: Date | null
   password: string
   email_address: string
   phone_number: string

@@ -39,6 +39,15 @@ const StepSpouseDetails: React.FC<UserDetailsStepProps> = ({ data, onUserChange 
         fullWidth
         sx={numberFieldSx}
       />
+      <TextField
+        dir="rtl"
+        label="תאריך לידה בן/בת זוג"
+        type="date"
+        value={data.userData.spouse_birth_date ?? ""}
+        onChange={onUserChange("spouse_birth_date")}
+        fullWidth
+        InputLabelProps={{ shrink: true }}
+      />
     </Box>
   );
 };
